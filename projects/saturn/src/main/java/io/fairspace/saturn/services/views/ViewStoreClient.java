@@ -60,27 +60,27 @@ public class ViewStoreClient {
 
     public void deleteRow(String view, String uri) throws SQLException {
         var viewTable = configuration.viewTables.get(view);
-        var query = connection.prepareStatement(
-                "delete from " + viewTable.name + " where id = ?");
-        query.setString(1, uri);
-        var deletedCount = query.executeUpdate();
-        query.close();
-        log.debug("Deleted {} rows from view {}", deletedCount, view);
+        try (var query = connection.prepareStatement(
+                "delete from " + viewTable.name + " where id = ?")) {
+            query.setString(1, uri);
+            var deletedCount = query.executeUpdate();
+            log.debug("Deleted {} rows from view {}", deletedCount, view);
+        }
     }
 
     Set<String> retrieveValues(String joinTable, String view, String id, ColumnDefinition column) throws SQLException {
-        var query = connection.prepareStatement(
+        try (var query = connection.prepareStatement(
                 "select " + column.name + " from " + joinTable +
                         " where " + idColumn(view).name + " = ?"
-        );
-        query.setString(1, id);
-        var result = query.executeQuery();
-        var links = new HashSet<String>();
-        while (result.next()) {
-            links.add(result.getString(1));
+        )) {
+            query.setString(1, id);
+            var result = query.executeQuery();
+            var links = new HashSet<String>();
+            while (result.next()) {
+                links.add(result.getString(1));
+            }
+            return links;
         }
-        query.close();
-        return links;
     }
 
     int deleteValues(
@@ -92,15 +92,14 @@ public class ViewStoreClient {
         var deleteSql = "delete from " + table.name +
                 " where " + idColumn.name + " = ? " +
                 " and " + valueColumn.name + " = ?";
-        PreparedStatement delete = connection.prepareStatement(deleteSql);
-        var deleteCount = 0;
-        for (String value: values) {
-            delete.setString(1, id);
-            delete.setString(2, value);
-            deleteCount += delete.executeUpdate();
+        try (var delete = connection.prepareStatement(deleteSql)) {
+            for (String value : values) {
+                delete.setString(1, id);
+                delete.setString(2, value);
+                delete.addBatch();
+            }
+            return Arrays.stream(delete.executeBatch()).sum();
         }
-        delete.close();
-        return deleteCount;
     }
 
     int insertValues(
@@ -111,15 +110,14 @@ public class ViewStoreClient {
             Collection<String> values) throws SQLException {
         var insertSql = "insert into " + table.name + " ( " +
                 idColumn.name + ", " + valueColumn.name + " ) values ( ?, ? )";
-        PreparedStatement insert = connection.prepareStatement(insertSql);
-        int insertCount = 0;
-        for (String value: values) {
-            insert.setString(1, id);
-            insert.setString(2, value);
-            insertCount += insert.executeUpdate();
+        try (var insert = connection.prepareStatement(insertSql)) {
+            for (String value : values) {
+                insert.setString(1, id);
+                insert.setString(2, value);
+                insert.addBatch();
+            }
+            return Arrays.stream(insert.executeBatch()).sum();
         }
-        insert.close();
-        return insertCount;
     }
 
     public void updateValues(String view, String id, String property, Set<String> values) throws SQLException {
@@ -166,15 +164,14 @@ public class ViewStoreClient {
     }
 
     boolean rowExists(String table, String id) throws SQLException {
-        var query = connection.prepareStatement(
+        try (var query = connection.prepareStatement(
                 "select exists ( select 1 from " + table + " where id = ? )"
-        );
-        query.setString(1, id);
-        var result = query.executeQuery();
-        result.next();
-        var exists = result.getBoolean(1);
-        query.close();
-        return exists;
+        )) {
+            query.setString(1, id);
+            var result = query.executeQuery();
+            result.next();
+            return result.getBoolean(1);
+        }
     }
 
     public void addLabel(String id, String type, String label) throws SQLException {
@@ -184,7 +181,6 @@ public class ViewStoreClient {
                 insert.setString(2, type);
                 insert.setString(3, label);
                 insert.executeUpdate();
-                insert.close();
                 log.debug("Inserted label '{}' for {} (type {})", label, id, type);
             }
         }
@@ -225,20 +221,20 @@ public class ViewStoreClient {
                             .map(column -> "?")
                             .collect(Collectors.joining(", ")) + " )";
         }
-        PreparedStatement update = connection.prepareStatement(updateSql);
-        for (var i=0; i < values.size(); i++) {
-            var value = values.get(i);
-            setQueryValue(update, i + 1, value);
-        }
-        if (exists) {
-            update.setString(values.size() + 1, id);
-        }
-        var updateCount = update.executeUpdate();
-        update.close();
-        if (exists) {
-            log.debug("Updated {} rows of view {}", updateCount, view);
-        } else {
-            log.debug("Inserted {} rows into view {}", updateCount, view);
+        try (var update = connection.prepareStatement(updateSql)) {
+            for (var i = 0; i < values.size(); i++) {
+                var value = values.get(i);
+                setQueryValue(update, i + 1, value);
+            }
+            if (exists) {
+                update.setString(values.size() + 1, id);
+            }
+            var updateCount = update.executeUpdate();
+            if (exists) {
+                log.debug("Updated {} rows of view {}", updateCount, view);
+            } else {
+                log.debug("Inserted {} rows into view {}", updateCount, view);
+            }
         }
     }
 }
