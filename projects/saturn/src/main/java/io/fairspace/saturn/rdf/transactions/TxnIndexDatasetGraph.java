@@ -41,7 +41,9 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void begin(TxnType type) {
         begin(TxnType.convert(type));
-        updatedSubjects.clear();
+        if (isInWriteTransaction()) {
+            updatedSubjects.clear();
+        }
     }
 
     @SneakyThrows
