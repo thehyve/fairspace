@@ -30,7 +30,7 @@ import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
 import UserContext from "./UserContext";
-import {getWorkspaceUsersWithRoles} from "./userUtils";
+import {getWorkspaceUsersWithRoles, isAdmin} from "./userUtils";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {canAlterPermission} from "../collections/collectionUtils";
 import TablePaginationActions from "../common/components/TablePaginationActions";
@@ -88,6 +88,10 @@ const UserList = (props: UserListProps) => {
             .finally(() => setShowAddUserDialog(false));
     };
 
+    const permissionCandidateFilter = (u: User) => (
+        (u.iri !== currentUser.iri || isAdmin(u)) && workspaceUsersWithRoles.find(wu => wu.iri === u.iri) === undefined
+    );
+
     const renderAddUserDialog = () => (
         <Dialog
             open={showAddUserDialog}
@@ -98,7 +102,7 @@ const UserList = (props: UserListProps) => {
                 <PermissionCandidateSelect
                     autoFocus
                     permissionCandidates={users}
-                    filter={u => u.iri !== currentUser.iri && workspaceUsersWithRoles.find(c => c.iri === u.iri) === undefined}
+                    filter={permissionCandidateFilter}
                     onChange={setUserToAdd}
                     placeholder="Please select a user"
                 />
