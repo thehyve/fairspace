@@ -11,20 +11,15 @@ import io.milton.property.PropertySource;
 import io.milton.property.PropertySource.PropertyMetaData;
 import io.milton.property.PropertySource.PropertySetException;
 import io.milton.resource.*;
-import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static io.fairspace.saturn.audit.Audit.audit;
@@ -154,10 +149,10 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.versions))
-                .forEachRemaining(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
+                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .forEach(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
         var versions = getListProperty(subject, FS.versions);
-
 
         if (versions != null) {
             var newVersions = subject.getModel().createList(versions.iterator()
@@ -167,11 +162,13 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         }
 
         subject.getModel().listSubjectsWithProperty(FS.belongsTo, subject)
-                .forEachRemaining(r -> move(r, newSubject, getStringProperty(r, RDFS.label), false));
+                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .forEach(r -> move(r, newSubject, getStringProperty(r, RDFS.label), false));
 
         subject.getModel().listStatements(null, null, subject)
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
-                .forEachRemaining(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
+                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .forEach(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
 
@@ -226,7 +223,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         }
         subject.getModel()
                 .listSubjectsWithProperty(FS.belongsTo, subject)
-                .forEachRemaining(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
+                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .forEach(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
 
         updateParents(subject);
         updateParents(newSubject);
@@ -397,7 +395,8 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
             resource.getModel()
                     .listSubjectsWithProperty(FS.belongsTo, resource)
-                    .forEachRemaining(r -> undelete(r, date, user));
+                    .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                    .forEach(r -> undelete(r, date, user));
         }
     }
 }

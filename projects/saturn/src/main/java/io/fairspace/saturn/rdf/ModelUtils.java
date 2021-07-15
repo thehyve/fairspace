@@ -310,13 +310,17 @@ public class ModelUtils {
 
     public static void copyProperties(Resource from, Resource to, Property... props) {
         for (var p : props) {
-            from.listProperties(p).forEachRemaining(s -> to.addProperty(p, s.getObject()));
+            from
+                    .listProperties(p)
+                    .toSet() // convert to set, to prevent updating a model while iterating over its elements
+                    .forEach(s -> to.addProperty(p, s.getObject()));
         }
     }
 
     public static void trimLabels(Model model) {
         model.listSubjectsWithProperty(RDFS.label)
-                .forEachRemaining(s -> {
+                .toSet() // convert to set, to prevent updating a model while iterating over its elements
+                .forEach(s -> {
                     var label = model.getProperty(s, RDFS.label);
                     model
                             .removeAll(s, RDFS.label, null)
