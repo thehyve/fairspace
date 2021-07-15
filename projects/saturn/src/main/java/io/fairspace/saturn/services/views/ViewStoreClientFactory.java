@@ -9,6 +9,7 @@ import io.fairspace.saturn.vocabulary.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 
+import javax.sql.*;
 import java.sql.*;
 import java.util.*;
 import java.util.stream.*;
@@ -20,11 +21,8 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 public class ViewStoreClientFactory {
     public static boolean H2_DATABASE = false;
 
-    public static ViewStoreClient build(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase) throws SQLException {
-        var factory = new ViewStoreClientFactory(viewsConfig, viewDatabase);
-        return new ViewStoreClient(
-                factory.connection,
-                factory.configuration);
+    public ViewStoreClient build() throws SQLException {
+        return new ViewStoreClient(getConnection(), configuration);
     }
 
     public static String databaseTypeForColumnType(ColumnType type) {
@@ -42,8 +40,8 @@ public class ViewStoreClientFactory {
             FS.DIRECTORY_URI,
             FS.FILE_URI);
 
-    public final Connection connection;
     final ViewStoreClient.ViewStoreConfiguration configuration;
+    public final DataSource dataSource;
 
     public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase) throws SQLException {
         log.debug("Initializing the database connection");
@@ -52,11 +50,13 @@ public class ViewStoreClientFactory {
         databaseConfig.setUsername(viewDatabase.username);
         databaseConfig.setPassword(viewDatabase.password);
         databaseConfig.setAutoCommit(false);
+        databaseConfig.setConnectionTimeout(1000);
 
-        var dataSource = new HikariDataSource(databaseConfig);
-        this.connection = dataSource.getConnection();
+        dataSource = new HikariDataSource(databaseConfig);
 
-        log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
+        try (var connection = dataSource.getConnection()) {
+            log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
+        }
 
         ensureTableExists(Table.builder()
                 .name("label")
@@ -73,7 +73,11 @@ public class ViewStoreClientFactory {
         }
     }
 
-    Map<String, ColumnMetadata> getColumnMetadata(String table) throws SQLException {
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    Map<String, ColumnMetadata> getColumnMetadata(Connection connection, String table) throws SQLException {
         log.debug("Fetching metadata for {} ...", table);
         var resultSet = connection.getMetaData().getColumns(null, null, table, null);
         var result = new LinkedHashMap<String, ColumnMetadata>();
@@ -91,47 +95,49 @@ public class ViewStoreClientFactory {
     }
 
     void ensureTableExists(Table table) throws SQLException {
-        log.debug("Check if table {} exists ...", table.name);
-        var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
-        var tableExists = resultSet.next();
-        if (!tableExists) {
-            // Create new table
-            connection.setAutoCommit(true);
-            var columnSpecification =
-                table.columns.stream()
-                        .filter(column -> !column.type.isSet())
-                        .map(column -> String.format("%s %s", column.name, databaseTypeForColumnType(column.type))
-                ).collect(Collectors.joining(", "));
-            var keys = table.columns.stream()
-                    .filter(column -> column.type == ColumnType.Identifier)
-                    .map(column -> column.name)
-                    .collect(Collectors.joining(", "));
-            var command = String.format("create table %s ( %s, primary key ( %s ) )", table.name, columnSpecification, keys);
-            log.debug(command);
-            connection.createStatement().execute(command);
-            connection.setAutoCommit(false);
-            log.info("Table {} created.", table.name);
-        } else {
-            var columnMetadata = getColumnMetadata(table.name);
-            var newColumns = table.columns.stream()
-                    .filter(column -> !column.type.isSet() && !columnMetadata.containsKey(column.name))
-                    .collect(Collectors.toList());
-            try {
-                log.debug("New columns: {}", new ObjectMapper().writeValueAsString(newColumns));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-            // Update existing table
-            if (!newColumns.isEmpty()) {
+        try (var connection = getConnection()) {
+            log.debug("Check if table {} exists ...", table.name);
+            var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
+            var tableExists = resultSet.next();
+            if (!tableExists) {
+                // Create new table
                 connection.setAutoCommit(true);
-                var command = newColumns.stream()
-                        .map(column -> String.format("alter table %s add column %s %s",
-                                table.name, column.name, databaseTypeForColumnType(column.type)))
-                        .collect(Collectors.joining("; "));
+                var columnSpecification =
+                        table.columns.stream()
+                                .filter(column -> !column.type.isSet())
+                                .map(column -> String.format("%s %s", column.name, databaseTypeForColumnType(column.type))
+                                ).collect(Collectors.joining(", "));
+                var keys = table.columns.stream()
+                        .filter(column -> column.type == ColumnType.Identifier)
+                        .map(column -> column.name)
+                        .collect(Collectors.joining(", "));
+                var command = String.format("create table %s ( %s, primary key ( %s ) )", table.name, columnSpecification, keys);
                 log.debug(command);
                 connection.createStatement().execute(command);
                 connection.setAutoCommit(false);
-                log.info("Table {} updated.", table.name);
+                log.info("Table {} created.", table.name);
+            } else {
+                var columnMetadata = getColumnMetadata(connection, table.name);
+                var newColumns = table.columns.stream()
+                        .filter(column -> !column.type.isSet() && !columnMetadata.containsKey(column.name))
+                        .collect(Collectors.toList());
+                try {
+                    log.debug("New columns: {}", new ObjectMapper().writeValueAsString(newColumns));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                // Update existing table
+                if (!newColumns.isEmpty()) {
+                    connection.setAutoCommit(true);
+                    var command = newColumns.stream()
+                            .map(column -> String.format("alter table %s add column %s %s",
+                                    table.name, column.name, databaseTypeForColumnType(column.type)))
+                            .collect(Collectors.joining("; "));
+                    log.debug(command);
+                    connection.createStatement().execute(command);
+                    connection.setAutoCommit(false);
+                    log.info("Table {} updated.", table.name);
+                }
             }
         }
     }

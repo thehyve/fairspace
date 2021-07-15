@@ -48,7 +48,6 @@ public class ViewServiceTest {
     MetadataService api;
     ViewService viewService;
 
-
     @Before
     public void before() throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
         var viewDatabase = new Config.ViewDatabase();
@@ -57,9 +56,9 @@ public class ViewServiceTest {
         viewDatabase.password = "";
         ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
         ViewStoreClientFactory.H2_DATABASE = true;
-        var viewStoreClient = ViewStoreClientFactory.build(config, viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
 
-        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClient);
+        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
 
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
@@ -72,8 +71,7 @@ public class ViewServiceTest {
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
         ds.getContext().set(FS_ROOT, davFactory.root);
 
-        var viewStoreReader = new ViewStoreReader(ConfigLoader.CONFIG.search, viewStoreClient);
-        viewService = new ViewService(ConfigLoader.VIEWS_CONFIG, ds, viewStoreReader);
+        viewService = new ViewService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, ds, viewStoreClientFactory);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);

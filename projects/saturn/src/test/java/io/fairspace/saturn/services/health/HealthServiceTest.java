@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.health;
 
+import com.zaxxer.hikari.*;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ConfigLoader;
 import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.services.views.ViewStoreClient;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -21,7 +21,7 @@ import java.sql.SQLException;
 @RunWith(MockitoJUnitRunner.class)
 public class HealthServiceTest {
     HealthService healthService;
-    ViewStoreClient viewStoreClient;
+    ViewStoreClientFactory viewStoreClientFactory;
 
     @Before
     public void before() throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
@@ -31,9 +31,9 @@ public class HealthServiceTest {
         viewDatabase.password = "";
         ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
         ViewStoreClientFactory.H2_DATABASE = true;
-        viewStoreClient = ViewStoreClientFactory.build(config, viewDatabase);
+        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
 
-        healthService = new HealthService(viewStoreClient);
+        healthService = new HealthService(viewStoreClientFactory.dataSource);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class HealthServiceTest {
     @SneakyThrows
     @Test
     public void testRetrieveStatusWithViewDatabase_DOWN() {
-        viewStoreClient.connection.close();
+        ((HikariDataSource)viewStoreClientFactory.dataSource).close();
         var health = healthService.getHealth();
 
         Assert.assertEquals(health.getStatus(), HealthStatus.DOWN);

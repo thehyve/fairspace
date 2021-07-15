@@ -13,17 +13,15 @@ import java.util.*;
 
 @Slf4j
 public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
-    private final ViewStoreClient viewStoreClient;
-    private final ViewUpdater viewUpdater;
+    private final ViewStoreClientFactory viewStoreClientFactory;
     // One set of updated subjects if write transactions are handled sequentially.
     // If many write transactions can be active simultaneously, this set needs to be
     // tied to the active thread.
     private final Set<Node> updatedSubjects = new HashSet<>();
 
-    public TxnIndexDatasetGraph(DatasetGraph dsg, ViewStoreClient viewStoreClient) {
+    public TxnIndexDatasetGraph(DatasetGraph dsg, ViewStoreClientFactory viewStoreClientFactory) {
         super(dsg);
-        this.viewStoreClient = viewStoreClient;
-        this.viewUpdater = new ViewUpdater(viewStoreClient, getDefaultGraph());
+        this.viewStoreClientFactory = viewStoreClientFactory;
     }
 
     private void markSubject(Node subject) {
@@ -43,7 +41,9 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void begin(TxnType type) {
         begin(TxnType.convert(type));
-        updatedSubjects.clear();
+        if (isInWriteTransaction()) {
+            updatedSubjects.clear();
+        }
     }
 
     @SneakyThrows
@@ -52,10 +52,16 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
         if (isInWriteTransaction()) {
             log.debug("Commit updated subjects: {}", updatedSubjects);
             var start = new Date().getTime();
-            updatedSubjects.forEach(viewUpdater::updateSubject);
-            viewStoreClient.commit();
-            log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);
-            updatedSubjects.clear();
+            try (var viewUpdater = new ViewUpdater(viewStoreClientFactory.build(), getDefaultGraph())) {
+                updatedSubjects.forEach(viewUpdater::updateSubject);
+                viewUpdater.commit();
+                log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);
+            } catch(Exception e) {
+                log.error("Updating {} subjects failed after {}ms", updatedSubjects.size(), new Date().getTime() - start, e);
+                throw e;
+            } finally {
+                updatedSubjects.clear();
+            }
         }
         super.commit();
     }
