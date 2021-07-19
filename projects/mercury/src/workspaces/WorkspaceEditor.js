@@ -8,23 +8,18 @@ export default ({onSubmit, onClose, creating, workspaces, title,
     const isWorkspaceNameUnique = (workspaceName) => !workspaces.some(workspace => workspace.name === workspaceName);
     const nameControl = useFormField(name, value => !!value && !!value.trim() && isWorkspaceNameUnique(value.trim()));
 
-    const allControls = [nameControl];
+    const nameField = {
+        control: nameControl,
+        autoFocus: true,
+        required: true,
+        id: "name",
+        label: "Code",
+        name: "name",
+        helperText: "Workspace code. Has to be unique. "
+            + "It will prefix all collections of the workspace - preferred length is maximum 10 characters"
+    };
 
-    const formValid = allControls.every(({valid}) => valid);
-
-    const fields = [
-        {
-            control: nameControl,
-            autoFocus: true,
-            required: true,
-            id: "name",
-            label: "Name",
-            name: "name",
-            helperText: "Workspace name. Has to be unique."
-        }
-    ];
-
-    const validateAndSubmit = () => formValid && onSubmit(
+    const validateAndSubmit = () => nameControl.valid && onSubmit(
         {
             name: nameControl.value.trim(),
         }
@@ -38,8 +33,8 @@ export default ({onSubmit, onClose, creating, workspaces, title,
                     validateAndSubmit();
                 }}
                 onClose={onClose}
-                submitDisabled={Boolean(!formValid)}
-                fields={fields}
+                submitDisabled={Boolean(!nameControl.valid)}
+                fields={[nameField]}
                 title={title}
             />
             <LoadingOverlay loading={creating} />

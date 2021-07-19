@@ -8,6 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import {withStyles} from "@material-ui/core";
 import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
@@ -42,6 +43,12 @@ const isNameValid = (name: string) => (
  */
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
+const styles = theme => ({
+    textHelperBasic: {
+        color: theme.palette.grey['600'],
+    }
+});
+
 type PathParam = {
     path: string;
 }
@@ -56,7 +63,8 @@ type CollectionEditorProps = {
     setBusy: (boolean) => void,
     match: Match<PathParam>,
     history: History,
-    workspace: Workspace
+    workspace: Workspace,
+    classes: any
 };
 
 type CollectionEditorState = {
@@ -77,7 +85,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         properties: this.props.collection ?
             copyProperties(this.props.collection) :
             {
-                name: `[${this.props.workspace.name.replace(/[/\\]/, '')}] `,
+                name: this.props.workspace.name ? `[${this.props.workspace.name.replace(/[/\\]/, '')}] ` : '',
                 description: '',
                 ownerWorkspace: this.props.workspace.iri
             }
@@ -204,6 +212,22 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         && isInputValid(this.state.properties)
         && havePropertiesChanged(this.props.collection, this.state.properties);
 
+    renderCollectionNameHelperText() {
+        return (
+            <span>
+                <span className={this.props.classes.textHelperBasic}>
+                    Unique collection name.
+                    <br />
+                    Keep the workspace code prefix. It ensures collection uniqueness between workspaces.
+                    <br />
+                </span>
+                {(isUnsafeFileName(this.state.properties.name.trim()) ? "Name cannot equal '.' or '..'" : '')}
+                {(fileNameContainsInvalidCharacter(this.state.properties.name) ? "Name cannot contain '/' or '\\'." : '')}
+                {(this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
+            </span>
+        );
+    }
+
     render() {
         return (
             <Dialog
@@ -215,16 +239,15 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     {this.props.collection ? 'Edit collection' : 'Add collection'}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText>You can edit the collection details here.</DialogContentText>
+                    {this.props.collection && (
+                        <DialogContentText>You can edit the collection details here.</DialogContentText>
+                    )}
                     <TextField
                         autoFocus
                         margin="dense"
                         id="name"
                         label="Name"
-                        helperText={'Unique collection name'
-                        + (isUnsafeFileName(this.state.properties.name.trim()) ? ". Name cannot equal '.' or '..'" : '')
-                        + (fileNameContainsInvalidCharacter(this.state.properties.name) ? ". Name cannot contain '/' or '\\'." : '')
-                        + (this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `. Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
+                        helperText={this.renderCollectionNameHelperText()}
                         value={this.state.properties.name}
                         name="name"
                         onChange={(event) => this.handleInputChange('name', event.target.value)}
@@ -268,4 +291,4 @@ const ContextualCollectionEditor = (props) => {
     );
 };
 
-export default withRouter(ContextualCollectionEditor);
+export default withRouter(withStyles(styles)(ContextualCollectionEditor));

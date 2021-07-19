@@ -51,6 +51,7 @@ describe('CollectionEditor', () => {
                     collection={collection}
                     onClose={closeCallback}
                     onSave={saveCallback}
+                    classes={{}}
                     editType
                 />
             );

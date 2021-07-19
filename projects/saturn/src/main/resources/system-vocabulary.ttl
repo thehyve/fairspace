@@ -254,7 +254,7 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Label" ;
-        sh:description "Unique collection label." ;
+        sh:description "Unique collection name." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         fs:machineOnly true ;
@@ -415,8 +415,8 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
-        sh:name "Label" ;
-        sh:description "Unique workspace label." ;
+        sh:name "Code" ;
+        sh:description "Workspace code. Has to be unique.  It prefixes all collections of the workspace - preferred length is maximum 10 characters." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -426,8 +426,8 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:order 0
     ],
     [
-        sh:name "Short description";
-        sh:description "Short public description of the workspace." ;
+        sh:name "Title";
+        sh:description "Workspace title." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
