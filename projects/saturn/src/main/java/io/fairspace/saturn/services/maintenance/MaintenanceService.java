@@ -173,9 +173,9 @@ public class MaintenanceService {
             int columnIndex = columns.indexOf(e);
 
             if (result.get(e).isLiteral()) {
-                values[columnIndex] = "'" + result.getLiteral(e).getValue().toString() + "'";
+                values[columnIndex] = result.getLiteral(e).getValue().toString();
             } else {
-                values[columnIndex] = "'" + result.getResource(e).asNode().getURI() + "'";
+                values[columnIndex] = result.getResource(e).asNode().getURI();
             }
         });
 

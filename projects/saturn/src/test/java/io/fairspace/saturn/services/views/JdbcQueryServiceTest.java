@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.dao.*;
 import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.maintenance.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.search.FileSearchRequest;
@@ -50,6 +51,7 @@ public class JdbcQueryServiceTest {
     WorkspaceService workspaceService;
     MetadataService api;
     QueryService queryService;
+    MaintenanceService maintenanceService;
 
     User user;
     Authentication.User userAuthentication;
@@ -83,6 +85,8 @@ public class JdbcQueryServiceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
+
+        maintenanceService = new MaintenanceService(ds, viewStoreClientFactory);
 
         workspaceService = new WorkspaceService(tx, userService);
 
@@ -140,6 +144,22 @@ public class JdbcQueryServiceTest {
 
     @Test
     public void testRetrieveSamplePage() {
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        var page = queryService.retrieveViewPage(request);
+        Assert.assertEquals(2, page.getRows().size());
+        var row = page.getRows().get(0);
+        Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(45.2f, ((Number)row.get("Sample_tumorCellularity").stream().findFirst().orElseThrow().getValue()).floatValue(), 0.01);
+    }
+
+    @Test
+    public void testRetrieveSamplePageAfterReindexing() {
+        maintenanceService.resetPostgres();
         var request = new ViewRequest();
         request.setView("Sample");
         request.setPage(1);
