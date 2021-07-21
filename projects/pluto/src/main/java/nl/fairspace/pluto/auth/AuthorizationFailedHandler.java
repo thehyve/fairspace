@@ -1,6 +1,7 @@
 package nl.fairspace.pluto.auth;
 
 import lombok.extern.slf4j.*;
+import org.springframework.http.*;
 
 import javax.servlet.http.*;
 import java.io.*;
@@ -35,7 +36,7 @@ public class AuthorizationFailedHandler {
 
     private boolean shouldRedirect(HttpServletRequest request) {
         String acceptHeader = request.getHeader(ACCEPT_HEADER);
-        return acceptHeader != null &&
+        return HttpMethod.GET.matches(request.getMethod()) && acceptHeader != null &&
                 acceptHeader.contains("text/html") &&
                 !XHR_VALUE.equals(request.getHeader(X_REQUESTED_WITH_HEADER));
     }
