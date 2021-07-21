@@ -7,9 +7,6 @@ import lombok.*;
 import lombok.extern.slf4j.*;
 
 import java.sql.*;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -253,10 +250,10 @@ public class ViewStoreClient {
         connection.rollback();
 
         var query = "truncate table " + tableName;
-        PreparedStatement statement = connection.prepareStatement(query);
-        int result = statement.executeUpdate();
-        connection.commit();
-        statement.close();
+        try (var statement = connection.prepareStatement(query)) {
+            statement.executeUpdate();
+            connection.commit();
+        }
     }
 
     public int insertValues(
@@ -276,17 +273,14 @@ public class ViewStoreClient {
         String query = "insert into " + tableName.toLowerCase() + " (" + String.join(", ", columnNames) +
                 ") VALUES (" + String.join(", ", placeHolders) + ")";
 
-        try {
-            var insert = connection.prepareStatement(query);
-
+        try (var insert = connection.prepareStatement(query)) {
             for (var row : rows) {
                 addRowValues(insert, row, columnTypes);
             }
 
-            var result = insert.executeBatch();
+            var result = Arrays.stream(insert.executeBatch()).sum();
             connection.commit();
-            insert.close();
-            return rows.size();
+            return result;
         } catch (SQLException e) {
             log.error("error with insert batch", e);
             throw new RuntimeException(e);
