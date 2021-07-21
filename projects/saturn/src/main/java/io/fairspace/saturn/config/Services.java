@@ -28,7 +28,6 @@ import org.apache.jena.sparql.util.Symbol;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
-import java.sql.SQLException;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
@@ -84,12 +83,7 @@ public class Services {
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
-        try {
-            maintenanceService = new MaintenanceService(dataset, viewStoreClientFactory.build());
-        } catch (SQLException e) {
-            log.error("SQL error, cannot build viewStoreClient.", e);
-            throw new RuntimeException("SQL error, cannot build viewStoreClient", e); // Terminates Saturn
-        }
+        maintenanceService = new MaintenanceService(dataset, viewStoreClientFactory);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);

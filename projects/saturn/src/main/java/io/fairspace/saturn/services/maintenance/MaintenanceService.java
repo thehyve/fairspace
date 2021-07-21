@@ -21,16 +21,23 @@ import java.util.stream.Collectors;
 public class MaintenanceService {
     private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
     private final Dataset dataset;
-    private final ViewStoreClient viewStoreClient;
+    private final ViewStoreClientFactory viewStoreClientFactory;
 
-    public MaintenanceService(@NonNull Dataset dataset, @NonNull ViewStoreClient viewStoreClient) {
+    public MaintenanceService(@NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
         this.dataset = dataset;
-        this.viewStoreClient = viewStoreClient;
+        this.viewStoreClientFactory = viewStoreClientFactory;
     }
 
     private static boolean isRunning = false;
 
+    public boolean available() {
+        return viewStoreClientFactory != null;
+    }
+
     public String resetPostgres() {
+        if (!available()) {
+            throw new RuntimeException("Not available");
+        }
         var updateId = UUID.randomUUID();
 
         // check if we can start a reset
@@ -75,6 +82,7 @@ public class MaintenanceService {
 
     private void indexData(ViewsConfig.View view) throws SQLException {
         // clear postgres table
+        var viewStoreClient = viewStoreClientFactory.build();
         viewStoreClient.truncateTable(view.name.toLowerCase());
 
         for(String type : view.types) {
@@ -87,7 +95,8 @@ public class MaintenanceService {
             columnNames.add(0, "id");
             columnNames.add(1, "label");
 
-            Function<List<String[]>, Integer> insertIntoPostgres = getPostgresInsertFunction(view, columnNames);
+            Function<List<String[]>, Integer> insertIntoPostgres = getPostgresInsertFunction(
+                    viewStoreClient, view, columnNames);
 
             SparqlUtils.copyData(dataset,
                     query,
@@ -96,7 +105,8 @@ public class MaintenanceService {
         }
     }
 
-    private Function<List<String[]>, Integer> getPostgresInsertFunction(ViewsConfig.View view, List<String> columnNames) {
+    private Function<List<String[]>, Integer> getPostgresInsertFunction(
+            ViewStoreClient viewStoreClient, ViewsConfig.View view, List<String> columnNames) {
         var columnTypes = view.columns.stream().map(c -> c.type).collect(Collectors.toList());
         columnTypes.add(0, ViewsConfig.ColumnType.Text);
         columnTypes.add(1, ViewsConfig.ColumnType.Text);
