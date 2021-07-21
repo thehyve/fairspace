@@ -1042,25 +1042,22 @@ curl -G -H "Accept: application/ld+json" \
 3+| Serialised RDF triples.
 |===
 
-.Example of adding metadata (curl)
+.Example of adding metadata in turtle format (curl)
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -X PUT -H "Content-type: application/ld+json" -d \
-'{
-  "@graph" : [ {
-    "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
-    "hasData" : "ws:4bcd1780-c9cd-4bdd-0000-1ce966ff9ac3"
-   } ],
-  "@context" : {
-    "hasData" : {
-      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
-      "@type" : "@id"
-    },
-    "ws" : "http://fairspace.ci.fairway.app/iri/"
-  }
-}' \
+curl -X PUT -H "Content-type: text/turtle" -d \
+'
+@prefix example: <https://example.com/ontology#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix test: <https://test.com/ontology#> .
+example:Study_001 a test:Study ;
+    rdfs:label "Project study #001" ;
+    test:studyIdentifier "STUDY-001" ;
+    test:studyTitle "Project study #001" ;
+    test:studyDescription "This is a description of the study." .
+' \
 "http://localhost:8080/api/metadata/"
 ----
 ====
@@ -1078,25 +1075,18 @@ curl -X PUT -H "Content-type: application/ld+json" -d \
 3+| Serialised RDF triples.
 |===
 
-.Example of updating metadata (curl)
+.Example of updating metadata in turtle format (curl)
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -X PATCH -H "Content-type: application/ld+json" -d \
-'{
-  "@graph" : [ {
-    "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
-    "hasData" : "ws:4bcd1780-c9cd-4bdd-0000-1ce966ff9ac3"
-   } ],
-  "@context" : {
-    "hasData" : {
-      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
-      "@type" : "@id"
-    },
-    "ws" : "http://fairspace.ci.fairway.app/iri/"
-  }
-}' \
+curl -X PATCH -H "Content-type: text/turtle" -d \
+'
+@prefix example: <https://example.com/ontology#> .
+@prefix test: <https://test.com/ontology#> .
+example:Study_001 a test:Study ;
+    test:studyTitle "Updated project study #001" ;
+' \
 "http://localhost:8080/api/metadata/"
 ----
 ====
@@ -1118,25 +1108,18 @@ Only available for users with _Add shared metadata_ role.
 3+| Serialised RDF triples. (_Optional_)
 |===
 
-.Example of deleting triples (curl)
+.Example of deleting triples in turtle format (curl)
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -X DELETE -H "Content-Type: application/ld+json" -d \
-'{
-  "@graph" : [ {
-    "@id" : "ws:7f0ed5bb-7a96-4715-8727-6b4b7f1facfd",
-    "hasData" : "ws:4bcd1780-c9cd-4bdd-0000-1ce966ff9ac3"
-   } ],
-  "@context" : {
-    "hasData" : {
-      "@id" : "http://fairspace.ci.fairway.app/vocabulary/hasData",
-      "@type" : "@id"
-    },
-    "ws" : "http://fairspace.ci.fairway.app/iri/"
-  }
-}' \
+curl -X DELETE -H "Content-Type: text/turtle" -d \
+'
+@prefix example: <https://example.com/ontology#> .
+@prefix test: <https://test.com/ontology#> .
+example:Study_001 a test:Study ;
+    test:studyDescription "This is a description of the study." .
+' \
 "http://localhost:8080/api/metadata/"
 ----
 ====
@@ -1146,9 +1129,7 @@ curl -X DELETE -H "Content-Type: application/ld+json" -d \
 ====
 [source, bash]
 ----
-curl -X DELETE -G -H "Content-Type: application/ld+json" \
---data-urlencode "subject=https://example.com/ontology#tpe1" \
-"http://localhost:8080/api/metadata/"
+curl -X DELETE -G --data-urlencode "subject=https://example.com/ontology#tpe1" "http://localhost:8080/api/metadata/"
 ----
 ====
 
