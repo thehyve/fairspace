@@ -145,7 +145,7 @@ export const descriptionForStatus = (status: Status) => {
             return "Editing data and metadata enabled.";
         case "ReadOnly":
             return "Data immutable, available only for reading.";
-        case "Closed":
+        case "Archived":
             return "Data not available for reading.";
         default:
             return "";

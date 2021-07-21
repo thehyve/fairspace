@@ -219,7 +219,7 @@ class CollectionResource extends DirectoryResource {
             return EnumSet.of(Status.ReadOnly);
         }
 
-        return EnumSet.of(Status.Active, Status.Closed, Status.ReadOnly);
+        return EnumSet.of(Status.Active, Status.Archived, Status.ReadOnly);
     }
 
     /**
@@ -392,7 +392,7 @@ class CollectionResource extends DirectoryResource {
     @Override
     protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
         super.undelete();
-        subject.removeAll(FS.status).addProperty(FS.status, Status.Closed.name());
+        subject.removeAll(FS.status).addProperty(FS.status, Status.Archived.name());
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {

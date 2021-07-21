@@ -69,11 +69,11 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                         Data will be immutable.
                     </span>
                 );
-            case 'Closed':
+            case 'Archived':
                 return (
                     <span>
-                        Are you sure you want to <b>close</b> collection <em>{collection.name}</em>?<br />
-                        Closing the collection will make the data unavailable for reading.
+                        Are you sure you want to <b>archive</b> collection <em>{collection.name}</em>?<br />
+                        Archiving the collection will make the data unavailable for reading.
                     </span>
                 );
             default:
