@@ -151,6 +151,7 @@ public class JdbcQueryServiceTest {
         var page = queryService.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row = page.getRows().get(0);
+        Assert.assertEquals(Set.of("Sample", "Sample_nature", "Sample_origin", "Sample_topography", "Sample_tumorCellularity"), row.keySet());
         Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
@@ -159,7 +160,7 @@ public class JdbcQueryServiceTest {
 
     @Test
     public void testRetrieveSamplePageAfterReindexing() {
-        maintenanceService.resetPostgres();
+        maintenanceService.recreateIndex();
         var request = new ViewRequest();
         request.setView("Sample");
         request.setPage(1);
@@ -167,6 +168,7 @@ public class JdbcQueryServiceTest {
         var page = queryService.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row = page.getRows().get(0);
+        Assert.assertEquals(Set.of("Sample", "Sample_nature", "Sample_origin", "Sample_topography", "Sample_tumorCellularity"), row.keySet());
         Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());

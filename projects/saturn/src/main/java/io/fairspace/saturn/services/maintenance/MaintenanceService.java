@@ -1,25 +1,19 @@
 package io.fairspace.saturn.services.maintenance;
 
 import io.fairspace.saturn.config.ConfigLoader;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.services.views.ViewStoreClient;
-import io.fairspace.saturn.services.views.ViewStoreClientFactory;
+import io.fairspace.saturn.services.views.*;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.query.Dataset;
-import org.apache.jena.query.QuerySolution;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.concurrent.*;
 
 @Log4j2
 public class MaintenanceService {
-    private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
+    private final ThreadPoolExecutor threadpool = new ThreadPoolExecutor(1, 1,
+            0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
 
@@ -28,157 +22,40 @@ public class MaintenanceService {
         this.viewStoreClientFactory = viewStoreClientFactory;
     }
 
-    private static boolean isRunning = false;
-
-    public boolean available() {
-        return viewStoreClientFactory != null;
+    public boolean disabled() {
+        return viewStoreClientFactory == null;
     }
 
-    public String resetPostgres() {
-        if (!available()) {
-            throw new RuntimeException("Not available");
+    public boolean active() {
+        return threadpool.getActiveCount() > 0;
+    }
+
+    public void startRecreateIndexTask() {
+        if (disabled()) {
+            throw new RuntimeException("Service not available");
         }
-        var updateId = UUID.randomUUID();
-
-        if (isRunning) {
-            log.info("An update process is running, can't run a new update simultaneous");
-            return "update is allready running";
+        if (active()) {
+            log.info("Reindexing is already in progress.");
+            throw new RuntimeException("Reindexing is already in progress.");
         }
-        isRunning = true;
-
-// TEST synchronous for test only:
-//        threadpool.submit(() -> {
-//            log.info("Start asynchronous postgres reset");
-//            RunResetSteps(updateId);
-//        });
-        runResetSteps();
-//
-        return "update started, please use {uri} to monitor progress";
-    }
-
-    private void runResetSteps() {
-
-        try {
-            // index entities
-            for (var view : ConfigLoader.VIEWS_CONFIG.views) {
-                indexData(view);
-            }
-
-            var joinTables = getJoinTablesToIndex(); // -> if postgres contains no foreign keys doesn't need to be a separate step...
-
-            // index entity relations (view.join's?)
-
-            // set status 'finished' and success 1 in table
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            // set status 'finished', with error message and success 0 in table
-        }
-
-        isRunning = false;
-        // set status finished and success 1
-    }
-
-    private void indexData(ViewsConfig.View view) throws SQLException {
-        // clear postgres table
-        var viewStoreClient = viewStoreClientFactory.build();
-        viewStoreClient.truncateTable(view.name.toLowerCase());
-
-        for(String type : view.types) {
-            String query = getQuery(view, type);
-
-            var columnNames = view.columns.stream()
-                    .filter(c -> !c.type.isSet())
-                    .map(c -> c.name)
-                    .collect(Collectors.toList());
-            columnNames.add(0, "id");
-            columnNames.add(1, "label");
-
-            Function<List<String[]>, Integer> insertIntoPostgres = getPostgresInsertFunction(
-                    viewStoreClient, view, columnNames);
-
-            SparqlUtils.copyData(dataset,
-                    query,
-                    (QuerySolution q) -> getEntity(columnNames, q),
-                    insertIntoPostgres);
-        }
-    }
-
-    private Function<List<String[]>, Integer> getPostgresInsertFunction(
-            ViewStoreClient viewStoreClient, ViewsConfig.View view, List<String> columnNames) {
-        var columnTypes = view.columns.stream().map(c -> c.type).collect(Collectors.toList());
-        columnTypes.add(0, ViewsConfig.ColumnType.Text);
-        columnTypes.add(1, ViewsConfig.ColumnType.Text);
-        var columnTypeArray = columnTypes.toArray(ViewsConfig.ColumnType[]::new);
-
-        return (List<String[]> values) ->
-        {
-            int rowsAffected = viewStoreClient.insertValues(view.name, columnNames, columnTypeArray, values);
-            if (rowsAffected != values.size()) {
-                throw new RuntimeException("Unexpected amount of row inserts");
-            }
-
-            return rowsAffected;
-        };
-    }
-
-    private String getQuery(ViewsConfig.View view, String type) {
-        var attributes = view.columns.stream()
-                .map(this::getColumnSelect)
-                .collect(Collectors.joining());
-        var attributeNames = view.columns.stream()
-                .map(c -> "?" + c.name)
-                .collect(Collectors.joining(" "));
-
-        var query = """
-                    SELECT ?id ?label {attributeNames}
-                    WHERE {
-                        ?id <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <{type}> .
-                        {attributes}
-                        ?id <http://www.w3.org/2000/01/rdf-schema#label> ?label .
-                    }
-                """;
-
-        query = query.replaceAll("\\{type}", type);
-        query = query.replaceAll("\\{attributes}", attributes);
-        query = query.replaceAll("\\{attributeNames}", attributeNames);
-        return query;
-    }
-
-    private String getColumnSelect(ViewsConfig.View.Column c) {
-        if (c.type.name().equals("Term")) {
-            return "OPTIONAL {?id <" + c.source + "> " + "?" + c.name + "Id .\n" +
-                    "?" + c.name + "Id <http://www.w3.org/2000/01/rdf-schema#label> ?" + c.name + " . }\n";
-        }
-
-        return "OPTIONAL {?id <" + c.source + "> " + "?" + c.name + " . }\n";
-    }
-
-    private List<String> getJoinTablesToIndex() {
-        var joinTables = new ArrayList<String>();
-        for (ViewsConfig.View view : ConfigLoader.VIEWS_CONFIG.views) {
-            for (ViewsConfig.View.JoinView join : view.join) {
-                var joinTable = ViewStoreClientFactory.getJoinTable(join, view).getName();
-                joinTables.add(joinTable);
-            }
-        }
-
-        return joinTables;
-    }
-
-    private String[] getEntity(List<String> columns, QuerySolution result) {
-        var values = new String[columns.size()];
-
-        result.varNames().forEachRemaining(e ->
-        {
-            int columnIndex = columns.indexOf(e);
-
-            if (result.get(e).isLiteral()) {
-                values[columnIndex] = result.getLiteral(e).getValue().toString();
-            } else {
-                values[columnIndex] = result.getResource(e).asNode().getURI();
-            }
+        threadpool.submit(() -> {
+            log.info("Start asynchronous reindexing task");
+            recreateIndex();
         });
+    }
 
-        return values;
+    public void recreateIndex() {
+        try (var viewStoreClient = viewStoreClientFactory.build();
+             var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph())){
+            var start = new Date().getTime();
+            // Index entities
+            for (var view : ConfigLoader.VIEWS_CONFIG.views) {
+                viewUpdater.recreateIndexForView(viewStoreClient, view);
+            }
+            viewUpdater.commit();
+            log.info("View index recreated in {}ms.", new Date().getTime() - start);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to recreate index", e);
+        }
     }
 }

@@ -8,9 +8,6 @@ import lombok.extern.slf4j.*;
 
 import java.sql.*;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
@@ -19,7 +16,7 @@ import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
 
 @Slf4j
-public class ViewStoreClient {
+public class ViewStoreClient implements AutoCloseable {
 
     public static class ViewStoreConfiguration {
         final Map<String, View> viewConfig;
@@ -35,9 +32,8 @@ public class ViewStoreClient {
     @SneakyThrows
     public static void setQueryValue(PreparedStatement query, int index, Object value) {
         if (value == null) {
-            throw new IllegalArgumentException("Unexpected null value.");
-        }
-        if (value instanceof Number) {
+            query.setNull(index, Types.NULL);
+        } else if (value instanceof Number) {
             query.setFloat(index, ((Number) value).floatValue());
         } else if (value instanceof Instant) {
             query.setTimestamp(index, Timestamp.from((Instant) value));
@@ -56,6 +52,11 @@ public class ViewStoreClient {
             ViewStoreConfiguration configuration) {
         this.connection = connection;
         this.configuration = configuration;
+    }
+
+    @Override
+    public void close() throws SQLException {
+        connection.close();
     }
 
     public void commit() throws SQLException {
@@ -190,138 +191,82 @@ public class ViewStoreClient {
         }
     }
 
-    public void updateRow(String view, Map<String, Object> row) throws SQLException {
+    public int updateRows(String view, List<Map<String, Object>> rows, boolean bulkInsert) throws SQLException {
         var viewTable = configuration.viewTables.get(view);
         var config = configuration.viewConfig.get(view);
-        var columnNames = new ArrayList<String>();
-        var values = new ArrayList<>();
-        row.forEach((key, value) -> {
-            if (value == null) {
-                return;
-            }
-            var columnName = key.toLowerCase();
-            if (config.columns.stream().anyMatch(column ->
-                    column.name.equalsIgnoreCase(columnName) && column.type.isSet())) {
-                // Skip value set columns
-                return;
-            }
-            columnNames.add(columnName);
-            values.add(value);
-        });
-        var id = (String) row.get("id");
-        var exists = rowExists(viewTable.name, id);
-
-        String updateSql;
-        if (exists) {
-            updateSql = "update " + viewTable.name + " set " +
-                    columnNames.stream()
-                            .map(column -> column + " = ?")
-                            .collect(Collectors.joining(", ")) +
-                    " where id = ?";
-        } else {
-            updateSql = "insert into " + viewTable.name + " ( " +
-                    String.join(", ", columnNames) + " ) values ( " +
-                    columnNames.stream()
-                            .map(column -> "?")
-                            .collect(Collectors.joining(", ")) + " )";
-        }
-        try (var update = connection.prepareStatement(updateSql)) {
-            for (var i = 0; i < values.size(); i++) {
-                var value = values.get(i);
-                setQueryValue(update, i + 1, value);
-            }
-            if (exists) {
-                update.setString(values.size() + 1, id);
-            }
-            var updateCount = update.executeUpdate();
-            if (exists) {
-                log.debug("Updated {} rows of view {}", updateCount, view);
-            } else {
-                log.debug("Inserted {} rows into view {}", updateCount, view);
-            }
-        }
-    }
-
-    public void truncateTable(String tableName) throws SQLException {
-        // rollback() is a workaround in case a previous transaction is still open.
-        // Discuss solution, rollback at any place in code where a SQLException is caught,
-        // or have every API request get a new connection. At this moment connection behaves like a singleton.
-        // Is it ever tested what happens with 2 parallel requests?
-        connection.rollback();
-
-        var query = "truncate table " + tableName;
-        try (var statement = connection.prepareStatement(query)) {
-            statement.executeUpdate();
-            connection.commit();
-        }
-    }
-
-    public int insertValues(
-            String tableName,
-            List<String> columnNames,
-            ViewsConfig.ColumnType[] columnTypes,
-            List<String[]> rows) {
-        if (rows.size() == 0) {
+        // Find the columns for which there are values in the rows
+        var columnNames = rows.stream()
+                .flatMap(row -> row.entrySet().stream()
+                        .filter(entry -> entry.getValue() != null)
+                        .map(Map.Entry::getKey))
+                .distinct()
+                .filter(columnName -> config.columns.stream().noneMatch(column ->
+                        // Skip value set columns
+                        column.name.equalsIgnoreCase(columnName) && column.type.isSet()))
+                .collect(Collectors.toList());
+        if (columnNames.isEmpty()) {
             return 0;
         }
-
-        var placeHolders = columnNames
-                .stream()
-                .map(v -> "?")
-                .toArray(String[]::new);
-
-        String query = "insert into " + tableName.toLowerCase() + " (" + String.join(", ", columnNames) +
-                ") VALUES (" + String.join(", ", placeHolders) + ")";
-
-        try (var insert = connection.prepareStatement(query)) {
-            for (var row : rows) {
-                addRowValues(insert, row, columnTypes);
+        var updateSql = "update " + viewTable.name + " set " +
+                columnNames.stream()
+                        .map(column -> column + " = ?")
+                        .collect(Collectors.joining(", ")) +
+                " where id = ?";
+        var insertSql = "insert into " + viewTable.name + " ( " +
+                String.join(", ", columnNames) + " ) values ( " +
+                columnNames.stream()
+                        .map(column -> "?")
+                        .collect(Collectors.joining(", ")) + " )";
+        try (var insert = connection.prepareStatement(insertSql);
+             var update = connection.prepareStatement(updateSql)) {
+            for (var row: rows) {
+                var values = columnNames.stream()
+                        .map(columnName -> row.getOrDefault(columnName, null))
+                        .collect(Collectors.toList());
+                var id = (String) row.get("id");
+                var exists = (!bulkInsert) && rowExists(viewTable.name, id);
+                if (exists) {
+                    for (var i = 0; i < values.size(); i++) {
+                        var value = values.get(i);
+                        setQueryValue(update, i + 1, value);
+                    }
+                    update.setString(values.size() + 1, id);
+                    update.addBatch();
+                } else {
+                    for (var i = 0; i < values.size(); i++) {
+                        var value = values.get(i);
+                        setQueryValue(insert, i + 1, value);
+                    }
+                    insert.addBatch();
+                }
             }
-
-            var result = Arrays.stream(insert.executeBatch()).sum();
-            connection.commit();
-            return result;
-        } catch (SQLException e) {
-            log.error("error with insert batch", e);
-            throw new RuntimeException(e);
+            var insertCount = Arrays.stream(insert.executeBatch()).sum();
+            if (insertCount > 0) {
+                log.debug("Inserted {} rows into view {}", insertCount, view);
+            }
+            var updateCount = Arrays.stream(update.executeBatch()).sum();
+            if (updateCount > 0) {
+                log.debug("Updated {} rows of view {}", updateCount, view);
+            }
+            return insertCount + updateCount;
         }
     }
 
-    @SneakyThrows
-    private void addRowValues(PreparedStatement insert, String[] row, ColumnType[] columnTypes) throws SQLException {
-        for (int i = 0; i < row.length; i++) {
-            if (row[i] == null) {
-                insert.setNull(i + 1, Types.NULL);
-                continue;
-            }
-
-            switch (columnTypes[i]) {
-                case Identifier:
-                case Term:
-                case Text:
-                    insert.setString(i + 1, row[i]);
-                    break;
-                case TermSet:
-                    break;
-                case Number:
-                    insert.setDouble(i + 1, Double.parseDouble(row[i].replaceAll("'", "")));
-                    break;
-                case Date:
-                    var dateString = row[i].replaceAll("'", "");
-
-                    DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                            .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-                            .appendFraction(ChronoField.MICRO_OF_SECOND, 0, 6, true)
-                            .appendPattern("'Z'")
-                            .toFormatter();
-
-                    LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-                    insert.setTimestamp(i + 1, java.sql.Timestamp.valueOf(dateTime));
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + columnTypes[i]);
+    public void truncateViewTables(String view) throws SQLException {
+        var tables = new ArrayList<Table>();
+        tables.add(configuration.viewTables.get(view));
+        tables.addAll(configuration.propertyTables.getOrDefault(view, Collections.emptyMap()).values());
+        var joins = configuration.viewConfig.get(view).join;
+        if (joins != null) {
+            joins.stream().filter(joinView -> !joinView.reverse)
+                    .forEach(joinView -> tables.add(configuration.joinTables.get(view).get(joinView.view)));
+        }
+        log.debug("Truncating tables for view {}: {}", view, tables.stream().map(Table::getName).collect(Collectors.toList()));
+        for (var table: tables) {
+            var query = "truncate table " + table.name;
+            try (var statement = connection.prepareStatement(query)) {
+                statement.executeUpdate();
             }
         }
-        insert.addBatch();
     }
 }

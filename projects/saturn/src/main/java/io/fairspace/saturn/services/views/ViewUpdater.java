@@ -1,9 +1,12 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.rdf.*;
 import io.fairspace.saturn.vocabulary.*;
 import lombok.extern.slf4j.*;
 import org.apache.jena.graph.*;
+import org.apache.jena.query.*;
+import org.apache.jena.sparql.core.*;
 import org.apache.jena.vocabulary.*;
 
 import java.net.*;
@@ -12,6 +15,7 @@ import java.sql.*;
 import java.time.*;
 import java.util.*;
 import java.util.Date;
+import java.util.concurrent.atomic.*;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
@@ -21,11 +25,22 @@ import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protecte
 @Slf4j
 public class ViewUpdater implements AutoCloseable {
     private final ViewStoreClient viewStoreClient;
+    private final DatasetGraph dsg;
     private final Graph graph;
 
-    public ViewUpdater(ViewStoreClient viewStoreClient, Graph graph) {
+    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg) {
         this.viewStoreClient = viewStoreClient;
-        this.graph = graph;
+        this.dsg = dsg;
+        this.graph = dsg.getDefaultGraph();
+    }
+
+    @Override
+    public void close() throws SQLException {
+        viewStoreClient.close();
+    }
+
+    public void commit() throws SQLException {
+        viewStoreClient.commit();
     }
 
     private List<Node> retrieveValues(Graph graph, Node subject, String source) {
@@ -53,6 +68,19 @@ public class ViewUpdater implements AutoCloseable {
             return null;
         }
         return labelNode.toString(false);
+    }
+
+    public Object getValue(ViewsConfig.View.Column column, Node node) throws SQLException {
+        return switch (column.type) {
+            case Number -> node.getLiteralValue();
+            case Date -> Instant.parse(node.getLiteralValue().toString());
+            case Term, TermSet -> {
+                var label = getLabel(graph, node);
+                viewStoreClient.addLabel(node.getURI(), column.rdfType, label);
+                yield label;
+            }
+            default -> node.getLiteralValue().toString();
+        };
     }
 
     public void updateSubject(Node subject) {
@@ -99,21 +127,9 @@ public class ViewUpdater implements AutoCloseable {
                         if (objects.isEmpty()) {
                             continue;
                         }
-                        switch (column.type) {
-                            case Number -> row.put(column.name, objects.get(0).getLiteralValue());
-                            case Date -> {
-                                row.put(column.name, Instant.parse(objects.get(0).getLiteralValue().toString()));
-                            }
-                            case Term, TermSet -> {
-                                var term = objects.get(0);
-                                var label = getLabel(graph, term);
-                                viewStoreClient.addLabel(term.getURI(), column.rdfType, label);
-                                row.put(column.name, label);
-                            }
-                            default -> row.put(column.name, objects.get(0).getLiteralValue().toString());
-                        }
+                        row.put(column.name, getValue(column, objects.get(0)));
                     }
-                    viewStoreClient.updateRow(view.name, row);
+                    viewStoreClient.updateRows(view.name, List.of(row), false);
                 } catch (SQLException e) {
                     log.error("Failed to update view row", e);
                 }
@@ -172,12 +188,76 @@ public class ViewUpdater implements AutoCloseable {
         log.debug("Updating subject of type {} took {}ms", type.getLocalName(), new Date().getTime() - start);
     }
 
-    @Override
-    public void close() throws SQLException {
-        viewStoreClient.connection.close();
+    public void recreateIndexForView(ViewStoreClient viewStoreClient, ViewsConfig.View view) throws SQLException {
+        // Clear database tables for view
+        viewStoreClient.truncateViewTables(view.name);
+        for (String type : view.types) {
+            var valueColumns = view.columns.stream()
+                    .filter(column -> !column.type.isSet())
+                    .collect(Collectors.toList());
+            var attributes = valueColumns.stream()
+                    .map(column -> "OPTIONAL {?id <" + column.source + "> " + "?" + column.name + " . }\n")
+                    .collect(Collectors.joining());
+            var attributeNames = valueColumns.stream()
+                    .map(c -> "?" + c.name)
+                    .collect(Collectors.joining(" "));
+
+            var query = """
+                    PREFIX rdfs: <%s>
+                    SELECT ?id ?label %s
+                    WHERE {
+                        ?id a <%s> .
+                        %s
+                        ?id rdfs:label ?label .
+                    }
+                """.formatted(RDFS.getURI(), attributeNames, type, attributes);
+
+            copyValuesFromQuery(view, valueColumns, query);
+        }
+        // TODO: add joins and value sets
     }
 
-    public void commit() throws SQLException {
-        viewStoreClient.connection.commit();
+    /**
+     * Copy data from Jena to Postgres.
+     * <p>
+     * Insert into postgres is done in the 'forEachRemaining' of the Jena read. This prevents us
+     * from doing a slow sorted sparql query with limit and offset.
+     */
+    public void copyValuesFromQuery(ViewsConfig.View view, List<ViewsConfig.View.Column> columns, String query) throws SQLException {
+        var rows = new ArrayList<Map<String, Object>>();
+        var error = new AtomicReference<SQLException>();
+        SparqlUtils.querySelect(dsg, query, (QuerySolution q) -> {
+            // read yielded jena data
+            try {
+                rows.add(transformResult(columns, q));
+                // copy in chunks to postgres
+                if (rows.size() == 1000) {
+                    viewStoreClient.updateRows(view.name, rows, true);
+                    rows.clear();
+                }
+            } catch (SQLException e) {
+                error.set(e);
+                throw new RuntimeException("Failed to bulk insert rows", e);
+            }
+        });
+        if (error.get() != null) {
+            throw error.get();
+        }
+        // copy any remaining items to postgres
+        int updateCount = viewStoreClient.updateRows(view.name, rows, true);
+        log.debug("Inserted {} rows for view {}", updateCount, view.name);
+    }
+
+    private Map<String, Object> transformResult(List<ViewsConfig.View.Column> columns, QuerySolution result) throws SQLException {
+        var values = new HashMap<String, Object>();
+        values.put("id", result.getResource("id").getURI());
+        values.put("label", result.getLiteral("label").toString());
+        for (var column: columns) {
+            var resultNode = result.get(column.name);
+            if (resultNode != null) {
+                values.put(column.name.toLowerCase(), getValue(column, resultNode.asNode()));
+            }
+        }
+        return values;
     }
 }
