@@ -103,7 +103,7 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
         case "MetadataPublished":
             return "All users can see collection metadata.";
         case "DataPublished":
-            return "For archived collections only, all users can see collection data and metadata.";
+            return "For read-only collections, all users can see collection data and metadata.";
         default:
             return "";
     }
@@ -143,8 +143,8 @@ export const descriptionForStatus = (status: Status) => {
     switch (status) {
         case "Active":
             return "Editing data and metadata enabled.";
-        case "Archived":
-            return "Data immutable, read-only.";
+        case "ReadOnly":
+            return "Data immutable, available only for reading.";
         case "Closed":
             return "Data not available for reading.";
         default:

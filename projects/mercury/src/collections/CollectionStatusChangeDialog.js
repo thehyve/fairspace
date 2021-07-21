@@ -62,11 +62,11 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                         Editing data and metadata will be enabled.
                     </span>
                 );
-            case 'Archived':
+            case 'ReadOnly':
                 return (
                     <span>
-                        Are you sure you want to <b>archive</b> collection <em>{collection.name}</em>?<br />
-                        Data will be immutable, i.e., read-only.
+                        Are you sure you want to make collection <em>{collection.name}</em> <b>read-only</b>?<br />
+                        Data will be immutable.
                     </span>
                 );
             case 'Closed':
@@ -106,7 +106,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                                         control={<Radio />}
                                         label={(
                                             <ListItemText
-                                                primary={camelCaseToWords(status)}
+                                                primary={camelCaseToWords(status, "-")}
                                                 secondary={descriptionForStatus(status)}
                                             />
                                         )}

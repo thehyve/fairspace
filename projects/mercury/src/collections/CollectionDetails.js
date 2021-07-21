@@ -34,7 +34,7 @@ import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 import {descriptionForStatus, isCollectionPage} from "./collectionUtils";
 import {getDisplayName, isAdmin} from '../users/userUtils';
-import {formatDateTime} from '../common/utils/genericUtils';
+import {camelCaseToWords, formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
 import UserContext from "../users/UserContext";
@@ -244,7 +244,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 <FormLabel>Status</FormLabel>
                 <FormGroup>
                     <ListItemText
-                        primary={this.props.collection.status}
+                        primary={camelCaseToWords(this.props.collection.status, "-")}
                         secondary={descriptionForStatus(this.props.collection.status)}
                     />
                 </FormGroup>

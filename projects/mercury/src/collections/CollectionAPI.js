@@ -12,8 +12,8 @@ export type AccessLevel = 'None' | 'List' | 'Read' | 'Write' | 'Manage';
 export const accessLevels: AccessLevel[] = ['None', 'List', 'Read', 'Write', 'Manage'];
 export type AccessMode = 'Restricted' | 'MetadataPublished' | 'DataPublished';
 export const accessModes: AccessMode[] = ['Restricted', 'MetadataPublished', 'DataPublished'];
-export type Status = 'Active' | 'Archived' | 'Closed';
-export const statuses: Status[] = ['Active', 'Archived', 'Closed'];
+export type Status = 'Active' | 'ReadOnly' | 'Closed';
+export const statuses: Status[] = ['Active', 'ReadOnly', 'Closed'];
 
 export type Permission = {
     iri: string; // iri
