@@ -40,8 +40,6 @@ public class MaintenanceService {
         }
         var updateId = UUID.randomUUID();
 
-        // check if we can start a reset
-        var canStart = canStart(updateId);
         if (isRunning) {
             log.info("An update process is running, can't run a new update simultaneous");
             return "update is allready running";
@@ -53,12 +51,12 @@ public class MaintenanceService {
 //            log.info("Start asynchronous postgres reset");
 //            RunResetSteps(updateId);
 //        });
-        runResetSteps(updateId);
+        runResetSteps();
 //
         return "update started, please use {uri} to monitor progress";
     }
 
-    private void runResetSteps(UUID updateId) {
+    private void runResetSteps() {
 
         try {
             // index entities
@@ -165,17 +163,6 @@ public class MaintenanceService {
         }
 
         return joinTables;
-    }
-
-    /**
-     * Check in database if a reset process is running.
-     *
-     * @param updateId Update id is used to track status of the asynchronous process
-     * @return 'true' if a new reset can start, 'false' if a reset is already in progress.
-     */
-    private boolean canStart(UUID updateId) {
-        // todo
-        return true;
     }
 
     private String[] getEntity(List<String> columns, QuerySolution result) {
