@@ -88,6 +88,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
                 <Grid item className={classes.centralPanel}>
                     <ExternalStorageBrowser
                         selection={selection}
+                        preselectedFile={preselectedFile}
                         storage={storage}
                         pathname={location.pathname}
                         setBreadcrumbSegments={setBreadcrumbSegments}

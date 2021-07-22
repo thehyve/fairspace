@@ -8,9 +8,12 @@ import type {ExternalStorage} from "../external-storage/externalStorageUtils";
 const NON_SAFE_FILE_NAME_CHARACTERS = ['/', '\\'];
 const NON_SAFE_FILE_NAMES = ['.', '..'];
 
-export function splitPathIntoArray(path) {
-    return path.split(PATH_SEPARATOR).filter(s => s.length > 0);
-}
+export const getStrippedPath = (path) => {
+    const stripped = path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path;
+    return path.endsWith(PATH_SEPARATOR) ? stripped.slice(0, -1) : stripped;
+};
+
+export const splitPathIntoArray = (path) => path.split(PATH_SEPARATOR).filter(s => s.length > 0);
 
 export const joinPaths = (...paths) => paths
     .map(p => (p && p !== PATH_SEPARATOR ? p : ''))
@@ -28,23 +31,22 @@ export const joinPathsAvoidEmpty = (...paths) => {
         } else if (index === (paths.length - 1)) {
             strippedPaths.push(path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path);
         } else {
-            let stripped = path.startsWith(PATH_SEPARATOR) ? path.substring(1) : path;
-            stripped = path.endsWith(PATH_SEPARATOR) ? stripped.slice(0, -1) : stripped;
-            strippedPaths.push(stripped);
+            strippedPaths.push(getStrippedPath(path));
         }
     });
     return joinPaths(...strippedPaths);
 };
 
-export function getParentPath(path) {
+export const getParentPath = (path: string) => {
     const pos = path.lastIndexOf(PATH_SEPARATOR, path.length - 2);
     return (pos > 1) ? path.substring(0, pos) : '';
-}
+};
 
 export const getPathFromIri = (iri: string, pathPrefix = "") => {
     const url = new URL(iri);
     const path = iri.replace(pathPrefix || url.origin + "/api/webdav/", '');
-    return decodeURIComponent(path);
+    const strippedPath = getStrippedPath(path);
+    return decodeURIComponent(strippedPath);
 };
 
 export const getPathHierarchy = (fullPath, skipRootFolder = true) => {

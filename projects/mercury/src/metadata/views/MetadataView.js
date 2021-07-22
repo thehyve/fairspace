@@ -308,8 +308,11 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {initialLoad();}, []);
 
-    if ((error && error.message) || (facetsError && facetsError.message)) {
+    if ((error && error.message)) {
         return <MessageDisplay message={error.message} />;
+    }
+    if (facetsError && facetsError.message) {
+        return <MessageDisplay message={facetsError.message} />;
     }
     if (loading || facetsLoading) {
         return <LoadingInlay />;

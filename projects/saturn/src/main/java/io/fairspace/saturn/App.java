@@ -3,9 +3,12 @@ package io.fairspace.saturn;
 import io.fairspace.saturn.auth.SaturnSecurityHandler;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.views.*;
 import lombok.extern.log4j.*;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.eclipse.jetty.server.session.SessionHandler;
+
+import java.sql.*;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
@@ -18,9 +21,21 @@ public class App {
     public static void main(String[] args) {
         log.info("Saturn is starting");
 
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena);
+        ViewStoreClientFactory viewStoreClientFactory = null;
+        if (CONFIG.viewDatabase.enabled) {
+            try {
+                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase);
+            } catch (SQLException e) {
+                log.error("Error connecting to the view database.", e);
+                throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
+            }
+        }
+        var ds = SaturnDatasetFactory.connect(
+                CONFIG.jena,
+                viewStoreClientFactory
+        );
 
-        var svc = new Services(CONFIG, VIEWS_CONFIG, ds);
+        var svc = new Services(CONFIG, VIEWS_CONFIG, ds, viewStoreClientFactory);
 
         var serverBuilder = FusekiServer.create()
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
@@ -37,5 +52,4 @@ public class App {
 
         log.info("Saturn has started");
     }
-
 }

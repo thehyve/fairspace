@@ -29,7 +29,7 @@ public class TransactionsTest {
         config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
         config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
 
-        ds = SaturnDatasetFactory.connect(config);
+        ds = SaturnDatasetFactory.connect(config, null);
     }
 
     @After

@@ -40,4 +40,8 @@ module.exports = (app) => {
         target: 'http://localhost:8080/',
         onProxyReq: addToken
     }));
+
+    app.use(proxy('/actuator/health', {
+        target: 'http://localhost:8080/'
+    }));
 };

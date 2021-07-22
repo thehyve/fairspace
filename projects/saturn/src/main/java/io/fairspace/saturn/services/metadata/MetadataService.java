@@ -71,6 +71,7 @@ public class MetadataService {
                     .map(p -> p.as(Property.class))
                     .forEach(property -> m.listStatements(null, property, resource)
                             .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
+                            .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted))
                             .forEachRemaining(stmt -> {
                                 model.add(stmt);
                                 if (withValueProperties) {
@@ -201,7 +202,7 @@ public class MetadataService {
     private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd) {
         modelToAdd.listSubjects()
                 .andThen(modelToRemove.listSubjects())
-                .filterDrop(permissions::canWriteMetadata)
+                .filterDrop(s -> permissions.canWriteMetadata(s.inModel(before)))
                 .forEachRemaining(s -> {
                     throw new AccessDeniedException(s.getURI());
                 });

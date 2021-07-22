@@ -8,11 +8,11 @@ public enum Status {
     /**
      * The contents of the collection is read-only.
      */
-    Archived,
+    ReadOnly,
     /**
      * The contents of the collection is not accessible.
      */
-    Closed,
+    Archived,
     /**
      * The content of the collection is permanently unavailable.
      */

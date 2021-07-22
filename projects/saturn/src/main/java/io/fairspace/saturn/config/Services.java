@@ -4,14 +4,13 @@ import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.health.HealthService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.views.QueryService;
-import io.fairspace.saturn.services.views.SparqlQueryService;
-import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.BlobStore;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -53,8 +52,9 @@ public class Services {
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
+    private final HealthService healthService;
 
-    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset) {
+    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
         this.config = config;
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
@@ -84,9 +84,13 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        viewService = new ViewService(viewsConfig, filteredDataset);
-        queryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset);
+        queryService = viewStoreClientFactory == null
+                ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
+                : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
+        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory);
 
         searchService = new SearchService(filteredDataset);
+
+        healthService = new HealthService(viewStoreClientFactory == null ? null : viewStoreClientFactory.dataSource);
     }
 }

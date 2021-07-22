@@ -56,6 +56,20 @@ public class MetadataServiceTest {
     }
 
     @Test
+    public void testGetWillNotReturnsDeleted() {
+        var statement = createStatement(S2, createProperty("https://institut-curie.org/ontology#sample"), S1);
+        txn.executeWrite(m -> m
+                .add(statement)
+                .add(S1, RDF.type, createResource( "https://institut-curie.org/ontology#BiologicalSample"))
+                .add(S1, RDFS.label, "Sample 1")
+                .add(S2, RDF.type, FS.File)
+                .add(S2, RDFS.label, "File 1")
+                .add(S2, FS.dateDeleted, "2021-07-06")
+        );
+        assertFalse(api.get(S1.getURI(), false).contains(statement));
+    }
+
+    @Test
     public void testPutWillAddStatements() {
         var delta = modelOf(STMT1, STMT2);
 

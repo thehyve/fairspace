@@ -4,6 +4,7 @@ pluto:
   domains:
     - http://localhost:8080
   force-https: false
+  downstreamServiceHealthUrl: http://localhost:8090/api/health/
   oauth2:
     base-url: http://localhost:5100
     realm: fairspace

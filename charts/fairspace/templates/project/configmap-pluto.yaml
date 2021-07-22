@@ -9,13 +9,20 @@ data:
   application.yaml: |-
     pluto:
       domains:
-        - https://{{ .Values.fairspace.ingress.domain }}
+        - {{ template "fairspace.scheme" . }}://{{ .Values.fairspace.ingress.domain }}
 {{ if .Values.pluto.externalDomains }}{{ toYaml .Values.pluto.externalDomains | indent 8 }}{{ end }}
+      downstreamServiceHealthUrl: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}/api/health/
       oauth2:
         base-url: {{ .Values.external.keycloak.baseUrl }}
         realm: {{ .Values.external.keycloak.realm }}
       storages:
 {{ toYaml .Values.fairspace.storages | indent 8 }}
+
+    management:
+      endpoint:
+        health:
+          probes:
+            enabled: true
 
     logging:
       level:
@@ -29,9 +36,9 @@ data:
 
     security:
       oidc:
-        redirect-after-logout-url: https://{{ .Values.fairspace.ingress.domain }}
+        redirect-after-logout-url: {{ template "fairspace.scheme" . }}://{{ .Values.fairspace.ingress.domain }}/login
         clientId: {{ .Values.external.keycloak.clientId }}
-        clientSecret: {{ .Values.external.keycloak.clientSecret }}
+        clientSecret: '{{ .Values.external.keycloak.clientSecret }}'
 
     spring:
       zipkin:

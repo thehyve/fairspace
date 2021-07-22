@@ -12,11 +12,10 @@ import org.springframework.web.cors.DefaultCorsProcessor;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD;
+import static org.springframework.http.HttpHeaders.*;
 
 /**
  * This class overrides the {@link DefaultCorsProcessor} implementation in
@@ -36,9 +35,6 @@ public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {
         String requestOrigin = request.getHeaders().getOrigin();
         String allowOrigin = checkOrigin(config, requestOrigin);
         HttpHeaders responseHeaders = response.getHeaders();
-
-        responseHeaders.addAll(HttpHeaders.VARY, Arrays.asList(HttpHeaders.ORIGIN,
-                ACCESS_CONTROL_REQUEST_METHOD, HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS));
 
         if (allowOrigin == null) {
             log.debug("Rejecting CORS request because '" + requestOrigin + "' origin is not allowed");

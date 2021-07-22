@@ -67,3 +67,9 @@ pluto:
       storage-test-search:
         path: /api/storages/test/search/files/**
         url: ${pluto.storages.test.search-url}
+
+postgres:
+  persistence:
+    storage:
+      size : 60Gi
+      storageClass: expandable

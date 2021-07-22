@@ -1,7 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.vocabulary.FS;
+import lombok.*;
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.*;
 import org.apache.jena.query.*;
@@ -57,12 +58,16 @@ public class ViewService {
             """, FS.NS));
 
 
-    private final ViewsConfig searchConfig;
+    private final Config.Search searchConfig;
+    private final ViewsConfig viewsConfig;
     private final Dataset ds;
+    private final ViewStoreClientFactory viewStoreClientFactory;
 
-    public ViewService(ViewsConfig viewsConfig, Dataset ds) {
-        this.searchConfig = viewsConfig;
+    public ViewService(Config.Search searchConfig, ViewsConfig viewsConfig, Dataset ds, ViewStoreClientFactory viewStoreClientFactory) {
+        this.searchConfig = searchConfig;
+        this.viewsConfig = viewsConfig;
         this.ds = ds;
+        this.viewStoreClientFactory = viewStoreClientFactory;
     }
 
     private Object convertLiteralValue(Object value) {
@@ -70,6 +75,16 @@ public class ViewService {
             return ofEpochMilli(((XSDDateTime) value).asCalendar().getTimeInMillis());
         }
         return value;
+    }
+
+    @SneakyThrows
+    Range getColumnRange(View view, View.Column column) {
+        if (!EnumSet.of(ColumnType.Date, ColumnType.Number).contains(column.type)) {
+            return null;
+        }
+        try (var reader = new ViewStoreReader(searchConfig, viewStoreClientFactory)) {
+            return reader.aggregate(view.name, column.name);
+        }
     }
 
     private FacetDTO getFacetInfo(View view, View.Column column) {
@@ -97,13 +112,21 @@ public class ViewService {
                 }
             }
             case Number, Date -> {
-                var binding = new QuerySolutionMap();
-                binding.add("predicate", createResource(column.source));
+                if (viewStoreClientFactory != null) {
+                    var range = getColumnRange(view, column);
+                    if (range != null) {
+                        min = range.getStart();
+                        max = range.getEnd();
+                    }
+                } else {
+                    var binding = new QuerySolutionMap();
+                    binding.add("predicate", createResource(column.source));
 
-                try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
-                    var row = execution.execSelect().next();
-                    min = ofNullable(row.getLiteral("min")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
-                    max = ofNullable(row.getLiteral("max")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                    try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
+                        var row = execution.execSelect().next();
+                        min = ofNullable(row.getLiteral("min")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                        max = ofNullable(row.getLiteral("max")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                    }
                 }
             }
         }
@@ -112,7 +135,7 @@ public class ViewService {
     }
 
     public List<FacetDTO> getFacets() {
-        return calculateRead(ds, () -> searchConfig.views
+        return calculateRead(ds, () -> viewsConfig.views
                 .stream()
                 .flatMap(view ->
                         view.columns.stream()
@@ -123,7 +146,7 @@ public class ViewService {
     }
 
     public List<ViewDTO> getViews() {
-        return searchConfig.views.stream()
+        return viewsConfig.views.stream()
                 .map(v -> {
                     var columns = new ArrayList<ColumnDTO>();
                     columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier));
@@ -131,7 +154,7 @@ public class ViewService {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type));
                     }
                     for (var j : v.join) {
-                        var joinView = searchConfig.views.stream().filter(view -> view.name.equalsIgnoreCase(j.view)).findFirst().orElse(null);
+                        var joinView = viewsConfig.views.stream().filter(view -> view.name.equalsIgnoreCase(j.view)).findFirst().orElse(null);
                         if (joinView == null) {
                             continue;
                         }

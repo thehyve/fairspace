@@ -54,6 +54,7 @@ public class DavFactoryTest {
     @Mock
     MetadataService metadataService;
     WorkspaceService workspaceService;
+    Workspace workspace;
 
     Context context = new Context();
     User user;
@@ -103,7 +104,7 @@ public class DavFactoryTest {
         request = getCurrentRequest();
 
         selectAdmin();
-        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
         workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 
@@ -187,19 +188,17 @@ public class DavFactoryTest {
 
     @Test
     public void testAdminAccess() throws NotAuthorizedException, BadRequestException, ConflictException {
+        selectWorkspaceManager();
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
-        root.createCollection("coll");
-
         var collName = "coll";
-        model.removeAll(null, FS.canManage, model.createResource(baseUri + "/" + collName));
+        root.createCollection(collName);
 
         selectAdmin();
-
         assertEquals(1, root.getChildren().size());
+        assertEquals(Access.Manage, ((DavFactory) factory).getAccess(model.getResource(baseUri + "/" + collName)));
 
-        selectWorkspaceManager();
-
-        assertEquals(1, root.getChildren().size());
+        model.removeAll(model.getResource(admin.getIri().getURI()), FS.isManagerOf, model.getResource(workspace.getIri().getURI()));
+        assertEquals(Access.List, ((DavFactory) factory).getAccess(model.getResource(baseUri + "/" + collName)));
     }
 
     @Test(expected = ConflictException.class)

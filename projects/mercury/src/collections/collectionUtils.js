@@ -12,7 +12,9 @@ import type {
 // eslint-disable-next-line import/no-cycle
 import {accessLevels} from "./CollectionAPI";
 import {compareBy, comparing} from "../common/utils/genericUtils";
+// eslint-disable-next-line import/no-cycle
 import {encodePath} from "../file/fileUtils";
+import {isAdmin} from "../users/userUtils";
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -67,18 +69,14 @@ export const sortPermissions = (permissions) => {
     ));
 };
 
-export const compareTo: boolean = (currentAccess, baseAccess) => (
-    permissionLevel(currentAccess) >= permissionLevel(baseAccess)
-);
-
 /**
  * Check if collaborator can alter permission. User can alter permission if:
  * - has manage access to a resource
- * - permission is not his/hers
+ * - permission is not his/hers, unless is admin
  */
 export const canAlterPermission = (canManage, user, currentLoggedUser) => {
     const isSomeoneElsePermission = currentLoggedUser.iri !== user.iri;
-    return canManage && isSomeoneElsePermission;
+    return canManage && (isSomeoneElsePermission || !!isAdmin(user));
 };
 
 export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
@@ -105,7 +103,7 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
         case "MetadataPublished":
             return "All users can see collection metadata.";
         case "DataPublished":
-            return "For archived collections only, all users can see collection data and metadata.";
+            return "For read-only collections, all users can see collection data and metadata.";
         default:
             return "";
     }
@@ -145,9 +143,9 @@ export const descriptionForStatus = (status: Status) => {
     switch (status) {
         case "Active":
             return "Editing data and metadata enabled.";
+        case "ReadOnly":
+            return "Data immutable, available only for reading.";
         case "Archived":
-            return "Data immutable, read-only.";
-        case "Closed":
             return "Data not available for reading.";
         default:
             return "";
