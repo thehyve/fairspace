@@ -150,12 +150,13 @@ export const formatDateTime = (value) => {
 };
 
 /**
- * Splits camel case string into whitespace separated string
+ * Splits camel case string into separated strings
  *
  * @param value
- * @returns {string} whitespace separated string
+ * @param separator whitespace by default
+ * @returns {string} separated string
  */
-export const camelCaseToWords = value => ((typeof value !== 'string')
-    ? '' : value.replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+export const camelCaseToWords = (value, separator = " ") => ((typeof value !== 'string')
+    ? '' : value.replace(/([a-z0-9])([A-Z])/g, `$1${separator}$2`)
         .replace(/.*/, (v) => v.charAt(0) + v.slice(1).toLowerCase())
 );

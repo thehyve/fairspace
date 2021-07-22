@@ -187,7 +187,7 @@ const CollectionList = ({
                                         </TableCell>
                                     ) }
                                     <TableCell>
-                                        {collection.status}
+                                        {camelCaseToWords(collection.status, "-")}
                                     </TableCell>
                                     <TableCell>
                                         {camelCaseToWords(collection.accessMode)}

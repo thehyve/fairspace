@@ -115,8 +115,8 @@ and edit the associated metadata.
 Users with _manage_ access can share collections with other users or workspaces,
 and change the default access mode for workspace members.
 Collection managers can also change the status of the collection
-(_Active_, _Archived_ or _Closed_), change the view mode
-(_Restricted_, _Metadata published_ or _Data published_ -- only available in the _Archived_ status),
+(_Active_, _Read-only_ or _Archived_), change the view mode
+(_Restricted_, _Metadata published_ or _Data published_ -- only available in the _Read-only_ status),
 delete the collection,
 or transfer ownership of the collection to another workspace.
 
@@ -1800,8 +1800,8 @@ During the lifetime of a collection, different rules may be applicable for data 
 In Fairspace, collections follow a workflow with the following statuses:
 
 * _Active_: for the phase of data collection, data production and data processing;
-* _Archived_: for when the data set is complete and is available for reuse;
-* _Closed_: for when the data set should not be available for reading, but still needs to be preserved;
+* _Read-only_: for when the data set is complete and is available for reuse;
+* _Archived_: for when the data set should not be available for reading, but still needs to be preserved;
 * _Deleted_: for when the data set needs to be permanently made unavailable.
 This status is irreversible. There is one exception to this rule – for the sake of data loss prevention, in special cases, administrators can still undelete a collection that was already deleted.
 

@@ -25,13 +25,13 @@ split
     end note
     end
 split again
-    :Archived;
+    :Read-only;
     note right
         Read-only, immutable,
         access explicitly granted,
         metadata published.
     end note
-    :Closed;
+    :Archived;
     note right
         No access,
         metadata unpublished.

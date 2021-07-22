@@ -94,9 +94,9 @@ public class DavFactory implements ResourceFactory {
             } else {
                 access = min(access, Access.List);
             }
-        } else if (coll.hasProperty(FS.status, Status.Archived.name())) {
+        } else if (coll.hasProperty(FS.status, Status.ReadOnly.name())) {
             access = min(access, Access.Read);
-        } else if (coll.hasProperty(FS.status, Status.Closed.name())) {
+        } else if (coll.hasProperty(FS.status, Status.Archived.name())) {
             access = min(access, Access.List);
         }
 

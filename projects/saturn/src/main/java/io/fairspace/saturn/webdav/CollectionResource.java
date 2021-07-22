@@ -156,7 +156,7 @@ class CollectionResource extends DirectoryResource {
      * - the collection is deleted; or
      * - the access mode is {@link AccessMode#DataPublished}, which is terminal;
      * returns all access modes except that {@link AccessMode#DataPublished} is only
-     * included when in status {@link Status#Archived}.
+     * included when in status {@link Status#ReadOnly}.
      */
     public Set<AccessMode> availableAccessModes() {
         if (!canManage()) {
@@ -169,7 +169,7 @@ class CollectionResource extends DirectoryResource {
 
         var accessModes = EnumSet.of(AccessMode.MetadataPublished, AccessMode.Restricted);
 
-        if (getStatus() == Status.Archived) {
+        if (getStatus() == Status.ReadOnly) {
             accessModes.add(AccessMode.DataPublished);
         }
 
@@ -216,10 +216,10 @@ class CollectionResource extends DirectoryResource {
         }
 
         if (getAccessMode() == AccessMode.DataPublished) {
-            return EnumSet.of(Status.Archived);
+            return EnumSet.of(Status.ReadOnly);
         }
 
-        return EnumSet.of(Status.Active, Status.Closed, Status.Archived);
+        return EnumSet.of(Status.Active, Status.Archived, Status.ReadOnly);
     }
 
     /**
@@ -392,7 +392,7 @@ class CollectionResource extends DirectoryResource {
     @Override
     protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
         super.undelete();
-        subject.removeAll(FS.status).addProperty(FS.status, Status.Closed.name());
+        subject.removeAll(FS.status).addProperty(FS.status, Status.Archived.name());
     }
 
     private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {
