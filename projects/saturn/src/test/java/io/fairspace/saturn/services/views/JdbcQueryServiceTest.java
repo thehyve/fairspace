@@ -26,6 +26,7 @@ import org.mockito.junit.*;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
@@ -237,7 +238,29 @@ public class JdbcQueryServiceTest {
         Assert.assertEquals(1, row1.get("Subject").size());
         var row2 = page.getRows().get(1);
         Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals(1, row2.get("Resource_analysisType").size());
+        Assert.assertEquals(
+                Set.of("RNA-seq", "Whole genome sequencing"),
+                row2.get("Resource_analysisType").stream().map(ValueDTO::getLabel).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void testRetrieveSamplePageIncludeJoinAfterReindexing() {
+        maintenanceService.recreateIndex();
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        request.setIncludeJoinedViews(true);
+        var page = queryService.retrieveViewPage(request);
+        Assert.assertEquals(2, page.getRows().size());
+        var row1 = page.getRows().get(0);
+        Assert.assertEquals("Sample A for subject 1", row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(1, row1.get("Subject").size());
+        var row2 = page.getRows().get(1);
+        Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                Set.of("RNA-seq", "Whole genome sequencing"),
+                row2.get("Resource_analysisType").stream().map(ValueDTO::getLabel).collect(Collectors.toSet()));
     }
 
     @Test
@@ -262,6 +285,21 @@ public class JdbcQueryServiceTest {
 
     @Test
     public void testSearchFilesRestrictsToAccessibleCollections() {
+        var request = new FileSearchRequest();
+        // There is one file named coffee.jpg in coll1, not accessible by the regular user.
+        request.setQuery("coffee");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(0, results.size());
+
+        selectAdmin();
+        results = queryService.searchFiles(request);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
+    }
+
+    @Test
+    public void testSearchFilesRestrictsToAccessibleCollectionsAfterReindexing() {
+        maintenanceService.recreateIndex();
         var request = new FileSearchRequest();
         // There is one file named coffee.jpg in coll1, not accessible by the regular user.
         request.setQuery("coffee");

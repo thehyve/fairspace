@@ -5,6 +5,7 @@ import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.services.views.Table.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
+import org.apache.commons.lang3.tuple.*;
 
 import java.sql.*;
 import java.time.*;
@@ -110,15 +111,14 @@ public class ViewStoreClient implements AutoCloseable {
     int insertValues(
             Table table,
             ColumnDefinition idColumn,
-            String id,
             ColumnDefinition valueColumn,
-            Collection<String> values) throws SQLException {
+            Collection<Pair<String, String>> values) throws SQLException {
         var insertSql = "insert into " + table.name + " ( " +
                 idColumn.name + ", " + valueColumn.name + " ) values ( ?, ? )";
         try (var insert = connection.prepareStatement(insertSql)) {
-            for (String value : values) {
-                insert.setString(1, id);
-                insert.setString(2, value);
+            for (var value : values) {
+                insert.setString(1, value.getKey());
+                insert.setString(2, value.getValue());
                 insert.addBatch();
             }
             return Arrays.stream(insert.executeBatch()).sum();
@@ -140,9 +140,10 @@ public class ViewStoreClient implements AutoCloseable {
         var insertCount = insertValues(
                 propertyTable,
                 idColumn(view),
-                id,
                 valueColumn,
-                values.stream().filter(value -> !existing.contains(value)).collect(Collectors.toList()));
+                values.stream().filter(value -> !existing.contains(value))
+                        .map(value -> Pair.of(id, value))
+                        .collect(Collectors.toList()));
 
         log.debug("Deleted {}, inserted {} values for {}_{}", deleteCount, insertCount, view, property);
     }
@@ -161,9 +162,11 @@ public class ViewStoreClient implements AutoCloseable {
         var insertCount = insertValues(
                 joinTable,
                 idColumn(view),
-                id,
                 idColumn(joinView),
-                links.stream().filter(link -> !existing.contains(link)).collect(Collectors.toList()));
+                links.stream()
+                        .filter(link -> !existing.contains(link))
+                        .map(link -> Pair.of(id, link))
+                        .collect(Collectors.toList()));
 
         log.debug("Deleted {}, inserted {} links for {} - {}", deleteCount, insertCount, view, joinView);
     }

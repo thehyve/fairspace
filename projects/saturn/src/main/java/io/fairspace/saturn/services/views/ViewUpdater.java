@@ -4,7 +4,9 @@ import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.*;
 import io.fairspace.saturn.vocabulary.*;
 import lombok.extern.slf4j.*;
+import org.apache.commons.lang3.tuple.*;
 import org.apache.jena.graph.*;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
 import org.apache.jena.sparql.core.*;
 import org.apache.jena.vocabulary.*;
@@ -20,6 +22,8 @@ import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
+import static io.fairspace.saturn.services.views.Table.idColumn;
+import static io.fairspace.saturn.services.views.Table.valueColumn;
 import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 
 @Slf4j
@@ -83,6 +87,27 @@ public class ViewUpdater implements AutoCloseable {
         };
     }
 
+    /**
+     * If the subject is a protected resource, add the collection name to the row.
+     * @param type The type IRI
+     * @param subject The subject node
+     * @param row the map to add the collection name to with key 'collection'.
+     */
+    private void addCollectionToProtectedResourceRow(String type, Node subject, Map<String, Object> row) {
+        if (protectedResources.contains(type)) {
+            // set collection name
+            var rootLocation = CONFIG.publicUrl + "/api/webdav" + "/";
+            if (!subject.getURI().startsWith(rootLocation)) {
+                log.error("Unexpected protected resource identifier: {}", subject.getURI());
+                log.error("Protected resource identifier should start with {}", rootLocation);
+                throw new IllegalStateException("Unexpected resource identifier: " + subject.getURI());
+            }
+            var location = subject.getURI().substring(rootLocation.length());
+            var collection = URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
+            row.put("collection", collection);
+        }
+    }
+
     public void updateSubject(Node subject) {
         if (!subject.isURI()) {
             return;
@@ -108,18 +133,7 @@ public class ViewUpdater implements AutoCloseable {
                 var row = new HashMap<String, Object>();
                 row.put("id", subject.getURI());
                 row.put("label", getLabel(graph, subject));
-                if (protectedResources.contains(type.getURI())) {
-                    // set collection name
-                    var rootLocation = CONFIG.publicUrl + "/api/webdav" + "/";
-                    if (!subject.getURI().startsWith(rootLocation)) {
-                        log.error("Unexpected protected resource identifier: {}", subject.getURI());
-                        log.error("Protected resource identifier should start with {}", rootLocation);
-                        throw new IllegalStateException("Unexpected resource identifier: " + subject.getURI());
-                    }
-                    var location = subject.getURI().substring(rootLocation.length());
-                    var collection = URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
-                    row.put("collection", collection);
-                }
+                addCollectionToProtectedResourceRow(type.getURI(), subject, row);
                 // Update subject value columns
                 try {
                     for (var column: view.columns) {
@@ -192,17 +206,58 @@ public class ViewUpdater implements AutoCloseable {
         // Clear database tables for view
         viewStoreClient.truncateViewTables(view.name);
         for (String type : view.types) {
-            var valueColumns = view.columns.stream()
-                    .filter(column -> !column.type.isSet())
+            copyValuesForType(view, type);
+            var valueSetColumns = view.columns.stream()
+                    .filter(column -> column.type.isSet())
                     .collect(Collectors.toList());
-            var attributes = valueColumns.stream()
-                    .map(column -> "OPTIONAL {?id <" + column.source + "> " + "?" + column.name + " . }\n")
-                    .collect(Collectors.joining());
-            var attributeNames = valueColumns.stream()
-                    .map(c -> "?" + c.name)
-                    .collect(Collectors.joining(" "));
+            for (var valueSetColumn: valueSetColumns) {
+                copyValueSetsForColumn(view, type, valueSetColumn);
+            }
+            for (var join: view.join) {
+                if (!join.reverse) {
+                    copyLinks(view, type, join);
+                }
+            }
+        }
+    }
 
-            var query = """
+    private Map<String, Object> transformResult(
+            String type, List<ViewsConfig.View.Column> columns, QuerySolution result) throws SQLException {
+        var values = new HashMap<String, Object>();
+        var subject = result.getResource("id");
+        values.put("id", subject.getURI());
+        values.put("label", result.getLiteral("label").toString());
+        addCollectionToProtectedResourceRow(type, subject.asNode(), values);
+        for (var column: columns) {
+            var resultNode = result.get(column.name);
+            if (resultNode != null) {
+                values.put(column.name.toLowerCase(), getValue(column, resultNode.asNode()));
+            }
+        }
+        return values;
+    }
+
+    /**
+     * Copy rows of values for a specified type to the view database in bulk.
+     *
+     * All simple values (no value sets) for the type are queried and the rows are inserted
+     * into the view database in batches of 1000 rows.
+     *
+     * @param view The view for which to update the values.
+     * @param type The subject type (for when the view includes multiple types)
+     */
+    public void copyValuesForType(ViewsConfig.View view, String type) throws SQLException {
+        var columns = view.columns.stream()
+                .filter(column -> !column.type.isSet())
+                .collect(Collectors.toList());
+        var attributes = columns.stream()
+                .map(column -> "OPTIONAL {?id <" + column.source + "> " + "?" + column.name + " . }\n")
+                .collect(Collectors.joining());
+        var attributeNames = columns.stream()
+                .map(c -> "?" + c.name)
+                .collect(Collectors.joining(" "));
+
+        var query = """
                     PREFIX rdfs: <%s>
                     SELECT ?id ?label %s
                     WHERE {
@@ -212,27 +267,16 @@ public class ViewUpdater implements AutoCloseable {
                     }
                 """.formatted(RDFS.getURI(), attributeNames, type, attributes);
 
-            copyValuesFromQuery(view, valueColumns, query);
-        }
-        // TODO: add joins and value sets
-    }
-
-    /**
-     * Copy data from Jena to Postgres.
-     * <p>
-     * Insert into postgres is done in the 'forEachRemaining' of the Jena read. This prevents us
-     * from doing a slow sorted sparql query with limit and offset.
-     */
-    public void copyValuesFromQuery(ViewsConfig.View view, List<ViewsConfig.View.Column> columns, String query) throws SQLException {
         var rows = new ArrayList<Map<String, Object>>();
         var error = new AtomicReference<SQLException>();
+        final int[] updateCount = new int[1];
         SparqlUtils.querySelect(dsg, query, (QuerySolution q) -> {
-            // read yielded jena data
+            // read query results
             try {
-                rows.add(transformResult(columns, q));
-                // copy in chunks to postgres
+                rows.add(transformResult(type, columns, q));
+                // copy in chunks to the view database
                 if (rows.size() == 1000) {
-                    viewStoreClient.updateRows(view.name, rows, true);
+                    updateCount[0] += viewStoreClient.updateRows(view.name, rows, true);
                     rows.clear();
                 }
             } catch (SQLException e) {
@@ -243,21 +287,111 @@ public class ViewUpdater implements AutoCloseable {
         if (error.get() != null) {
             throw error.get();
         }
-        // copy any remaining items to postgres
-        int updateCount = viewStoreClient.updateRows(view.name, rows, true);
-        log.debug("Inserted {} rows for view {}", updateCount, view.name);
+        // copy any remaining items to the view database
+        updateCount[0] += viewStoreClient.updateRows(view.name, rows, true);
+        log.debug("Inserted {} rows for view {}", updateCount[0], view.name);
     }
 
-    private Map<String, Object> transformResult(List<ViewsConfig.View.Column> columns, QuerySolution result) throws SQLException {
-        var values = new HashMap<String, Object>();
-        values.put("id", result.getResource("id").getURI());
-        values.put("label", result.getLiteral("label").toString());
-        for (var column: columns) {
-            var resultNode = result.get(column.name);
-            if (resultNode != null) {
-                values.put(column.name.toLowerCase(), getValue(column, resultNode.asNode()));
+    /**
+     * Copy value sets for a specified type and property to the view database in bulk.
+     *
+     * All values for the type and property are queried and the (subject, value) tuples are inserted
+     * into the view database in batches of 1000 tuples.
+     *
+     * @param view The view for which to update the value set property.
+     * @param type The subject type (for when the view includes multiple types)
+     * @param column The view column of value set property.
+     */
+    public void copyValueSetsForColumn(ViewsConfig.View view, String type, ViewsConfig.View.Column column) throws SQLException {
+        var property = column.name;
+        var propertyTable = viewStoreClient.configuration.propertyTables.get(view.name).get(property);
+        var idColumn = idColumn(view.name);
+        var propertyColumn = valueColumn(column.name, ViewsConfig.ColumnType.Identifier);
+        var predicate = Arrays.stream(column.source.split("\\s+"))
+                .map("<%s>"::formatted).collect(Collectors.joining("/"));
+        var query = """
+                    SELECT ?id ?%s
+                    WHERE {
+                        ?id a <%s> .
+                        ?id %s ?%s .
+                    }
+                """.formatted(property, type, predicate, property);
+        var rows = new ArrayList<Pair<String, String>>();
+        var error = new AtomicReference<SQLException>();
+        final int[] updateCount = new int[1];
+        SparqlUtils.querySelect(dsg, query, (QuerySolution q) -> {
+            // read query results
+            try {
+                rows.add(Pair.of(
+                        q.getResource("id").getURI(),
+                        getValue(column, q.get(column.name).asNode()).toString())
+                );
+                // copy in chunks to the view database
+                if (rows.size() == 1000) {
+                    updateCount[0] += viewStoreClient.insertValues(propertyTable, idColumn, propertyColumn, rows);
+                    rows.clear();
+                }
+            } catch (SQLException e) {
+                error.set(e);
+                throw new RuntimeException("Failed to bulk insert rows", e);
             }
+        });
+        if (error.get() != null) {
+            throw error.get();
         }
-        return values;
+        // copy any remaining items to the view database
+        updateCount[0] += viewStoreClient.insertValues(propertyTable, idColumn, propertyColumn, rows);
+        log.debug("Inserted {} rows for property {} of view {}", updateCount[0], column.name, view.name);
+    }
+
+    /**
+     * Copy view join links for a specified type and join relation to the view database in bulk.
+     *
+     * All join links for the type and join relation are queried and the (source, target) tuples are inserted
+     * into the view database in batches of 1000 tuples.
+     *
+     * @param view The view for which to update the join links.
+     * @param type The subject type (for when the view includes multiple types)
+     * @param join The join relation.
+     */
+    public void copyLinks(ViewsConfig.View view, String type, ViewsConfig.View.JoinView join) throws SQLException {
+        var joinTable = viewStoreClient.configuration.joinTables.get(view.name).get(join.view);
+        var idColumn = idColumn(view.name);
+        var joinColumn = idColumn(join.view);
+        var predicate = Arrays.stream(join.on.split("\\s+"))
+                .map("<%s>"::formatted).collect(Collectors.joining("/"));
+        var query = """
+                    SELECT ?source ?target
+                    WHERE {
+                        ?source a <%s> .
+                        ?source %s ?target .
+                    }
+                """.formatted(type, predicate);
+        var rows = new ArrayList<Pair<String, String>>();
+        var error = new AtomicReference<SQLException>();
+        final int[] updateCount = new int[1];
+        SparqlUtils.querySelect(dsg, query, (QuerySolution q) -> {
+            // read query results
+            try {
+                rows.add(Pair.of(
+                        q.getResource("source").getURI(),
+                        q.getResource("target").getURI()
+                ));
+                // copy in chunks to the view database
+                if (rows.size() == 1000) {
+                    updateCount[0] += viewStoreClient.insertValues(joinTable, idColumn, joinColumn, rows);
+                    rows.clear();
+                }
+            } catch (SQLException e) {
+                error.set(e);
+                throw new RuntimeException("Failed to bulk insert rows", e);
+            }
+        });
+        if (error.get() != null) {
+            throw error.get();
+        }
+        // copy any remaining items to the view database
+        updateCount[0] += viewStoreClient.insertValues(joinTable, idColumn, joinColumn, rows);
+        log.debug("Inserted {} rows for join of view {} with view {}", updateCount[0], view.name, join.view);
     }
 }
