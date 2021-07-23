@@ -2496,7 +2496,7 @@ saturn:
 pluto:
   image:
     pullPolicy: Always
-  socketTimeoutMillis: 10000
+  socketTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
   maxFileSize: 1GB
   maxRequestSize: 1GB
