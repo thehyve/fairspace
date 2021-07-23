@@ -3,8 +3,7 @@ package io.fairspace.saturn.services.maintenance;
 import io.fairspace.saturn.services.BaseApp;
 
 import static javax.servlet.http.HttpServletResponse.*;
-import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
-import static spark.Spark.get;
+import static spark.Spark.post;
 
 public class MaintenanceApp extends BaseApp {
     private final MaintenanceService maintenanceService;
@@ -17,11 +16,10 @@ public class MaintenanceApp extends BaseApp {
 
     @Override
     protected void initApp() {
-        get("/reindex", (req, res) -> {
-            res.type(APPLICATION_JSON.asString());
+        post("/reindex", (req, res) -> {
             maintenanceService.startRecreateIndexTask();
-            res.status(SC_OK);
-            return null;
+            res.status(SC_NO_CONTENT);
+            return "";
         });
     }
 }
