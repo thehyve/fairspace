@@ -1,6 +1,8 @@
 package io.fairspace.saturn.services.maintenance;
 
 import io.fairspace.saturn.config.ConfigLoader;
+import io.fairspace.saturn.services.*;
+import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.views.*;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -14,10 +16,12 @@ import java.util.concurrent.*;
 public class MaintenanceService {
     private final ThreadPoolExecutor threadpool = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+    private final UserService userService;
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
 
-    public MaintenanceService(@NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
+    public MaintenanceService(@NonNull UserService userService, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
+        this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
     }
@@ -30,13 +34,16 @@ public class MaintenanceService {
         return threadpool.getActiveCount() > 0;
     }
 
-    public void startRecreateIndexTask() {
+    public synchronized void startRecreateIndexTask() {
+        if (!userService.currentUser().isAdmin()) {
+            throw new AccessDeniedException();
+        }
         if (disabled()) {
-            throw new RuntimeException("Service not available");
+            throw new NotAvailableException("Service not available");
         }
         if (active()) {
             log.info("Reindexing is already in progress.");
-            throw new RuntimeException("Reindexing is already in progress.");
+            throw new ConflictException("Reindexing is already in progress.");
         }
         threadpool.submit(() -> {
             log.info("Start asynchronous reindexing task");

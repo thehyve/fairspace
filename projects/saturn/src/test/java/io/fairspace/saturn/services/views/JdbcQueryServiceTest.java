@@ -87,7 +87,7 @@ public class JdbcQueryServiceTest {
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
 
-        maintenanceService = new MaintenanceService(ds, viewStoreClientFactory);
+        maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory);
 
         workspaceService = new WorkspaceService(tx, userService);
 
