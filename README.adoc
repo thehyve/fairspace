@@ -1371,7 +1371,7 @@ Operations on workspace entities.
 ====
 [source, bash]
 ----
-curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
+curl -H "http://localhost:8080/api/workspaces/"
 ----
 ====
 
@@ -1392,7 +1392,7 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 ====
 [source, bash]
 ----
-curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces/"
+curl -X PUT -H "Content-type: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces/"
 ----
 ====
 
@@ -1418,7 +1418,7 @@ curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http:/
 ===== Workspace users
 
 |===
-3+| ``GET /api/workspaces/users``
+3+| ``GET /api/workspaces/users/``
 
 3+| List all workspace users with workspace roles.
 3+| _Parameters:_
@@ -1434,20 +1434,25 @@ curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http:/
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?workspace=http://fairspace.com/iri/123'
+curl -G --data-urlencode "workspace=http://fairspace.com/iri/123" "http://localhost:8080/api/workspaces/users/"
 ----
 ====
 
 |===
-3+| ``PATCH /api/workspaces/users``
+3+| ``PATCH /api/workspaces/users/``
 
-3+| Update workspace users and their workspace roles.
+3+| Assign a workspace role to a user (``Member`` or ``Manager``) or revoke
+a workspace role (by assigning role ``None``).
 3+| _Parameters:_
 | ``workspace``
 | string
-| Workspace IRI (URL-encoded).
-3+| _Response:_
-3+| Response contains list of workspace users with their updated workspace roles.
+| Workspace IRI.
+| ``user``
+| string
+| User IRI
+| ``role``
+| string
+| ``None`` (to remove), ``Member`` or ``Manager``
 |===
 
 .Example of updating workspace users (curl)
@@ -1455,7 +1460,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?w
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' --data-urlencode "workspace=http://fairspace.com/iri/123" "http://localhost:8080/api/workspaces/users"
+curl -X PATCH -H "Content-type: application/json" -d '{"workspace":"http://fairspace.com/iri/123","user":"http://fairspace.com/iri/456","role":"Member"}' "http://localhost:8080/api/workspaces/users/"
 ----
 ====
 
