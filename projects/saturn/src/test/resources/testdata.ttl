@@ -76,9 +76,9 @@ file:coll2\/sample-s2-b-rna.fastq
     curie:sample sample:s2-b .
 
 file:coll2\/sample-s2-b-rna.fastq
-    curie:analysisType analysis:O6-12 .  # RNA-seq
-
+    curie:analysisType analysis:O6-12 ;  # RNA-seq
+    curie:analysisType analysis:O6-15 .  # Whole genome sequencing
 
 file:coll2\/sample-s2-b-rna_copy.fastq
-curie:aboutSubject subject:s2 ;
-curie:sample sample:s2-b .
+    curie:aboutSubject subject:s2 ;
+    curie:sample sample:s2-b .

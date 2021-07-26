@@ -206,20 +206,26 @@ public class ViewStoreClientFactory {
         if (view.join != null) {
             // Add join tables
             for (ViewsConfig.View.JoinView join: view.join) {
-                String left = join.reverse ? join.view : view.name;
-                String right = join.reverse ? view.name : join.view;
-                var joinTable = Table.builder()
-                        .name(String.format("%s_%s", left.toLowerCase(), right.toLowerCase()))
-                        .columns(Arrays.asList(
-                                idColumn(left),
-                                idColumn(right)
-                        ))
-                        .build();
+                var joinTable = getJoinTable(join, view);
                 ensureTableExists(joinTable);
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
             }
         }
+    }
+
+    public static Table getJoinTable(View.JoinView join, View view) {
+        String left = join.reverse ? join.view : view.name;
+        String right = join.reverse ? view.name : join.view;
+        var joinTable = Table.builder()
+                .name(String.format("%s_%s", left.toLowerCase(), right.toLowerCase()))
+                .columns(Arrays.asList(
+                        idColumn(left),
+                        idColumn(right)
+                ))
+                .build();
+
+        return joinTable;
     }
 
     @Data @Builder

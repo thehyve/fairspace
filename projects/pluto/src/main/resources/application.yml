@@ -95,6 +95,6 @@ zuul:
   - Origin  # Including the header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
   set-content-length: true
   host:
-    socket-timeout-millis: 10000
+    socket-timeout-millis: 600000  # 10 minutes
     connect-timeout-millis: 2000
   ignored-services: '*'

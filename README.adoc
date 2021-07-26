@@ -1639,6 +1639,42 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/storages/'
 ----
 ====
 
+===== Maintenance
+
+|===
+2+| ``POST /api/maintenance/reindex``
+
+2+| Recreate the view database from the RDF database.
+
+Starts an asynchronous task to clean the PostgreSQL database with the data used for the metadata views, and to repopulate the database with the data from the RDF database.
+
+This can be used after a change in the data model or view configuration to ensure
+that all data is properly indexed.
+
+Only available when the application is configured with ``viewDatabase.enabled: true``.
+
+Only allowed for administrators.
+2+| _Response:_
+| ``204``
+| Asynchronous task to recreate the index has started.
+| ``403``
+| Operation not allowed. The current user is not an administrator.
+| ``409``
+| Reindexing is already in progress.
+| ``503``
+| Service not available. This means that the application is configured not to use a view database.
+|===
+
+
+.Example recreate index using curl
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/api/maintenance/reindex'
+----
+====
+
 === External file system integration
 
 As Fairspace supports the <<WebDAV>> protocol, it can be configured to connect to external data storages that implement a WebDAV interface.
@@ -2496,7 +2532,7 @@ saturn:
 pluto:
   image:
     pullPolicy: Always
-  socketTimeoutMillis: 10000
+  socketTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
   maxFileSize: 1GB
   maxRequestSize: 1GB

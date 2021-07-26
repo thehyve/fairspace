@@ -13,6 +13,7 @@ import java.util.*;
 
 @Slf4j
 public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
+    private final DatasetGraph dsg;
     private final ViewStoreClientFactory viewStoreClientFactory;
     // One set of updated subjects if write transactions are handled sequentially.
     // If many write transactions can be active simultaneously, this set needs to be
@@ -21,6 +22,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     public TxnIndexDatasetGraph(DatasetGraph dsg, ViewStoreClientFactory viewStoreClientFactory) {
         super(dsg);
+        this.dsg = dsg;
         this.viewStoreClientFactory = viewStoreClientFactory;
     }
 
@@ -52,7 +54,8 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
         if (isInWriteTransaction()) {
             log.debug("Commit updated subjects: {}", updatedSubjects);
             var start = new Date().getTime();
-            try (var viewUpdater = new ViewUpdater(viewStoreClientFactory.build(), getDefaultGraph())) {
+            try (var viewStoreClient = viewStoreClientFactory.build();
+                 var viewUpdater = new ViewUpdater(viewStoreClient, dsg)) {
                 updatedSubjects.forEach(viewUpdater::updateSubject);
                 viewUpdater.commit();
                 log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);

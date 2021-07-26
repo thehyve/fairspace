@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.dao.*;
 import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.maintenance.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.search.FileSearchRequest;
@@ -25,6 +26,7 @@ import org.mockito.junit.*;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
@@ -50,6 +52,7 @@ public class JdbcQueryServiceTest {
     WorkspaceService workspaceService;
     MetadataService api;
     QueryService queryService;
+    MaintenanceService maintenanceService;
 
     User user;
     Authentication.User userAuthentication;
@@ -83,6 +86,8 @@ public class JdbcQueryServiceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
+
+        maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory);
 
         workspaceService = new WorkspaceService(tx, userService);
 
@@ -147,6 +152,24 @@ public class JdbcQueryServiceTest {
         var page = queryService.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row = page.getRows().get(0);
+        Assert.assertEquals(Set.of("Sample", "Sample_nature", "Sample_origin", "Sample_topography", "Sample_tumorCellularity"), row.keySet());
+        Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(45.2f, ((Number)row.get("Sample_tumorCellularity").stream().findFirst().orElseThrow().getValue()).floatValue(), 0.01);
+    }
+
+    @Test
+    public void testRetrieveSamplePageAfterReindexing() {
+        maintenanceService.recreateIndex();
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        var page = queryService.retrieveViewPage(request);
+        Assert.assertEquals(2, page.getRows().size());
+        var row = page.getRows().get(0);
+        Assert.assertEquals(Set.of("Sample", "Sample_nature", "Sample_origin", "Sample_topography", "Sample_tumorCellularity"), row.keySet());
         Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
@@ -215,7 +238,29 @@ public class JdbcQueryServiceTest {
         Assert.assertEquals(1, row1.get("Subject").size());
         var row2 = page.getRows().get(1);
         Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals(1, row2.get("Resource_analysisType").size());
+        Assert.assertEquals(
+                Set.of("RNA-seq", "Whole genome sequencing"),
+                row2.get("Resource_analysisType").stream().map(ValueDTO::getLabel).collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void testRetrieveSamplePageIncludeJoinAfterReindexing() {
+        maintenanceService.recreateIndex();
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        request.setIncludeJoinedViews(true);
+        var page = queryService.retrieveViewPage(request);
+        Assert.assertEquals(2, page.getRows().size());
+        var row1 = page.getRows().get(0);
+        Assert.assertEquals("Sample A for subject 1", row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(1, row1.get("Subject").size());
+        var row2 = page.getRows().get(1);
+        Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                Set.of("RNA-seq", "Whole genome sequencing"),
+                row2.get("Resource_analysisType").stream().map(ValueDTO::getLabel).collect(Collectors.toSet()));
     }
 
     @Test
@@ -240,6 +285,21 @@ public class JdbcQueryServiceTest {
 
     @Test
     public void testSearchFilesRestrictsToAccessibleCollections() {
+        var request = new FileSearchRequest();
+        // There is one file named coffee.jpg in coll1, not accessible by the regular user.
+        request.setQuery("coffee");
+        var results = queryService.searchFiles(request);
+        Assert.assertEquals(0, results.size());
+
+        selectAdmin();
+        results = queryService.searchFiles(request);
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
+    }
+
+    @Test
+    public void testSearchFilesRestrictsToAccessibleCollectionsAfterReindexing() {
+        maintenanceService.recreateIndex();
         var request = new FileSearchRequest();
         // There is one file named coffee.jpg in coll1, not accessible by the regular user.
         request.setQuery("coffee");
