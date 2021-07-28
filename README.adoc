@@ -1620,6 +1620,26 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/services/'
 ----
 ====
 
+===== Server configuration
+
+|===
+| ``GET /api/config``
+
+| View server configuration properties.
+|===
+
+Response contains a list of server configuration properties,
+currently limited to a max file size for uploads.
+
+.Example listing properties (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -H 'Accept: application/json' 'http://localhost:8080/api/config/'
+----
+====
+
 ===== External storages
 
 |===
@@ -2534,8 +2554,8 @@ pluto:
     pullPolicy: Always
   socketTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
-  maxFileSize: 1GB
-  maxRequestSize: 1GB
+  maxFileSize: 1GB    # max total size of file(s) that can be uploaded
+  maxRequestSize: 1GB  # max total size of the request (should be >= maxFileSize)
   backends:
     storageRoutes:
       storage-external-webdav:
