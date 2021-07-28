@@ -2,7 +2,7 @@ package nl.fairspace.pluto.web;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.config.dto.PlutoConfig;
-import nl.fairspace.pluto.model.StorageInfo;
+import nl.fairspace.pluto.web.dto.StorageInfo;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
