@@ -100,7 +100,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         return fileCandidates.length > 0 && fileCandidates.some(f => f.dateDeleted);
     };
 
-    const {startUpload} = useContext(UploadsContext);
+    const {startUpload, maxFileSize} = useContext(UploadsContext);
     const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
     const [showCannotOverwriteWarning, setShowCannotOverwriteWarning] = useState(false);
     const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
@@ -291,6 +291,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
                 refreshFiles={refreshFiles}
                 uploadFolder={uploadFolder}
                 uploadFile={uploadFile}
+                maxFileSize={maxFileSize}
             />
         </div>
     );

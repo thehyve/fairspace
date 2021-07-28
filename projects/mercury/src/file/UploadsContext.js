@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {LocalFileAPI} from "./FileAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
 import {isValidFileName} from './fileUtils';
 import {PATH_SEPARATOR} from '../constants';
+import {ConfigResponse, getServerConfig} from "../status/StatusAPI";
 
 export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
@@ -39,10 +40,43 @@ export const showCannotOverwriteDeletedError = (filesLength: number) => {
     );
 };
 
+export const showInvalidFilenames = (invalidFilenames) => {
+    ErrorDialog.showError(
+        'Invalid file name',
+        <span>
+            Invalid file {invalidFilenames.length === 1 ? 'name' : 'names'}: <em>{invalidFilenames.join(', ')}</em>.<br />
+        </span>
+    );
+};
+
+export const showFileTooLarge = (size: string) => {
+    ErrorDialog.showError(
+        'File too large',
+        <span>
+            File or folder exceeds the upload size limit: {size}.<br />
+        </span>
+    );
+};
+
 export const UploadsContext = React.createContext({});
 
 export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
     const [uploads, setUploads] = useState([]);
+    const [maxFileSize, setMaxFileSize] = useState();
+
+    const handleGetMaxFileSize = async () => getServerConfig()
+        .then((response: ConfigResponse) => {
+            if (response && response.maxFileSize != null) {
+                setMaxFileSize(response.maxFileSize);
+            }
+        })
+        .catch(() => {
+            setMaxFileSize(null);
+        });
+
+    useEffect(() => {
+        handleGetMaxFileSize();
+    }, []);
 
     const updateSpecificUpload = (selected, updateFunc) => setUploads(
         currentUploads => currentUploads.map(upload => {
@@ -88,12 +122,7 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
             })
             .filter(fileName => !!fileName);
         if (invalidFilenames.length > 0) {
-            ErrorDialog.showError(
-                'Invalid file name',
-                <span>
-                    Invalid file {invalidFilenames.length === 1 ? 'name' : 'names'}: <em>{invalidFilenames.join(', ')}</em>.<br />
-                </span>
-            );
+            showInvalidFilenames(invalidFilenames);
             setStateForUpload(upload, UPLOAD_STATUS_ERROR);
             return Promise.resolve();
         }
@@ -111,6 +140,9 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
                 if (err && err.message && err.message.includes("Conflict")) {
                     showCannotOverwriteDeletedError(newUpload.files.length);
                 }
+                if (err && err.message && err.message.includes("Payload too large")) {
+                    showFileTooLarge(maxFileSize);
+                }
                 setStateForUpload(newUpload, UPLOAD_STATUS_ERROR);
             });
     };
@@ -120,7 +152,8 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
             value={{
                 uploads,
                 startUpload,
-                removeUpload
+                removeUpload,
+                maxFileSize
             }}
         >
             {children}

@@ -131,6 +131,8 @@ class FileAPI {
                     switch (e.response.status) {
                         case 403:
                             throw new Error("You do not have authorization to add files \nto this collection.");
+                        case 413:
+                            throw new Error("Payload too large");
                     }
                 }
 
@@ -155,7 +157,16 @@ class FileAPI {
         };
         return this.client()
             .customRequest(destinationPath, requestOptions)
-            .catch(handleHttpError("Error uploading files"));
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 413:
+                            throw new Error("Payload too large");
+                    }
+                }
+                handleHttpError("Error uploading files");
+            });
     }
 
     /**

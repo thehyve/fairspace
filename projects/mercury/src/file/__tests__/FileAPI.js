@@ -58,6 +58,14 @@ describe('FileAPI', () => {
             return expect(LocalFileAPI.upload(file))
                 .rejects.toThrow(/authorization to add/);
         });
+
+        it('should result in a clear error on 413 response', () => {
+            LocalFileAPI.client = () => ({putFileContents: jest.fn(() => Promise.reject({response: {status: 413}}))});
+            const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
+
+            return expect(LocalFileAPI.upload(file))
+                .rejects.toThrow(/Payload too large/);
+        });
     });
 
     describe('Moving', () => {
