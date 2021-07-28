@@ -59,7 +59,7 @@ public class MetadataService {
 
             resource.listProperties().forEachRemaining(stmt -> {
                 model.add(stmt);
-                if (withValueProperties && stmt.getObject().isURIResource() && permissions.canReadMetadata(stmt.getResource())) {
+                if (withValueProperties && stmt.getObject().isURIResource()) {
                     addImportantProperties(stmt.getResource(), model);
                 }
             });
