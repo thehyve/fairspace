@@ -379,7 +379,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         style={{wordBreak: 'break-word'}}
                     />
                     <CardContent style={{paddingTop: 0}}>
-                        <Typography component="p">
+                        <Typography component="p" style={{whiteSpace: 'pre-line'}}>
                             {collection.description}
                         </Typography>
                         <List>

@@ -8,6 +8,15 @@ import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from "../../../constants";
 import Iri from "../../../common/components/Iri";
 
 export const ReferringValue = ({property, entry}) => {
+    function renderValue(property, value) {
+        if (!value || !property.multiLine) {
+            return value;
+        }
+        return (
+            <div style={{whiteSpace: 'pre-line'}}>
+                {value}
+            </div>);
+    }
     function extractDisplayValue(value) {
         switch (property.datatype) {
             case DATETIME_URI:
@@ -17,7 +26,7 @@ export const ReferringValue = ({property, entry}) => {
             case MARKDOWN_URI:
                 return <ReactMarkdown source={value.value} />;
             default:
-                return value.label || value.value || <Iri iri={value.id} />;
+                return value.label || renderValue(property, value.value) || <Iri iri={value.id} />;
         }
     }
 

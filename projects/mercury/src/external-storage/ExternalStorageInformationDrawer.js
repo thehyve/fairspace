@@ -71,7 +71,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                 <FormControl>
                     <FormLabel>{data[key].label || key}</FormLabel>
                     <FormGroup>
-                        <ListItemText primary={data[key].value} />
+                        <ListItemText primary={data[key].value} style={{whiteSpace: 'pre-line'}} />
                     </FormGroup>
                 </FormControl>
             </ListItem>

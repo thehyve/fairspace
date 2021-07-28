@@ -173,6 +173,7 @@ const CollectionList = ({
                                                 </Link>
                                             )}
                                             secondary={collection.description}
+                                            secondaryTypographyProps={{noWrap: true}}
                                         />
                                     </TableCell>
                                     { currentWorkspace() ? null : (

@@ -32,6 +32,7 @@ import ExternalStoragesContext from "../external-storage/ExternalStoragesContext
 import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
 import ExternalStorageBreadcrumbsContextProvider from "../external-storage/ExternalStorageBreadcrumbsContextProvider";
 import {getPathFromIri, redirectLink} from "../file/fileUtils";
+import ShortText from './ShortText';
 
 const styles = {
     tableRoot: {
@@ -126,11 +127,11 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
                                 key={item.id}
                                 onDoubleClick={() => handleResultDoubleClick(item)}
                             >
-                                <TableCell>{renderType(item)}</TableCell>
-                                <TableCell>
+                                <TableCell width={5}>{renderType(item)}</TableCell>
+                                <TableCell style={{maxWidth: 500}}>
                                     <ListItemText
                                         primary={item.label}
-                                        secondary={item.comment}
+                                        secondary={<ShortText text={item.comment} maxLength={200} maxLines={3}/>}
                                     />
                                 </TableCell>
                                 <TableCell>
