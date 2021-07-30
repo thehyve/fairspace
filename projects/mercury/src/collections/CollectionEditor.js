@@ -46,6 +46,9 @@ export const isInputValid = (properties: CollectionProperties) => isNameValid(pr
 const styles = theme => ({
     textHelperBasic: {
         color: theme.palette.grey['600'],
+    },
+    textHelperWarning: {
+        color: theme.palette.warning.dark,
     }
 });
 
@@ -212,12 +215,21 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         && isInputValid(this.state.properties)
         && havePropertiesChanged(this.props.collection, this.state.properties);
 
+    validateNameStartsWithWorkspaceCode() {
+        return this.state.properties.name.startsWith(`[${this.props.workspace.name}]`);
+    }
+
     renderCollectionNameHelperText() {
         return (
             <span>
                 <span className={this.props.classes.textHelperBasic}>
                     Unique collection name.
+                </span>
+                <span className={this.validateNameStartsWithWorkspaceCode() ? this.props.classes.textHelperBasic : this.props.classes.textHelperWarning}>
                     <br />
+                    {!this.validateNameStartsWithWorkspaceCode() && (
+                        <span><b>Warning!</b> Name does not start with the suggested form of workspace prefix!<br /></span>
+                    )}
                     Keep the workspace code prefix. It ensures collection uniqueness between workspaces.
                     <br />
                 </span>
