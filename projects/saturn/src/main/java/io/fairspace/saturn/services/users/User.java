@@ -45,4 +45,7 @@ public class User extends PersistentEntity {
 
     @RDFProperty(FS.CAN_ADD_SHARED_METADATA_URI)
     private boolean canAddSharedMetadata;
+
+    @RDFProperty(FS.CAN_QUERY_METADATA_URI)
+    private boolean canQueryMetadata;
 }

@@ -16,4 +16,6 @@ public class UserRolesUpdate {
     private Boolean canViewPublicData;
 
     private Boolean canAddSharedMetadata;
+
+    private Boolean canQueryMetadata;
 }

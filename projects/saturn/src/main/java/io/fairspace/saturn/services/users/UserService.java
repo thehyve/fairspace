@@ -176,6 +176,12 @@ public class UserService {
                     user.setCanViewPublicMetadata(true);
                 }
             }
+            if (roles.getCanQueryMetadata() != null) {
+                user.setCanQueryMetadata(roles.getCanQueryMetadata());
+                if (user.isCanQueryMetadata()) {
+                    user.setCanViewPublicMetadata(true);
+                }
+            }
             if (roles.getCanViewPublicMetadata() != null) {
                 user.setCanViewPublicMetadata(roles.getCanViewPublicMetadata());
             }
@@ -184,7 +190,8 @@ public class UserService {
             }
 
             if (user.isAdmin() && !user.isCanViewPublicData()
-            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()) {
+            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()
+            || user.isCanQueryMetadata() && !user.isCanViewPublicMetadata()) {
                 throw new IllegalArgumentException("Inconsistent organisation-level roles");
             }
 
