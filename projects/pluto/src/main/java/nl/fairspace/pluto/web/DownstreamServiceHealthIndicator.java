@@ -1,6 +1,7 @@
 package nl.fairspace.pluto.web;
 
 import nl.fairspace.pluto.config.dto.PlutoConfig;
+import nl.fairspace.pluto.web.dto.DownstreamServiceHealthStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;

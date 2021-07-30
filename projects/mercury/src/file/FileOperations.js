@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {Badge, IconButton} from "@material-ui/core";
+import {Badge, IconButton, ListItem, ListItemText, withStyles} from "@material-ui/core";
 import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@material-ui/icons';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
@@ -7,6 +7,7 @@ import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
+import Divider from "@material-ui/core/Divider";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 import {getParentPath, isListOnlyFile, joinPaths} from "./fileUtils";
@@ -18,6 +19,7 @@ import CreateDirectoryButton from "./buttons/CreateDirectoryButton";
 import ProgressButton from "../common/components/ProgressButton";
 import RenameButton from "./buttons/RenameButton";
 import ShowFileVersionsButton from "./buttons/ShowFileVersionsButton";
+import styles from "./FileOperations.styles";
 
 export const Operations = {
     PASTE: 'PASTE',
@@ -37,11 +39,12 @@ export const FileOperations = ({
     selectedPaths,
     clearSelection,
     fileActions = {},
-
+    classes,
     files,
     refreshFiles,
     uploadFolder,
     uploadFile,
+    maxFileSize,
     clipboard
 }) => {
     const [activeOperation, setActiveOperation] = useState();
@@ -217,9 +220,17 @@ export const FileOperations = ({
                             keepMounted
                             open={Boolean(anchorEl)}
                             onClose={handleUploadMenuClose}
+                            className={classes.uploadMenu}
                         >
                             <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
                             <MenuItem onClick={handleUploadFolder}>Upload folder</MenuItem>
+                            <Divider className={classes.uploadMenuHelperDivider} />
+                            <ListItem className={classes.uploadMenuHelper}>
+                                <ListItemText
+                                    secondary={`Size limit: ${maxFileSize}`}
+                                    className={classes.uploadMenuHelperText}
+                                />
+                            </ListItem>
                         </Menu>
 
                     </>
@@ -360,4 +371,4 @@ const ContextualFileOperations = props => {
     return <FileOperations clipboard={clipboard} {...props} />;
 };
 
-export default ContextualFileOperations;
+export default withStyles(styles)(ContextualFileOperations);

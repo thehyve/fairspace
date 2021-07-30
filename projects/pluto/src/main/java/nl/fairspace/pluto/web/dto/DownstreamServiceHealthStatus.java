@@ -1,4 +1,4 @@
-package nl.fairspace.pluto.web;
+package nl.fairspace.pluto.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;

@@ -83,6 +83,7 @@ zuul:
   - /actuator/**
   - /api/storages/
   - /api/status
+  - /api/config
   - /login
   - /logout
   - /authorize
