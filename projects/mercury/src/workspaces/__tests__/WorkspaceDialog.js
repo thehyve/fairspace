@@ -9,7 +9,7 @@ let workspaceDialog;
 let wrapper;
 
 const enterValue = (value) => {
-    const nameField = wrapper.find('input#name').first();
+    const nameField = wrapper.find('input#code').first();
     nameField.simulate('focus');
     nameField.simulate('change', {target: {value}});
 };
@@ -22,7 +22,7 @@ beforeEach(() => {
             onSubmit={onSubmit}
             onClose={onClose}
             creating={false}
-            workspaces={[{name: "w1"}]}
+            workspaces={[{code: "w1"}]}
         />
     );
     wrapper = mount(workspaceDialog);
@@ -40,7 +40,7 @@ describe('WorkspaceDialog', () => {
         const submitButton = wrapper.find('[data-testid="submit-button"]').first();
         submitButton.simulate('click');
         expect(onSubmit).toHaveBeenCalledTimes(1);
-        expect(onSubmit).toHaveBeenCalledWith({name: 'a'});
+        expect(onSubmit).toHaveBeenCalledWith({code: 'a'});
     });
 
     it('should require unique workspace code', () => {

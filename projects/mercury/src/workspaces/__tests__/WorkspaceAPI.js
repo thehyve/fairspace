@@ -3,18 +3,18 @@ import workspacesAPI, {Workspace} from '../WorkspacesAPI';
 
 describe('WorkspacesAPI', () => {
     it('Fetches workspaces', async () => {
-        const dummyWorkspaces = [{name: 'workspace1'}, {name: 'workspace2'}];
+        const dummyWorkspaces = [{code: 'workspace1'}, {code: 'workspace2'}];
         mockAxios.get.mockImplementationOnce(() => Promise.resolve({
             data: dummyWorkspaces,
             headers: {'content-type': 'application/json'}
         }));
         const workspaces: Workspace[] = await workspacesAPI.getWorkspaces();
-        expect(workspaces.map((workspace: Workspace) => workspace.name)).toEqual(dummyWorkspaces.map(workspace => workspace.name));
+        expect(workspaces.map((workspace: Workspace) => workspace.code)).toEqual(dummyWorkspaces.map(workspace => workspace.code));
     });
 
     it('Creates a new workspace', async () => {
         const workspaceData: Workspace = {
-            name: 'workspace1'
+            code: 'workspace1'
         };
         const putResponse: AxiosResponse = {
             headers: {'content-type': 'application/json'}
@@ -24,14 +24,14 @@ describe('WorkspacesAPI', () => {
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
             '/api/workspaces/',
-            "{\"name\":\"workspace1\"}",
+            "{\"code\":\"workspace1\"}",
             {headers: {'Accept': 'application/json', 'Content-type': 'application/json'}}
         );
     });
 
     it('Failure to create a workspace is handled correctly', async (done) => {
         const workspaceData: Workspace = {
-            name: 'workspace1'
+            code: 'workspace1'
         };
         const conflictResponse: AxiosResponse = {
             status: 409,

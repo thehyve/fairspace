@@ -98,12 +98,12 @@ public class WorkspaceService {
             throw new AccessDeniedException();
         }
         validate(ws.getIri() == null, "IRI must be empty");
-        validate(!isNullOrEmpty(ws.getName()), "Please specify workspace name");
+        validate(!isNullOrEmpty(ws.getCode()), "Please specify workspace code");
 
         var created = tx.calculateWrite(m -> {
-            var conflictingWorkspace = findExistingWorkspace(m, ws.getName());
+            var conflictingWorkspace = findExistingWorkspace(m, ws.getCode());
             if (conflictingWorkspace.isPresent()) {
-                throw new IllegalArgumentException("Workspace already exists with the same name.");
+                throw new IllegalArgumentException("Workspace already exists with the same code.");
             }
 
             var workspace = new DAO(m).write(ws);

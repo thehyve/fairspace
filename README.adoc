@@ -1347,10 +1347,10 @@ Operations on workspace entities.
 2+| _Response_ contains the following data:
 | ``iri``
 | Unique workspace IRI.
-| ``name``
-| Unique workspace name.
-| ``comment``
-| Workspace description in markdown format.
+| ``code``
+| Unique workspace code.
+| ``title``
+| Workspace title.
 | ``managers``
 | List of  workspace managers.
 | ``summary``
@@ -1375,9 +1375,9 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 
 3+| Add a workspace. Available only to administrators.
 3+| _Parameters:_
-|``name``
+|``code``
 |string
-|Unique workspace name.
+|Unique workspace code.
 3+| _Response:_
 3+| Response contains the workspace name and newly assigned IRI.
 |===

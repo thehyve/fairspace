@@ -76,7 +76,7 @@ public class UserServiceTest {
         selectAdmin();
         // Create test workspace
         workspaceService.createWorkspace(Workspace.builder()
-                .name("ws1")
+                .code("ws1")
                 .build());
     }
 
