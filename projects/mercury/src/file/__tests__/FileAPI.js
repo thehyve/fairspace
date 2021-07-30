@@ -38,36 +38,6 @@ describe('FileAPI', () => {
         });
     });
 
-    describe('Uploading', () => {
-        it('uploads a file', async () => {
-            const putFileContents = jest.fn(() => Promise.resolve({}));
-            LocalFileAPI.client = () => ({putFileContents});
-            const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
-            const result = await LocalFileAPI.upload(file);
-
-            expect(result).toEqual({});
-            expect(putFileContents).toHaveBeenCalledTimes(1);
-            expect(putFileContents)
-                .toHaveBeenCalledWith('/test/path/destination.txt', 'FILE_OBJECT', expect.anything());
-        });
-
-        it('should result in a clear error on 403 response', () => {
-            LocalFileAPI.client = () => ({putFileContents: jest.fn(() => Promise.reject({response: {status: 403}}))});
-            const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
-
-            return expect(LocalFileAPI.upload(file))
-                .rejects.toThrow(/authorization to add/);
-        });
-
-        it('should result in a clear error on 413 response', () => {
-            LocalFileAPI.client = () => ({putFileContents: jest.fn(() => Promise.reject({response: {status: 413}}))});
-            const file = {file: 'FILE_OBJECT', destinationFilename: 'destination.txt', destinationPath: '/test/path'};
-
-            return expect(LocalFileAPI.upload(file))
-                .rejects.toThrow(/Payload too large/);
-        });
-    });
-
     describe('Moving', () => {
         it('ignores cut-and-paste into same folder', async () => {
             const moveFile = jest.fn(() => Promise.resolve());

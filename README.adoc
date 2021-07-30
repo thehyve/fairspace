@@ -2555,7 +2555,7 @@ pluto:
   socketTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
   maxFileSize: 1GB    # max total size of file(s) that can be uploaded
-  maxRequestSize: 1GB  # max total size of the request (should be >= maxFileSize)
+  maxRequestSize: 1GB  # max total size of the request (should be > maxFileSize)
   backends:
     storageRoutes:
       storage-external-webdav:
