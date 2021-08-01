@@ -1,11 +1,13 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.SaturnSecurityHandler;
-import io.fairspace.saturn.config.Services;
+import io.fairspace.saturn.auth.*;
+import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.views.*;
 import lombok.extern.log4j.*;
 import org.apache.jena.fuseki.main.FusekiServer;
+import org.apache.jena.fuseki.server.*;
+import org.apache.jena.riot.*;
 import org.eclipse.jetty.server.session.SessionHandler;
 
 import java.sql.*;
@@ -37,7 +39,10 @@ public class App {
 
         var svc = new Services(CONFIG, VIEWS_CONFIG, ds, viewStoreClientFactory);
 
-        var serverBuilder = FusekiServer.create()
+        var operationRegistry = OperationRegistry.createStd();
+        operationRegistry.register(Operation.Query, WebContent.contentTypeSPARQLQuery,
+                new Protected_SPARQL_QueryDataset(svc.getUserService()));
+        var serverBuilder = FusekiServer.create(operationRegistry)
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())

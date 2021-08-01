@@ -803,6 +803,7 @@ These are not documented here in detail, but can be used from the user interface
 ==== SPARQL
 The {SPARQL}[SPARQL] API is a standard API for querying RDF databases.
 This endpoint is read-only and can be used for advanced search, analytics, data extraction, etc.
+It is only accessible for users with the _canQueryMetadata_ role.
 
 |===
 | ``POST /api/rdf/query``
@@ -1888,6 +1889,7 @@ We distinguish the following roles in the solution:
 * _View public data_: the user can read public files;
 * _Admin_: can create workspaces, assign roles and permissions;
 * _Add shared metadata_: can add, modify and delete shared metadata entities.
+* _Query metadata_: can run <<SPARQL>> queries to query metadata.
 
 Most users should have the _View public data_ role.
 Only when the shared metadata may contain sensitive information that should
