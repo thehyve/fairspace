@@ -8,6 +8,8 @@
 @prefix analysis: <https://institut-curie.org/analysis#> .
 @prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
 @prefix workspaceType: <https://fairspace.nl/workspace-type#> .
+@prefix availabilityForResearch: <https://institut-curie.org/availabilityForResearch#> .
+@prefix consentAnswer: <https://institut-curie.org/consentAnswer#> .
 
 fs:File rdfs:label "File" .
 fs:Directory rdfs:label "Directory" .
@@ -29,6 +31,21 @@ gender:female a curie:Gender ;
   rdfs:label "Female" .
 gender:undifferentiated a curie:Gender ;
   rdfs:label "Undifferentiated" .
+
+availabilityForResearch:yes a curie:AvailabilityForResearch ;
+  rdfs:label "Yes" .
+availabilityForResearch:yesAfterPatientInformation a curie:AvailabilityForResearch ;
+  rdfs:label "Yes after patient information" .
+availabilityForResearch:no a curie:AvailabilityForResearch ;
+  rdfs:label "No" .
+
+consentAnswer:yes a curie:ConsentAnswer ;
+  rdfs:label "Yes" .
+consentAnswer:no a curie:ConsentAnswer ;
+  rdfs:label "No" .
+consentAnswer:noInformation a curie:ConsentAnswer ;
+  rdfs:label "No information" .
+
 icdo3t:C00 a curie:Topography ;
   rdfs:label "LIP" .
 icdo3t:C00.0 a curie:Topography ;

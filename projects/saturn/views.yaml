@@ -25,11 +25,36 @@ views:
         title: Age at death
         source: https://institut-curie.org/ontology#ageAtDeath
         type: number
+      - name: availableForResearch
+        title: Available for research
+        source: https://institut-curie.org/ontology#availableForResearch
+        rdfType: https://institut-curie.org/ontology#AvailabilityForResearch
+        type: term
+      - name: dateOfOpposition
+        title: Date of opposition
+        source: https://institut-curie.org/ontology#dateOfOpposition
+        type: date
+      - name: reuseClinicalWithGeneticData
+        title: Reuse clinical with genetic data
+        source: https://institut-curie.org/ontology#reuseClinicalWithGeneticData
+        rdfType: https://institut-curie.org/ontology#ConsentAnswer
+        type: term
+      - name: sampleStorageAndReuse
+        title: Sample storage and reuse
+        source: https://institut-curie.org/ontology#sampleStorageAndReuse
+        rdfType: https://institut-curie.org/ontology#ConsentAnswer
+        type: term
+      - name: geneticAnalysis
+        title: Genetic analysis
+        source: https://institut-curie.org/ontology#geneticAnalysis
+        rdfType: https://institut-curie.org/ontology#ConsentAnswer
+        type: term
     join:
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#eventSubject
         reverse: true
         include:
+          - id
           - topography
           - morphology
           - eventType
@@ -46,6 +71,7 @@ views:
         reverse: true
         include:
           - analysisType
+
   - name: TumorPathologyEvent
     title: Tumor pathology events
     itemName: Tumor pathology event
@@ -97,6 +123,7 @@ views:
         reverse: true
         include:
           - analysisType
+
   - name: Sample
     title: Samples
     itemName: Sample
@@ -133,10 +160,13 @@ views:
           - species
           - gender
           - ageAtDeath
+          - availableForResearch
+          - reuseClinicalWithGeneticData
+          - sampleStorageAndReuse
+          - geneticAnalysis
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#diagnosis
         include:
-          - id
           - topography
           - morphology
           - laterality

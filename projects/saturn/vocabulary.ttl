@@ -147,10 +147,47 @@ curie:Species a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:label
     ] .
 
+curie:AvailabilityForResearch a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "Indication whether the subject is available for research." ;
+    sh:name "Availability for research" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+          [
+        sh:name "Label" ;
+        sh:description "Unique availability label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:ConsentAnswer a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "Answer type for consent questions." ;
+    sh:name "Consent answer" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+          [
+        sh:name "Label" ;
+        sh:description "Unique answer label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
 curie:ageAtLastNews a rdf:Property .
 curie:ageAtDeath a rdf:Property .
 curie:isOfGender a rdf:Property .
 curie:isOfSpecies a rdf:Property .
+curie:availableForResearch a rdf:Property .
+curie:dateOfOpposition a rdf:Property .
+curie:reuseClinicalWithGeneticData a rdf:Property .
+curie:sampleStorageAndReuse a rdf:Property .
+curie:geneticsAnalysis a rdf:Property .
 
 curie:Subject a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
@@ -187,10 +224,34 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:path curie:ageAtDeath
     ],
     [
-        sh:name "Gave consent" ;
-        sh:description "" ;
-        sh:class <PersonConsent> ;
-        sh:path <gaveConsent>
+        sh:name "Available for research" ;
+        sh:maxCount 1 ;
+        sh:class curie:AvailabilityForResearch ;
+        sh:path curie:availableForResearch
+    ],
+    [
+        sh:name "Date of opposition" ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        sh:path curie:dateOfOpposition
+    ],
+    [
+        sh:name "Reuse clinical with genetic data" ;
+        sh:maxCount 1 ;
+        sh:class curie:ConsentAnswer ;
+        sh:path curie:reuseClinicalWithGeneticData
+    ],
+    [
+        sh:name "Sample storage and reuse" ;
+        sh:maxCount 1 ;
+        sh:class curie:ConsentAnswer ;
+        sh:path curie:sampleStorageAndReuse
+    ],
+    [
+        sh:name "Genetic analysis" ;
+        sh:maxCount 1 ;
+        sh:class curie:ConsentAnswer ;
+        sh:path curie:geneticAnalysis
     ],
     [
         sh:name "Label" ;
@@ -224,47 +285,6 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:description "Linked files" ;
         sh:path [sh:inversePath curie:aboutSubject];
     ].
-
-curie:isProjectConsent a rdf:Property .
-curie:authorizes a rdf:Property .
-curie:isConsentOf a rdf:Property .
-
-curie:PersonConsent a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "A research consent given by person." ;
-    sh:name "Person consent" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Consent authorizes" ;
-        sh:description "The samples that is authorized with this consent." ;
-        sh:class curie:BiologicalSample ;
-        sh:path curie:authorizes
-    ],
-    [
-         sh:name "Is consent of" ;
-         sh:description "" ;
-         sh:class curie:Person ;
-         sh:maxCount 1 ;
-         sh:path curie:isConsentOf
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique person consent label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ; ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ] .
 
 
 curie:Topography a rdfs:Class, sh:NodeShape ;
