@@ -32,7 +32,7 @@
                 <ns1:canDelete>FALSE</ns1:canDelete>
                 <ns1:iri>http://localhost:8080/api/webdav/collection%202021-01-18_02_04-1</ns1:iri>
                 <ns1:canWrite>FALSE</ns1:canWrite>
-                <ns1:ownedByName>testje</ns1:ownedByName>
+                <ns1:ownedByCode>testje</ns1:ownedByCode>
                 <ns1:canManage>FALSE</ns1:canManage>
                 <ns1:canUndelete>FALSE</ns1:canUndelete>
                 <ns1:workspacePermissions></ns1:workspacePermissions>
@@ -72,7 +72,7 @@
                 <ns1:canDelete>FALSE</ns1:canDelete>
                 <ns1:iri>http://localhost:8080/api/webdav/Book</ns1:iri>
                 <ns1:canWrite>TRUE</ns1:canWrite>
-                <ns1:ownedByName>Test</ns1:ownedByName>
+                <ns1:ownedByCode>Test</ns1:ownedByCode>
                 <ns1:canManage>FALSE</ns1:canManage>
                 <ns1:canUndelete>FALSE</ns1:canUndelete>
                 <ns1:workspacePermissions></ns1:workspacePermissions>
