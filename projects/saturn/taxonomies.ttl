@@ -7,12 +7,21 @@
 @prefix ncbitaxon: <https://bioportal.bioontology.org/ontologies/NCBITAXON/> .
 @prefix analysis: <https://institut-curie.org/analysis#> .
 @prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
-
+@prefix workspaceType: <https://fairspace.nl/workspace-type#> .
 
 fs:File rdfs:label "File" .
 fs:Directory rdfs:label "Directory" .
 fs:Collection rdfs:label "Collection" .
 fs:Workspace rdfs:label "Workspace" .
+
+workspaceType:personal a fs:WorkspaceType ;
+  rdfs:label "Personal" .
+workspaceType:researchProject a fs:WorkspaceType ;
+  rdfs:label "Research project" .
+workspaceType:clinicalTrial a fs:WorkspaceType ;
+  rdfs:label "Clinical trial" .
+workspaceType:team a fs:WorkspaceType ;
+  rdfs:label "Team" .
 
 gender:male a curie:Gender ;
   rdfs:label "Male" .

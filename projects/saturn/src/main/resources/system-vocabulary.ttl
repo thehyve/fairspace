@@ -413,6 +413,25 @@ fs:User a rdfs:Class, sh:NodeShape ;
     ] .
 
 fs:workspaceDescription a rdf:Property .
+fs:workspaceType a rdf:Property .
+fs:principalInvestigator a rdf:Property .
+fs:projectCode a rdf:Property .
+
+fs:WorkspaceType a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The type of the workspace. " ;
+    sh:name "Workspace type" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique workspace type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
 
 fs:Workspace a rdfs:Class, sh:NodeShape ;
     sh:description "" ;
@@ -450,9 +469,35 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:order 2
     ],
     [
+        sh:name "Type" ;
+        sh:description "Workspace type." ;
+        sh:maxCount 1 ;
+        sh:class fs:WorkspaceType ;
+        sh:path fs:workspaceType  ;
+        sh:order 3
+    ],
+    [
+        sh:name "Project code" ;
+        sh:description "Project code related to the workspace." ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        sh:maxCount 1 ;
+        sh:path fs:projectCode ;
+        sh:order 4
+    ],
+    [
+        sh:name "Principal investigator" ;
+        sh:description "Name of the PI or team leader." ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        sh:maxCount 1 ;
+        sh:path fs:principalInvestigator ;
+        sh:order 5
+    ],
+    [
         sh:name "Keywords" ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
         sh:path dcat:keyword;
-        sh:order 3
+        sh:order 6
     ].
