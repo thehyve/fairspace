@@ -23,8 +23,8 @@ export type WorkspaceSummary = {|
 |};
 export type WorkspaceProperties = {|
     iri: string;
-    name?: string;
-    comment?: string;
+    code?: string;
+    title?: string;
     description?: string;
     summary ?: WorkspaceSummary;
     managers?: User[];

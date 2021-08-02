@@ -35,9 +35,9 @@ const columns = {
         valueExtractor: 'canCollaborate',
         label: ' '
     },
-    name: {
-        valueExtractor: 'name',
-        label: 'Name'
+    code: {
+        valueExtractor: 'code',
+        label: 'Workspace'
     },
     collectionCount: {
         valueExtractor: 'summary.nonDeletedCollectionCount',
@@ -76,7 +76,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
             history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
         }
     };
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'code');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!props.workspaces || props.workspaces.length === 0) {
@@ -123,7 +123,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
                                         {!workspace.canCollaborate && (<Lock />)}
                                     </TableCell>
-                                    <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="name">
+                                    <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="code">
                                         <ListItemText
                                             style={{margin: 0}}
                                             primary={workspace.canCollaborate ? (
@@ -134,10 +134,10 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                                     variant="body2"
                                                     style={{textAlign: "left"}}
                                                 >
-                                                    {workspace.name}
+                                                    {workspace.code}
                                                 </Link>
-                                            ) : workspace.name}
-                                            secondary={workspace.comment}
+                                            ) : workspace.code}
+                                            secondary={workspace.title}
                                         />
                                     </TableCell>
                                     <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">

@@ -8,6 +8,7 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import {withStyles} from "@material-ui/core";
 import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
@@ -17,6 +18,7 @@ import {
     fileNameContainsInvalidCharacter, isUnsafeFileName,
     isValidFileName
 } from '../file/fileUtils';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 const fields = ['name', 'description', 'ownerWorkspace'];
 
@@ -41,6 +43,15 @@ const isNameValid = (name: string) => (
  */
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
+const styles = theme => ({
+    textHelperBasic: {
+        color: theme.palette.grey['600'],
+    },
+    textHelperWarning: {
+        color: theme.palette.warning.dark,
+    }
+});
+
 type PathParam = {
     path: string;
 }
@@ -55,7 +66,8 @@ type CollectionEditorProps = {
     setBusy: (boolean) => void,
     match: Match<PathParam>,
     history: History,
-    workspaceIri: string
+    workspace: Workspace,
+    classes: any
 };
 
 type CollectionEditorState = {
@@ -73,9 +85,13 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     state = {
         editing: true,
         saveInProgress: false,
-        properties: this.props.collection
-            ? copyProperties(this.props.collection)
-            : {name: '', description: '', ownerWorkspace: this.props.workspaceIri}
+        properties: this.props.collection ?
+            copyProperties(this.props.collection) :
+            {
+                name: this.props.workspace.code ? `[${this.props.workspace.code.replace(/[/\\]/, '')}] ` : '',
+                description: '',
+                ownerWorkspace: this.props.workspace.iri
+            }
     };
 
     unmounting = false;
@@ -199,6 +215,31 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         && isInputValid(this.state.properties)
         && havePropertiesChanged(this.props.collection, this.state.properties);
 
+    validateNameStartsWithWorkspaceCode() {
+        return this.state.properties.name.startsWith(`[${this.props.workspace.code}]`);
+    }
+
+    renderCollectionNameHelperText() {
+        return (
+            <span>
+                <span className={this.props.classes.textHelperBasic}>
+                    Unique collection name.
+                </span>
+                <span className={this.validateNameStartsWithWorkspaceCode() ? this.props.classes.textHelperBasic : this.props.classes.textHelperWarning}>
+                    <br />
+                    {!this.validateNameStartsWithWorkspaceCode() && (
+                        <span><b>Warning!</b> Name does not start with the suggested form of workspace prefix!<br /></span>
+                    )}
+                    Keep the workspace code prefix. It ensures collection uniqueness between workspaces.
+                    <br />
+                </span>
+                {(isUnsafeFileName(this.state.properties.name.trim()) ? "Name cannot equal '.' or '..'" : '')}
+                {(fileNameContainsInvalidCharacter(this.state.properties.name) ? "Name cannot contain '/' or '\\'." : '')}
+                {(this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
+            </span>
+        );
+    }
+
     render() {
         return (
             <Dialog
@@ -210,16 +251,15 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     {this.props.collection ? 'Edit collection' : 'Add collection'}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText>You can edit the collection details here.</DialogContentText>
+                    {this.props.collection && (
+                        <DialogContentText>You can edit the collection details here.</DialogContentText>
+                    )}
                     <TextField
                         autoFocus
                         margin="dense"
                         id="name"
                         label="Name"
-                        helperText={'Unique collection name'
-                        + (isUnsafeFileName(this.state.properties.name.trim()) ? ". Name cannot equal '.' or '..'" : '')
-                        + (fileNameContainsInvalidCharacter(this.state.properties.name) ? ". Name cannot contain '/' or '\\'." : '')
-                        + (this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `. Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
+                        helperText={this.renderCollectionNameHelperText()}
                         value={this.state.properties.name}
                         name="name"
                         onChange={(event) => this.handleInputChange('name', event.target.value)}
@@ -263,4 +303,4 @@ const ContextualCollectionEditor = (props) => {
     );
 };
 
-export default withRouter(ContextualCollectionEditor);
+export default withRouter(withStyles(styles)(ContextualCollectionEditor));

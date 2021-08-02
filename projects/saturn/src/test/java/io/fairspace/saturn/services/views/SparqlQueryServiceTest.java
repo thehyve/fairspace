@@ -124,7 +124,7 @@ public class SparqlQueryServiceTest {
         var taxonomies = model.read("taxonomies.ttl");
         api.put(taxonomies);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 

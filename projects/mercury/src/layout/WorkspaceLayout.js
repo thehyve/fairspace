@@ -14,12 +14,13 @@ import {MetadataViewProvider} from "../metadata/views/MetadataViewContext";
 import {MetadataViewFacetsProvider} from "../metadata/views/MetadataViewFacetsContext";
 import {ExternalStoragesProvider} from "../external-storage/ExternalStoragesContext";
 import {StatusProvider} from "../status/StatusContext";
+import type {Workspace} from "../workspaces/WorkspacesAPI";
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
 
-    const workspace = currentWorkspace() && workspaces.find(w => w.iri === currentWorkspace());
-    const title = (workspace && workspace.name) || '';
+    const workspace: Workspace = currentWorkspace() && workspaces.find(w => w.iri === currentWorkspace());
+    const title = (workspace && workspace.code) || '';
 
     return (
         <StatusProvider>

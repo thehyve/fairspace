@@ -47,10 +47,12 @@ describe('CollectionEditor', () => {
                 <CollectionEditor
                     editing
                     title="title"
+                    workspace={{name: ownerWorkspace}}
                     addCollection={saveCallback}
                     collection={collection}
                     onClose={closeCallback}
                     onSave={saveCallback}
+                    classes={{}}
                     editType
                 />
             );

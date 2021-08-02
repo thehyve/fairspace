@@ -61,7 +61,7 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
         <ConfirmationDialog
             open
             title="Confirmation"
-            content={`Are you sure you want to delete workspace ${workspace.name}? This operation cannot be reverted.`}
+            content={`Are you sure you want to delete workspace ${workspace.code}? This operation cannot be reverted.`}
             dangerous
             agreeButtonText="Yes"
             onAgree={handleDeleteWorkspace}

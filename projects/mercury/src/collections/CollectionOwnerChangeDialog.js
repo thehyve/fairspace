@@ -14,17 +14,17 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
     const [openDialog, setOpenDialog] = useState(true);
 
     const options = workspaces
-        .sort(compareBy('name'))
+        .sort(compareBy('code'))
         .map(workspace => (
             {
-                label: workspace.name,
+                label: workspace.code,
                 ...workspace
             }
         ));
 
     const handleValueChange = (selectedOwnerWorkspace) => {
         if (selectedOwnerWorkspace) {
-            setSelectedValue({label: selectedOwnerWorkspace.name, ...selectedOwnerWorkspace});
+            setSelectedValue({label: selectedOwnerWorkspace.code, ...selectedOwnerWorkspace});
         } else {
             setSelectedValue(null);
         }

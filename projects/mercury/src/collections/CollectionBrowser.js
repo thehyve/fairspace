@@ -13,6 +13,7 @@ import {getDisplayName} from "../users/userUtils";
 import type {User} from "../users/UsersAPI";
 import type {Collection} from "./CollectionAPI";
 import {getCollectionAbsolutePath} from "./collectionUtils";
+import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 
 type ContextualCollectionBrowserProperties = {
@@ -28,6 +29,7 @@ type CollectionBrowserProperties = ContextualCollectionBrowserProperties & {
     error: Error;
     collections: Collection[];
     users: User[];
+    workspace: Workspace;
     showDeleted: boolean;
     canAddCollection: boolean;
 }
@@ -41,7 +43,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
         users = [],
         canAddCollection = true,
         setBusy = () => {},
-        showDeleted, history, error, workspaceIri
+        showDeleted, history, error, workspace
     } = props;
 
     const [addingNewCollection, setAddingNewCollection] = useState(false);
@@ -73,7 +75,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
                     <CollectionEditor
                         setBusy={setBusy}
                         onClose={handleCancelAddCollection}
-                        workspaceIri={workspaceIri}
+                        workspace={workspace}
                     />
                 ) : null}
             </>
@@ -125,6 +127,7 @@ const ContextualCollectionBrowser = (props: ContextualCollectionBrowserPropertie
     return (
         <CollectionBrowser
             {...props}
+            workspace={workspace}
             collections={filteredCollections}
             users={users}
             canAddCollection={canAdd}

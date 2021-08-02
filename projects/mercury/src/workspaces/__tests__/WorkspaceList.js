@@ -14,12 +14,12 @@ describe('WorkspaceList', () => {
 
     it('displays the list of workspaces', () => {
         const workspaces: Workspace[] = [{
-            id: 'workspace1', name: 'workspace-1', comment: 'First workspace'
+            id: 'workspace1', code: 'workspace-1', title: 'First workspace'
         }, {
-            id: 'workspace2', name: 'workspace-2', comment: 'Second workspace'
+            id: 'workspace2', code: 'workspace-2', title: 'Second workspace'
         }];
         const {getByText} = render(<MemoryRouter><WorkspaceList workspaces={workspaces} /></MemoryRouter>);
-        expect(getByText('Name'))
+        expect(getByText('Workspace'))
             .toBeInTheDocument();
         expect(getByText('workspace-1'))
             .toBeInTheDocument();

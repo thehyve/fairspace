@@ -106,7 +106,7 @@ public class DirectoryResourceTest {
         var taxonomies = model.read("taxonomies.ttl");
         metadataService.put(taxonomies);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
 
         when(request.getHeader("Owner")).thenReturn(workspace.getIri().getURI());
         var blob = new BlobInfo("id", FILE_SIZE, "md5");

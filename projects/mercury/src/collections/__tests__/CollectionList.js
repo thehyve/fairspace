@@ -19,7 +19,7 @@ describe('CollectionList', () => {
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceName: 'ws1'
+            ownerWorkspaceCode: 'ws1'
         }];
 
         const {queryByText} = render(
@@ -43,7 +43,7 @@ describe('CollectionList', () => {
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceName: 'ws1',
+            ownerWorkspaceCode: 'ws1',
             dateDeleted: new Date().toUTCString()
         }];
 
@@ -69,7 +69,7 @@ describe('CollectionList', () => {
                 dateCreated: new Date().toUTCString(),
                 iri: 'http://example.com/0',
                 ownerWorkspace: 'http://example.com/ws1',
-                ownerWorkspaceName: 'ws1',
+                ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
             },
             {
@@ -78,7 +78,7 @@ describe('CollectionList', () => {
                 dateCreated: new Date().toUTCString(),
                 iri: 'http://example.com/1',
                 ownerWorkspace: 'http://example.com/ws1',
-                ownerWorkspaceName: 'ws1',
+                ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
             }];
 
@@ -102,7 +102,7 @@ describe('CollectionList', () => {
                 dateCreated: new Date().toUTCString(),
                 iri: 'http://example.com/0',
                 ownerWorkspace: 'http://example.com/ws1',
-                ownerWorkspaceName: 'ws1',
+                ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString(),
                 description: "This one is not a secret"
             },
@@ -112,7 +112,7 @@ describe('CollectionList', () => {
                 dateCreated: new Date().toUTCString(),
                 iri: 'http://example.com/1',
                 ownerWorkspace: 'http://example.com/ws1',
-                ownerWorkspaceName: 'ws1',
+                ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
             }];
 
