@@ -16,24 +16,24 @@ const styles = theme => ({
 const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}) => {
     const [value, setValue] = useState(null);
 
-    const isNameLengthWarning = () => (!!value && value.trim().length > 10);
-    const isWorkspaceNameUnique = (workspaceName) => !workspaces.some(workspace => workspace.name === workspaceName);
-    const isNameValid = () => value === null || (!!value && !!value.trim() && isWorkspaceNameUnique(value.trim()));
+    const isCodeLengthWarning = () => (!!value && value.trim().length > 10);
+    const isWorkspaceCodeUnique = (workspaceName) => !workspaces.some(workspace => workspace.code === workspaceName);
+    const isCodeValid = () => value === null || (!!value && !!value.trim() && isWorkspaceCodeUnique(value.trim()));
 
     const onDialogSubmit = (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (value && isNameValid()) {
-            onSubmit({name: value.trim()});
+        if (value && isCodeValid()) {
+            onSubmit({code: value.trim()});
         }
     };
 
-    const renderNameHelperText = () => (
+    const renderCodeHelperText = () => (
         <span>
             Workspace code. Has to be unique.
-            <span className={!isNameLengthWarning() ? classes.textHelperBasic : classes.textHelperWarning}>
+            <span className={!isCodeLengthWarning() ? classes.textHelperBasic : classes.textHelperWarning}>
                 <br />
-                {isNameLengthWarning() && (
+                {isCodeLengthWarning() && (
                     <span><b>Warning!</b> Code is longer than 10 characters!<br /></span>
                 )}
                 The code will prefix all collections of the workspace - preferred length is maximum 10 characters
@@ -60,16 +60,16 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
                     <TextField
                         autoFocus
                         margin="dense"
-                        id="name"
+                        id="code"
                         label="Code"
                         data-testid="Code"
-                        helperText={renderNameHelperText()}
+                        helperText={renderCodeHelperText()}
                         value={value}
-                        name="name"
+                        name="code"
                         onChange={(event) => setValue(event.target.value)}
                         fullWidth
                         required
-                        error={!isNameValid()}
+                        error={!isCodeValid()}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -77,7 +77,7 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
                         type="submit"
                         form="formId"
                         data-testid="submit-button"
-                        disabled={value === null || !isNameValid()}
+                        disabled={value === null || !isCodeValid()}
                         color="primary"
                         variant="contained"
                         onClick={onDialogSubmit}

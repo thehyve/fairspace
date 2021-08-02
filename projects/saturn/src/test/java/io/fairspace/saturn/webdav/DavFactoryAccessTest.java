@@ -122,7 +122,7 @@ public class DavFactoryAccessTest {
         new DAO(model).write(admin);
 
         selectAdmin();
-        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 
         selectRegularUser();

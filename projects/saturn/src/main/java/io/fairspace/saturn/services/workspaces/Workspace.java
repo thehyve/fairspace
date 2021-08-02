@@ -19,10 +19,10 @@ import static io.fairspace.saturn.vocabulary.FS.WORKSPACE_URI;
 @RDFType(WORKSPACE_URI)
 public class Workspace extends LifecycleAwarePersistentEntity {
     @RDFProperty(value = RDFS.uri + "label")
-    private String name;
+    private String code;
 
     @RDFProperty(value = RDFS.uri + "comment")
-    private String comment;
+    private String title;
 
     private List<User> managers;
     private WorkspaceSummary summary;
