@@ -10,6 +10,10 @@
 @prefix workspaceType: <https://fairspace.nl/workspace-type#> .
 @prefix availabilityForResearch: <https://institut-curie.org/availabilityForResearch#> .
 @prefix consentAnswer: <https://institut-curie.org/consentAnswer#> .
+@prefix tumorGradeValue: <https://institut-curie.org/tumorGradeValue#> .
+@prefix tnmT: <https://institut-curie.org/TNM-T#> .
+@prefix tnmN: <https://institut-curie.org/TNM-N#> .
+@prefix tnmM: <https://institut-curie.org/TNM-M#> .
 
 fs:File rdfs:label "File" .
 fs:Directory rdfs:label "Directory" .
@@ -3156,57 +3160,59 @@ evs:C25229 a curie:Laterality ;
   rdfs:label "Left" .
 evs:C25228 a curie:Laterality ;
   rdfs:label "Right" .
-curie:c a curie:TnmType ;
-  rdfs:label "Clinique" .
-curie:p a curie:TnmType ;
-  rdfs:label "Pathologique" .
-curie:y a curie:TnmType ;
-  rdfs:label "Après traitement neoadjuvant" .
-curie:u a curie:TnmType ;
-  rdfs:label "Radiologique" .
-curie:tx a curie:TnmT ;
+tumorGradeValue:gradeValue0 a curie:TumorGradeValue ;
+  rdfs:label "0" .
+tumorGradeValue:gradeValueI a curie:TumorGradeValue ;
+  rdfs:label "I" .
+tumorGradeValue:gradeValueII a curie:TumorGradeValue ;
+  rdfs:label "II" .
+tumorGradeValue:gradeValueIII a curie:TumorGradeValue ;
+  rdfs:label "III" .
+tumorGradeValue:gradeValueIV a curie:TumorGradeValue ;
+  rdfs:label "IV" .
+tnmT:tx a curie:TnmT ;
   rdfs:label "Tx" .
-curie:t0 a curie:TnmT ;
+tnmT:t0 a curie:TnmT ;
   rdfs:label "T0" .
-curie:t1 a curie:TnmT ;
+tnmT:t1 a curie:TnmT ;
   rdfs:label "T1" .
-curie:t1a a curie:TnmT ;
+tnmT:t1a a curie:TnmT ;
   rdfs:label "T1a" .
-curie:t1b a curie:TnmT ;
+tnmT:t1b a curie:TnmT ;
   rdfs:label "T1b" .
-curie:t1c a curie:TnmT ;
+tnmT:t1c a curie:TnmT ;
   rdfs:label "T1c" .
-curie:t2 a curie:TnmT ;
+tnmT:t2 a curie:TnmT ;
   rdfs:label "T2" .
-curie:t3 a curie:TnmT ;
+tnmT:t3 a curie:TnmT ;
   rdfs:label "T3" .
-curie:t4 a curie:TnmT ;
+tnmT:t4 a curie:TnmT ;
   rdfs:label "T4" .
-curie:t4a a curie:TnmT ;
+tnmT:t4a a curie:TnmT ;
   rdfs:label "T4a" .
-curie:t4b a curie:TnmT ;
+tnmT:t4b a curie:TnmT ;
   rdfs:label "T4b" .
-curie:t4c a curie:TnmT ;
+tnmT:t4c a curie:TnmT ;
   rdfs:label "T4c" .
-curie:t4d a curie:TnmT ;
+tnmT:t4d a curie:TnmT ;
   rdfs:label "T4d" .
-curie:nx a curie:TnmN ;
+tnmN:nx a curie:TnmN ;
   rdfs:label "Nx" .
-curie:n0 a curie:TnmN ;
+tnmN:n0 a curie:TnmN ;
   rdfs:label "N0" .
-curie:n1mi a curie:TnmN ;
+tnmN:n1mi a curie:TnmN ;
   rdfs:label "N1mi" .
-curie:n1 a curie:TnmN ;
+tnmN:n1 a curie:TnmN ;
   rdfs:label "N1" .
-curie:n2 a curie:TnmN ;
+tnmN:n2 a curie:TnmN ;
   rdfs:label "N2" .
-curie:n3 a curie:TnmN ;
+tnmN:n3 a curie:TnmN ;
   rdfs:label "N3" .
-curie:mx a curie:TnmM ;
+tnmM:mx a curie:TnmM ;
   rdfs:label "Mx" .
-curie:m0 a curie:TnmM ;
+tnmM:m0 a curie:TnmM ;
   rdfs:label "M0" .
-curie:m1 a curie:TnmM ;
+tnmM:m1 a curie:TnmM ;
   rdfs:label "M1" .
 analysis:C37-1 a curie:AnalysisType ;
   rdfs:label "Biology" .
