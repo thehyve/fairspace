@@ -230,7 +230,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                             this.props.history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
                         }}
                     >
-                        <Typography variant="body2">{workspace.name}</Typography>
+                        <Typography variant="body2">{workspace.code}</Typography>
                     </Link>
                 </FormGroup>
             </FormControl>

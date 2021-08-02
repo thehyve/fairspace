@@ -88,7 +88,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         properties: this.props.collection ?
             copyProperties(this.props.collection) :
             {
-                name: this.props.workspace.name ? `[${this.props.workspace.name.replace(/[/\\]/, '')}] ` : '',
+                name: this.props.workspace.code ? `[${this.props.workspace.code.replace(/[/\\]/, '')}] ` : '',
                 description: '',
                 ownerWorkspace: this.props.workspace.iri
             }
@@ -216,7 +216,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         && havePropertiesChanged(this.props.collection, this.state.properties);
 
     validateNameStartsWithWorkspaceCode() {
-        return this.state.properties.name.startsWith(`[${this.props.workspace.name}]`);
+        return this.state.properties.name.startsWith(`[${this.props.workspace.code}]`);
     }
 
     renderCollectionNameHelperText() {
