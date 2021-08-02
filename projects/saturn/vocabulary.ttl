@@ -599,6 +599,7 @@ curie:SampleOrigin a rdfs:Class, sh:NodeShape ;
 curie:collectDate a rdf:Property .
 curie:tumorCellularity a rdf:Property .
 curie:isOfNature a rdf:Property .
+curie:parentIsOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
 curie:subject a rdf:Property .
 curie:diagosis a rdf:Property .
@@ -637,6 +638,13 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         sh:class curie:SampleNature ;
         sh:path curie:isOfNature
+    ],
+    [
+        sh:name "Parent sample nature" ;
+        sh:description "The nature of parent sample." ;
+        sh:maxCount 1 ;
+        sh:class curie:SampleNature ;
+        sh:path curie:parentIsOfNature
     ],
     [
         sh:name "Sample origin" ;
