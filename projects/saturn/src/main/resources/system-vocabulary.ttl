@@ -288,6 +288,7 @@ fs:isSuperadmin a rdf:Property .
 fs:canViewPublicMetadata a rdf:Property .
 fs:canViewPublicData a rdf:Property .
 fs:canAddSharedMetadata a rdf:Property .
+fs:canQueryMetadata a rdf:Property .
 
 fs:User a rdfs:Class, sh:NodeShape ;
     sh:description "" ;
@@ -359,6 +360,14 @@ fs:User a rdfs:Class, sh:NodeShape ;
         fs:machineOnly true ;
         sh:maxCount 1 ;
         sh:path fs:canAddSharedMetadata ;
+    ],
+    [
+        sh:name "Can query metadata" ;
+        sh:description "Allows the user to run SPARQL queries." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:canQueryMetadata ;
     ],
     [
          sh:name "Can list" ;
