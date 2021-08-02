@@ -123,56 +123,56 @@ fs:File sh:property
     ] .
 
 fs:Directory sh:property
-        [
-            sh:name "Is about subject" ;
-            sh:description "Subjects that are featured in this collection." ;
-            sh:class curie:Subject ;
-            sh:path curie:aboutSubject
-        ],
-        [
-            sh:name "Is about biological sample" ;
-            sh:description "Biological samples that are featured in this collection." ;
-            sh:class curie:BiologicalSample ;
-            sh:path curie:sample
-        ],
-        [
-            sh:name "Is about tumor pathology event" ;
-            sh:description "Events that are featured in this collection." ;
-            sh:class curie:TumorPathologyEvent ;
-            sh:path curie:aboutEvent
-        ],
-        [
-            sh:name "Type of analysis" ;
-            sh:description "Type of analysis associated to this collection" ;
-            sh:class curie:AnalysisType ;
-            sh:path curie:analysisType
-        ] .
+    [
+        sh:name "Is about subject" ;
+        sh:description "Subjects that are featured in this directory." ;
+        sh:class curie:Subject ;
+        sh:path curie:aboutSubject
+    ],
+    [
+        sh:name "Is about biological sample" ;
+        sh:description "Biological samples that are featured in this directory." ;
+        sh:class curie:BiologicalSample ;
+        sh:path curie:sample
+    ],
+    [
+        sh:name "Is about tumor pathology event" ;
+        sh:description "Events that are featured in this directory." ;
+        sh:class curie:TumorPathologyEvent ;
+        sh:path curie:aboutEvent
+    ],
+    [
+        sh:name "Type of analysis" ;
+        sh:description "Type of analysis associated to this directory" ;
+        sh:class curie:AnalysisType ;
+        sh:path curie:analysisType
+    ] .
 
 fs:Collection sh:property
-        [
-            sh:name "Is about subject" ;
-            sh:description "Subjects that are featured in this collection." ;
-            sh:class curie:Subject ;
-            sh:path curie:aboutSubject
-        ],
-        [
-            sh:name "Is about biological sample" ;
-            sh:description "Biological samples that are featured in this collection." ;
-            sh:class curie:BiologicalSample ;
-            sh:path curie:sample
-        ],
-        [
-            sh:name "Is about tumor pathology event" ;
-            sh:description "Events that are featured in this collection." ;
-            sh:class curie:TumorPathologyEvent ;
-            sh:path curie:aboutEvent
-        ],
-        [
-            sh:name "Type of analysis" ;
-            sh:description "Type of analysis associated to this collection" ;
-            sh:class curie:AnalysisType ;
-            sh:path curie:analysisType
-        ] .
+    [
+        sh:name "Is about subject" ;
+        sh:description "Subjects that are featured in this collection." ;
+        sh:class curie:Subject ;
+        sh:path curie:aboutSubject
+    ],
+    [
+        sh:name "Is about biological sample" ;
+        sh:description "Biological samples that are featured in this collection." ;
+        sh:class curie:BiologicalSample ;
+        sh:path curie:sample
+    ],
+    [
+        sh:name "Is about tumor pathology event" ;
+        sh:description "Events that are featured in this collection." ;
+        sh:class curie:TumorPathologyEvent ;
+        sh:path curie:aboutEvent
+    ],
+    [
+        sh:name "Type of analysis" ;
+        sh:description "Type of analysis associated to this collection" ;
+        sh:class curie:AnalysisType ;
+        sh:path curie:analysisType
+    ] .
 
 ## User class Shapes
 
