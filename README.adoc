@@ -553,7 +553,7 @@ like the description (``ns1:comment``), to be included in the WebDAV response.
                 <ns1:canDelete>FALSE</ns1:canDelete>
                 <ns1:iri>https://fairspace.ci.fairway.app/api/webdav/Demonstration</ns1:iri>
                 <ns1:canWrite>TRUE</ns1:canWrite>
-                <ns1:ownedByName>Demo</ns1:ownedByName>
+                <ns1:ownedByCode>Demo</ns1:ownedByCode>
                 <ns1:canManage>FALSE</ns1:canManage>
                 <ns1:canUndelete>FALSE</ns1:canUndelete>
                 <ns1:workspacePermissions>http://fairspace.ci.fairway.app/iri/workspace-iri

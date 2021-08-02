@@ -67,7 +67,7 @@ class CollectionResource extends DirectoryResource {
     }
 
     @Property
-    public String getOwnedByName() {
+    public String getOwnedByCode() {
         return Optional.ofNullable(subject.getPropertyResourceValue(FS.ownedBy))
                 .map(workspace -> getStringProperty(workspace, RDFS.label))
                 .orElse(null);

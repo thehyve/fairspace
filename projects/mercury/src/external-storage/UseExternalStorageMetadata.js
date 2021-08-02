@@ -20,7 +20,7 @@ export type LinkedEntityProperty = {
 }
 
 const ignoredProperties = [
-    'filename', 'basename', 'displayname', 'name', 'type', 'iri', 'ownedBy', 'ownedByName',
+    'filename', 'basename', 'displayname', 'name', 'type', 'iri', 'ownedBy', 'ownedByCode',
     'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'accessMode', 'isreadonly',
     'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
     'status', 'getcreated', 'getcontenttype', 'mime', 'etag', 'getetag', 'iscollection',
