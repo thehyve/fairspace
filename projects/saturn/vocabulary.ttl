@@ -17,8 +17,52 @@ curie:aboutSubject a rdf:Property .
 curie:aboutEvent a rdf:Property .
 curie:sample a rdf:Property .
 curie:analysisType a rdf:Property .
+curie:workspaceType a rdf:Property .
+curie:principalInvestigator a rdf:Property .
+curie:projectCode a rdf:Property .
+
+curie:WorkspaceType a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The type of the workspace. " ;
+    sh:name "Workspace type" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique workspace type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
 
 ## Augmented system class shapes
+fs:Workspace sh:property
+    [
+        sh:name "Type" ;
+        sh:description "Workspace type." ;
+        sh:maxCount 1 ;
+        sh:class curie:WorkspaceType ;
+        sh:path curie:workspaceType
+    ],
+    [
+        sh:name "Project code" ;
+        sh:description "Project code related to the workspace." ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        sh:maxCount 1 ;
+        sh:path curie:projectCode
+    ],
+    [
+        sh:name "Principal investigator" ;
+        sh:description "Name of the PI or team leader." ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        sh:maxCount 1 ;
+        sh:path curie:principalInvestigator
+    ] .
+
 fs:File sh:property
     [
         sh:name "Is about subject" ;
