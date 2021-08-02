@@ -5,7 +5,6 @@
 @prefix icdo3m: <https://bioportal.bioontology.org/ontologies/ICD-O-3-M/> .
 @prefix gender: <http://hl7.org/fhir/administrative-gender#> .
 @prefix ncbitaxon: <https://bioportal.bioontology.org/ontologies/NCBITAXON/> .
-@prefix analysis: <https://institut-curie.org/analysis#> .
 @prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
 @prefix workspaceType: <https://institut-curie.org/workspace-type#> .
 @prefix availabilityForResearch: <https://institut-curie.org/availabilityForResearch#> .
@@ -14,6 +13,7 @@
 @prefix tnmT: <https://institut-curie.org/TNM-T#> .
 @prefix tnmN: <https://institut-curie.org/TNM-N#> .
 @prefix tnmM: <https://institut-curie.org/TNM-M#> .
+@prefix osiris: <https://institut-curie.org/osiris#> .
 
 fs:File rdfs:label "File" .
 fs:Directory rdfs:label "Directory" .
@@ -3214,45 +3214,224 @@ tnmM:m0 a curie:TnmM ;
   rdfs:label "M0" .
 tnmM:m1 a curie:TnmM ;
   rdfs:label "M1" .
-analysis:C37-1 a curie:AnalysisType ;
+osiris:C37-1 a curie:AnalysisType ;
   rdfs:label "Biology" .
-analysis:C37-2 a curie:AnalysisType ;
+osiris:C37-2 a curie:AnalysisType ;
   rdfs:label "Imaging" .
-analysis:C37-3 a curie:AnalysisType ;
+osiris:C37-3 a curie:AnalysisType ;
   rdfs:label "Omic" .
-analysis:C37-4 a curie:AnalysisType ;
+osiris:C37-4 a curie:AnalysisType ;
   rdfs:label "Pathology" .
-analysis:O6-1 a curie:AnalysisType ;
+osiris:O6-1 a curie:AnalysisType ;
   rdfs:label "ChIP-on-Chip" .
-analysis:O6-2 a curie:AnalysisType ;
+osiris:O6-2 a curie:AnalysisType ;
   rdfs:label "ChIP-seq" .
-analysis:O6-3 a curie:AnalysisType ;
+osiris:O6-3 a curie:AnalysisType ;
   rdfs:label "DNA microarray" .
-analysis:O6-4 a curie:AnalysisType ;
+osiris:O6-4 a curie:AnalysisType ;
   rdfs:label "DNA targeted panel sequencing" .
-analysis:O6-5 a curie:AnalysisType ;
+osiris:O6-5 a curie:AnalysisType ;
   rdfs:label "Exome sequencing" .
-analysis:O6-6 a curie:AnalysisType ;
+osiris:O6-6 a curie:AnalysisType ;
   rdfs:label "Mass spectrometry" .
-analysis:O6-7 a curie:AnalysisType ;
+osiris:O6-7 a curie:AnalysisType ;
   rdfs:label "MeDIP-Chip" .
-analysis:O6-8 a curie:AnalysisType ;
+osiris:O6-8 a curie:AnalysisType ;
   rdfs:label "MeDIP-seq" .
-analysis:O6-9 a curie:AnalysisType ;
+osiris:O6-9 a curie:AnalysisType ;
   rdfs:label "Methylation microarray" .
-analysis:O6-10 a curie:AnalysisType ;
+osiris:O6-10 a curie:AnalysisType ;
   rdfs:label "RNA microarray" .
-analysis:O6-11 a curie:AnalysisType ;
+osiris:O6-11 a curie:AnalysisType ;
   rdfs:label "RNA targeted panel sequencing" .
-analysis:O6-12 a curie:AnalysisType ;
+osiris:O6-12 a curie:AnalysisType ;
   rdfs:label "RNA-seq" .
-analysis:O6-13 a curie:AnalysisType ;
+osiris:O6-13 a curie:AnalysisType ;
   rdfs:label "RPPA" .
-analysis:O6-14 a curie:AnalysisType ;
+osiris:O6-14 a curie:AnalysisType ;
   rdfs:label "Whole genome bisulfite sequencing" .
-analysis:O6-15 a curie:AnalysisType ;
+osiris:O6-15 a curie:AnalysisType ;
   rdfs:label "Whole genome sequencing" .
-analysis:O6-16 a curie:AnalysisType ;
+osiris:O6-16 a curie:AnalysisType ;
   rdfs:label "miRNA microarray" .
-analysis:O6-OTH a curie:AnalysisType ;
+osiris:O6-OTH a curie:AnalysisType ;
+  rdfs:label "Other" .
+
+osiris:O7-1 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Cytoscan HD" .
+osiris:O7-2 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix EMET Plus Premier Pack" .
+osiris:O7-3 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Genome-Wide Human SNP Array 5.0" .
+osiris:O7-4 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Genome-Wide Human SNP Array 6.0" .
+osiris:O7-5 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix HT Human Genome U133A Array Plate Set" .
+osiris:O7-6 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human Exon 1.0 ST" .
+osiris:O7-7 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human Gene 1.0 ST" .
+osiris:O7-8 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human Genome U219 Array Plate" .
+osiris:O7-9 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human MIP 330K" .
+osiris:O7-10 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human U133 Plus 2.0" .
+osiris:O7-11 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human U133 Plus PM" .
+osiris:O7-12 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Mapping 100K Array Set" .
+osiris:O7-13 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Mapping 10K 2.0 Array Set" .
+osiris:O7-14 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Mapping 500K Array Set" .
+osiris:O7-15 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix OncoScan FFPE Express 2.0" .
+osiris:O7-16 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07" .
+osiris:O7-17 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07-1" .
+osiris:O7-18 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07-2" .
+osiris:O7-19 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07-3" .
+osiris:O7-20 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 8 x 15K Human miRNA-specific microarray" .
+osiris:O7-21 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 1x1M" .
+osiris:O7-22 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 2x400K" .
+osiris:O7-23 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 4x180K" .
+osiris:O7-24 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 8x60K" .
+osiris:O7-25 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CNV 2x400K" .
+osiris:O7-26 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CNV Association 2x105K" .
+osiris:O7-27 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CpG Island Microarray Kit" .
+osiris:O7-28 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome 105A" .
+osiris:O7-29 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome 244A" .
+osiris:O7-30 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome 44K" .
+osiris:O7-31 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome CGH Custom Microaary 2x415K" .
+osiris:O7-32 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human miRNA Microarray Kit (v2)" .
+osiris:O7-33 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Promoter ChIP-on-chip Microarray Set" .
+osiris:O7-34 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human SpliceArray" .
+osiris:O7-35 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Whole Human Genome Oligo Microarray Kit" .
+osiris:O7-36 a curie:TechnologyPlatformName ;
+  rdfs:label "Almac Human CRC" .
+osiris:O7-37 a curie:TechnologyPlatformName ;
+  rdfs:label "capillary sequencing" .
+osiris:O7-38 a curie:TechnologyPlatformName ;
+  rdfs:label "Complete Genomics" .
+osiris:O7-39 a curie:TechnologyPlatformName ;
+  rdfs:label "Custom-designed cDNA array" .
+osiris:O7-40 a curie:TechnologyPlatformName ;
+  rdfs:label "Custom-designed gene expression array" .
+osiris:O7-41 a curie:TechnologyPlatformName ;
+  rdfs:label "Helicos sequencing" .
+osiris:O7-42 a curie:TechnologyPlatformName ;
+  rdfs:label "HumanOmni2.5-8 BeadChip Kit" .
+osiris:O7-43 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina GA sequencing" .
+osiris:O7-44 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina goldengate methylation" .
+osiris:O7-45 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina GoldenGate Methylation Cancer Panel I" .
+osiris:O7-46 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HiSeq" .
+osiris:O7-47 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HiSeq X Ten" .
+osiris:O7-48 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina Human Omni1-Quad beadchip" .
+osiris:O7-49 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina Human1M OmniQuad chip" .
+osiris:O7-50 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina human1m-duo" .
+osiris:O7-51 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina human510s-duo" .
+osiris:O7-52 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina human660w-quad" .
+osiris:O7-53 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanCNV370-Duo v1.0 BeadChip" .
+osiris:O7-54 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humancytosnp-12" .
+osiris:O7-55 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanHap550" .
+osiris:O7-56 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanHT-12 v4.0 beadchip" .
+osiris:O7-57 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humanht-16" .
+osiris:O7-58 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humanht-17" .
+osiris:O7-59 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humanmethylation27" .
+osiris:O7-60 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanOmniExpress BeadChip" .
+osiris:O7-61 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanRef-8 v3.0 beadchip" .
+osiris:O7-62 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanWG-6 v3.0 beadchip" .
+osiris:O7-63 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina Infinium HumanMethylation450" .
+osiris:O7-64 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina microRNA Expression Profiling Panel" .
+osiris:O7-65 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina MiSeq Personal Sequencer" .
+osiris:O7-66 a curie:TechnologyPlatformName ;
+  rdfs:label "Ion Torrent PGM" .
+osiris:O7-67 a curie:TechnologyPlatformName ;
+  rdfs:label "Ion Torrent Proton" .
+osiris:O7-68 a curie:TechnologyPlatformName ;
+  rdfs:label "M.D. Anderson Reverse Phase Protein Array Core" .
+osiris:O7-69 a curie:TechnologyPlatformName ;
+  rdfs:label "Microsatellite Instability Analysis" .
+osiris:O7-70 a curie:TechnologyPlatformName ;
+  rdfs:label "nanoString" .
+osiris:O7-71 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen CGS" .
+osiris:O7-72 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Gene Expression 12x135K" .
+osiris:O7-73 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Gene Expression 385K" .
+osiris:O7-74 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Gene Expression 4x72K" .
+osiris:O7-75 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human CGH 2.1M Whole-Genome v2.0D Array" .
+osiris:O7-76 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human CGH 3x720 Whole-Genome v3.0 Array" .
+osiris:O7-77 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human Methylation 2.1M Whole-Genome sets" .
+osiris:O7-78 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human Methylation 385K Whole-Genome sets" .
+osiris:O7-79 a curie:TechnologyPlatformName ;
+  rdfs:label "PacBio RS sequencing" .
+osiris:O7-80 a curie:TechnologyPlatformName ;
+  rdfs:label "PCR" .
+osiris:O7-81 a curie:TechnologyPlatformName ;
+  rdfs:label "PCR and capillary sequencing" .
+osiris:O7-82 a curie:TechnologyPlatformName ;
+  rdfs:label "qPCR" .
+osiris:O7-83 a curie:TechnologyPlatformName ;
+  rdfs:label "Roche 454 sequencing" .
+osiris:O7-84 a curie:TechnologyPlatformName ;
+  rdfs:label "Sequenom MassARRAY" .
+osiris:O7-85 a curie:TechnologyPlatformName ;
+  rdfs:label "SOLiD sequencing" .
+osiris:O7-86 a curie:TechnologyPlatformName ;
+  rdfs:label "Digital PCR" .
+osiris:O7-87 a curie:TechnologyPlatformName ;
+  rdfs:label "NextSeq 500" .
+osiris:O7-88 a curie:TechnologyPlatformName ;
+  rdfs:label "NovaSeq" .
+osiris:O7-OTH a curie:TechnologyPlatformName ;
   rdfs:label "Other" .

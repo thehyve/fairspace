@@ -20,6 +20,10 @@ curie:analysisType a rdf:Property .
 curie:workspaceType a rdf:Property .
 curie:principalInvestigator a rdf:Property .
 curie:projectCode a rdf:Property .
+curie:analysisCode a rdf:Property .
+curie:analysisDate a rdf:Property .
+curie:platformName a rdf:Property .
+curie:analyticPipelineCode a rdf:Property .
 
 curie:WorkspaceType a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
@@ -66,27 +70,56 @@ fs:Workspace sh:property
 fs:File sh:property
     [
         sh:name "Is about subject" ;
-        sh:description "Subjects that are featured in this collection." ;
+        sh:description "Subjects that are featured in this file." ;
         sh:class curie:Subject ;
         sh:path curie:aboutSubject
     ],
     [
         sh:name "Is about biological sample" ;
-        sh:description "Biological samples that are featured in this collection." ;
+        sh:description "Biological samples that are featured in this file." ;
         sh:class curie:BiologicalSample ;
         sh:path curie:sample
     ],
     [
         sh:name "Is about tumor pathology event" ;
-        sh:description "Events that are featured in this collection." ;
+        sh:description "Events that are featured in this file." ;
         sh:class curie:TumorPathologyEvent ;
         sh:path curie:aboutEvent
     ],
     [
         sh:name "Type of analysis" ;
-        sh:description "Type of analysis associated to this collection" ;
+        sh:description "Type of analysis associated to this file" ;
+        sh:maxCount 1 ;
         sh:class curie:AnalysisType ;
         sh:path curie:analysisType
+    ],
+    [
+        sh:name "Analysis code" ;
+        sh:description "The analysis code (could be the sequencing run identifier for instance, or the imaging identifier, etc.)" ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path curie:analysisCode
+    ],
+    [
+        sh:name "Analysis date" ;
+        sh:description "" ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        sh:path curie:analysisDate
+    ],
+    [
+        sh:name "Platform name" ;
+        sh:description "The name of the technology platform on which the analysis has been processed." ;
+        sh:class curie:TechnologyPlatformName ;
+        sh:maxCount 1 ;
+        sh:path curie:platformName
+    ],
+    [
+        sh:name "Analytic pipeline code" ;
+        sh:description "The analytic pipeline code (which is helpful for data traceability and comparison)." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path curie:analyticPipelineCode
     ] .
 
 fs:Directory sh:property
@@ -158,6 +191,22 @@ curie:AnalysisType a rdfs:Class, sh:NodeShape ;
         fs:importantProperty true ;
         sh:path rdfs:label
     ] .
+
+curie:TechnologyPlatformName a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "" ;
+    sh:name "Technology platform name" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+           [
+         sh:name "Label" ;
+         sh:description "Unique technology platform name." ;
+         sh:datatype xsd:string ;
+         sh:maxCount 1 ;
+         dash:singleLine true ;
+         fs:importantProperty true ;
+         sh:path rdfs:label
+     ] .
 
 curie:Gender a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
