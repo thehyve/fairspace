@@ -113,7 +113,11 @@ class FileAPI {
             });
     }
 
-    uploadMulti(destinationPath, files, onUploadProgress = () => {}) {
+    uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
+        var totalSize = files.reduce((size, file) => size + file.size, 0);
+        if (totalSize > maxFileSizeBytes) {
+            return Promise.reject(new Error("Payload too large"));
+        }
         const formData = new FormData();
         formData.append('action', 'upload_files');
         files.forEach(f => formData.append(encodeURIComponent(f.path), f));

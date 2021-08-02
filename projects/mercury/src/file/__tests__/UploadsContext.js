@@ -88,7 +88,7 @@ describe('UploadsProvider', () => {
 
     it('should store upload progress', async () => {
         const fileApi = {
-            uploadMulti: (destination, files, onProgress) => new Promise(resolve => {
+            uploadMulti: (destination, files, maxFileSizeBytes, onProgress) => new Promise(resolve => {
                 // Set progress to 50 on start
                 onProgress({loaded: 1024, total: 2048});
 

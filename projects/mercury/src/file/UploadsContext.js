@@ -63,11 +63,17 @@ export const UploadsContext = React.createContext({});
 export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
     const [uploads, setUploads] = useState([]);
     const [maxFileSize, setMaxFileSize] = useState();
+    const [maxFileSizeBytes, setMaxFileSizeBytes] = useState();
 
     const handleGetMaxFileSize = async () => getServerConfig()
         .then((response: ConfigResponse) => {
-            if (response && response.maxFileSize != null) {
-                setMaxFileSize(response.maxFileSize);
+            if (response) {
+                if (response.maxFileSize != null) {
+                    setMaxFileSize(response.maxFileSize);
+                }
+                if (response.maxFileSizeBytes != null) {
+                    setMaxFileSizeBytes(response.maxFileSizeBytes);
+                }
             }
         })
         .catch(() => {
@@ -131,7 +137,7 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
             u => ({...u, progress: (progressEvent.loaded * 100) / progressEvent.total})
         );
         setStateForUpload(newUpload, UPLOAD_STATUS_IN_PROGRESS);
-        return fileApi.uploadMulti(newUpload.destinationPath, newUpload.files, onUploadProgress)
+        return fileApi.uploadMulti(newUpload.destinationPath, newUpload.files, maxFileSizeBytes, onUploadProgress)
             .then(() => {
                 setStateForUpload(newUpload, UPLOAD_STATUS_FINISHED);
                 setTimeout(() => removeUpload(newUpload), 5000);
