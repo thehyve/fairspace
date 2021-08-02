@@ -101,7 +101,10 @@ const UserRolesPage = () => {
 
     const toggleRole = (id, role, enable) => setUserRole(id, role, enable)
         .then(refresh)
-        .catch(e => ErrorDialog.showError("Error assigning role", e));
+        .catch(e => {
+            const message = e.hasOwnProperty('message') ? e.message : null;
+            ErrorDialog.showError("Error assigning role", message);
+        });
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = filtersObject[columnName];
@@ -195,7 +198,6 @@ const UserRolesPage = () => {
                                     <Checkbox
                                         checked={u.canAddSharedMetadata}
                                         onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
-                                        disabled={u.isSuperadmin}
                                     />
                                 </TableCell>
                             </TableRow>
