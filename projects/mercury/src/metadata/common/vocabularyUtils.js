@@ -178,18 +178,6 @@ export const determineImportantPropertyShapes = (vocabulary, type) => determineP
     .filter(shape => getFirstPredicateValue(shape, constants.IMPORTANT_PROPERTY_URI, false));
 
 /**
- * Determines whether the given class URI is a fairspace class
- */
-const isFairspaceClass = (vocabulary, className) => {
-    if (!className) {
-        return false;
-    }
-
-    return getClassesInCatalog(vocabulary)
-        .some(entry => entry['@id'] === className || getFirstPredicateId(entry, constants.SHACL_TARGET_CLASS) === className);
-};
-
-/**
  * Generates a list entry for a single property
  * @param predicate
  * @param shape
@@ -222,7 +210,7 @@ const generatePropertyEntry = (vocabulary, predicate, shape) => {
         allowedValues: getFirstPredicateList(shape, constants.SHACL_IN),
         isGenericIriResource: isGenericIriResource(shape),
         isExternalLink: isExternalLink(shape),
-        allowAdditionOfEntities: isFairspaceClass(vocabulary, className),
+        allowAdditionOfEntities: false,
         isRelationShape: shapeIsRelationShape,
         importantPropertyShapes
     };
