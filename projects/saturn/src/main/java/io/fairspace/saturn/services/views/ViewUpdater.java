@@ -83,7 +83,13 @@ public class ViewUpdater implements AutoCloseable {
                 viewStoreClient.addLabel(node.getURI(), column.rdfType, label);
                 yield label;
             }
-            default -> node.getLiteralValue().toString();
+            default -> {
+                if (node.isLiteral()) {
+                    yield node.getLiteralValue().toString();
+                } else {
+                    yield getLabel(graph, node);
+                }
+            }
         };
     }
 
