@@ -8,6 +8,7 @@ metadata:
 data:
   application.yaml: |-
     port: 8090
+    livenessPort: 8091
     publicUrl: https://{{ .Values.fairspace.ingress.domain }}
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
