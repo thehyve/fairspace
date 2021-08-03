@@ -351,15 +351,31 @@ curie:EventType a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:label
     ] .
 
-curie:TnmType a rdfs:Class, sh:NodeShape ;
+curie:TumorGradeType a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
-    sh:description "The type of TNM." ;
-    sh:name "TNM type" ;
+    sh:description "The type of grading classification." ;
+    sh:name "Tumor grade type" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
         sh:name "Label" ;
-        sh:description "Unique TNM type label." ;
+        sh:description "Unique tumor grade type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:TumorGradeValue a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The grading value." ;
+    sh:name "Tumor grade value" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique tumor grade value label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -419,14 +435,19 @@ curie:eventType a rdf:Property .
 curie:topography a rdf:Property .
 curie:tumorMorphology a rdf:Property .
 curie:tumorLaterality a rdf:Property .
-curie:diagnosisDate a rdf:Property .
+curie:yearOfDiagnosis a rdf:Property .
 curie:ageAtDiagnosis a rdf:Property .
 curie:tumorGradeType a rdf:Property .
 curie:tumorGradeValue a rdf:Property .
-curie:tnmType a rdf:Property .
-curie:tnmT a rdf:Property .
-curie:tnmN a rdf:Property .
-curie:tnmM a rdf:Property .
+curie:cTnmT a rdf:Property .
+curie:cTnmN a rdf:Property .
+curie:cTnmM a rdf:Property .
+curie:pTnmT a rdf:Property .
+curie:pTnmN a rdf:Property .
+curie:pTnmM a rdf:Property .
+curie:yTnmT a rdf:Property .
+curie:yTnmN a rdf:Property .
+curie:yTnmM a rdf:Property .
 
 curie:isAnalysedBy a rdf:Property .
 curie:eventSubject a rdf:Property .
@@ -467,11 +488,11 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:path curie:eventType
     ],
     [
-        sh:name "Diagnosis date" ;
-        sh:description "The diagnosis date of the primary tumor." ;
-        sh:datatype xsd:date ;
+        sh:name "Year of diagnosis" ;
+        sh:description "The diagnosis year of the primary tumor." ;
+        sh:datatype xsd:integer ;
         sh:maxCount 1 ;
-        sh:path curie:diagnosisDate
+        sh:path curie:yearOfDiagnosis
     ],
     [
         sh:name "Age at diagnosis" ;
@@ -483,44 +504,79 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Tumor grade type" ;
         sh:description "The type of tumor grading classification." ;
-        sh:class curie:tumorGradeType ;
+        sh:class curie:TumorGradeType ;
         sh:maxCount 1 ;
         sh:path curie:tumorGradeType
     ],
     [
         sh:name "Tumor grade value" ;
         sh:description "The tumor grading value." ;
-        sh:class curie:tumorGradeValue ;
+        sh:class curie:TumorGradeValue ;
         sh:maxCount 1 ;
         sh:path curie:tumorGradeValue
     ],
     [
-        sh:name "TNM type" ;
-        sh:description "The type of TNM." ;
-        sh:class curie:TnmType ;
-        sh:maxCount 1 ;
-        sh:path curie:tnmType
-    ],
-    [
-        sh:name "TNM_T" ;
-        sh:description "The primary tumor size." ;
+        sh:name "cTNM_T" ;
+        sh:description "The primary tumor size (clinical evaluation)." ;
         sh:maxCount 1 ;
         sh:class curie:TnmT ;
-        sh:path curie:tnmT
+        sh:path curie:cTnmT
     ],
     [
-        sh:name "TNM_N" ;
-        sh:description "The regional lymph nodes." ;
+        sh:name "cTNM_N" ;
+        sh:description "The regional lymph nodes (clinical evaluation)." ;
         sh:maxCount 1 ;
-        sh:class curie:tnmN ;
-        sh:path curie:tnmN
+        sh:class curie:TnmN ;
+        sh:path curie:cTnmN
     ],
     [
-        sh:name "TNM_M" ;
-        sh:description "Distant metastasis." ;
+        sh:name "cTNM_M" ;
+        sh:description "Distant metastasis (clinical evaluation)." ;
         sh:maxCount 1 ;
-        sh:class curie:tnmM ;
-        sh:path curie:tnmM
+        sh:class curie:TnmM ;
+        sh:path curie:cTnmM
+    ],
+    [
+        sh:name "pTNM_T" ;
+        sh:description "The primary tumor size (pathological evaluation)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmT ;
+        sh:path curie:pTnmT
+    ],
+    [
+        sh:name "pTNM_N" ;
+        sh:description "The regional lymph nodes (pathological evaluation)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmN ;
+        sh:path curie:pTnmN
+    ],
+    [
+        sh:name "pTNM_M" ;
+        sh:description "Distant metastasis (pathological evaluation)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmM ;
+        sh:path curie:pTnmM
+    ],
+    [
+        sh:name "yTNM_T" ;
+        sh:description "The primary tumor size (after treatment)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmT ;
+        sh:path curie:yTnmT
+    ],
+    [
+        sh:name "yTNM_N" ;
+        sh:description "The regional lymph nodes (after treatment)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmN ;
+        sh:path curie:yTnmN
+    ],
+    [
+        sh:name "yTNM_M" ;
+        sh:description "Distant metastasis (after treatment)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmM ;
+        sh:path curie:yTnmM
     ],
     [
         sh:name "Event subject" ;
@@ -528,12 +584,6 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:class curie:Subject ;
         sh:maxCount 1 ;
         sh:path curie:eventSubject
-    ],
-    [
-        sh:name "Event parentage" ;
-        sh:description "The tumor events could be linked to others as a chain. For example, a primary tumor event could be linked to a local relapse and then a metastatic relapse." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:path curie:isLinkedTo
     ],
     [
         sh:name "Label" ;
