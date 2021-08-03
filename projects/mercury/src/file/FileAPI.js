@@ -37,6 +37,10 @@ class FileAPI {
         this.remoteURL = remoteURL;
     }
 
+    uploadClient() {
+        return createClient('/zuul' + this.remoteURL);
+    }
+
     client() {
         return createClient(this.remoteURL);
     }
@@ -109,7 +113,11 @@ class FileAPI {
             });
     }
 
-    uploadMulti(destinationPath, files, onUploadProgress = () => {}) {
+    uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
+        var totalSize = files.reduce((size, file) => size + file.size, 0);
+        if (totalSize > maxFileSizeBytes) {
+            return Promise.reject(new Error("Payload too large"));
+        }
         const formData = new FormData();
         formData.append('action', 'upload_files');
         files.forEach(f => formData.append(encodeURIComponent(f.path), f));
@@ -124,7 +132,7 @@ class FileAPI {
             onUploadProgress,
             data: formData
         };
-        return this.client()
+        return this.uploadClient()
             .customRequest(destinationPath, requestOptions)
             .catch(e => {
                 if (e && e.response) {

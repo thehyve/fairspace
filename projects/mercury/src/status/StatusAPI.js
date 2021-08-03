@@ -9,6 +9,7 @@ export type StatusResponse = {
 }
 export type ConfigResponse = {
     maxFileSize: string;
+    maxFileSizeBytes: ?number;
 }
 
 const requestOptions = {
@@ -25,5 +26,8 @@ export const getServerStatus = (): StatusResponse => axios.get('/actuator/health
 
 export const getServerConfig = (): ConfigResponse => axios.get('/api/config', requestOptions)
     .then(extractJsonData)
-    .then((res: ConfigResponse) => ({maxFileSize: res.maxFileSize}))
+    .then((res: ConfigResponse) => ({
+        maxFileSize: res.maxFileSize,
+        maxFileSizeBytes: res.maxFileSizeBytes
+    }))
     .catch(handleHttpError("Failure when retrieving server config"));
