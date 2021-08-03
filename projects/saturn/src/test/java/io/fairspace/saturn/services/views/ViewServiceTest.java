@@ -106,7 +106,7 @@ public class ViewServiceTest {
         var dateFacets = facets.stream()
                 .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Date)
                 .collect(Collectors.toList());
-        Assert.assertEquals(1, dateFacets.size());
+        Assert.assertEquals(2, dateFacets.size());
         viewService.getViews();
     }
 }
