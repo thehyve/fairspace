@@ -20,9 +20,8 @@ import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 public class App {
     public static final String API_PREFIX = "/api";
 
-    public static void main(String[] args) {
+    public static FusekiServer startFusekiServer() {
         log.info("Saturn is starting");
-
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (CONFIG.viewDatabase.enabled) {
             try {
@@ -56,5 +55,16 @@ public class App {
         server.start();
 
         log.info("Saturn has started");
+
+        return server;
+    }
+
+    public static void main(String[] args) {
+        try (var ignored = new LivenessServer()) {
+            var fusekiServer = startFusekiServer();
+            fusekiServer.join();
+        } catch (Throwable e) {
+            throw new RuntimeException("Saturn ended unexpectedly", e);
+        }
     }
 }

@@ -95,8 +95,8 @@ spec:
               mountPath: /data/saturn/audit
           livenessProbe:
             httpGet:
-              path:  /api/health/
-              port: 8090
+              path:  /liveness
+              port: 8091
             initialDelaySeconds: {{ .Values.saturn.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.saturn.livenessProbe.periodSeconds }}
             successThreshold: {{ .Values.saturn.livenessProbe.successThreshold }}

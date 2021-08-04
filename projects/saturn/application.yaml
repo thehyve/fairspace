@@ -1,5 +1,6 @@
 # Application's port
 port: 8090
+livenessPort: 8091
 publicUrl: http://localhost:8080
 jena:
   # Base IRI for all metadata entities
