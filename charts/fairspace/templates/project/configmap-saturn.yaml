@@ -9,7 +9,7 @@ data:
   application.yaml: |-
     port: 8090
     livenessPort: 8091
-    publicUrl: https://{{ .Values.fairspace.ingress.domain }}
+    publicUrl: {{ template "fairspace.url" . }}
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
       datasetPath: "/data/saturn/db"

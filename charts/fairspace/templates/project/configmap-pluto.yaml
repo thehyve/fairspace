@@ -9,7 +9,7 @@ data:
   application.yaml: |-
     pluto:
       domains:
-        - {{ template "fairspace.scheme" . }}://{{ .Values.fairspace.ingress.domain }}
+        - {{ template "fairspace.url" . }}
 {{ if .Values.pluto.externalDomains }}{{ toYaml .Values.pluto.externalDomains | indent 8 }}{{ end }}
       downstreamServiceHealthUrl: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}/api/health/
       oauth2:
