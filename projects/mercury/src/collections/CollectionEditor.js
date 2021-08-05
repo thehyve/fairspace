@@ -79,7 +79,8 @@ type CollectionEditorState = {
 export class CollectionEditor extends React.Component<CollectionEditorProps, CollectionEditorState> {
     static defaultProps = {
         setBusy: () => {},
-        updateExisting: false
+        updateExisting: false,
+        workspace: {}
     };
 
     state = {
