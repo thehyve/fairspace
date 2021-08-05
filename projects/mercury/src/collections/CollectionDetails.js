@@ -405,6 +405,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 {editing ? (
                     <CollectionEditor
                         collection={collection}
+                        workspace={ownerWorkspace}
                         updateExisting
                         setBusy={this.props.setBusy}
                         onClose={() => { if (!this.unmounting) { this.setState({editing: false});} }}
