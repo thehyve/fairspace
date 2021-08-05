@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.health.HealthService;
+import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
@@ -53,6 +54,7 @@ public class Services {
     private final HttpServlet davServlet;
     private final DatasetGraph filteredDatasetGraph;
     private final HealthService healthService;
+    private final MaintenanceService maintenanceService;
 
     public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
         this.config = config;
@@ -80,6 +82,8 @@ public class Services {
 
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
+
+        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory);
 
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);

@@ -28,10 +28,18 @@ type MetadataViewTableProperties = {
 };
 
 const useStyles = makeStyles(() => ({
-    cellContents: {
-        textOverflow: 'ellipsis',
+    headerCellContents: {
+        verticalAlign: 'top',
         whiteSpace: 'nowrap',
-        verticalAlign: 'top'
+    },
+    cellContents: {
+        verticalAlign: 'top',
+        display: 'block',
+        whiteSpace: 'nowrap',
+        maxWidth: '40em',
+        overflow: 'hidden',
+        overflowWrap: 'break-word',
+        textOverflow: 'ellipsis'
     }
 }));
 
@@ -131,7 +139,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             <TableHead>
                 <TableRow>
                     {visibleColumns.map(column => (
-                        <TableCell key={column.name} className={classes.cellContents}>
+                        <TableCell key={column.name} className={classes.headerCellContents}>
                             {column.title}
                             {(TextualValueTypes.includes(column.type)) && renderColumnFilter(column.name)}
                         </TableCell>

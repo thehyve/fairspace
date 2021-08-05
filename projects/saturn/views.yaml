@@ -25,33 +25,65 @@ views:
         title: Age at death
         source: https://institut-curie.org/ontology#ageAtDeath
         type: number
+      - name: availableForResearch
+        title: Available for research
+        source: https://institut-curie.org/ontology#availableForResearch
+        rdfType: https://institut-curie.org/ontology#AvailabilityForResearch
+        type: term
+      - name: dateOfOpposition
+        title: Date of opposition
+        source: https://institut-curie.org/ontology#dateOfOpposition
+        type: date
+      - name: reuseClinicalWithGeneticData
+        title: Reuse clinical with genetic data
+        source: https://institut-curie.org/ontology#reuseClinicalWithGeneticData
+        rdfType: https://institut-curie.org/ontology#ConsentAnswer
+        type: term
+      - name: sampleStorageAndReuse
+        title: Sample storage and reuse
+        source: https://institut-curie.org/ontology#sampleStorageAndReuse
+        rdfType: https://institut-curie.org/ontology#ConsentAnswer
+        type: term
+      - name: geneticAnalysis
+        title: Genetic analysis
+        source: https://institut-curie.org/ontology#geneticAnalysis
+        rdfType: https://institut-curie.org/ontology#ConsentAnswer
+        type: term
     join:
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#eventSubject
         reverse: true
         include:
+          - id
+          - eventType
           - topography
           - morphology
-          - eventType
           - ageAtDiagnosis
       - view: Sample
         on: https://institut-curie.org/ontology#subject
         reverse: true
         include:
-          - topography
           - nature
+          - topography
           - origin
       - view: Resource
         on: https://institut-curie.org/ontology#aboutSubject
         reverse: true
         include:
           - analysisType
+
   - name: TumorPathologyEvent
     title: Tumor pathology events
     itemName: Tumor pathology event
     types:
       - https://institut-curie.org/ontology#TumorPathologyEvent
     columns:
+      - name: eventType
+        title: Event type
+        source: https://institut-curie.org/ontology#eventType
+        rdfType: https://institut-curie.org/ontology#EventType
+        type: term
+        priority: 100
       - name: topography
         title: Tumor topography
         source: https://institut-curie.org/ontology#topography
@@ -68,17 +100,71 @@ views:
         rdfType: https://institut-curie.org/ontology#Laterality
         type: term
         priority: 1000
-      - name: eventType
-        title: Event type
-        source: https://institut-curie.org/ontology#eventType
-        rdfType: https://institut-curie.org/ontology#EventType
-        type: term
-        priority: 100
       - name: ageAtDiagnosis
         title: Age at diagnosis
         source: https://institut-curie.org/ontology#ageAtDiagnosis
         type: number
         priority: 100
+      - name: yearOfDiagnosis
+        title: Year of diagnosis
+        source: https://institut-curie.org/ontology#yearOfDiagnosis
+        type: number
+        priority: 200
+      - name: tumorGradeType
+        title: Tumor grade type
+        source: https://institut-curie.org/ontology#tumorGradeType
+        rdfType: https://institut-curie.org/ontology#TumorGradeType
+        type: term
+      - name: tumorGradeValue
+        title: Tumor grade value
+        source: https://institut-curie.org/ontology#tumorGradeValue
+        rdfType: https://institut-curie.org/ontology#TumorGradeValue
+        type: term
+      - name: cTnmT
+        title: cTNM_T
+        source: https://institut-curie.org/ontology#cTnmT
+        rdfType: https://institut-curie.org/ontology#TnmT
+        type: term
+      - name: cTnmN
+        title: cTNM_N
+        source: https://institut-curie.org/ontology#cTnmN
+        rdfType: https://institut-curie.org/ontology#TnmN
+        type: term
+      - name: cTnmM
+        title: cTNM_M
+        source: https://institut-curie.org/ontology#cTnmM
+        rdfType: https://institut-curie.org/ontology#TnmM
+        type: term
+      - name: pTnmT
+        title: pTNM_T
+        source: https://institut-curie.org/ontology#pTnmT
+        rdfType: https://institut-curie.org/ontology#TnmT
+        type: term
+      - name: pTnmN
+        title: pTNM_N
+        source: https://institut-curie.org/ontology#pTnmN
+        rdfType: https://institut-curie.org/ontology#TnmN
+        type: term
+      - name: pTnmM
+        title: pTNM_M
+        source: https://institut-curie.org/ontology#pTnmM
+        rdfType: https://institut-curie.org/ontology#TnmM
+        type: term
+      - name: yTnmT
+        title: yTNM_T
+        source: https://institut-curie.org/ontology#yTnmT
+        rdfType: https://institut-curie.org/ontology#TnmT
+        type: term
+      - name: yTnmN
+        title: yTNM_N
+        source: https://institut-curie.org/ontology#yTnmN
+        rdfType: https://institut-curie.org/ontology#TnmN
+        type: term
+      - name: yTnmM
+        title: yTNM_M
+        source: https://institut-curie.org/ontology#yTnmM
+        rdfType: https://institut-curie.org/ontology#TnmM
+        type: term
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#eventSubject
@@ -90,19 +176,43 @@ views:
         on: https://institut-curie.org/ontology#diagnosis
         reverse: true
         include:
-          - topography
           - nature
+          - origin
+          - topography
       - view: Resource
         on: https://institut-curie.org/ontology#aboutEvent
         reverse: true
         include:
           - analysisType
+
   - name: Sample
     title: Samples
     itemName: Sample
     types:
       - https://institut-curie.org/ontology#BiologicalSample
     columns:
+      - name: collectDate
+        title: Collect date
+        source: https://institut-curie.org/ontology#collectDate
+        type: date
+      - name: nature
+        title: Sample nature
+        source: https://institut-curie.org/ontology#isOfNature
+        rdfType: https://institut-curie.org/ontology#SampleNature
+        type: term
+        priority: 100
+      - name: parentIsOfNature
+        title: Parent sample nature
+        source: https://institut-curie.org/ontology#parentIsOfNature
+        rdfType: https://institut-curie.org/ontology#SampleNature
+        type: term
+        priority: 200
+      - name: origin
+        title: Sample origin
+        source: https://institut-curie.org/ontology#hasOrigin
+        rdfType: https://institut-curie.org/ontology#SampleOrigin
+        type: term
+        priority: 100
       - name: tumorCellularity
         title: Tumor cellularity
         source: https://institut-curie.org/ontology#tumorCellularity
@@ -113,18 +223,6 @@ views:
         source: https://institut-curie.org/ontology#topography
         rdfType: https://institut-curie.org/ontology#Topography
         type: term
-      - name: nature
-        title: Sample nature
-        source: https://institut-curie.org/ontology#isOfNature
-        rdfType: https://institut-curie.org/ontology#SampleNature
-        type: term
-        priority: 100
-      - name: origin
-        title: Sample origin
-        source: https://institut-curie.org/ontology#hasOrigin
-        rdfType: https://institut-curie.org/ontology#SampleOrigin
-        type: term
-        priority: 100
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#subject
@@ -133,15 +231,26 @@ views:
           - species
           - gender
           - ageAtDeath
+          - availableForResearch
+          - reuseClinicalWithGeneticData
+          - sampleStorageAndReuse
+          - geneticAnalysis
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#diagnosis
         include:
-          - id
+          - eventType
           - topography
           - morphology
           - laterality
-          - eventType
           - ageAtDiagnosis
+          - tumorGradeType
+          - tumorGradeValue
+          - cTnmT
+          - cTnmN
+          - cTnmM
+          - pTnmT
+          - pTnmN
+          - pTnmM
       - view: Resource
         on: https://institut-curie.org/ontology#sample
         reverse: true
@@ -164,31 +273,65 @@ views:
         title: Resource type
         source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
         type: term
+      - name: keywords
+        title: Key words
+        source: http://www.w3.org/ns/dcat#keyword
+        type: set
+      - name: status
+        title: Collection status
+        source: https://fairspace.nl/ontology#status
+        type: text
+      - name: createdBy
+        title: Created by
+        source: https://fairspace.nl/ontology#createdBy
+        type: text
       - name: dateCreated
-        title: File created
+        title: Date created
         source: https://fairspace.nl/ontology#dateCreated
         type: date
+      - name: modifiedBy
+        title: Last modified by
+        source: https://fairspace.nl/ontology#modifiedBy
+        type: text
+      - name: dateModified
+        title: Last modified
+        source: https://fairspace.nl/ontology#dateModified
+        type: date
+      - name: deletedBy
+        title: Deleted by
+        source: https://fairspace.nl/ontology#deletedBy
+        type: text
+      - name: dateDeleted
+        title: Date deleted
+        source: https://fairspace.nl/ontology#dateDeleted
+        type: date
+      - name: contentType
+        title: Content type
+        source: https://fairspace.nl/ontology#contentType
+        type: text
       - name: analysisType
         title: Analysis type
         source: https://institut-curie.org/ontology#analysisType
         rdfType: https://institut-curie.org/ontology#AnalysisType
         type: termset
         priority: 100
-      - name: keywords
-        title: Key words
-        source: http://www.w3.org/ns/dcat#keyword
-        type: set
+      - name: platformName
+        title: Platform name
+        source: https://institut-curie.org/ontology#platformName
+        rdfType: https://institut-curie.org/ontology#TechnologyPlatformName
+        type: termset
+        priority: 200
     join:
       - view: Subject
         on: https://institut-curie.org/ontology#aboutSubject
         include:
           - gender
-      - view: Sample
-        on: https://institut-curie.org/ontology#sample
-        include:
-          - topography
-          - nature
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#aboutEvent
         include:
           - eventType
+      - view: Sample
+        on: https://institut-curie.org/ontology#sample
+        include:
+          - nature
+          - topography

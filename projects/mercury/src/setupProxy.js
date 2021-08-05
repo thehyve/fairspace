@@ -29,7 +29,7 @@ module.exports = (app) => {
     );
 
     // Return 401 Unauthorized for API requests
-    keycloak.redirectToLogin = (request) => !request.baseUrl.startsWith('/api/');
+    keycloak.redirectToLogin = (request) => !(request.baseUrl.startsWith('/api/') || request.baseUrl.startsWith('/zuul/'));
 
     app.use(keycloak.middleware({logout: '/logout'}));
     app.use('/dev', keycloak.protect());
@@ -37,6 +37,11 @@ module.exports = (app) => {
     const addToken = (proxyReq, req) => req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
     app.use(proxy('/api', {
+        target: 'http://localhost:8080/',
+        onProxyReq: addToken
+    }));
+
+    app.use(proxy('/zuul', {
         target: 'http://localhost:8080/',
         onProxyReq: addToken
     }));

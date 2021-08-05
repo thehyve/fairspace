@@ -553,7 +553,7 @@ like the description (``ns1:comment``), to be included in the WebDAV response.
                 <ns1:canDelete>FALSE</ns1:canDelete>
                 <ns1:iri>https://fairspace.ci.fairway.app/api/webdav/Demonstration</ns1:iri>
                 <ns1:canWrite>TRUE</ns1:canWrite>
-                <ns1:ownedByName>Demo</ns1:ownedByName>
+                <ns1:ownedByCode>Demo</ns1:ownedByCode>
                 <ns1:canManage>FALSE</ns1:canManage>
                 <ns1:canUndelete>FALSE</ns1:canUndelete>
                 <ns1:workspacePermissions>http://fairspace.ci.fairway.app/iri/workspace-iri
@@ -803,6 +803,7 @@ These are not documented here in detail, but can be used from the user interface
 ==== SPARQL
 The {SPARQL}[SPARQL] API is a standard API for querying RDF databases.
 This endpoint is read-only and can be used for advanced search, analytics, data extraction, etc.
+It is only accessible for users with the _canQueryMetadata_ role.
 
 |===
 | ``POST /api/rdf/query``
@@ -1352,10 +1353,10 @@ Operations on workspace entities.
 2+| _Response_ contains the following data:
 | ``iri``
 | Unique workspace IRI.
-| ``name``
-| Unique workspace name.
-| ``comment``
-| Workspace description in markdown format.
+| ``code``
+| Unique workspace code.
+| ``title``
+| Workspace title.
 | ``managers``
 | List of  workspace managers.
 | ``summary``
@@ -1371,7 +1372,7 @@ Operations on workspace entities.
 ====
 [source, bash]
 ----
-curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
+curl -H "http://localhost:8080/api/workspaces/"
 ----
 ====
 
@@ -1380,9 +1381,9 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 
 3+| Add a workspace. Available only to administrators.
 3+| _Parameters:_
-|``name``
+|``code``
 |string
-|Unique workspace name.
+|Unique workspace code.
 3+| _Response:_
 3+| Response contains the workspace name and newly assigned IRI.
 |===
@@ -1392,7 +1393,7 @@ curl -H "Accept: application/json" "http://localhost:8080/api/workspaces/"
 ====
 [source, bash]
 ----
-curl -X PUT -H "Accept: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces/"
+curl -X PUT -H "Content-type: application/json" -d '{"name": "test workspace"}' "http://localhost:8080/api/workspaces/"
 ----
 ====
 
@@ -1418,7 +1419,7 @@ curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http:/
 ===== Workspace users
 
 |===
-3+| ``GET /api/workspaces/users``
+3+| ``GET /api/workspaces/users/``
 
 3+| List all workspace users with workspace roles.
 3+| _Parameters:_
@@ -1434,20 +1435,25 @@ curl -X DELETE --data-urlencode "workspace=http://fairspace.com/iri/123" "http:/
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?workspace=http://fairspace.com/iri/123'
+curl -G --data-urlencode "workspace=http://fairspace.com/iri/123" "http://localhost:8080/api/workspaces/users/"
 ----
 ====
 
 |===
-3+| ``PATCH /api/workspaces/users``
+3+| ``PATCH /api/workspaces/users/``
 
-3+| Update workspace users and their workspace roles.
+3+| Assign a workspace role to a user (``Member`` or ``Manager``) or revoke
+a workspace role (by assigning role ``None``).
 3+| _Parameters:_
 | ``workspace``
 | string
-| Workspace IRI (URL-encoded).
-3+| _Response:_
-3+| Response contains list of workspace users with their updated workspace roles.
+| Workspace IRI.
+| ``user``
+| string
+| User IRI
+| ``role``
+| string
+| ``None`` (to remove), ``Member`` or ``Manager``
 |===
 
 .Example of updating workspace users (curl)
@@ -1455,7 +1461,7 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/workspaces/users?w
 ====
 [source, bash]
 ----
-curl -H 'Accept: application/json' --data-urlencode "workspace=http://fairspace.com/iri/123" "http://localhost:8080/api/workspaces/users"
+curl -X PATCH -H "Content-type: application/json" -d '{"workspace":"http://fairspace.com/iri/123","user":"http://fairspace.com/iri/456","role":"Member"}' "http://localhost:8080/api/workspaces/users/"
 ----
 ====
 
@@ -1615,6 +1621,26 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/services/'
 ----
 ====
 
+===== Server configuration
+
+|===
+| ``GET /api/config``
+
+| View server configuration properties.
+|===
+
+Response contains a list of server configuration properties,
+currently limited to a max file size for uploads.
+
+.Example listing properties (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -H 'Accept: application/json' 'http://localhost:8080/api/config/'
+----
+====
+
 ===== External storages
 
 |===
@@ -1631,6 +1657,42 @@ Response contains list of external data storages linked to Fairspace.
 [source, bash]
 ----
 curl -H 'Accept: application/json' 'http://localhost:8080/api/storages/'
+----
+====
+
+===== Maintenance
+
+|===
+2+| ``POST /api/maintenance/reindex``
+
+2+| Recreate the view database from the RDF database.
+
+Starts an asynchronous task to clean the PostgreSQL database with the data used for the metadata views, and to repopulate the database with the data from the RDF database.
+
+This can be used after a change in the data model or view configuration to ensure
+that all data is properly indexed.
+
+Only available when the application is configured with ``viewDatabase.enabled: true``.
+
+Only allowed for administrators.
+2+| _Response:_
+| ``204``
+| Asynchronous task to recreate the index has started.
+| ``403``
+| Operation not allowed. The current user is not an administrator.
+| ``409``
+| Reindexing is already in progress.
+| ``503``
+| Service not available. This means that the application is configured not to use a view database.
+|===
+
+
+.Example recreate index using curl
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/api/maintenance/reindex'
 ----
 ====
 
@@ -1827,6 +1889,7 @@ We distinguish the following roles in the solution:
 * _View public data_: the user can read public files;
 * _Admin_: can create workspaces, assign roles and permissions;
 * _Add shared metadata_: can add, modify and delete shared metadata entities.
+* _Query metadata_: can run <<SPARQL>> queries to query metadata.
 
 Most users should have the _View public data_ role.
 Only when the shared metadata may contain sensitive information that should
@@ -2340,7 +2403,7 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.16
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.17
 ----
 
 ===== Deploy Hyperspace
@@ -2425,7 +2488,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.16 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.17 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2491,10 +2554,10 @@ saturn:
 pluto:
   image:
     pullPolicy: Always
-  socketTimeoutMillis: 10000
+  socketTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
-  maxFileSize: 1GB
-  maxRequestSize: 1GB
+  maxFileSize: 1GB    # max total size of file(s) that can be uploaded
+  maxRequestSize: 1GB  # max total size of the request (should be > maxFileSize)
   backends:
     storageRoutes:
       storage-external-webdav:
@@ -2558,7 +2621,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.16.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.17.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.

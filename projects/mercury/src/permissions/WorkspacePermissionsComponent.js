@@ -103,7 +103,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
             <ConfirmationDialog
                 open
                 title="Confirmation"
-                content={`Are you sure you do not want to share collection "${collection.name}" with workspace "${selectedWorkspace.name}" anymore?`}
+                content={`Are you sure you do not want to share collection "${collection.name}" with workspace "${selectedWorkspace.code}" anymore?`}
                 dangerous
                 agreeButtonText="Remove"
                 onAgree={() => removePermission(selectedWorkspace)}

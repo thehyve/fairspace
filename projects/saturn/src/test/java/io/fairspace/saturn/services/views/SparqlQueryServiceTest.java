@@ -38,8 +38,8 @@ public class SparqlQueryServiceTest {
     static final String BASE_PATH = "/api/webdav";
     static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;
     static final String SAMPLE_NATURE_BLOOD = "http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#C12434";
-    static final String ANALYSIS_TYPE_RNA_SEQ = "https://institut-curie.org/analysis#O6-12";
-    static final String ANALYSIS_TYPE_IMAGING = "https://institut-curie.org/analysis#C37-2";
+    static final String ANALYSIS_TYPE_RNA_SEQ = "https://institut-curie.org/osiris#O6-12";
+    static final String ANALYSIS_TYPE_IMAGING = "https://institut-curie.org/osiris#C37-2";
 
     @Mock
     BlobStore store;
@@ -124,7 +124,7 @@ public class SparqlQueryServiceTest {
         var taxonomies = model.read("taxonomies.ttl");
         api.put(taxonomies);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 

@@ -95,7 +95,6 @@ fs:File a rdfs:Class, sh:NodeShape ;
         sh:name "Keywords" ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
-        fs:importantProperty true ;
         sh:path dcat:keyword;
         sh:order 2
     ],
@@ -185,7 +184,6 @@ fs:Directory a rdfs:Class, sh:NodeShape ;
         sh:name "Keywords" ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
-        fs:importantProperty true ;
         sh:path dcat:keyword;
         sh:order 2
     ] .
@@ -254,7 +252,7 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Label" ;
-        sh:description "Unique collection label." ;
+        sh:description "Unique collection name." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         fs:machineOnly true ;
@@ -274,7 +272,6 @@ fs:Collection a rdfs:Class, sh:NodeShape ;
         sh:name "Keywords" ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
-        fs:importantProperty true ;
         sh:path dcat:keyword;
         sh:order 2
     ].
@@ -291,6 +288,7 @@ fs:isSuperadmin a rdf:Property .
 fs:canViewPublicMetadata a rdf:Property .
 fs:canViewPublicData a rdf:Property .
 fs:canAddSharedMetadata a rdf:Property .
+fs:canQueryMetadata a rdf:Property .
 
 fs:User a rdfs:Class, sh:NodeShape ;
     sh:description "" ;
@@ -364,6 +362,14 @@ fs:User a rdfs:Class, sh:NodeShape ;
         sh:path fs:canAddSharedMetadata ;
     ],
     [
+        sh:name "Can query metadata" ;
+        sh:description "Allows the user to run SPARQL queries." ;
+        sh:class xsd:boolean;
+        fs:machineOnly true ;
+        sh:maxCount 1 ;
+        sh:path fs:canQueryMetadata ;
+    ],
+    [
          sh:name "Can list" ;
          sh:description "Visible collections." ;
          sh:class fs:Collection ;
@@ -415,8 +421,8 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
-        sh:name "Label" ;
-        sh:description "Unique workspace label." ;
+        sh:name "Code" ;
+        sh:description "Workspace code. Has to be unique.  It prefixes all collections of the workspace - preferred length is maximum 10 characters." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         sh:minCount 1 ;
@@ -426,8 +432,8 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:order 0
     ],
     [
-        sh:name "Short description";
-        sh:description "Short public description of the workspace." ;
+        sh:name "Title";
+        sh:description "Workspace title." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -447,7 +453,6 @@ fs:Workspace a rdfs:Class, sh:NodeShape ;
         sh:name "Keywords" ;
         sh:datatype xsd:string ;
         dash:singleLine true ;
-        fs:importantProperty true ;
         sh:path dcat:keyword;
         sh:order 3
     ].

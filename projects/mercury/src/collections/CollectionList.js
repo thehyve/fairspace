@@ -29,7 +29,7 @@ const baseColumns = {
         label: 'Name'
     },
     workspace: {
-        valueExtractor: 'ownerWorkspaceName',
+        valueExtractor: 'ownerWorkspaceCode',
         label: 'Workspace'
     },
     status: {
@@ -173,6 +173,7 @@ const CollectionList = ({
                                                 </Link>
                                             )}
                                             secondary={collection.description}
+                                            secondaryTypographyProps={{noWrap: true}}
                                         />
                                     </TableCell>
                                     { currentWorkspace() ? null : (
@@ -183,7 +184,7 @@ const CollectionList = ({
                                             maxWidth: 160
                                         }}
                                         >
-                                            {collection.ownerWorkspaceName}
+                                            {collection.ownerWorkspaceCode}
                                         </TableCell>
                                     ) }
                                     <TableCell>

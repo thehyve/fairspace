@@ -15,6 +15,7 @@ export type User = {
     canViewPublicMetadata: boolean;
     canViewPublicData: boolean;
     canAddSharedMetadata: boolean;
+    canQueryMetadata: boolean;
 }
 
 const requestOptions = {

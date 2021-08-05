@@ -230,7 +230,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                             this.props.history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
                         }}
                     >
-                        <Typography variant="body2">{workspace.name}</Typography>
+                        <Typography variant="body2">{workspace.code}</Typography>
                     </Link>
                 </FormGroup>
             </FormControl>
@@ -379,7 +379,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         style={{wordBreak: 'break-word'}}
                     />
                     <CardContent style={{paddingTop: 0}}>
-                        <Typography component="p">
+                        <Typography component="p" style={{whiteSpace: 'pre-line'}}>
                             {collection.description}
                         </Typography>
                         <List>

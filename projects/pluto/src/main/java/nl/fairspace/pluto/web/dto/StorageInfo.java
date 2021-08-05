@@ -1,4 +1,4 @@
-package nl.fairspace.pluto.model;
+package nl.fairspace.pluto.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

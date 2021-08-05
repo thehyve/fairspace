@@ -17,10 +17,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 
 import javax.servlet.ServletException;
 import javax.ws.rs.NotFoundException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;
 
@@ -160,7 +157,10 @@ public class UserService {
                 throw new NotFoundException();
             }
             if (user.isSuperadmin()) {
-                throw new IllegalArgumentException("Cannot modify superadmin's roles");
+                if (Stream.of(roles.getAdmin(), roles.getCanViewPublicData(), roles.getCanViewPublicMetadata())
+                        .anyMatch(role -> role != null && !role)) {
+                    throw new IllegalArgumentException("Cannot revoke admin or public access roles from superadmin user.");
+                }
             }
             username[0] = user.getUsername();
             if (roles.getAdmin() != null) {
@@ -176,6 +176,12 @@ public class UserService {
                     user.setCanViewPublicMetadata(true);
                 }
             }
+            if (roles.getCanQueryMetadata() != null) {
+                user.setCanQueryMetadata(roles.getCanQueryMetadata());
+                if (user.isCanQueryMetadata()) {
+                    user.setCanViewPublicMetadata(true);
+                }
+            }
             if (roles.getCanViewPublicMetadata() != null) {
                 user.setCanViewPublicMetadata(roles.getCanViewPublicMetadata());
             }
@@ -184,7 +190,8 @@ public class UserService {
             }
 
             if (user.isAdmin() && !user.isCanViewPublicData()
-            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()) {
+            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()
+            || user.isCanQueryMetadata() && !user.isCanViewPublicMetadata()) {
                 throw new IllegalArgumentException("Inconsistent organisation-level roles");
             }
 

@@ -53,6 +53,10 @@ const columns = {
         valueExtractor: 'canViewPublicMetadata',
         label: 'View public metadata'
     },
+    canQueryMetadata: {
+        valueExtractor: 'canQueryMetadata',
+        label: 'Query metadata'
+    },
     canAddSharedMetadata: {
         valueExtractor: 'canAddSharedMetadata',
         label: 'Add shared metadata'
@@ -60,7 +64,12 @@ const columns = {
 };
 
 const roleSelectionColumns = [
-    columns.isSuperadmin, columns.isAdmin, columns.canViewPublicData, columns.canViewPublicMetadata, columns.canAddSharedMetadata
+    columns.isSuperadmin,
+    columns.isAdmin,
+    columns.canViewPublicData,
+    columns.canViewPublicMetadata,
+    columns.canQueryMetadata,
+    columns.canAddSharedMetadata
 ];
 
 const UserRolesPage = () => {
@@ -101,7 +110,10 @@ const UserRolesPage = () => {
 
     const toggleRole = (id, role, enable) => setUserRole(id, role, enable)
         .then(refresh)
-        .catch(e => ErrorDialog.showError("Error assigning role", e));
+        .catch(e => {
+            const message = e.hasOwnProperty('message') ? e.message : null;
+            ErrorDialog.showError("Error assigning role", message);
+        });
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = filtersObject[columnName];
@@ -188,14 +200,19 @@ const UserRolesPage = () => {
                                     <Checkbox
                                         checked={u.canViewPublicMetadata}
                                         onChange={(e) => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
-                                        disabled={u.canViewPublicData}
+                                        disabled={u.canViewPublicData || u.canQueryMetadata}
+                                    />
+                                </TableCell>
+                                <TableCell style={{width: 80}}>
+                                    <Checkbox
+                                        checked={u.canQueryMetadata}
+                                        onChange={(e) => toggleRole(u.id, 'canQueryMetadata', e.target.checked)}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canAddSharedMetadata}
                                         onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
-                                        disabled={u.isSuperadmin}
                                     />
                                 </TableCell>
                             </TableRow>

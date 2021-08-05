@@ -9,7 +9,7 @@
 @prefix icdo3t: <https://bioportal.bioontology.org/ontologies/ICD-O-3-T/> .
 @prefix icdo3m: <https://bioportal.bioontology.org/ontologies/ICD-O-3-M/> .
 @prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
-@prefix analysis: <https://institut-curie.org/analysis#> .
+@prefix osiris: <https://institut-curie.org/osiris#> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 
 subject:s1 a curie:Subject ;
@@ -62,7 +62,7 @@ file:coll1\/coffee.jpg
     curie:sample sample:s1-a .
 
 file:coll1\/coffee.jpg
-    curie:analysisType analysis:C37-2 .  # Imaging
+    curie:analysisType osiris:C37-2 .  # Imaging
 
 
 file:coll1\/coffee.jpg
@@ -76,9 +76,9 @@ file:coll2\/sample-s2-b-rna.fastq
     curie:sample sample:s2-b .
 
 file:coll2\/sample-s2-b-rna.fastq
-    curie:analysisType analysis:O6-12 .  # RNA-seq
-
+    curie:analysisType osiris:O6-12 ;  # RNA-seq
+    curie:analysisType osiris:O6-15 .  # Whole genome sequencing
 
 file:coll2\/sample-s2-b-rna_copy.fastq
-curie:aboutSubject subject:s2 ;
-curie:sample sample:s2-b .
+    curie:aboutSubject subject:s2 ;
+    curie:sample sample:s2-b .

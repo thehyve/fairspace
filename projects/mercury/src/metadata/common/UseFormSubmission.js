@@ -22,6 +22,13 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
     const onFormSubmissionError = (entityType: string) => (error) => {
         if (error.details) {
             if (error.details.length === 1 && error.details[0].message === 'Duplicate label') {
+                if (entityType === 'Workspace') {
+                    errorDialog.showError(
+                        `${entityType} code must be unique`,
+                        `${entityType} code is already in use. Please choose a unique code.`
+                    );
+                    return;
+                }
                 errorDialog.showError(
                     `${entityType} label must be unique`,
                     `${entityType} label is already in use. Please choose a unique label.`

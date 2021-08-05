@@ -37,6 +37,10 @@ class FileAPI {
         this.remoteURL = remoteURL;
     }
 
+    uploadClient() {
+        return createClient('/zuul' + this.remoteURL);
+    }
+
     client() {
         return createClient(this.remoteURL);
     }
@@ -109,36 +113,11 @@ class FileAPI {
             });
     }
 
-    /**
-     * Uploads a file
-     * @param file
-     * @param destinationFilename
-     * @param destinationPath
-     * @param onUploadProgress
-     * @returns {Promise<never>|Promise<any[]>}
-     */
-    upload({file, destinationFilename, destinationPath}, onUploadProgress = () => {}) {
-        if (!file) {
-            return Promise.reject(Error("No file given"));
+    uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
+        var totalSize = files.reduce((size, file) => size + file.size, 0);
+        if (totalSize > maxFileSizeBytes) {
+            return Promise.reject(new Error("Payload too large"));
         }
-
-        const requestOptions = {...defaultOptions, onUploadProgress};
-
-        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, requestOptions)
-            .catch(e => {
-                if (e && e.response) {
-                    // eslint-disable-next-line default-case
-                    switch (e.response.status) {
-                        case 403:
-                            throw new Error("You do not have authorization to add files \nto this collection.");
-                    }
-                }
-
-                return Promise.reject(e);
-            });
-    }
-
-    uploadMulti(destinationPath, files, onUploadProgress = () => {}) {
         const formData = new FormData();
         formData.append('action', 'upload_files');
         files.forEach(f => formData.append(encodeURIComponent(f.path), f));
@@ -153,9 +132,18 @@ class FileAPI {
             onUploadProgress,
             data: formData
         };
-        return this.client()
+        return this.uploadClient()
             .customRequest(destinationPath, requestOptions)
-            .catch(handleHttpError("Error uploading files"));
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 413:
+                            throw new Error("Payload too large");
+                    }
+                }
+                handleHttpError("Error uploading files");
+            });
     }
 
     /**

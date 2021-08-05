@@ -17,9 +17,138 @@ curie:aboutSubject a rdf:Property .
 curie:aboutEvent a rdf:Property .
 curie:sample a rdf:Property .
 curie:analysisType a rdf:Property .
+curie:workspaceType a rdf:Property .
+curie:principalInvestigator a rdf:Property .
+curie:projectCode a rdf:Property .
+curie:analysisCode a rdf:Property .
+curie:analysisDate a rdf:Property .
+curie:platformName a rdf:Property .
+curie:analyticPipelineCode a rdf:Property .
+
+curie:WorkspaceType a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The type of the workspace. " ;
+    sh:name "Workspace type" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique workspace type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
 
 ## Augmented system class shapes
+fs:Workspace sh:property
+    [
+        sh:name "Type" ;
+        sh:description "Workspace type." ;
+        sh:maxCount 1 ;
+        sh:class curie:WorkspaceType ;
+        sh:path curie:workspaceType
+    ],
+    [
+        sh:name "Project code" ;
+        sh:description "Project code related to the workspace." ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        sh:maxCount 1 ;
+        sh:path curie:projectCode
+    ],
+    [
+        sh:name "Principal investigator" ;
+        sh:description "Name of the PI or team leader." ;
+        sh:datatype xsd:string ;
+        dash:singleLine true ;
+        sh:maxCount 1 ;
+        sh:path curie:principalInvestigator
+    ] .
+
 fs:File sh:property
+    [
+        sh:name "Is about subject" ;
+        sh:description "Subjects that are featured in this file." ;
+        sh:class curie:Subject ;
+        sh:path curie:aboutSubject
+    ],
+    [
+        sh:name "Is about biological sample" ;
+        sh:description "Biological samples that are featured in this file." ;
+        sh:class curie:BiologicalSample ;
+        sh:path curie:sample
+    ],
+    [
+        sh:name "Is about tumor pathology event" ;
+        sh:description "Events that are featured in this file." ;
+        sh:class curie:TumorPathologyEvent ;
+        sh:path curie:aboutEvent
+    ],
+    [
+        sh:name "Type of analysis" ;
+        sh:description "Type of analysis associated to this file" ;
+        sh:maxCount 1 ;
+        sh:class curie:AnalysisType ;
+        sh:path curie:analysisType
+    ],
+    [
+        sh:name "Analysis code" ;
+        sh:description "The analysis code (could be the sequencing run identifier for instance, or the imaging identifier, etc.)" ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path curie:analysisCode
+    ],
+    [
+        sh:name "Analysis date" ;
+        sh:description "" ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        sh:path curie:analysisDate
+    ],
+    [
+        sh:name "Platform name" ;
+        sh:description "The name of the technology platform on which the analysis has been processed." ;
+        sh:class curie:TechnologyPlatformName ;
+        sh:maxCount 1 ;
+        sh:path curie:platformName
+    ],
+    [
+        sh:name "Analytic pipeline code" ;
+        sh:description "The analytic pipeline code (which is helpful for data traceability and comparison)." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:path curie:analyticPipelineCode
+    ] .
+
+fs:Directory sh:property
+    [
+        sh:name "Is about subject" ;
+        sh:description "Subjects that are featured in this directory." ;
+        sh:class curie:Subject ;
+        sh:path curie:aboutSubject
+    ],
+    [
+        sh:name "Is about biological sample" ;
+        sh:description "Biological samples that are featured in this directory." ;
+        sh:class curie:BiologicalSample ;
+        sh:path curie:sample
+    ],
+    [
+        sh:name "Is about tumor pathology event" ;
+        sh:description "Events that are featured in this directory." ;
+        sh:class curie:TumorPathologyEvent ;
+        sh:path curie:aboutEvent
+    ],
+    [
+        sh:name "Type of analysis" ;
+        sh:description "Type of analysis associated to this directory" ;
+        sh:class curie:AnalysisType ;
+        sh:path curie:analysisType
+    ] .
+
+fs:Collection sh:property
     [
         sh:name "Is about subject" ;
         sh:description "Subjects that are featured in this collection." ;
@@ -45,58 +174,6 @@ fs:File sh:property
         sh:path curie:analysisType
     ] .
 
-fs:Directory sh:property
-        [
-            sh:name "Is about subject" ;
-            sh:description "Subjects that are featured in this collection." ;
-            sh:class curie:Subject ;
-            sh:path curie:aboutSubject
-        ],
-        [
-            sh:name "Is about biological sample" ;
-            sh:description "Biological samples that are featured in this collection." ;
-            sh:class curie:BiologicalSample ;
-            sh:path curie:sample
-        ],
-        [
-            sh:name "Is about tumor pathology event" ;
-            sh:description "Events that are featured in this collection." ;
-            sh:class curie:TumorPathologyEvent ;
-            sh:path curie:aboutEvent
-        ],
-        [
-            sh:name "Type of analysis" ;
-            sh:description "Type of analysis associated to this collection" ;
-            sh:class curie:AnalysisType ;
-            sh:path curie:analysisType
-        ] .
-
-fs:Collection sh:property
-        [
-            sh:name "Is about subject" ;
-            sh:description "Subjects that are featured in this collection." ;
-            sh:class curie:Subject ;
-            sh:path curie:aboutSubject
-        ],
-        [
-            sh:name "Is about biological sample" ;
-            sh:description "Biological samples that are featured in this collection." ;
-            sh:class curie:BiologicalSample ;
-            sh:path curie:sample
-        ],
-        [
-            sh:name "Is about tumor pathology event" ;
-            sh:description "Events that are featured in this collection." ;
-            sh:class curie:TumorPathologyEvent ;
-            sh:path curie:aboutEvent
-        ],
-        [
-            sh:name "Type of analysis" ;
-            sh:description "Type of analysis associated to this collection" ;
-            sh:class curie:AnalysisType ;
-            sh:path curie:analysisType
-        ] .
-
 ## User class Shapes
 
 curie:AnalysisType a rdfs:Class, sh:NodeShape ;
@@ -114,6 +191,22 @@ curie:AnalysisType a rdfs:Class, sh:NodeShape ;
         fs:importantProperty true ;
         sh:path rdfs:label
     ] .
+
+curie:TechnologyPlatformName a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "" ;
+    sh:name "Technology platform name" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+           [
+         sh:name "Label" ;
+         sh:description "Unique technology platform name." ;
+         sh:datatype xsd:string ;
+         sh:maxCount 1 ;
+         dash:singleLine true ;
+         fs:importantProperty true ;
+         sh:path rdfs:label
+     ] .
 
 curie:Gender a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
@@ -147,10 +240,47 @@ curie:Species a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:label
     ] .
 
+curie:AvailabilityForResearch a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "Indication whether the subject is available for research." ;
+    sh:name "Availability for research" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+          [
+        sh:name "Label" ;
+        sh:description "Unique availability label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:ConsentAnswer a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "Answer type for consent questions." ;
+    sh:name "Consent answer" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+          [
+        sh:name "Label" ;
+        sh:description "Unique answer label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
 curie:ageAtLastNews a rdf:Property .
 curie:ageAtDeath a rdf:Property .
 curie:isOfGender a rdf:Property .
 curie:isOfSpecies a rdf:Property .
+curie:availableForResearch a rdf:Property .
+curie:dateOfOpposition a rdf:Property .
+curie:reuseClinicalWithGeneticData a rdf:Property .
+curie:sampleStorageAndReuse a rdf:Property .
+curie:geneticsAnalysis a rdf:Property .
 
 curie:Subject a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
@@ -187,10 +317,34 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:path curie:ageAtDeath
     ],
     [
-        sh:name "Gave consent" ;
-        sh:description "" ;
-        sh:class <PersonConsent> ;
-        sh:path <gaveConsent>
+        sh:name "Available for research" ;
+        sh:maxCount 1 ;
+        sh:class curie:AvailabilityForResearch ;
+        sh:path curie:availableForResearch
+    ],
+    [
+        sh:name "Date of opposition" ;
+        sh:datatype xsd:date ;
+        sh:maxCount 1 ;
+        sh:path curie:dateOfOpposition
+    ],
+    [
+        sh:name "Reuse clinical with genetic data" ;
+        sh:maxCount 1 ;
+        sh:class curie:ConsentAnswer ;
+        sh:path curie:reuseClinicalWithGeneticData
+    ],
+    [
+        sh:name "Sample storage and reuse" ;
+        sh:maxCount 1 ;
+        sh:class curie:ConsentAnswer ;
+        sh:path curie:sampleStorageAndReuse
+    ],
+    [
+        sh:name "Genetic analysis" ;
+        sh:maxCount 1 ;
+        sh:class curie:ConsentAnswer ;
+        sh:path curie:geneticAnalysis
     ],
     [
         sh:name "Label" ;
@@ -224,47 +378,6 @@ curie:Subject a rdfs:Class, sh:NodeShape ;
         sh:description "Linked files" ;
         sh:path [sh:inversePath curie:aboutSubject];
     ].
-
-curie:isProjectConsent a rdf:Property .
-curie:authorizes a rdf:Property .
-curie:isConsentOf a rdf:Property .
-
-curie:PersonConsent a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "A research consent given by person." ;
-    sh:name "Person consent" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Consent authorizes" ;
-        sh:description "The samples that is authorized with this consent." ;
-        sh:class curie:BiologicalSample ;
-        sh:path curie:authorizes
-    ],
-    [
-         sh:name "Is consent of" ;
-         sh:description "" ;
-         sh:class curie:Person ;
-         sh:maxCount 1 ;
-         sh:path curie:isConsentOf
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique person consent label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ; ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ] .
 
 
 curie:Topography a rdfs:Class, sh:NodeShape ;
@@ -331,15 +444,31 @@ curie:EventType a rdfs:Class, sh:NodeShape ;
         sh:path rdfs:label
     ] .
 
-curie:TnmType a rdfs:Class, sh:NodeShape ;
+curie:TumorGradeType a rdfs:Class, sh:NodeShape ;
     sh:closed false ;
-    sh:description "The type of TNM." ;
-    sh:name "TNM type" ;
+    sh:description "The type of grading classification." ;
+    sh:name "Tumor grade type" ;
     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
     sh:property
     [
         sh:name "Label" ;
-        sh:description "Unique TNM type label." ;
+        sh:description "Unique tumor grade type label." ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        dash:singleLine true ;
+        fs:importantProperty true ;
+        sh:path rdfs:label
+    ] .
+
+curie:TumorGradeValue a rdfs:Class, sh:NodeShape ;
+    sh:closed false ;
+    sh:description "The grading value." ;
+    sh:name "Tumor grade value" ;
+    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+    sh:property
+    [
+        sh:name "Label" ;
+        sh:description "Unique tumor grade value label." ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
         dash:singleLine true ;
@@ -399,14 +528,19 @@ curie:eventType a rdf:Property .
 curie:topography a rdf:Property .
 curie:tumorMorphology a rdf:Property .
 curie:tumorLaterality a rdf:Property .
-curie:diagnosisDate a rdf:Property .
+curie:yearOfDiagnosis a rdf:Property .
 curie:ageAtDiagnosis a rdf:Property .
 curie:tumorGradeType a rdf:Property .
 curie:tumorGradeValue a rdf:Property .
-curie:tnmType a rdf:Property .
-curie:tnmT a rdf:Property .
-curie:tnmN a rdf:Property .
-curie:tnmM a rdf:Property .
+curie:cTnmT a rdf:Property .
+curie:cTnmN a rdf:Property .
+curie:cTnmM a rdf:Property .
+curie:pTnmT a rdf:Property .
+curie:pTnmN a rdf:Property .
+curie:pTnmM a rdf:Property .
+curie:yTnmT a rdf:Property .
+curie:yTnmN a rdf:Property .
+curie:yTnmM a rdf:Property .
 
 curie:isAnalysedBy a rdf:Property .
 curie:eventSubject a rdf:Property .
@@ -447,11 +581,11 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:path curie:eventType
     ],
     [
-        sh:name "Diagnosis date" ;
-        sh:description "The diagnosis date of the primary tumor." ;
-        sh:datatype xsd:date ;
+        sh:name "Year of diagnosis" ;
+        sh:description "The diagnosis year of the primary tumor." ;
+        sh:datatype xsd:integer ;
         sh:maxCount 1 ;
-        sh:path curie:diagnosisDate
+        sh:path curie:yearOfDiagnosis
     ],
     [
         sh:name "Age at diagnosis" ;
@@ -463,44 +597,79 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Tumor grade type" ;
         sh:description "The type of tumor grading classification." ;
-        sh:class curie:tumorGradeType ;
+        sh:class curie:TumorGradeType ;
         sh:maxCount 1 ;
         sh:path curie:tumorGradeType
     ],
     [
         sh:name "Tumor grade value" ;
         sh:description "The tumor grading value." ;
-        sh:class curie:tumorGradeValue ;
+        sh:class curie:TumorGradeValue ;
         sh:maxCount 1 ;
         sh:path curie:tumorGradeValue
     ],
     [
-        sh:name "TNM type" ;
-        sh:description "The type of TNM." ;
-        sh:class curie:TnmType ;
-        sh:maxCount 1 ;
-        sh:path curie:tnmType
-    ],
-    [
-        sh:name "TNM_T" ;
-        sh:description "The primary tumor size." ;
+        sh:name "cTNM_T" ;
+        sh:description "The primary tumor size (clinical evaluation)." ;
         sh:maxCount 1 ;
         sh:class curie:TnmT ;
-        sh:path curie:tnmT
+        sh:path curie:cTnmT
     ],
     [
-        sh:name "TNM_N" ;
-        sh:description "The regional lymph nodes." ;
+        sh:name "cTNM_N" ;
+        sh:description "The regional lymph nodes (clinical evaluation)." ;
         sh:maxCount 1 ;
-        sh:class curie:tnmN ;
-        sh:path curie:tnmN
+        sh:class curie:TnmN ;
+        sh:path curie:cTnmN
     ],
     [
-        sh:name "TNM_M" ;
-        sh:description "Distant metastasis." ;
+        sh:name "cTNM_M" ;
+        sh:description "Distant metastasis (clinical evaluation)." ;
         sh:maxCount 1 ;
-        sh:class curie:tnmM ;
-        sh:path curie:tnmM
+        sh:class curie:TnmM ;
+        sh:path curie:cTnmM
+    ],
+    [
+        sh:name "pTNM_T" ;
+        sh:description "The primary tumor size (pathological evaluation)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmT ;
+        sh:path curie:pTnmT
+    ],
+    [
+        sh:name "pTNM_N" ;
+        sh:description "The regional lymph nodes (pathological evaluation)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmN ;
+        sh:path curie:pTnmN
+    ],
+    [
+        sh:name "pTNM_M" ;
+        sh:description "Distant metastasis (pathological evaluation)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmM ;
+        sh:path curie:pTnmM
+    ],
+    [
+        sh:name "yTNM_T" ;
+        sh:description "The primary tumor size (after treatment)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmT ;
+        sh:path curie:yTnmT
+    ],
+    [
+        sh:name "yTNM_N" ;
+        sh:description "The regional lymph nodes (after treatment)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmN ;
+        sh:path curie:yTnmN
+    ],
+    [
+        sh:name "yTNM_M" ;
+        sh:description "Distant metastasis (after treatment)." ;
+        sh:maxCount 1 ;
+        sh:class curie:TnmM ;
+        sh:path curie:yTnmM
     ],
     [
         sh:name "Event subject" ;
@@ -508,12 +677,6 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
         sh:class curie:Subject ;
         sh:maxCount 1 ;
         sh:path curie:eventSubject
-    ],
-    [
-        sh:name "Event parentage" ;
-        sh:description "The tumor events could be linked to others as a chain. For example, a primary tumor event could be linked to a local relapse and then a metastatic relapse." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:path curie:isLinkedTo
     ],
     [
         sh:name "Label" ;
@@ -579,6 +742,7 @@ curie:SampleOrigin a rdfs:Class, sh:NodeShape ;
 curie:collectDate a rdf:Property .
 curie:tumorCellularity a rdf:Property .
 curie:isOfNature a rdf:Property .
+curie:parentIsOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
 curie:subject a rdf:Property .
 curie:diagosis a rdf:Property .
@@ -617,6 +781,13 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
         sh:maxCount 1 ;
         sh:class curie:SampleNature ;
         sh:path curie:isOfNature
+    ],
+    [
+        sh:name "Parent sample nature" ;
+        sh:description "The nature of parent sample." ;
+        sh:maxCount 1 ;
+        sh:class curie:SampleNature ;
+        sh:path curie:parentIsOfNature
     ],
     [
         sh:name "Sample origin" ;

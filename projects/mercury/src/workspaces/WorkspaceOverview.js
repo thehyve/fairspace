@@ -51,7 +51,7 @@ const WorkspaceOverview = (props) => {
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
     const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
 
-    usePageTitleUpdater(workspace ? workspace.name : "");
+    usePageTitleUpdater(workspace ? workspace.code : "");
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
@@ -89,7 +89,7 @@ const WorkspaceOverview = (props) => {
         ]}}
         >
             <BreadCrumbs additionalSegments={[{
-                label: workspace.name,
+                label: workspace.code,
                 href: workspacePrefix()
             }]}
             />
@@ -112,7 +112,7 @@ const WorkspaceOverview = (props) => {
             </TabPanel>
             <TabPanel value={selectedTab} index={2}>
                 <LinkedDataMetadataProvider>
-                    <Collections history={props.history} workspaceIri={workspace.iri} documentTitle={workspace.name} />
+                    <Collections history={props.history} workspaceIri={workspace.iri} documentTitle={workspace.code} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
         </BreadcrumbsContext.Provider>

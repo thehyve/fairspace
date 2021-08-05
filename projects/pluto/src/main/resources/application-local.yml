@@ -30,9 +30,6 @@ zuul:
     saturn:
       path: /api/**
       url: http://localhost:8090/api/
-    ui:
-      path: /**
-      url: http://localhost:3000
 
   include-debug-header: true
 

@@ -87,7 +87,7 @@ public class ViewServiceTest {
         lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
         lenient().when(userService.currentUser()).thenReturn(user);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().name("Test").build());
+        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
 
         when(request.getHeader("Owner")).thenReturn(workspace.getIri().getURI());
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 0, "md5"));
@@ -106,7 +106,7 @@ public class ViewServiceTest {
         var dateFacets = facets.stream()
                 .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Date)
                 .collect(Collectors.toList());
-        Assert.assertEquals(1, dateFacets.size());
+        Assert.assertEquals(2, dateFacets.size());
         viewService.getViews();
     }
 }
