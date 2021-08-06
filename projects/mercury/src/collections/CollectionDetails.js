@@ -38,6 +38,7 @@ import {camelCaseToWords, formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
 import UserContext from "../users/UserContext";
+import ProgressButton from "../common/components/ProgressButton";
 
 export const ICONS = {
     LOCAL_STORAGE: <Folder aria-label="Local storage" />,
@@ -85,7 +86,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         anchorEl: null,
         deleting: false,
         undeleting: false,
-        unpublishing: false
+        unpublishing: false,
+        isActiveOperation: false
     };
 
     unmounting = false;
@@ -93,6 +95,19 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     componentWillUnmount() {
         this.unmounting = true;
     }
+
+    handleCollectionOperation = (operationPromise) => {
+        this.setState({isActiveOperation: true});
+        return operationPromise
+            .then(r => {
+                this.setState({isActiveOperation: false});
+                return r;
+            })
+            .catch(e => {
+                this.setState({isActiveOperation: false});
+                return Promise.reject(e);
+            });
+    };
 
     handleEdit = () => {
         if (this.props.collection.canWrite) {
@@ -163,7 +178,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     handleCollectionDelete = (collection: Collection) => {
         const {deleteCollection, history} = this.props;
         this.handleCloseDelete();
-        deleteCollection(collection)
+        this.handleCollectionOperation(deleteCollection(collection))
             .then(() => {
                 if (isCollectionPage()) {
                     history.push('/collections');
@@ -179,7 +194,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     handleCollectionUndelete = (collection: Collection) => {
         const {undeleteCollection} = this.props;
         this.handleCloseUndelete();
-        undeleteCollection(collection)
+        this.handleCollectionOperation(undeleteCollection(collection))
             .catch(e => ErrorDialog.showError(
                 "An error occurred while undeleting a collection",
                 e,
@@ -190,7 +205,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     handleCollectionUnpublish = (collection: Collection) => {
         const {unpublish} = this.props;
         this.handleCloseUnpublish();
-        unpublish(collection)
+        this.handleCollectionOperation(unpublish(collection))
             .catch(err => ErrorDialog.showError(
                 "An error occurred while unpublishing a collection",
                 err,
@@ -202,7 +217,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const {setOwnedBy, onChangeOwner, history} = this.props;
         this.handleCloseChangingOwner();
         onChangeOwner();
-        setOwnedBy(collection.name, selectedOwner.iri)
+        this.handleCollectionOperation(setOwnedBy(collection.name, selectedOwner.iri))
             .then(() => {
                 if (!selectedOwner.canCollaborate) {
                     history.push('/collections');
@@ -355,14 +370,16 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <CardHeader
                         action={menuItems && menuItems.length > 0 && (
                             <>
-                                <IconButton
-                                    aria-label="More"
-                                    aria-owns={anchorEl ? 'long-menu' : undefined}
-                                    aria-haspopup="true"
-                                    onClick={this.handleMenuClick}
-                                >
-                                    <MoreVert />
-                                </IconButton>
+                                <ProgressButton active={this.state.isActiveOperation}>
+                                    <IconButton
+                                        aria-label="More"
+                                        aria-owns={anchorEl ? 'long-menu' : undefined}
+                                        aria-haspopup="true"
+                                        onClick={this.handleMenuClick}
+                                    >
+                                        <MoreVert />
+                                    </IconButton>
+                                </ProgressButton>
                                 <Menu
                                     id="simple-menu"
                                     anchorEl={anchorEl}
