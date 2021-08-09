@@ -784,8 +784,7 @@ curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
     ],
     [
         sh:name "Parent sample nature" ;
-        sh:description "The nature of parent sample." ;
-        sh:maxCount 1 ;
+        sh:description "Natures of parent samples." ;
         sh:class curie:SampleNature ;
         sh:path curie:parentIsOfNature
     ],
