@@ -23,6 +23,7 @@ fairspace:
       pluto:
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/proxy-body-size: 10g
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "600000"
         nginx.ingress.kubernetes.io/configuration-snippet: |
           proxy_set_header  X-Forwarded-Proto $scheme;
       docs:
