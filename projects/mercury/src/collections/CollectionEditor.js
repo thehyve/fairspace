@@ -43,6 +43,10 @@ const isNameValid = (name: string) => (
  */
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
+export const formatPrefix = (prefix: string) => (
+    prefix ? `[${prefix.replace(/[/\\]/, '')}] ` : ''
+);
+
 const styles = theme => ({
     textHelperBasic: {
         color: theme.palette.grey['600'],
@@ -79,16 +83,17 @@ type CollectionEditorState = {
 export class CollectionEditor extends React.Component<CollectionEditorProps, CollectionEditorState> {
     static defaultProps = {
         setBusy: () => {},
-        updateExisting: false
+        updateExisting: false,
+        workspace: {}
     };
 
     state = {
         editing: true,
         saveInProgress: false,
-        properties: this.props.collection ?
-            copyProperties(this.props.collection) :
-            {
-                name: this.props.workspace.code ? `[${this.props.workspace.code.replace(/[/\\]/, '')}] ` : '',
+        properties: this.props.collection
+            ? copyProperties(this.props.collection)
+            : {
+                name: formatPrefix(this.props.workspace.code),
                 description: '',
                 ownerWorkspace: this.props.workspace.iri
             }
@@ -228,7 +233,10 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 <span className={this.validateNameStartsWithWorkspaceCode() ? this.props.classes.textHelperBasic : this.props.classes.textHelperWarning}>
                     <br />
                     {!this.validateNameStartsWithWorkspaceCode() && (
-                        <span><b>Warning!</b> Name does not start with the suggested form of workspace prefix!<br /></span>
+                        <span>
+                            <b>Warning!</b> Name does not start with the suggested form of a workspace code:
+                            <i> {formatPrefix(this.props.workspace.code)}</i><br />
+                        </span>
                     )}
                     Keep the workspace code prefix. It ensures collection uniqueness between workspaces.
                     <br />
@@ -252,7 +260,9 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 </DialogTitle>
                 <DialogContent>
                     {this.props.collection && (
-                        <DialogContentText>You can edit the collection details here.</DialogContentText>
+                        <DialogContentText>
+                            Be aware that renaming of a large collection can take more time.
+                        </DialogContentText>
                     )}
                     <TextField
                         autoFocus
