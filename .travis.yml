@@ -14,6 +14,7 @@ env:
      - ARTIFACT_BUILD_FILE=""
      - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
      - DEPLOYMENT_CONFIG_DIR="./.travis"
+     - ACCOUNT_CONFIG_DIR="./.travis"
      - RELEASE_BRANCH="release"
      - SNAPSHOT_BRANCH="dev"
      - DOCUMENTATION_REPO="fairspace/fairspace-docs"
