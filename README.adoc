@@ -2525,13 +2525,13 @@ fairspace:
 # Specific settings for Saturn subchart
 saturn:
   persistence:
-    files:
+    files:     # stores transaction logs and files
       size: 60Gi
       storageClass: expandable
-    database:
+    database:  # stores RDF database
       size: 60Gi
       storageClass: expandable
-    audit:
+    audit:     # stores the audit log
       size: 10Gi
       storageClass: expandable
   resources:
@@ -2796,7 +2796,51 @@ Request: ``/api/users/``
 
 Fetching user information is not included in the audit log.
 
+==== Data recovery using transaction log
 
+In case of corruption the RDF database can be restored at any point of time using the transaction log.
+In order to restore the RDF database, follow the steps below.
+
+Stop (scale down) the application:
+[source, shell]
+----
+kubectl scale --replicas=0 --namespace fairspace-new statefulset/fairspace-new
+----
+
+Delete a persistent volume claim consisting transient data:
+[source, shell]
+----
+kubectl --namespace fairspace-new delete pvc database-fairspace-new-0
+----
+
+Start (scale up) the application. The deleted pvc will be recreated and data recovery will start automatically:
+[source, shell]
+----
+kubectl scale --replicas=1 --namespace fairspace-new statefulset/fairspace-new
+----
+
+Check the Saturn container's logs to monitor the recovery process:
+[source, shell]
+----
+kubectl --namespace fairspace-new logs statefulset/fairspace-new  fairspace-new-saturn -f
+----
+
+The logs should contain the following information:
+[source, text]
+----
+2021-08-10 09:09:59 WARN  Your metadata database is gone. Restoring from the transaction log containing 809 transactions
+2021-08-10 09:09:59 INFO  Progress: 0%
+2021-08-10 09:10:20 INFO  Progress: 1%
+...
+2021-08-10 09:27:17 INFO  Progress: 99%
+2021-08-10 09:27:17 INFO  Progress: 100%
+2021-08-10 09:27:17 INFO  Committing changes
+2021-08-10 09:32:36 WARN  Restore is finished.
+...
+2021-08-10 09:32:39 INFO  Saturn has started
+----
+
+As soon as you see "Saturn has started" the RDF database should be restored to the state preceding the crash.
 
 == Design
 
