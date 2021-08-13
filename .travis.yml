@@ -12,7 +12,7 @@ env:
      - APPNAME="fairspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
-     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
+     - BUILD_SCRIPTS_REPO="fairspace/fairspace-build-scripts"
      - DEPLOYMENT_CONFIG_REPO="fairspace/fairspace-config-priv"
      - ACCOUNT_CONFIG_DIR="./.travis"
      - RELEASE_BRANCH="release"
