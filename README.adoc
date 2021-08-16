@@ -2,7 +2,7 @@
 :description: Fairspace documentation.
 :doctype: book
 :showtitle!:
-:url-repo: https://github.com/fairspace/workspace
+:url-repo: https://github.com/thehyve/fairspace
 :source-highlighter: rouge
 :icons: font
 :toc: macro
