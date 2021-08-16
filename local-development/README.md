@@ -13,7 +13,7 @@ The Helm chart for deploying Fairspace on a Kubernetes cluster can be tested loc
 
 ### Deploy and configure Keycloak
 
-Check the [Hyperspace local development instructions](https://github.com/fairspace/hyperspace/blob/local-development/local-development/README.md) on how to use the Hyperspace chart
+Check the [Fairspace Keycloak local development instructions](https://github.com/thehyve/fairspace-keycloak/blob/local-development/local-development/README.md) on how to use the Hyperspace chart
 to install and configure Keycloak locally.
 You can also follow the instructions in the [section on Kubernetes and Helm](https://docs.fairway.app/#_kubernetes_and_helm)  in the Fairspace documentation.
 
