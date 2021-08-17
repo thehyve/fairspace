@@ -20,6 +20,7 @@ function EnumerationDropdown({property, currentValues, ...otherProps}) {
 
     return (
         <Dropdown
+            clearTextOnSelection
             options={options}
             isOptionDisabled={({disabled}) => disabled}
             {...otherProps}

@@ -11,7 +11,7 @@ import ErrorDialog from "../common/components/ErrorDialog";
 import {sortPermissions} from "../collections/collectionUtils";
 import AlterWorkspacePermissionsDialog from "./AlterWorkspacePermissionsDialog";
 import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
-import type {Permission} from "../collections/CollectionAPI";
+import type {PrincipalPermission} from "../collections/CollectionAPI";
 
 const styles = {
     tableWrapper: {
@@ -41,12 +41,14 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
     const [selectedWorkspace, setSelectedWorkspace] = useState();
     const [showWorkspacePermissionsDialog, setShowWorkspacePermissionsDialog] = useState(false);
 
-    const sortedPermissions = sortPermissions(permissions.filter(p => p.iri !== collection.ownerWorkspace));
-    const permissionCandidates = workspaces.filter(
+    const sortedPermissions: PrincipalPermission[] = sortPermissions(permissions.filter(p => p.iri !== collection.ownerWorkspace));
+    const permissionCandidates: PrincipalPermission[] = workspaces.filter(
         w => !sortedPermissions.some(p => p.iri === w.iri)
+    ).map(
+        w => ({...w, name: w.code})
     );
 
-    const handleDeletePermission = (permission: Permission) => {
+    const handleDeletePermission = (permission: PrincipalPermission) => {
         setShowConfirmDeleteDialog(true);
         setSelectedWorkspace(permission);
     };
@@ -55,7 +57,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
         setShowConfirmDeleteDialog(false);
     };
 
-    const removePermission = (permission: Permission) => {
+    const removePermission = (permission: PrincipalPermission) => {
         setPermission(collection.name, permission.iri, 'None')
             .catch(err => ErrorDialog.showError('Error removing permission.', err))
             .finally(handleCloseConfirmDeleteDialog);
@@ -79,7 +81,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
                         className={classes.addButton}
                         onClick={() => handleAlterWorkspacePermissionsDialogShow()}
                     >
-                        <Add/>
+                        <Add />
                     </IconButton>
                 </Tooltip>
             )}

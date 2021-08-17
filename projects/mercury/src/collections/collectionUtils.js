@@ -81,7 +81,7 @@ export const canAlterPermission = (canManage, user, currentLoggedUser) => {
 
 export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
     iri: principalProperties.iri,
-    name: principalProperties.name,
+    name: principalProperties.code ? principalProperties.code : principalProperties.name,
     access
 });
 
@@ -132,6 +132,7 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     canManage: (properties.canManage?.toLowerCase() === 'true'),
     canDelete: properties.canDelete?.toLowerCase() === 'true',
     canUndelete: properties.canUndelete?.toLowerCase() === 'true',
+    canUnpublish: properties.canUnpublish?.toLowerCase() === 'true',
     access: properties.access,
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),

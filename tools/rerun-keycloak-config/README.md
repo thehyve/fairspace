@@ -31,5 +31,5 @@ The default values for `workspace name` and `full workspace name` are defined in
 
 ## See also
 
-- Please consult the [README of the Keycloak configuration scripts repository](https://github.com/fairspace/keycloak-configuration)
+- Please consult the [README of the Keycloak configuration scripts repository](https://github.com/thehyve/fairspace-keycloak-configuration)
   for additional information about the Keycloak configuration scripts.

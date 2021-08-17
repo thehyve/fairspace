@@ -12,11 +12,12 @@ env:
      - APPNAME="fairspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
-     - BUILD_SCRIPTS_REPO="fairspace/build-scripts"
-     - DEPLOYMENT_CONFIG_DIR="./.travis"
+     - BUILD_SCRIPTS_REPO="thehyve/fairspace-build-scripts"
+     - DEPLOYMENT_CONFIG_REPO="thehyve/fairspace-config-private"
+     - ACCOUNT_CONFIG_DIR="./.travis"
      - RELEASE_BRANCH="release"
      - SNAPSHOT_BRANCH="dev"
-     - DOCUMENTATION_REPO="fairspace/fairspace-docs"
+     - DOCUMENTATION_REPO="thehyve/fairspace-docs"
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
      - GCP_PROJECT="fairspace-207108"
@@ -46,6 +47,8 @@ before_install:
   - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
+  - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$DEPLOYMENT_CONFIG_REPO ci-config
+  - export DEPLOYMENT_CONFIG_DIR="$(pwd)/ci-config/fairspace"
   - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE" ; fi'
   - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE" ; fi'
   - export INFRASTRUCTURE_PLATFORM="${DEPLOY_PLATFORM:-NONE}"

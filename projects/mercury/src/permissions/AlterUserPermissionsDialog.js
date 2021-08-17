@@ -111,7 +111,6 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
     const renderUserSelector = () => (
         <PermissionCandidateSelect
             disableClearable
-            clearTextOnSelection
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
             onChange={p => handleAddSelectedPermission({...p, access: "Read"})}

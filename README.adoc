@@ -2,7 +2,7 @@
 :description: Fairspace documentation.
 :doctype: book
 :showtitle!:
-:url-repo: https://github.com/fairspace/workspace
+:url-repo: https://github.com/thehyve/fairspace
 :source-highlighter: rouge
 :icons: font
 :toc: macro
@@ -2317,16 +2317,16 @@ https://storage.googleapis.com/fairspace-helm.
 
 We provide a number of charts for various components that can be used in combination, or separately:
 
-- _Hyperspace_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>.
-(Chart source: https://github.com/fairspace/hyperspace.)
+- _Fairspace Keycloak_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>.
+(Chart source: https://github.com/thehyve/fairspace-keycloak.)
 - _Fairspace_: Installs the Fairspace application, including the _saturn_ backend, _pluto_ proxy, _mercury_ frontend and a PostgreSQL database, and configures an ingress node for Fairspace.
-- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/fairspace/jupyter.)
+- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/thehyve/jupyter.)
 
 ==== Instructions for deploying to Google Cloud
 
 ===== Download and install helm and gcloud
 
-* Download ``helm 3.6.0`` from from https://github.com/helm/helm/releases/tag/v3.6.0
+* Download ``helm 3.6.0`` from https://github.com/helm/helm/releases/tag/v3.6.0
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
 [source, shell]
@@ -2403,7 +2403,7 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.18
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.19
 ----
 
 ===== Deploy Hyperspace
@@ -2488,7 +2488,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.18 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.19 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2525,13 +2525,13 @@ fairspace:
 # Specific settings for Saturn subchart
 saturn:
   persistence:
-    files:
+    files:     # stores transaction logs and files
       size: 60Gi
       storageClass: expandable
-    database:
+    database:  # stores RDF database
       size: 60Gi
       storageClass: expandable
-    audit:
+    audit:     # stores the audit log
       size: 10Gi
       storageClass: expandable
   resources:
@@ -2621,7 +2621,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.18.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.19.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
@@ -2796,7 +2796,51 @@ Request: ``/api/users/``
 
 Fetching user information is not included in the audit log.
 
+==== Data recovery using transaction log
 
+In case of corruption the RDF database can be restored at any point of time using the transaction log.
+In order to restore the RDF database, follow the steps below.
+
+Stop (scale down) the application:
+[source, shell]
+----
+kubectl scale --replicas=0 --namespace fairspace-new statefulset/fairspace-new
+----
+
+Delete a persistent volume claim consisting transient data:
+[source, shell]
+----
+kubectl --namespace fairspace-new delete pvc database-fairspace-new-0
+----
+
+Start (scale up) the application. The deleted pvc will be recreated and data recovery will start automatically:
+[source, shell]
+----
+kubectl scale --replicas=1 --namespace fairspace-new statefulset/fairspace-new
+----
+
+Check the Saturn container's logs to monitor the recovery process:
+[source, shell]
+----
+kubectl --namespace fairspace-new logs statefulset/fairspace-new  fairspace-new-saturn -f
+----
+
+The logs should contain the following information:
+[source, text]
+----
+2021-08-10 09:09:59 WARN  Your metadata database is gone. Restoring from the transaction log containing 809 transactions
+2021-08-10 09:09:59 INFO  Progress: 0%
+2021-08-10 09:10:20 INFO  Progress: 1%
+...
+2021-08-10 09:27:17 INFO  Progress: 99%
+2021-08-10 09:27:17 INFO  Progress: 100%
+2021-08-10 09:27:17 INFO  Committing changes
+2021-08-10 09:32:36 WARN  Restore is finished.
+...
+2021-08-10 09:32:39 INFO  Saturn has started
+----
+
+As soon as you see "Saturn has started" the RDF database should be restored to the state preceding the crash.
 
 == Design
 
@@ -2814,4 +2858,13 @@ File system data stored as blocks on the file system in append-only fashion.
 
 == License
 
-...
+Copyright (c) 2021 The Hyve B.V.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the Apache 2.0
+License published by the Apache Software Foundation, either version 2.0 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Apache 2.0 License for more details.
+
+You should have received a copy of the Apache 2.0 License along with this program (see link:LICENSE[LICENSE]). If not, see https://www.apache.org/licenses/LICENSE-2.0.txt.
+
