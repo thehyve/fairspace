@@ -1,5 +1,7 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
+import {Box, FormHelperText, FormLabel} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import UserPermissionsComponent from "./UserPermissionsComponent";
@@ -7,8 +9,6 @@ import UserContext from "../users/UserContext";
 import CollectionsContext from "../collections/CollectionsContext";
 import WorkspacePermissionsComponent from "./WorkspacePermissionsComponent";
 import {sortPermissions} from "../collections/collectionUtils";
-import {Box, FormHelperText, FormLabel} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles({
     root: {
@@ -18,17 +18,16 @@ const useStyles = makeStyles({
 });
 
 export const PermissionViewer = ({
-                                     collection, workspaceUsers, collaboratingWorkspaces,
-                                     collaboratingUsers, currentUser, setPermission, error, loading
-                                 }) => {
-
+    collection, workspaceUsers, collaboratingWorkspaces,
+    collaboratingUsers, currentUser, setPermission, error, loading
+}) => {
     const classes = useStyles();
 
     if (error) {
-        return (<MessageDisplay message="An error occurred loading permissions"/>);
+        return (<MessageDisplay message="An error occurred loading permissions" />);
     }
     if (loading) {
-        return (<LoadingInlay/>);
+        return (<LoadingInlay />);
     }
 
     const renderUserPermissionComponent = () => (

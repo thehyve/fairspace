@@ -6,7 +6,7 @@ import useIsMounted from 'react-is-mounted-hook';
 import {compareBy} from "../../../common/utils/genericUtils";
 
 const Dropdown = ({
-    options = null, clearTextOnSelection = true, placeholder,
+    options = null, clearTextOnSelection, placeholder,
     loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value,
     autoFocus = false, label, ...otherProps
 }) => {

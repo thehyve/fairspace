@@ -78,7 +78,6 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
 
     const renderWorkspaceSelector = () => (
         <PermissionCandidateSelect
-            clearTextOnSelection
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
