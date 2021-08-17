@@ -81,7 +81,7 @@ export const canAlterPermission = (canManage, user, currentLoggedUser) => {
 
 export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
     iri: principalProperties.iri,
-    name: principalProperties.name,
+    name: principalProperties.code ? principalProperties.code : principalProperties.name,
     access
 });
 
