@@ -31,7 +31,7 @@ class CollectionResource extends DirectoryResource {
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return switch (method) {
             case DELETE -> canDelete();
-            case POST -> canManage() || canWrite() || canUndelete();
+            case POST -> canManage() || canWrite() || canUndelete() || canUnpublish();
             default -> super.authorise(request, method, auth);
         };
     }
@@ -338,6 +338,15 @@ class CollectionResource extends DirectoryResource {
             case Write -> principal.addProperty(FS.canWrite, subject);
             case Manage -> principal.addProperty(FS.canManage, subject);
         }
+    }
+
+    @Property
+    public boolean getCanUnpublish() {
+        return canUnpublish();
+    }
+
+    private boolean canUnpublish() {
+        return getAccessMode() == AccessMode.DataPublished && factory.userService.currentUser().isAdmin();
     }
 
     private void unpublish() throws NotAuthorizedException, ConflictException {

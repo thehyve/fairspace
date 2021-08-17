@@ -45,6 +45,7 @@ export type CollectionPermissions = {|
     canManage: boolean;
     canDelete: boolean;
     canUndelete: boolean;
+    canUnpublish: boolean;
     access: AccessLevel;
 |};
 

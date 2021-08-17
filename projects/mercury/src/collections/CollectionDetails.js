@@ -33,7 +33,7 @@ import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspac
 import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
 import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
 import {descriptionForStatus, isCollectionPage} from "./collectionUtils";
-import {getDisplayName, isAdmin} from '../users/userUtils';
+import {getDisplayName} from '../users/userUtils';
 import {camelCaseToWords, formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
@@ -145,7 +145,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     };
 
     handleUnpublish = () => {
-        if (isAdmin(this.props.currentUser)) {
+        if (this.props.collection.canUnpublish) {
             this.setState({unpublishing: true});
             this.handleMenuClose();
         }
@@ -295,7 +295,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     );
 
     render() {
-        const {loading, error, collection, users, currentUser, workspaceRoles, workspaces} = this.props;
+        const {loading, error, collection, users, workspaceRoles, workspaces} = this.props;
         const {anchorEl, editing, changingStatus, changingOwner, deleting, undeleting, unpublishing} = this.state;
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
@@ -354,7 +354,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 </MenuItem>
             );
         }
-        if (collection.accessMode === 'DataPublished' && isAdmin(currentUser)) {
+        if (collection.canUnpublish) {
             menuItems.push(
                 <MenuItem key="unpublish" onClick={this.handleUnpublish}>
                     <Typography color="error">
