@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
 
+import static io.fairspace.saturn.App.API_PREFIX;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.milton.http.ResponseStatus.SC_UNSUPPORTED_MEDIA_TYPE;
@@ -137,6 +138,10 @@ public class WebDAVServlet extends HttpServlet {
 
     static boolean includeMetadataLinks() {
         return "true".equalsIgnoreCase(getCurrentRequest().getHeader("With-Metadata-Links"));
+    }
+
+    static boolean isMetadataRequest() {
+        return (API_PREFIX + "/metadata/").equalsIgnoreCase(getCurrentRequest().getServletPath());
     }
 
     static BlobInfo getBlob() {
