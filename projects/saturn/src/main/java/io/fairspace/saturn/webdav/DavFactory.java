@@ -16,6 +16,7 @@ import static io.fairspace.saturn.util.EnumUtils.min;
 import static io.fairspace.saturn.webdav.AccessMode.DataPublished;
 import static io.fairspace.saturn.webdav.AccessMode.MetadataPublished;
 import static io.fairspace.saturn.webdav.PathUtils.encodePath;
+import static io.fairspace.saturn.webdav.WebDAVServlet.isMetadataRequest;
 import static io.fairspace.saturn.webdav.WebDAVServlet.showDeleted;
 
 public class DavFactory implements ResourceFactory {
@@ -89,7 +90,7 @@ public class DavFactory implements ResourceFactory {
         }
 
         if (deleted) {
-            if (!showDeleted()) {
+            if (!showDeleted() && !isMetadataRequest()) {
                 return Access.None;
             } else {
                 access = min(access, Access.List);
