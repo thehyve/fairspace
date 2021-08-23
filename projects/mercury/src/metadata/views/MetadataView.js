@@ -26,6 +26,7 @@ import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
+import {accessLevelForCollection} from "../../collections/collectionUtils";
 
 type MetadataViewProperties = {
     classes: any;
@@ -123,7 +124,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         name: 'location',
         title: "Collection",
         type: 'Term',
-        values: collections.map(c => ({value: c.iri, label: c.name, access: c.access}))
+        values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
     };
 
     const appendCustomColumns = (view: MetadataViewOptions) => {
