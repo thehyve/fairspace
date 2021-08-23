@@ -2399,11 +2399,11 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available hyperspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/hyperspace
 # Fetch the hyperspace chart
-~/bin/helm/helm pull fairspace/hyperspace --version 0.6.2
+~/bin/helm/helm pull fairspace/hyperspace --version 0.6.4
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.20
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.21
 ----
 
 ===== Deploy Hyperspace
@@ -2488,7 +2488,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.20 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.21 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2578,7 +2578,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Jupyter Hub chart:
 [source, shell]
 ----
-~/bin/helm/helm install jupyterhub-new fairspace/jupyter --version 0.8.4 --namespace jupyterhub-new \
+~/bin/helm/helm install jupyterhub-new fairspace/jupyter --version 0.8.5 --namespace jupyterhub-new \
 -f /path/to/values.yaml
 ----
 You can pass values files with ``-f``.
@@ -2621,7 +2621,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.20.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.21.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
