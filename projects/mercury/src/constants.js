@@ -102,6 +102,7 @@ export const CAN_MANAGE_URI = FAIRSPACE_NS + 'canManage';
 export const CAN_ADD_SHARED_METADATA_URI = FAIRSPACE_NS + 'canAddSharedMetadata';
 export const CAN_VIEW_PUBLIC_METADATA_URI = FAIRSPACE_NS + 'canViewPublicMetadata';
 export const CAN_VIEW_PUBLIC_DATA_URI = FAIRSPACE_NS + 'canViewPublicData';
+export const CAN_QUERY_METADATA_URI = FAIRSPACE_NS + 'canQueryMetadata';
 export const IS_ADMIN = FAIRSPACE_NS + 'isAdmin';
 export const IS_SUPERADMIN = FAIRSPACE_NS + 'isSuperadmin';
 export const IS_MEMBER_OF_URI = FAIRSPACE_NS + 'isMemberOf';
