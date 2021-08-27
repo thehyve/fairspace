@@ -299,12 +299,12 @@ Requires the https://stedolan.github.io/jq/[jq] JSON parser.
 ----
 fetch_access_token() {
   curl -s \
-    -d "client_id=${KEYCLOAK_CLIENT_ID}" \
-    -d "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-    -d "username=${KEYCLOAK_USERNAME}" \
-    -d "password=${KEYCLOAK_PASSWORD}" \
+    --data-urlencode "client_id=${KEYCLOAK_CLIENT_ID}" \
+    --data-urlencode "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+    --data-urlencode "username=${KEYCLOAK_USERNAME}" \
+    --data-urlencode "password=${KEYCLOAK_PASSWORD}" \
     -d 'grant_type=password' \
-    "${KEYCLOAK_SERVER_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
+    "${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
 }
 ACCESS_TOKEN=$(fetch_access_token)
 ----
@@ -417,6 +417,9 @@ Fairspace exposes a WebDAV API for accessing the file systems, while restricting
 The WebDAV API allows to upload and download files and to perform standard file operations such as copying or moving,
 as well as custom operations, such as collection lifecycle management
 and advanced data loss prevention features such as versioning and undeletion.
+
+Be aware that the _move_ operation moves both file content and all its metadata (e.g. linked metadata entities),
+whereas _copy_ includes only the file content and standard webdav properties, like file size.
 
 ===== Directory listing and path properties
 
@@ -690,7 +693,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F 'action=upload_files' -F '
 |===
 2+| ``COPY /api/webdav/{path}``
 
-2+| Copy a directory or file.
+2+| Copy a directory or file. Metadata linked to the file/directory is not copied.
 2+| _Request headers_:
 | ``Destination``
 | The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
@@ -711,7 +714,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X COPY -H "Destination: ${target}" "
 |===
 2+| ``MOVE /api/webdav/{path}``
 
-2+| Move or rename a directory or file
+2+| Move or rename a directory or file. Metadata linked to the file/directory is also moved along with it.
 2+| _Request headers_:
 | ``Destination``
 | The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
@@ -1493,11 +1496,11 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/users/'
 3+| _Parameters:_
 | ``id``
 | string
-| Id of the user for which roles will be updated.
+| UUID of the user for which roles will be updated.
 | "role name"
 | boolean
-| Role name is any of ``isAdmin``, ``canViewPublicData``, ``canViewPublicMetadata`` or ``canAddSharedMetadata``.
-The value determines whether the user has the role or not.
+| Role name is any of ``isAdmin``, ``canViewPublicData``, ``canViewPublicMetadata``, ``canAddSharedMetadata``
+or ``canQueryMetadata``. The value determines whether the user has the role or not.
 |===
 
 .Example updating user roles (curl)
@@ -1505,9 +1508,9 @@ The value determines whether the user has the role or not.
 ====
 [source, bash]
 ----
-curl -X PATCH -H "Accept: application/json" -d \
+curl -X PATCH -H "Accept: application/json" -H "Content-Type: application/json" -d \
 '{
-  "id": "xyz-0000",
+  "id": "123e4567-e89b-12d3-a456-426614174000",
   "canViewPublicData": false,
   "canViewPublicMetadata": true
 }' \
@@ -2311,6 +2314,11 @@ Now everything should be ready to start using Fairspace:
 
 === Kubernetes and helm
 
+Requires:
+
+* Helm >= 3.5.x
+* kubectl >= 1.17.x
+
 You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Helm].
 Helm charts for Fairspace are published to the public helm repository at
 https://storage.googleapis.com/fairspace-helm.
@@ -2334,7 +2342,7 @@ We provide a number of charts for various components that can be used in combina
 ~/bin/helm/helm version
 ----
 
-* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl].
+* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.6.x install version > 1.18.x).
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
@@ -2566,6 +2574,13 @@ pluto:
       storage-external-search:
         path: /api/storages/external/search/files/**
         url: ${pluto.storages.external.search-url}
+
+# Settings for a volume with PostgreSQL database used by Fairspace to store data for the metadata views.
+postgres:
+  persistance:
+    storage:
+      size: 60Gi
+      storageClass: storageos-ssd-ext4
 ----
 
 ===== Deploy Jupyter Hub
@@ -2591,28 +2606,25 @@ ingress:
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
-  auth:
-    state:
-      cryptoKey: # Generate strong secret
-    custom:
-      config:
+  hub:
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY: xxx # A random string, you can use 'openssl rand -hex 32'
+    config:
+      FairspaceOAuthenticator:
         client_id: fairspace-example-private
-        client_secret: # Configure Keycloak client secret
+        client_secret: # Copy the client secret from Keycloak
         authorize_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/auth
         token_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/token
         userdata_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/userinfo
         logout_redirect_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
-  hub:
     image:
       pullPolicy: Always
-    extraEnv:
-      JUPYTERHUB_CRYPT_KEY: # Same as jupyterhub.auth.state.cryptoKey
   singleuser:
     image:
       pullPolicy: Always
     extraEnv:
       TARGET_URL: https://fairspace.example.com
-      # EXTERNAL_TARGETS: external
+      # EXTERNAL_TARGETS: external   # Comma-separated list of names of external storages configured in Fairspace
   proxy:
     secretToken: # Generate strong secret
 ----
