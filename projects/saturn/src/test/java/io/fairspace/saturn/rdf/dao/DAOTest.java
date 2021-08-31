@@ -17,11 +17,11 @@ import java.util.Set;
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.apache.jena.riot.system.IRIResolver.validateIRI;
 import static org.junit.Assert.*;
 
 public class DAOTest {
@@ -90,7 +90,7 @@ public class DAOTest {
         entity.setFloatPrimitiveValue(1.2345f);
         testWriteAndRead(entity);
     }
-    
+
     @Test
     public void testFloatObjectProperty() {
         entity.setFloatObjectValue(1.2345f);
@@ -156,7 +156,7 @@ public class DAOTest {
         entity.setByteObjectValue((byte)123);
         testWriteAndRead(entity);
     }
-    
+
     @Test
     public void testSetProperty() {
         entity.getTags().add("aaa");

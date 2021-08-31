@@ -1,6 +1,6 @@
 package io.fairspace.saturn.util;
 
-import static org.apache.jena.riot.system.IRIResolver.checkIRI;
+import static org.apache.jena.riot.system.Checker.checkIRI;
 
 public class ValidationUtils {
     public static void validate(boolean condition, String message) {
@@ -10,6 +10,6 @@ public class ValidationUtils {
     }
 
     public static void validateIRI(String iri) {
-        validate(!checkIRI(iri), "Invalid IRI: " + iri);
+        validate(checkIRI(iri), "Invalid IRI: " + iri);
     }
 }
