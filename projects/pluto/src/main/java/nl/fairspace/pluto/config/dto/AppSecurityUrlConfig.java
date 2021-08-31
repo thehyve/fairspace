@@ -14,6 +14,5 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class AppSecurityUrlConfig {
     private String[] permitAll = new String[0];
-    private String[] needsAuthentication = new String[0];
     private String[] needsAuthorization = new String[0];
 }

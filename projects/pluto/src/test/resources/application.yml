@@ -18,8 +18,6 @@ security:
     permitAll:
     - /actuator/health
     - /login
-    needsAuthentication:
-    - /noauthz
     needsAuthorization:
     - /thehyve
     - /echo-token

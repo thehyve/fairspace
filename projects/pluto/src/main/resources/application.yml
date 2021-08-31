@@ -69,7 +69,6 @@ security:
     - /logout
     - /authorize
     - /favicon.ico
-    needsAuthentication: []
     needsAuthorization:
     - /*
 

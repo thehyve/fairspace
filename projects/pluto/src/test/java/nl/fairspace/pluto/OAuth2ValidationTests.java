@@ -1,6 +1,5 @@
 package nl.fairspace.pluto;
 
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
@@ -165,19 +164,10 @@ public class OAuth2ValidationTests {
         assertEquals(401, response.getStatusCodeValue());
 	}
 
-    @Test
-	public void accessAllowedWithoutCorrectAuthorityToNoAuthzEndpoint() throws Exception {
-        ResponseEntity<String> response = getWithKey(
-                new JWTBuilder().signWith(keyId, privateKey).authorities(Collections.singletonList("other-authority")).build(),
-                "/noauthz"
-        );
-        assertEquals(200, response.getStatusCodeValue());
-	}
-
 	@Test
 	public void accessAnonymousEndpoints() {
 		for(String path: Arrays.asList("/login", "/actuator/health")) {
-			HttpEntity<Object> request = new HttpEntity<Object>(null);
+			HttpEntity<Object> request = new HttpEntity<>(null);
 			ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, request, String.class);
 			assertTrue("Anonymous call to " + path + " does not result in success status", response.getStatusCodeValue() < 400);
 		}

@@ -14,7 +14,7 @@ import static nl.fairspace.pluto.config.Urls.CONFIG_PATH;
 @Slf4j
 public class ConfigResource {
 
-    @Value("${spring.servlet.multipart.max-file-size}")
+    @Value("${spring.servlet.multipart.max-file-size:1GB}")
     private String maxFileSize;
 
     @Autowired
