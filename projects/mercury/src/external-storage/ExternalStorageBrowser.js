@@ -111,7 +111,6 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
     );
 };
 
-
 const ContextualExternalStorageBrowser = (props: ContextualExternalStorageBrowserProperties) => {
     const {pathname, storage, setAtLeastSingleRootFileExists} = props;
     const path = getRelativePath(pathname, storage.name);

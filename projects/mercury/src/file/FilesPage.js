@@ -30,7 +30,7 @@ import type {Match} from "../types";
 import {handleTextSearchRedirect} from "../search/searchUtils";
 
 type ContextualFilesPageProperties = {
-    match: Match,
+    match: Match;
     history: History;
     location: Location;
     classes: any;

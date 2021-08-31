@@ -161,5 +161,4 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
     );
 };
 
-
 export default withStyles(styles)(CollectionsPage);

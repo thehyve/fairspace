@@ -22,10 +22,13 @@ const shape = {
 
 const extendProperties = () => [];
 
-const createLinkedDataEntity = jest.fn(() => Promise.resolve());
-
 describe('<NewLinkedDataEntityDialog />', () => {
-    it('initilises the values/updates with the type', async () => {
+    const createLinkedDataEntity = jest.fn();
+    beforeEach(() => {
+        createLinkedDataEntity.mockResolvedValue({});
+    });
+
+    it('initialises the values/updates with the type', async () => {
         const {getByTestId} = render(
             <MemoryRouter>
                 <VocabularyContext.Provider

@@ -28,7 +28,7 @@ describe('array Utils', () => {
             expect(groupBy(
                 [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
                 "type"
-            )).toEqual({"a": [{name: "x", type: "a"}, {name: "y", type: "a"}], "b": [{name: "z", type: "b"}]});
+            )).toEqual({a: [{name: "x", type: "a"}, {name: "y", type: "a"}], b: [{name: "z", type: "b"}]});
         });
     });
 });
@@ -135,7 +135,7 @@ describe('formatDateTime', () => {
     it('should show date when it is not today', () => {
         const dateValue = '2008-09-15T15:53:00';
         const formatted = formatDateTime(dateValue);
-        expect(formatted).toEqual('15 Sep 2008');
+        expect(formatted).toEqual('15 Sept 2008');
     });
 
     it('should show time when it is today', () => {

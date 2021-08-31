@@ -7,7 +7,9 @@ import '../__mocks__/clipboard.mock';
 import CopyButton from "../CopyButton";
 
 describe('<CopyButton />', () => {
-    jest.useFakeTimers();
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
 
     it('changes the icon and title after copying', () => {
         const {getByTestId, getByTitle} = render(<CopyButton

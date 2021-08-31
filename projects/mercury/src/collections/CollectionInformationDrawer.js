@@ -39,7 +39,6 @@ import {determinePropertyShapesForTypes, determineShapeForTypes} from "../metada
 import {getFirstPredicateId, getFirstPredicateValue} from "../metadata/common/jsonLdUtils";
 import {getPathHierarchy} from "../file/fileUtils";
 
-
 const useStyles = makeStyles((theme) => ({
     expandOpen: {
         transform: 'rotate(180deg)',
