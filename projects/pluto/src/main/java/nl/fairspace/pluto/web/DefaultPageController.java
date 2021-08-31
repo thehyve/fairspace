@@ -32,7 +32,6 @@ public class DefaultPageController implements ErrorController {
         return "error";
     }
 
-    @Override
     public String getErrorPath() {
         return null;
     }
