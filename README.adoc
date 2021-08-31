@@ -2638,6 +2638,18 @@ To update a deployment using a new chart:
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
 
+Upgrading to a new version of the application may fail with a message, saying:
+----
+Forbidden: updates to statefulset spec for fields other than 'replicas', 'template', and 'updateStrategy' are forbidden
+----
+To prevent that, you can remove the existing ``StatefulSet`` before the upgrade:
+[source,shell]
+----
+kubectl delete statefulset fairspace-new --namespace fairspace-new --cascade=orphan
+----
+This will remove the ``StatefulSet``, but keep all pods and volumes intact.
+After running ``helm upgrade --install`` the ``StatefulSet`` will be recreated and the running pod will be replaced with a pod running the new application version.
+
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm uninstall`` or ``kubectl delete``.
 
