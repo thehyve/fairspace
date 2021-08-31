@@ -2404,45 +2404,40 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 ----
 # Update repo
 ~/bin/helm/helm repo update
-# List available hyperspace chart versions
-~/bin/helm/helm search repo --versions fairspace/hyperspace
-# Fetch the hyperspace chart
-~/bin/helm/helm pull fairspace/hyperspace --version 0.6.4
+# List available fairspace-keycloak chart versions
+~/bin/helm/helm search repo --versions fairspace/fairspace-keycloak
+# Fetch the fairspace-keycloak chart
+~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.6.4
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
 ~/bin/helm/helm pull fairspace/fairspace --version 0.7.21
 ----
 
-===== Deploy Hyperspace
+===== Deploy Keycloak
 Create a new Kubernetes namespace:
 [source, shell]
 ----
-kubectl create namespace hyperspace-new
+kubectl create namespace keycloak-new
 ----
 Create a new deployment (called _release_ in helm terminology) and
-install the Hyperspace chart:
+install the Fairspace Keycloak chart:
 [source, shell]
 ----
-~/bin/helm/helm install hyperspace-new fairspace/hyperspace --version 0.6.4 --namespace hyperspace-new \
--f /path/to/hyperspace-values.yaml
+~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.6.4 --namespace keycloak-new \
+-f /path/to/fairspace-keycloak-values.yaml
 ----
 You can pass values files with ``-f``.
 
-Example ``hyperspace-values.yaml`` file:
+Example ``fairspace-keycloak-values.yaml`` file:
 [source, yaml]
 ----
-hyperspace:
-  name: hyperspace-new
-  ingress:
-    domain: keycloak.example.com
-    tls:
-      certificate:
-        force: true
-
-keycloak:
+fairspaceKeycloak:
+  name: keycloak-new
   postgresql:
     postgresPassword: # choose a strong database password
+
+keycloak:
   extraEnv: |
     - name: KEYCLOAK_USER
       value: keycloak
@@ -2450,6 +2445,12 @@ keycloak:
       value: # choose a strong Keycloak admin password
     - name: PROXY_ADDRESS_FORWARDING
       value: "true"
+
+ingress:
+  domain: keycloak.example.com
+  tls:
+    certificate:
+      force: true
 ----
 
 ===== Configure a Keycloak realm for Fairspace
