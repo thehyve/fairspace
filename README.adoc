@@ -1,5 +1,8 @@
 = Fairspace
+The Hyve
+VERSION, {docdate}
 :description: Fairspace documentation.
+:author: The Hyve
 :doctype: book
 :showtitle!:
 :url-repo: https://github.com/thehyve/fairspace
