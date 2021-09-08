@@ -51,6 +51,7 @@ public class ViewStoreClientFactory {
         databaseConfig.setPassword(viewDatabase.password);
         databaseConfig.setAutoCommit(false);
         databaseConfig.setConnectionTimeout(1000);
+        databaseConfig.setMaximumPoolSize(50)
 
         dataSource = new HikariDataSource(databaseConfig);
 
