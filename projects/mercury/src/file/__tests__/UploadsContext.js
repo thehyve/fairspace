@@ -22,7 +22,9 @@ const getUploadsProviderValue = props => {
 };
 
 describe('UploadsProvider', () => {
-    LocalFileAPI.uploadMulti = jest.fn(() => Promise.resolve());
+    beforeEach(() => {
+        LocalFileAPI.uploadMulti = jest.fn(() => Promise.resolve());
+    });
 
     it('should upload files with default state', async () => {
         const getContext = getUploadsProviderValue();

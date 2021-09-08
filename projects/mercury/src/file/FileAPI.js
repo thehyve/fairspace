@@ -1,6 +1,7 @@
 import {createClient} from "webdav";
 import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
+// eslint-disable-next-line import/no-cycle
 import {
     decodeHTMLEntities,
     encodePath,
@@ -114,7 +115,7 @@ class FileAPI {
     }
 
     uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
-        var totalSize = files.reduce((size, file) => size + file.size, 0);
+        const totalSize = files.reduce((size, file) => size + file.size, 0);
         if (totalSize > maxFileSizeBytes) {
             return Promise.reject(new Error("Payload too large"));
         }

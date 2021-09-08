@@ -22,6 +22,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import static com.fasterxml.jackson.databind.type.TypeFactory.rawClass;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static java.lang.String.format;
@@ -30,7 +31,6 @@ import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.elasticsearch.common.inject.internal.MoreTypes.getRawType;
 
 /**
  * A simple Data Access Object for objects extending io.fairspace.saturn.rdf.dao.PersistentEntity.
@@ -256,7 +256,7 @@ public class DAO {
                     }
 
                     var parameterizedType = (ParameterizedType) field.getGenericType();
-                    var valueType = getRawType(parameterizedType.getActualTypeArguments()[0]);
+                    var valueType = rawClass(parameterizedType.getActualTypeArguments()[0]);
 
                     stmts.forEach(stmt -> collection.add(nodeToType(stmt.getObject(), valueType)));
                 } else {

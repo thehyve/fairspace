@@ -97,7 +97,7 @@ const UserMenu = ({classes}) => {
                                             style={{cursor: 'default'}}
                                         />
                                     </ListItem>
-                                    <Divider/>
+                                    <Divider />
                                     <MenuItem onClick={handleLogout}>
                                         <ListItemIcon>
                                             <ExitToAppIcon />

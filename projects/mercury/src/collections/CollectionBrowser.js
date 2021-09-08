@@ -15,7 +15,6 @@ import type {Collection} from "./CollectionAPI";
 import {getCollectionAbsolutePath} from "./collectionUtils";
 import type {Workspace} from '../workspaces/WorkspacesAPI';
 
-
 type ContextualCollectionBrowserProperties = {
     history: History;
     workspaceIri: string;

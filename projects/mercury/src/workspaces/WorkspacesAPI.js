@@ -47,7 +47,7 @@ class WorkspacesAPI {
 
     createWorkspace(workspace: WorkspaceProperties): Promise<WorkspaceProperties> {
         return axios.put(workspacesUrl, JSON.stringify(workspace), {
-            headers: {Accept: 'application/json', 'Content-type': 'application/json'},
+            headers: {'Accept': 'application/json', 'Content-type': 'application/json'},
         })
             .then(extractJsonData)
             .catch(handleHttpError("Failure while creating a workspace"));

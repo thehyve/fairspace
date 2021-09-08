@@ -8,14 +8,15 @@ import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from "../../../constants";
 import Iri from "../../../common/components/Iri";
 
 export const ReferringValue = ({property, entry}) => {
-    function renderValue(property, value) {
-        if (!value || !property.multiLine) {
+    function renderValue(prop, value) {
+        if (!value || !prop.multiLine) {
             return value;
         }
         return (
             <div style={{whiteSpace: 'pre-line'}}>
                 {value}
-            </div>);
+            </div>
+        );
     }
     function extractDisplayValue(value) {
         switch (property.datatype) {

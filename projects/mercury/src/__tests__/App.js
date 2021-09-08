@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import App from '../App';
 import {LocalFileAPI} from "../file/FileAPI";
 
-beforeAll(() => {
+beforeEach(() => {
     window.localStorage = {
         getItem: jest.fn(() => null),
         setItem: jest.fn()

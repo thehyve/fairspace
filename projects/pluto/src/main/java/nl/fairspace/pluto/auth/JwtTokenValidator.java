@@ -49,7 +49,7 @@ public class JwtTokenValidator {
         jwtProcessor.setJWSKeySelector(keySelector);
 
         // The overridden version of "verify" allows expiration time to be set to zero (no expiry).
-        DefaultJWTClaimsVerifier<C> claimsVerifier = new DefaultJWTClaimsVerifier<>() {
+        DefaultJWTClaimsVerifier<C> claimsVerifier = new DefaultJWTClaimsVerifier<>(null, null) {
             @Override
             public void verify(JWTClaimsSet claimsSet, C context) throws BadJWTException {
                 Date exp = claimsSet.getExpirationTime();

@@ -13,7 +13,7 @@ export const shortenText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) {
         return text;
     }
-    let shortText = text.substring(0, maxLength + 1);
+    const shortText = text.substring(0, maxLength + 1);
     const nonAlphaNumerical = new RegExp(/[!\W]+/g);
     let end = 0;
     while ((nonAlphaNumerical.exec(shortText)) !== null) {
@@ -23,11 +23,12 @@ export const shortenText = (text: string, maxLength: number) => {
         end = 0;
     }
     return shortText.substring(0, end);
-}
+};
 
 export const limitLines = (text: string, maxLines: number) => {
     let newLineCount = 0;
-    let start = 0, pos = 0;
+    let start = 0;
+    let pos = 0;
     while ((pos = text.indexOf('\n', start)) !== -1) {
         newLineCount++;
         if (newLineCount >= maxLines) {
@@ -36,11 +37,11 @@ export const limitLines = (text: string, maxLines: number) => {
         start = pos + 1;
     }
     return text;
-}
+};
 
 export const ShortText = (props: ShortTextProps) => {
     const [expanded, setExpanded] = useState(false);
-    const toggle = () => expanded ? setExpanded(false) : setExpanded(true);
+    const toggle = () => (expanded ? setExpanded(false) : setExpanded(true));
     const {text, maxLength, maxLines} = props;
     if (text == null) {
         return null;
@@ -49,18 +50,24 @@ export const ShortText = (props: ShortTextProps) => {
     let shortText = shortenText(displayText, maxLength);
     shortText = limitLines(shortText, maxLines);
     const overflow = (shortText.length < displayText.length);
-    return (<p style={{whiteSpace: 'pre-line'}}>
-        {expanded ? displayText : shortText}
-        {overflow && !expanded && <span> &hellip;
-            <IconButton aria-label="Expand" size="small" onClick={toggle}>
-                <ArrowDropDown fontSize="inherit"/>
-            </IconButton>
-        </span>}
-        {overflow && expanded &&
-            <IconButton aria-label="Collapse" size="small" onClick={toggle}>
-                <ArrowDropUp fontSize="inherit"/>
-            </IconButton>}
-    </p>);
+    return (
+        <p style={{whiteSpace: 'pre-line'}}>
+            {expanded ? displayText : shortText}
+            {overflow && !expanded && (
+                <span> &hellip;
+                    <IconButton aria-label="Expand" size="small" onClick={toggle}>
+                        <ArrowDropDown fontSize="inherit" />
+                    </IconButton>
+                </span>
+            )}
+            {overflow && expanded
+            && (
+                <IconButton aria-label="Collapse" size="small" onClick={toggle}>
+                    <ArrowDropUp fontSize="inherit" />
+                </IconButton>
+            )}
+        </p>
+    );
 };
 
 export default ShortText;

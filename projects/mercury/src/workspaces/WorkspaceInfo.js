@@ -1,7 +1,6 @@
 import React, {useContext} from 'react';
 import {Paper} from '@material-ui/core';
 
-
 import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';
 import useLinkedData from '../metadata/common/UseLinkedData';

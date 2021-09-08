@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        jena_version = '3.17.0'
+        jena_version = '4.1.0'
         milton_version = '2.8.0.3'
         mockitoVersion = '3.6.28'
         jacksonVersion = '2.11.3' // check what version is used by Jena
@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'io.franzbecker.gradle-lombok' version '4.0.0'
+    id "io.freefair.lombok" version "6.1.0"
     id 'application'
     id 'jacoco'
 //    id  'com.github.spotbugs' version '1.6.10'
@@ -38,7 +38,7 @@ repositories {
     }
 }
 
-lombok.version = "1.18.16"
+lombok.version = "1.18.20"
 
 jacoco.toolVersion = "0.8.6"
 
@@ -46,7 +46,6 @@ dependencies {
 //    implementation fileTree(dir: 'libs', include: '*.jar') // jena-fuseki-server-*.jar jena-text-es-*.jar
     implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
     implementation "org.apache.jena:jena-text:${jena_version}"
-    implementation "org.apache.jena:jena-text-es:${jena_version}"
     implementation "io.milton:milton-server-ce:${milton_version}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
@@ -65,13 +64,13 @@ dependencies {
     implementation 'org.keycloak:keycloak-jetty94-adapter:13.0.1'
     implementation 'org.keycloak:keycloak-admin-client:13.0.1'
 
-    testCompile 'com.h2database:h2:1.4.200'
+    testImplementation 'com.h2database:h2:1.4.200'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "com.zaxxer:HikariCP:3.4.5"
 
-    runtime 'org.apache.logging.log4j:log4j-api:2.14.1'
-    runtime 'org.apache.logging.log4j:log4j-core:2.14.1'
-    runtime 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1'
+    runtimeOnly 'org.apache.logging.log4j:log4j-api:2.14.1'
+    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.14.1'
+    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1'
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
