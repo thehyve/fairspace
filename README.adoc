@@ -2329,9 +2329,9 @@ https://storage.googleapis.com/fairspace-helm.
 We provide a number of charts for various components that can be used in combination, or separately:
 
 - _Fairspace Keycloak_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>.
-(Chart source: https://github.com/thehyve/fairspace-keycloak.)
+(Chart source: https://github.com/thehyve/fairspace-keycloak[].)
 - _Fairspace_: Installs the Fairspace application, including the _saturn_ backend, _pluto_ proxy, _mercury_ frontend and a PostgreSQL database, and configures an ingress node for Fairspace.
-- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/thehyve/jupyter.)
+- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/thehyve/fairspace-jupyter[].)
 
 ==== Instructions for deploying to Google Cloud
 
