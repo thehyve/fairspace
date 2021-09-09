@@ -11,7 +11,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -23,9 +22,9 @@ import java.time.*;
 import java.util.*;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
+import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
@@ -186,6 +185,7 @@ public class SparqlQueryService implements QueryService {
                 filters.remove(locationFilter);
 
                 if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
+                    locationFilter.values.forEach(v -> validateIRI(v.toString()));
                     var fileLink = view.join.stream().filter(v -> v.view.equals(RESOURCES_VIEW))
                             .findFirst().orElse(null);
                     if (fileLink != null) {
@@ -324,6 +324,7 @@ public class SparqlQueryService implements QueryService {
                 .append("WHERE {\n");
 
         if (parentIRI != null && !parentIRI.trim().isEmpty()) {
+            validateIRI(parentIRI);
             builder.append("?id fs:belongsTo* <").append(parentIRI).append("> .\n");
         }
 
