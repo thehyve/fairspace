@@ -6,6 +6,7 @@ import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.metadata.*;
 import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.webdav.*;
@@ -30,7 +31,7 @@ import static io.fairspace.saturn.auth.RequestContext.*;
 import static io.fairspace.saturn.config.Services.*;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.query.DatasetFactory.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -244,6 +245,50 @@ public class SparqlQueryServiceTest {
         ));
         var page = queryService.retrieveViewPage(request);
         assertEquals(1, page.getRows().size());
+    }
+
+    @Test
+    public void testRetrieveSamplesForInvalidLocation() {
+        var request = new ViewRequest();
+        request.setView("Sample");
+        request.setPage(1);
+        request.setSize(10);
+        request.setFilters(Collections.singletonList(
+                ViewFilter.builder()
+                        .field("location")
+                        .values(Collections.singletonList(">; INSERT something"))
+                        .build()
+        ));
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> queryService.retrieveViewPage(request));
+        String expectedMessage = "Invalid IRI";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void testRetrieveFilesForParent() {
+        selectAdmin();
+        var request = new FileSearchRequest();
+        request.setQuery("coffee");
+        request.setParentIRI(baseUri + "/coll1");
+
+        var results = queryService.searchFiles(request);
+        assertEquals(1, results.size());
+    }
+
+    @Test
+    public void testRetrieveFilesForInvalidParent() {
+        selectAdmin();
+        var request = new FileSearchRequest();
+        request.setQuery("coffee");
+        request.setParentIRI(">; INSERT something");
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> queryService.searchFiles(request));
+        String expectedMessage = "Invalid IRI";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
