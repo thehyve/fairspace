@@ -2583,7 +2583,7 @@ postgres:
   persistance:
     storage:
       size: 60Gi
-      storageClass: storageos-ssd-ext4
+      storageClass: expandable
 ----
 
 ===== Deploy Jupyter Hub
