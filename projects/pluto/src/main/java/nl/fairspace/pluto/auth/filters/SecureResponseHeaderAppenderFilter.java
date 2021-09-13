@@ -32,7 +32,7 @@ public class SecureResponseHeaderAppenderFilter implements Filter {
         httpServletResponse.setHeader("X-Permitted-Cross-Domain-Policies", "none");
         httpServletResponse.setHeader(
                 "Content-Security-Policy",
-                "default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; style-src: 'self'"
+                "default-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' 'unsafe-inline' https://*"
         );
         chain.doFilter(request, response);
     }
