@@ -50,7 +50,7 @@ const LinkedDataEntityHeader = ({
 
     return !linkedDataError && !linkedDataLoading && (
         <>
-            <Grid container justify="space-between" style={{alignItems: "center"}}>
+            <Grid container justifyContent="space-between" style={{alignItems: "center"}}>
                 <Grid item style={{display: "flex", alignItems: "center"}}>
                     <Typography variant="h5" className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}>
                         <IriTooltip title={subject}>

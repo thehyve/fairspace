@@ -226,8 +226,8 @@ const UserRolesPage = () => {
                     count={users.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onChangePage={(e, p) => setPage(p)}
-                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    onPageChange={(e, p) => setPage(p)}
+                    onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
                     ActionsComponent={TablePaginationActions}
                 />

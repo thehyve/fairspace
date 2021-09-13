@@ -25,7 +25,7 @@ export const ReferringValue = ({property, entry}) => {
             case BOOLEAN_URI:
                 return <Switch checked={value.value} readOnly />;
             case MARKDOWN_URI:
-                return <ReactMarkdown source={value.value} />;
+                return <ReactMarkdown>{value.value}</ReactMarkdown>;
             default:
                 return value.label || renderValue(property, value.value) || <Iri iri={value.id} />;
         }
