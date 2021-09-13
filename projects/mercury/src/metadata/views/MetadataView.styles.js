@@ -1,4 +1,4 @@
-import {fade} from "@material-ui/core/styles/colorManipulator";
+import {alpha} from "@material-ui/core/styles/colorManipulator";
 import * as consts from "../../constants";
 
 const CENTRAL_PANEL_WIDTH = '70%';
@@ -50,7 +50,7 @@ const styles = theme => ({
     },
     confirmFiltersButtonBlockActive: {
         position: 'sticky',
-        backgroundColor: fade(theme.palette.common.white, 0.8)
+        backgroundColor: alpha(theme.palette.common.white, 0.8)
     },
     confirmFiltersButton: {
         width: '100%'

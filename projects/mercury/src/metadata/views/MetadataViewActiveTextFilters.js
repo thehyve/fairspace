@@ -44,7 +44,7 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
             <Grid
                 container
                 direction="row"
-                justify="flex-start"
+                justifyContent="flex-start"
                 alignItems="center"
                 spacing={1}
                 className={classes.activeTextFiltersBox}

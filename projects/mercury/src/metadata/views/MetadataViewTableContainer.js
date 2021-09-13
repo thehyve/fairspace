@@ -233,8 +233,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     count={count && isNonEmptyValue(count.count) ? count.count : -1}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
                     className={classes.tableFooter}
                     labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
                     ActionsComponent={TablePaginationActions}

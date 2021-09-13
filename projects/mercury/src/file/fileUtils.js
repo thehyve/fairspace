@@ -90,7 +90,7 @@ export const getAbsolutePath = (path: string, storageName: string = "") => {
 export const redirectLink = (iri: string, type: string, storage: ExternalStorage = {}) => {
     const path = getPathFromIri(iri, storage.rootDirectoryIri);
     if (type && type === FILE_URI) {
-        const parentPath = getParentPath(path, storage.name);
+        const parentPath = getParentPath(path);
         return `${getAbsolutePath(parentPath, storage.name)}?selection=${encodeURIComponent(`${PATH_SEPARATOR}${path}`)}`;
     }
     return getAbsolutePath(path, storage.name);

@@ -6,7 +6,7 @@ import MessageDisplay from './MessageDisplay';
 const EmptyInformationDrawer = (props) => {
     const {message} = props;
     return (
-        <Grid container direction="column" justify="center" alignItems="center">
+        <Grid container direction="column" justifyContent="center" alignItems="center">
             <Grid item>
                 <AssignmentOutlined color="disabled" style={{fontSize: '4em'}} />
             </Grid>

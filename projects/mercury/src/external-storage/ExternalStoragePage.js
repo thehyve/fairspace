@@ -74,7 +74,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
         <ExternalStorageBreadcrumbsContextProvider storage={storage}>
             <BreadCrumbs additionalSegments={breadcrumbSegments} />
             {isSearchAvailable && (
-                <Grid container justify="space-between" spacing={1}>
+                <Grid container justifyContent="space-between" spacing={1}>
                     <Grid item className={classes.topBar}>
                         <SearchBar
                             placeholder={getSearchPlaceholder()}

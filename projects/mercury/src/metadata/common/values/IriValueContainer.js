@@ -36,7 +36,7 @@ export const IriValue = React.forwardRef(({
     }
 
     return (
-        <Grid container alignItems="flex-end" justify="space-between" spacing={1}>
+        <Grid container alignItems="flex-end" justifyContent="space-between" spacing={1}>
             <Grid item xs={4}>
                 <Autocomplete
                     options={namespaceOptions}

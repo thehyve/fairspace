@@ -144,7 +144,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
 
     const renderFacets = () => (
-        <Grid container item direction="column" justify="flex-start" spacing={1}>
+        <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
             {facetsEx.map(facet => {
                 const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
                 const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
@@ -258,7 +258,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
             {(areFacetFiltersNonEmpty() || areTextFiltersNonEmpty()) && (
-                <Grid container justify="space-between" direction="row-reverse">
+                <Grid container justifyContent="space-between" direction="row-reverse">
                     <Grid item xs={2} className={classes.clearAllButtonContainer}>
                         <Button className={classes.clearAllButton} startIcon={<Close />} onClick={handleClearAllFilters}>
                             Clear all filters
