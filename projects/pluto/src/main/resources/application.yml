@@ -92,6 +92,7 @@ zuul:
   - X-Frame-Options
   - X-Content-Type-Options
   - X-XSS-Protection
+  - X-Permitted-Cross-Domain-Policies
   - Origin  # Including the header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
   set-content-length: true
   host:
