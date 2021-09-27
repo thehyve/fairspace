@@ -60,7 +60,12 @@ const styles = theme => ({
     },
     clearAllButton: {
         color: theme.palette.error.main
-    }
+    },
+    facetHeaders: {
+        textAlign: 'center',
+        marginTop: 6,
+        color: theme.palette.info.main
+    },
 });
 
 export default styles;
