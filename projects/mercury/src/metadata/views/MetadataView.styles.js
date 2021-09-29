@@ -17,6 +17,13 @@ const styles = theme => ({
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto'
     },
+    facetHeaders: {
+        textAlign: 'left',
+        marginTop: 6,
+        fontSize: 13,
+        color: '#3f51b5',
+        marginLeft: 4,
+    },
     centralPanel: {
         width: CENTRAL_PANEL_WIDTH,
         overflowX: 'auto',
@@ -60,11 +67,6 @@ const styles = theme => ({
     },
     clearAllButton: {
         color: theme.palette.error.main
-    },
-    facetHeaders: {
-        textAlign: 'center',
-        marginTop: 6,
-        color: theme.palette.info.main
     },
 });
 

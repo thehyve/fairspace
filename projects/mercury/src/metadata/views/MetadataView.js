@@ -141,8 +141,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return view.columns;
     };
 
-    const getFacetDisplayName = (name) => name.match(/[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+/g).join(' ');
-
     const renderSingleFacet = (facet) => {
         const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
         const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
@@ -197,12 +195,15 @@ export const MetadataView = (props: MetadataViewProperties) => {
     );
 
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
-    const viewNames = [...new Set(facetsEx.map(facet => facet.name.split("_")[0]))];
 
-    const renderFacets = (viewName) => (
+    const renderFacets = (view) => (
         <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
-            <div className={classes.facetHeaders}>{getFacetDisplayName(viewName)}</div>
-            {facetsEx.map(facet => (facet.name.toLowerCase().startsWith(viewName.toLowerCase()) ? renderSingleFacet(facet) : ""))}
+            <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
+            {facetsEx.map(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase()) ? renderSingleFacet(facet) : ""))}
+            {
+                // location is the collection location, which we will group under resources
+                (view.name.toLowerCase() === 'resource') ? facetsEx.map(facet => (facet.name.toLowerCase().startsWith('location') ? renderSingleFacet(facet) : "")) : ""
+            }
         </Grid>
     );
 
@@ -290,7 +291,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.facets}>
                             <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
-                                {viewNames.map(viewName => renderFacets(viewName))}
+                                {views.map(view => renderFacets(view))}
                                 {renderFacetConfirmButtons}
                             </Grid>
                         </Grid>
