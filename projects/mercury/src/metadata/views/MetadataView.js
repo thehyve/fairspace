@@ -197,12 +197,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
 
     const renderFacets = (view) => (
-        <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
+        <Grid key={view.name} container item direction="column" justifyContent="flex-start" spacing={1}>
             <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
-            {facetsEx.map(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase()) ? renderSingleFacet(facet) : ""))}
+            {
+                facetsEx
+                    .filter(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase())))
+                    .map(facet => renderSingleFacet(facet))
+            }
             {
                 // location is the collection location, which we will group under resources
-                (view.name.toLowerCase() === 'resource') ? facetsEx.map(facet => (facet.name.toLowerCase().startsWith('location') ? renderSingleFacet(facet) : "")) : ""
+                (view.name.toLowerCase() === 'resource') ? facetsEx.filter(facet => facet.name.toLowerCase().startsWith('location')).map(facet => (renderSingleFacet(facet))) : ""
             }
         </Grid>
     );

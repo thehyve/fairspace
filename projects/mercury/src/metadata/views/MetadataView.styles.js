@@ -21,7 +21,7 @@ const styles = theme => ({
         textAlign: 'left',
         marginTop: 6,
         fontSize: 13,
-        color: '#3f51b5',
+        color: theme.palette.primary.light,
         marginLeft: 4,
     },
     centralPanel: {
