@@ -1,10 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
+import _ from 'lodash';
+import {useHistory} from "react-router-dom";
 import {Button, Grid, withStyles, Typography} from '@material-ui/core';
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {Assignment, Close} from "@material-ui/icons";
-import {useHistory} from "react-router-dom";
-import _ from 'lodash';
+import styles from "./MetadataView.styles";
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
@@ -21,7 +22,6 @@ import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
-import styles from "./MetadataView.styles";
 import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
@@ -141,59 +141,73 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return view.columns;
     };
 
+    const renderSingleFacet = (facet) => {
+        const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
+        const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
+        let activeFilterValues = [];
+        if (activeFilter) {
+            activeFilterValues = ofRangeValueType(facet.type) ? [activeFilter.min, activeFilter.max] : activeFilter.values;
+        }
+        return facetOptions && facetOptions.length > 0 && (
+            <Grid key={facet.name} item>
+                <Facet
+                    type={facet.type}
+                    title={facet.title}
+                    options={facetOptions}
+                    onChange={(values) => updateFilterCandidates(facet, values)}
+                    extraClasses={classes.facet}
+                    activeFilterValues={activeFilterValues}
+                    clearFilter={() => handleClearFilter(facet.name)}
+                />
+            </Grid>
+        );
+    };
+
+    const renderFacetConfirmButtons = (
+        <Grid
+            container
+            spacing={1}
+            className={`${classes.confirmFiltersButtonBlock} ${filterCandidates.length > 0 && classes.confirmFiltersButtonBlockActive}`}
+        >
+            <Grid item xs={4}>
+                <Button
+                    onClick={clearFilterCandidates}
+                    variant="contained"
+                    color="default"
+                    className={classes.confirmFiltersButton}
+                    disabled={filterCandidates.length === 0}
+                >
+                    Cancel
+                </Button>
+            </Grid>
+            <Grid item xs={8}>
+                <Button
+                    onClick={applyFilters}
+                    variant="contained"
+                    color="secondary"
+                    className={classes.confirmFiltersButton}
+                    disabled={filterCandidates.length === 0}
+                >
+                    Apply filters
+                </Button>
+            </Grid>
+        </Grid>
+    );
+
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
 
-    const renderFacets = () => (
-        <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
-            {facetsEx.map(facet => {
-                const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
-                const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
-                let activeFilterValues = [];
-                if (activeFilter) {
-                    activeFilterValues = ofRangeValueType(facet.type) ? [activeFilter.min, activeFilter.max] : activeFilter.values;
-                }
-                return facetOptions && facetOptions.length > 0 && (
-                    <Grid key={facet.name} item>
-                        <Facet
-                            type={facet.type}
-                            title={facet.title}
-                            options={facetOptions}
-                            onChange={(values) => updateFilterCandidates(facet, values)}
-                            extraClasses={classes.facet}
-                            activeFilterValues={activeFilterValues}
-                            clearFilter={() => handleClearFilter(facet.name)}
-                        />
-                    </Grid>
-                );
-            })}
-            <Grid
-                container
-                spacing={1}
-                className={`${classes.confirmFiltersButtonBlock} ${filterCandidates.length > 0 && classes.confirmFiltersButtonBlockActive}`}
-            >
-                <Grid item xs={4}>
-                    <Button
-                        onClick={clearFilterCandidates}
-                        variant="contained"
-                        color="default"
-                        className={classes.confirmFiltersButton}
-                        disabled={filterCandidates.length === 0}
-                    >
-                        Cancel
-                    </Button>
-                </Grid>
-                <Grid item xs={8}>
-                    <Button
-                        onClick={applyFilters}
-                        variant="contained"
-                        color="secondary"
-                        className={classes.confirmFiltersButton}
-                        disabled={filterCandidates.length === 0}
-                    >
-                        Apply filters
-                    </Button>
-                </Grid>
-            </Grid>
+    const renderFacets = (view) => (
+        <Grid key={view.name} container item direction="column" justifyContent="flex-start" spacing={1}>
+            <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
+            {
+                facetsEx
+                    .filter(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase())))
+                    .map(facet => renderSingleFacet(facet))
+            }
+            {
+                // location is the collection location, which we will group under resources
+                (view.name.toLowerCase() === 'resource') ? facetsEx.filter(facet => facet.name.toLowerCase().startsWith('location')).map(facet => (renderSingleFacet(facet))) : ""
+            }
         </Grid>
     );
 
@@ -267,7 +281,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     {areFacetFiltersNonEmpty() && (
                         <Grid item container xs alignItems="center" spacing={1}>
                             <Grid item>
-                                <Typography variant="overline" component="span" color="textSecondary">Active filters: </Typography>
+                                <Typography variant="overline" component="span" color="textSecondary">Active filters:</Typography>
                             </Grid>
                             <Grid item>
                                 <MetadataViewActiveFacetFilters facets={facetsEx} filters={filters} setFilters={updateFilters} />
@@ -280,7 +294,10 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.facets}>
-                            {renderFacets()}
+                            <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
+                                {views.map(view => renderFacets(view))}
+                                {renderFacetConfirmButtons}
+                            </Grid>
                         </Grid>
                         <Grid item className={classes.metadataViewTabs}>
                             {renderViewTabs()}

@@ -17,6 +17,13 @@ const styles = theme => ({
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto'
     },
+    facetHeaders: {
+        textAlign: 'left',
+        marginTop: 6,
+        fontSize: 13,
+        color: theme.palette.primary.light,
+        marginLeft: 4,
+    },
     centralPanel: {
         width: CENTRAL_PANEL_WIDTH,
         overflowX: 'auto',
