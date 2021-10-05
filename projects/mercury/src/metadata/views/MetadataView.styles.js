@@ -67,7 +67,7 @@ const styles = theme => ({
     },
     clearAllButton: {
         color: theme.palette.error.main
-    },
+    }
 });
 
 export default styles;
