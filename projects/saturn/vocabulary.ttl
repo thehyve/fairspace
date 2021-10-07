@@ -698,7 +698,7 @@ curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
     [
         sh:name "Samples" ;
         sh:description "Samples" ;
-        sh:path [sh:inversePath curie:diagosis];
+        sh:path [sh:inversePath curie:diagnosis];
     ],
     [
         sh:name "Files" ;
@@ -745,7 +745,7 @@ curie:isOfNature a rdf:Property .
 curie:parentIsOfNature a rdf:Property .
 curie:hasOrigin a rdf:Property .
 curie:subject a rdf:Property .
-curie:diagosis a rdf:Property .
+curie:diagnosis a rdf:Property .
 curie:isChildOf a rdf:Property .
 
 curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
