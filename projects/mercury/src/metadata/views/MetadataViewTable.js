@@ -58,7 +58,10 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
     );
 
-    const getAccess = (iri: string) => collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/')).access;
+    const getAccess = (iri: string) => {
+        const col = collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/'));
+        return col ? col.access : 'None';
+    };
 
     const getResourceType = (row: Map<string, any>) => (
         row[RESOURCE_TYPE_COLUMN] && row[RESOURCE_TYPE_COLUMN][0] && row[RESOURCE_TYPE_COLUMN][0].value
