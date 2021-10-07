@@ -58,6 +58,16 @@ export const groupBy = (array, key) => array.reduce((objectsMap, obj) => {
  * @param {*} y
  */
 export function comparePrimitives(x, y) {
+    if (typeof x === "undefined" || typeof y === "undefined") {
+        if (typeof x === "undefined" && typeof y === "undefined") {
+            return 0;
+        }
+        if (typeof x === "undefined") {
+            return -1;
+        }
+        return 1;
+    }
+
     if (typeof x === 'string' && typeof y === 'string') {
         return x.localeCompare(y, undefined, {sensitivity: 'base'});
     }
