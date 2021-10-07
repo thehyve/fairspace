@@ -38,6 +38,8 @@ describe('comparison Utils', () => {
         it('can compare by attribute', () => {
             expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a'))).toEqual([{a: 1}, {a: 2}, {a: 3}]);
             expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 3}, {a: 2}, {a: 1}]);
+            expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', true))).toEqual([{}, {a: 1}, {a: 2}]);
+            expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 2}, {a: 1}, {}]);
         });
 
         it('can compare by function', () => {
@@ -161,6 +163,12 @@ describe('stableSort', () => {
         const a = ["c", "a", "b"];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
+    });
+
+    it('respects sorting direction with empty values', () => {
+        const a = ["c", "a", "", "b"];
+        expect(stableSort(a, comparePrimitives, true)).toEqual(['', 'a', 'b', 'c']);
+        expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a', '']);
     });
 });
 
