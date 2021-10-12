@@ -125,6 +125,12 @@ or transfer ownership of the collection to another workspace.
 
 image:docs/images/screenshots/Collection browser.png[Collection browser]
 
+Due to the data loss prevention, data in Fairspace is not removed from the system on deletion.
+Deleted collections and files can be still viewes the application using "Show deleted" switch.
+The goal is to prevent deleted data from being overwritten by users (not to create collections or files with the paths
+that already existed in the system) and to allow administrators to perform special actions (to be performed only in exceptional special cases),
+like undeletion or permanent removal, to revert accidental removal or creation of a collection or a file.
+
 ===== Metadata forms
 
 Users with write access to the collection can annotate collections,
@@ -1870,7 +1876,7 @@ In Fairspace, collections follow a workflow with the following statuses:
 * _Active_: for the phase of data collection, data production and data processing;
 * _Read-only_: for when the data set is complete and is available for reuse;
 * _Archived_: for when the data set should not be available for reading, but still needs to be preserved;
-* _Deleted_: for when the data set needs to be permanently made unavailable.
+* _Deleted_: for when the data set needs to be permanently made unavailable (non-readable and non-searchable).
 This status is irreversible. There is one exception to this rule – for the sake of data loss prevention, in special cases, administrators can still undelete a collection that was already deleted.
 
 In these different statuses, different actions on the data are enabled or disabled. Also, visibility of the data and linked metadata depends partly on the collection status.
