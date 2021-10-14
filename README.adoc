@@ -126,7 +126,7 @@ or transfer ownership of the collection to another workspace.
 image:docs/images/screenshots/Collection browser.png[Collection browser]
 
 Due to the data loss prevention, data in Fairspace is not removed from the system on deletion.
-Deleted collections and files can be still viewes the application using "Show deleted" switch.
+Deleted collections and files can still be viewed in the application using "Show deleted" switch.
 The goal is to prevent deleted data from being overwritten by users (not to create collections or files with the paths
 that already existed in the system) and to allow administrators to perform special actions (to be performed only in exceptional special cases),
 like undeletion or permanent removal, to revert accidental removal or creation of a collection or a file.
@@ -2217,7 +2217,7 @@ Data model evolution is possible, but needs to be applied carefully as well:
 make sure that new versions of data models are consistent with previous versions,
 in order to prevent inconsistencies for existing data.
 
-WARNING: _Editing a data model is specialist work for data modellers/information architects. Use with care.
+WARNING: _Editing a data model is specialized work for data modellers/information architects. Use with care.
 The system is flexible, but the system cannot compensate for poor data modelling choices.
 Bad modelling will make it hard for users to enter data and to interact with the data._
 
@@ -2234,7 +2234,7 @@ List of data model changes that can be considered safe:
 Dangerous actions (not recommended):
 
 * Changing or removing existing entities,
-* Adding or changing constrains,
+* Adding or changing constraints,
 * Removing or changing existing properties (property type, name),
 * Changing relations between entities.
 
