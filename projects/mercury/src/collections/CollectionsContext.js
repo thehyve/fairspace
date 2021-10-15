@@ -4,6 +4,7 @@ import CollectionAPI from "./CollectionAPI";
 import useAsync from "../common/hooks/UseAsync";
 import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
 import UserContext from "../users/UserContext";
+import WorkspaceContext from "../workspaces/WorkspaceContext";
 
 const CollectionsContext = React.createContext({});
 
@@ -11,16 +12,17 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const [showDeleted, setShowDeleted] = useState(false);
     const {vocabulary} = useContext(VocabularyContext);
     const {currentUser} = useContext(UserContext);
+    const {refreshWorkspaces} = useContext(WorkspaceContext);
 
     const {data: collections = [], error, loading, refresh} = useAsync(
         () => collectionApi.getCollections(showDeleted),
         [currentUser, showDeleted]
     );
 
-    const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection, vocabulary).then(refresh);
+    const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection, vocabulary).then(refresh).then(refreshWorkspaces);
     const updateCollection = (collection: Collection) => collectionApi.updateCollection(collection, vocabulary).then(refresh);
-    const deleteCollection = (collection: CollectionProperties) => collectionApi.deleteCollection(collection, showDeleted).then(refresh);
-    const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh);
+    const deleteCollection = (collection: CollectionProperties) => collectionApi.deleteCollection(collection, showDeleted).then(refresh).then(refreshWorkspaces);
+    const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh).then(refreshWorkspaces);
     const unpublish = (collection: CollectionProperties) => collectionApi.unpublish(collection).then(refresh);
     const renameCollection = (name: string, target: string) => collectionApi.renameCollection(name, target).then(refresh);
     const setPermission = (name: string, principal: string, access: AccessLevel) => collectionApi.setPermission(name, principal, access).then(refresh);
