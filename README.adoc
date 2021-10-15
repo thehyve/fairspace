@@ -125,6 +125,12 @@ or transfer ownership of the collection to another workspace.
 
 image:docs/images/screenshots/Collection browser.png[Collection browser]
 
+Due to the data loss prevention, data in Fairspace is not removed from the system on deletion.
+Deleted collections and files can still be viewed in the application using "Show deleted" switch.
+The goal is to prevent deleted data from being overwritten by users (not to create collections or files with the paths
+that already existed in the system) and to allow administrators to perform special actions (to be performed only in exceptional special cases),
+like undeletion or permanent removal, to revert accidental removal or creation of a collection or a file.
+
 ===== Metadata forms
 
 Users with write access to the collection can annotate collections,
@@ -1870,7 +1876,7 @@ In Fairspace, collections follow a workflow with the following statuses:
 * _Active_: for the phase of data collection, data production and data processing;
 * _Read-only_: for when the data set is complete and is available for reuse;
 * _Archived_: for when the data set should not be available for reading, but still needs to be preserved;
-* _Deleted_: for when the data set needs to be permanently made unavailable.
+* _Deleted_: for when the data set needs to be permanently made unavailable (non-readable and non-searchable).
 This status is irreversible. There is one exception to this rule – for the sake of data loss prevention, in special cases, administrators can still undelete a collection that was already deleted.
 
 In these different statuses, different actions on the data are enabled or disabled. Also, visibility of the data and linked metadata depends partly on the collection status.
@@ -2197,6 +2203,66 @@ indicating the sub type of the entity.
 E.g., instead of defining entity types _DNASeqAssay_ and _RNASeqAssay_
 as sub types of _Assay_, a property type _assayType_ can be defined on _Assay_,
 using a controlled vocabulary type _AssayType_ with the assay types as values.
+
+Although there are many RDF-compatible XSD datatypes, it is recommended to reuse the types
+that are already used in the default vocabularies.ttl file as a value of ``sh:datatype`` property.
+Other types may not be handled properly in the user interface and may cause some unexpected issues.
+Same recommendation is for SHACL constraints that can be added for an entity or its properties - reuse the constraints described
+in the custom data model creation guidelines.
+
+==== Changing existing data model
+
+Flexible, configurable data model is one of the key features of Fairspace.
+Data model evolution is possible, but needs to be applied carefully as well:
+make sure that new versions of data models are consistent with previous versions,
+in order to prevent inconsistencies for existing data.
+
+WARNING: _Editing a data model is specialized work for data modellers/information architects. Use with care.
+The system is flexible, but the system cannot compensate for poor data modelling choices.
+Bad modelling will make it hard for users to enter data and to interact with the data._
+
+It is recommended to only add properties to existing entities or add new entities.
+Changing existing entities will cause inconsistencies.
+
+List of data model changes that can be considered safe:
+
+* Adding new entity,
+* Adding new property to an existing entity,
+* Removing constraints on properties,
+* Changing description of an existing entity or property.
+
+Dangerous actions (not recommended):
+
+* Changing or removing existing entities,
+* Adding or changing constraints,
+* Removing or changing existing properties (property type, name),
+* Changing relations between entities.
+
+.In order to change the model:
+
+. Update the vocabularies.ttl file, defining the custom model. Follow the guides specified in <<Data model configuration>> section).
+. Update views configuration file (see views <<View configuration>> section),
+if applicable - only if there is a change that needs to be reflected in metadata search views.
+. Apply the changes
++
+For the deployment with Helm, run an upgrade command with _saturn.vocabulary_ and _saturn.views_ parameters
+pointing to a new vocabularies and views definitions (see <<Installation and configuration>>),
+use `--set-file` option:
++
+[source, bash]
+----
+~bin/helm/helm upgrade … --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
+----
++
+This should also restart the Saturn pod. If not, trigger the restart manually.
++
+For local development - replace vocabulary file in link:projects/saturn/vocabulary.ttl[projects/saturn/vocabulary.ttl]
+and views configuration in link:projects/saturn/views.ttl[projects/saturn/views.ttl].
+Restart Saturn run.
++
+. Load data for new entities or properties.
+. Reindex Postgres database using `/api/maintenance/reindex` API endpoint (see <<Maintenance>> API) to apply the changes for metadata search.
+
 
 ==== Controlled vocabularies
 
