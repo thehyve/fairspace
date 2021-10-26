@@ -325,6 +325,7 @@ views:
       - view: Subject
         on: https://institut-curie.org/ontology#aboutSubject
         include:
+          - id
           - gender
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#aboutEvent
@@ -333,5 +334,6 @@ views:
       - view: Sample
         on: https://institut-curie.org/ontology#sample
         include:
+          - id
           - nature
           - topography
