@@ -2893,7 +2893,12 @@ Fetching user information is not included in the audit log.
 ==== Data recovery using transaction log
 
 In case of corruption the RDF database can be restored at any point of time using the transaction log.
-In order to restore the RDF database, follow the steps below.
+
+
+Data recovery starts automatically on the Saturn application start, if the RDF database is empty
+and the transaction log containing entries is detected.
+
+If Fairspace is deployed using Kubernetes, follow the steps below in order to restore the RDF database.
 
 Stop (scale down) the application:
 [source, shell]
@@ -2901,13 +2906,28 @@ Stop (scale down) the application:
 kubectl scale --replicas=0 --namespace fairspace-new statefulset/fairspace-new
 ----
 
-Delete a persistent volume claim consisting transient data:
+Delete a persistent volume consisting transient data.
+If the reclaim policy of the pv is set to `Delete` or `Recycle`, delete the bound
+persistent volume claim and the volume will be removed as well:
 [source, shell]
 ----
 kubectl --namespace fairspace-new delete pvc database-fairspace-new-0
 ----
 
-Start (scale up) the application. The deleted pvc will be recreated and data recovery will start automatically:
+If the reclaim policy is set to `Retain`, you need to delete the pv manually.
+Find a name of pv bound to the deleted pvc (claim equals to `database-fairspace-new-0`):
+----
+kubectl --namespace fairspace-new get pv
+----
+
+and delete the pv:
+----
+kubectl delete pv <pv_name>
+----
+
+See link:https://kubernetes.io/docs/concepts/storage/persistent-volumes/#reclaiming[the reclaim policy documentation of Kubernetes] for more information.
+
+Start (scale up) the application. The deleted pvc and pv will be recreated and data recovery will start automatically:
 [source, shell]
 ----
 kubectl scale --replicas=1 --namespace fairspace-new statefulset/fairspace-new
