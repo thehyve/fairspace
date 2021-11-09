@@ -141,7 +141,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return view.columns;
     };
 
-    const renderSingleFacet = (facet) => {
+    const renderSingleFacet = (facet: MetadataViewFacet) => {
         const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
         const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
         let activeFilterValues = [];
@@ -196,20 +196,25 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
 
-    const renderFacets = (view) => (
-        <Grid key={view.name} container item direction="column" justifyContent="flex-start" spacing={1}>
-            <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
-            {
-                facetsEx
-                    .filter(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase())))
-                    .map(facet => renderSingleFacet(facet))
-            }
-            {
-                // location is the collection location, which we will group under resources
-                (view.name.toLowerCase() === 'resource') ? facetsEx.filter(facet => facet.name.toLowerCase().startsWith('location')).map(facet => (renderSingleFacet(facet))) : ""
-            }
-        </Grid>
-    );
+    const renderFacets = (view: MetadataViewOptions) => {
+        const viewFacets = facetsEx.filter(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase())));
+        return viewFacets.length > 0 && (
+            <Grid key={view.name} container item direction="column" justifyContent="flex-start" spacing={1}>
+                <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
+                {
+                    viewFacets.map(facet => renderSingleFacet(facet))
+                }
+                {
+                    // location is the collection location, which we will group under resources
+                    (view.name.toLowerCase() === 'resource') ? (
+                        facetsEx
+                            .filter(facet => facet.name.toLowerCase().startsWith('location'))
+                            .map(facet => (renderSingleFacet(facet)))
+                    ) : ""
+                }
+            </Grid>
+        );
+    };
 
     const renderViewTabs = () => (
         <div>
