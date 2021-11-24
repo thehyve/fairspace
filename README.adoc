@@ -2956,17 +2956,89 @@ The logs should contain the following information:
 
 As soon as you see "Saturn has started" the RDF database should be restored to the state preceding the crash.
 
-== Design
+== Architecture
 
-=== Storage
+image:docs/images/diagrams/Architecture.png[Architecture]
 
-RDF database using {Jena}[Apache Jena] for:
+There are three core components of Fairspace: Mercury front-end, Pluto proxy and Saturn back-end.
+Together with storages and Keycloak as an identity and access management solution
+they create a complete Fairspace environment.
+
+There could be additional applications integrated within the Fairspace environment,
+like Jupyter Hub and external storage systems.
+
+
+=== Mercury
+
+Web application developed using link:https://reactjs.org/[React] and link:https://mui.com/[Material-UI] component library.
+Mercury's generic components for data and metadata allow changing the data model without a need to make changes
+in the front-end code.
+
+Mercury connects to Pluto using session based authentication.
+
+=== Pluto
+
+Lightweight API gateway with OpenID Connect authentication support, that functions
+as a proxy between the microservices and the frontend.
+Pluto keeps track of user sessions, handles the OIDC authentication flow (authorization code based),
+JWT tokens (validation, refreshing) and redirects to back-end applications.
+
+Pluto is a link:https://spring.io/projects/spring-boot[Java Spring Boot] application,
+using link:https://github.com/Netflix/zuul[Netflix Zuul] as an embedded reverse proxy
+and link:https://bitbucket.org/connect2id/nimbus-jose-jwt[Nimbus JOSE + JWT library] to connect to Keycloak,
+follow the authentication flow and to handle JWT tokens.
+
+=== Saturn
+
+The heart of Fairspace, back-end application handling all the logic and connection to the storages.
+Data repository and catalog.
+
+Saturn is served as link:https://jena.apache.org/documentation/fuseki2/[Apache Jena Fuseki SPARQL] server,
+embedded into link:https://www.eclipse.org/jetty/[Jetty] Web server.
+
+Saturn uses link:https://jena.apache.org/documentation/rdf/[Apache Jena RDF] for handling RDF graphs,
+serialisation of triples and TDB triple store connection.
+All data within Fairspace, except to uploaded files and logs, are stored in Apache Jena RDF database.
+
+For security, Saturn is integrated with Keycloak using link:https://www.keycloak.org/docs/latest/securing_apps/#_jetty9_adapter[Keycloak Jetty client adapter].
+It enables user authentication with access tokens.
+
+Saturn is also responsible for authorization of users in Fairspace - it includes user access validators
+and storage of user records and permissions in the RDF database.
+
+Saturn uses link:https://milton.io/[Milton IO], Java Webdav Server Library, to enable file storage management,
+directory listings and file properties handling, adding, moving, replacing and deleting files, directories and collections.
+
+=== Storages
+
+There are two types of storages that Saturn connects to: primary for storing RDF triples and file blobs,
+and secondary for efficient data retrieval.
+
+==== Primary data storage
+
+RDF database (link:https://jena.apache.org/documentation/tdb2[Apache Jena TDB2]) stores:
 
 * File metadata
+* Metadata entities
 * Permissions
 * User metadata
 
-File system data stored as blocks on the file system in append-only fashion.
+Data model schema is defined as a set of RDF classes and properties and {SHACL}[SHACL] constraints over them.
+
+The virtual file system stores directory structure and file information in the RDF database
+and the files themselves in a separate append-only storage as blobs.
+Both adding a new file and updating an existing file result in adding a new file on the underlying storage.
+Every file version is stored as a separate blob and is normally never deleted
+(a deleted file is simply detached from the directory structure but remains in the blob store).
+
+In combination with the fact that all operations on the RDF database are stored in the transaction log,
+that makes it possible to (incrementally) backup full state of workspaces and metadata at any point in time without stopping it.
+
+==== Secondary data storage for efficient data retrieval
+
+To improve the performance of metadata views, especially for counts and pagination, a simple relational database
+(PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
+which enables recreation of the database at any point of time.
 
 
 == Acknowledgement
