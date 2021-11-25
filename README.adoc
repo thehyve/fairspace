@@ -2975,7 +2975,7 @@ This project was realized thanks to and funded by:
 
 * The generosity of donors supporting the Curie Foundation.
 * Food Nutrition Security Cloud (FNS-Cloud). FNS-Cloud has received funding from the European Union’s Horizon 2020 Research and Innovation programme (H2020-EU.3.2.2.3. – A sustainable and competitive agri-food industry) under Grant Agreement No. 863059.
-* The Hyve BV, enabling open science (link:www.thehyve.nl[www.thehyve.nl]).
+* The Hyve BV, enabling open science (link:https://thehyve.nl[www.thehyve.nl]).
 
 
 == License
