@@ -132,9 +132,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
             const pathColumn = {title: "Path", name: "path", type: "Custom"};
             const accessColumn = {title: "Access", name: "access", type: "Custom"};
             return [
-                view.columns.find(c => c.type === 'Identifier'),
+                view.columns.find(c => c.name === RESOURCES_VIEW),
                 pathColumn,
-                ...view.columns.filter(c => c.type !== 'Identifier'),
+                ...view.columns.filter(c => c.name !== RESOURCES_VIEW),
                 accessColumn
             ];
         }
