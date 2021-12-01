@@ -179,7 +179,7 @@ const MetadataCard = (props) => {
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
                 title={title}
-                subheader={metadataUploadPath && 'Drag \'n\' drop a metadata file here'}
+                subheader={metadataUploadPath && 'Drag \'n\' drop a metadata file here or click the edit button below to see all available fields.'}
                 avatar={avatar}
                 style={{wordBreak: 'break-word'}}
                 action={(
