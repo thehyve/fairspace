@@ -25,6 +25,7 @@ import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
+import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 
 @Log4j2
 class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
@@ -120,7 +121,7 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
         if (!factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
                 && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
                 && !factory.userService.currentUser().isAdmin()) {
-            throw new NotAuthorizedException();
+            throw new NotAuthorizedException("Not authorized to create a new collection in this workspace.", this, SC_FORBIDDEN);
         }
 
         subj.addProperty(FS.ownedBy, ws).addProperty(FS.belongsTo, ws);

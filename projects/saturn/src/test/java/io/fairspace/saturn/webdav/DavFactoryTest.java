@@ -33,6 +33,7 @@ import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.lang.String.format;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -394,6 +395,8 @@ public class DavFactoryTest {
             fail("Only admin can purge a collection.");
         } catch (NotAuthorizedException e) {
             assertNotNull(e);
+            assertEquals(SC_FORBIDDEN, e.getRequiredStatusCode());
+            assertEquals("Not authorized to purge the resource.", e.getMessage());
         }
 
         userService.currentUser().setAdmin(true);
