@@ -23,6 +23,7 @@ import java.util.Map;
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
+import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.lang.Integer.parseInt;
 
 class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
@@ -132,7 +133,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
     private void revert(String versionStr) throws BadRequestException, NotAuthorizedException, ConflictException {
         if (!access.canWrite()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to revert this resource to a previous version.", this, SC_FORBIDDEN);
         }
 
         int version;
