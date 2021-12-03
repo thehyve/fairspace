@@ -127,6 +127,7 @@ const LinkedDataEntityFormContainer = ({
                 {showEditButtons && hasEditRight && !editingEnabled && (
                     <IconButton
                         aria-label="Edit"
+                        title="Edit"
                         onClick={() => {
                             setEditingEnabled(true);
                         }}

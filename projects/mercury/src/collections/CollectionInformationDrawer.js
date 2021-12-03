@@ -119,7 +119,7 @@ const generateTemplate = (vocabulary) => {
             ['#', 'Path', 'A relative path to a file or a directory; use ./ for the current directory or collection.', 'string', '1..1', ''],
             ...doc]) + '\n#\n'
         + '"Path",' + uniqueProps.map(ps => JSON.stringify(getFirstPredicateValue(ps, SHACL_NAME))).join(',') + '\n'
-        + '<PUT YOUR DATA HERE FOLLOWING SAMPLE ROWS BELOW. REMOVE THE SAMPLE ROWS AFTERWARDS.>\n'
+        + '# PUT YOUR DATA BELOW FOLLOWING SAMPLE ROWS. REMOVE THIS LINE AND THE SAMPLE ROWS AFTERWARDS.\n'
         + '# ./,' + sampleRow("_0").join(',') + '\n'
         + '# ./file1,' + sampleRow("_1").join(',') + '\n'
         + '# ./file2,' + sampleRow("_2").join(',') + '\n';
@@ -179,7 +179,7 @@ const MetadataCard = (props) => {
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
                 title={title}
-                subheader={metadataUploadPath && 'Drag \'n\' drop a metadata file here'}
+                subheader={metadataUploadPath && 'Drag \'n\' drop a metadata file here or click the edit button below to see all available fields.'}
                 avatar={avatar}
                 style={{wordBreak: 'break-word'}}
                 action={(
