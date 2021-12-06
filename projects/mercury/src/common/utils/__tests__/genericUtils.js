@@ -28,7 +28,7 @@ describe('array Utils', () => {
             expect(groupBy(
                 [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
                 "type"
-            )).toEqual({"a": [{name: "x", type: "a"}, {name: "y", type: "a"}], "b": [{name: "z", type: "b"}]});
+            )).toEqual({a: [{name: "x", type: "a"}, {name: "y", type: "a"}], b: [{name: "z", type: "b"}]});
         });
     });
 });
@@ -38,6 +38,8 @@ describe('comparison Utils', () => {
         it('can compare by attribute', () => {
             expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a'))).toEqual([{a: 1}, {a: 2}, {a: 3}]);
             expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 3}, {a: 2}, {a: 1}]);
+            expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', true))).toEqual([{}, {a: 1}, {a: 2}]);
+            expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 2}, {a: 1}, {}]);
         });
 
         it('can compare by function', () => {
@@ -135,7 +137,7 @@ describe('formatDateTime', () => {
     it('should show date when it is not today', () => {
         const dateValue = '2008-09-15T15:53:00';
         const formatted = formatDateTime(dateValue);
-        expect(formatted).toEqual('15 Sep 2008');
+        expect(formatted).toEqual('15 Sept 2008');
     });
 
     it('should show time when it is today', () => {
@@ -161,6 +163,12 @@ describe('stableSort', () => {
         const a = ["c", "a", "b"];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
+    });
+
+    it('respects sorting direction with empty values', () => {
+        const a = ["c", "a", "", "b"];
+        expect(stableSort(a, comparePrimitives, true)).toEqual(['', 'a', 'b', 'c']);
+        expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a', '']);
     });
 });
 

@@ -1,5 +1,8 @@
 = Fairspace
+The Hyve
+VERSION, {docdate}
 :description: Fairspace documentation.
+:author: The Hyve
 :doctype: book
 :showtitle!:
 :url-repo: https://github.com/thehyve/fairspace
@@ -121,6 +124,12 @@ delete the collection,
 or transfer ownership of the collection to another workspace.
 
 image:docs/images/screenshots/Collection browser.png[Collection browser]
+
+Due to the data loss prevention, data in Fairspace is not removed from the system on deletion.
+Deleted collections and files can still be viewed in the application using "Show deleted" switch.
+The goal is to prevent deleted data from being overwritten by users (not to create collections or files with the paths
+that already existed in the system) and to allow administrators to perform special actions (to be performed only in exceptional special cases),
+like undeletion or permanent removal, to revert accidental removal or creation of a collection or a file.
 
 ===== Metadata forms
 
@@ -299,12 +308,12 @@ Requires the https://stedolan.github.io/jq/[jq] JSON parser.
 ----
 fetch_access_token() {
   curl -s \
-    -d "client_id=${KEYCLOAK_CLIENT_ID}" \
-    -d "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
-    -d "username=${KEYCLOAK_USERNAME}" \
-    -d "password=${KEYCLOAK_PASSWORD}" \
+    --data-urlencode "client_id=${KEYCLOAK_CLIENT_ID}" \
+    --data-urlencode "client_secret=${KEYCLOAK_CLIENT_SECRET}" \
+    --data-urlencode "username=${KEYCLOAK_USERNAME}" \
+    --data-urlencode "password=${KEYCLOAK_PASSWORD}" \
     -d 'grant_type=password' \
-    "${KEYCLOAK_SERVER_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
+    "${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
 }
 ACCESS_TOKEN=$(fetch_access_token)
 ----
@@ -417,6 +426,9 @@ Fairspace exposes a WebDAV API for accessing the file systems, while restricting
 The WebDAV API allows to upload and download files and to perform standard file operations such as copying or moving,
 as well as custom operations, such as collection lifecycle management
 and advanced data loss prevention features such as versioning and undeletion.
+
+Be aware that the _move_ operation moves both file content and all its metadata (e.g. linked metadata entities),
+whereas _copy_ includes only the file content and standard webdav properties, like file size.
 
 ===== Directory listing and path properties
 
@@ -690,7 +702,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F 'action=upload_files' -F '
 |===
 2+| ``COPY /api/webdav/{path}``
 
-2+| Copy a directory or file.
+2+| Copy a directory or file. Metadata linked to the file/directory is not copied.
 2+| _Request headers_:
 | ``Destination``
 | The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
@@ -711,7 +723,7 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X COPY -H "Destination: ${target}" "
 |===
 2+| ``MOVE /api/webdav/{path}``
 
-2+| Move or rename a directory or file
+2+| Move or rename a directory or file. Metadata linked to the file/directory is also moved along with it.
 2+| _Request headers_:
 | ``Destination``
 | The destination path relative to the server, URL encoded, e.g., ``/api/webdav/collection%20abc/test.txt``.
@@ -1493,11 +1505,11 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/users/'
 3+| _Parameters:_
 | ``id``
 | string
-| Id of the user for which roles will be updated.
+| UUID of the user for which roles will be updated.
 | "role name"
 | boolean
-| Role name is any of ``isAdmin``, ``canViewPublicData``, ``canViewPublicMetadata`` or ``canAddSharedMetadata``.
-The value determines whether the user has the role or not.
+| Role name is any of ``isAdmin``, ``canViewPublicData``, ``canViewPublicMetadata``, ``canAddSharedMetadata``
+or ``canQueryMetadata``. The value determines whether the user has the role or not.
 |===
 
 .Example updating user roles (curl)
@@ -1505,9 +1517,9 @@ The value determines whether the user has the role or not.
 ====
 [source, bash]
 ----
-curl -X PATCH -H "Accept: application/json" -d \
+curl -X PATCH -H "Accept: application/json" -H "Content-Type: application/json" -d \
 '{
-  "id": "xyz-0000",
+  "id": "123e4567-e89b-12d3-a456-426614174000",
   "canViewPublicData": false,
   "canViewPublicMetadata": true
 }' \
@@ -1864,7 +1876,7 @@ In Fairspace, collections follow a workflow with the following statuses:
 * _Active_: for the phase of data collection, data production and data processing;
 * _Read-only_: for when the data set is complete and is available for reuse;
 * _Archived_: for when the data set should not be available for reading, but still needs to be preserved;
-* _Deleted_: for when the data set needs to be permanently made unavailable.
+* _Deleted_: for when the data set needs to be permanently made unavailable (non-readable and non-searchable).
 This status is irreversible. There is one exception to this rule – for the sake of data loss prevention, in special cases, administrators can still undelete a collection that was already deleted.
 
 In these different statuses, different actions on the data are enabled or disabled. Also, visibility of the data and linked metadata depends partly on the collection status.
@@ -2192,6 +2204,66 @@ E.g., instead of defining entity types _DNASeqAssay_ and _RNASeqAssay_
 as sub types of _Assay_, a property type _assayType_ can be defined on _Assay_,
 using a controlled vocabulary type _AssayType_ with the assay types as values.
 
+Although there are many RDF-compatible XSD datatypes, it is recommended to reuse the types
+that are already used in the default vocabularies.ttl file as a value of ``sh:datatype`` property.
+Other types may not be handled properly in the user interface and may cause some unexpected issues.
+Same recommendation is for SHACL constraints that can be added for an entity or its properties - reuse the constraints described
+in the custom data model creation guidelines.
+
+==== Changing existing data model
+
+Flexible, configurable data model is one of the key features of Fairspace.
+Data model evolution is possible, but needs to be applied carefully as well:
+make sure that new versions of data models are consistent with previous versions,
+in order to prevent inconsistencies for existing data.
+
+WARNING: _Editing a data model is specialized work for data modellers/information architects. Use with care.
+The system is flexible, but the system cannot compensate for poor data modelling choices.
+Bad modelling will make it hard for users to enter data and to interact with the data._
+
+It is recommended to only add properties to existing entities or add new entities.
+Changing existing entities will cause inconsistencies.
+
+List of data model changes that can be considered safe:
+
+* Adding new entity,
+* Adding new property to an existing entity,
+* Removing constraints on properties,
+* Changing description of an existing entity or property.
+
+Dangerous actions (not recommended):
+
+* Changing or removing existing entities,
+* Adding or changing constraints,
+* Removing or changing existing properties (property type, name),
+* Changing relations between entities.
+
+.In order to change the model:
+
+. Update the vocabularies.ttl file, defining the custom model. Follow the guides specified in <<Data model configuration>> section).
+. Update views configuration file (see views <<View configuration>> section),
+if applicable - only if there is a change that needs to be reflected in metadata search views.
+. Apply the changes
++
+For the deployment with Helm, run an upgrade command with _saturn.vocabulary_ and _saturn.views_ parameters
+pointing to a new vocabularies and views definitions (see <<Installation and configuration>>),
+use `--set-file` option:
++
+[source, bash]
+----
+~bin/helm/helm upgrade … --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
+----
++
+This should also restart the Saturn pod. If not, trigger the restart manually.
++
+For local development - replace vocabulary file in link:projects/saturn/vocabulary.ttl[projects/saturn/vocabulary.ttl]
+and views configuration in link:projects/saturn/views.ttl[projects/saturn/views.ttl].
+Restart Saturn run.
++
+. Load data for new entities or properties.
+. Reindex Postgres database using `/api/maintenance/reindex` API endpoint (see <<Maintenance>> API) to apply the changes for metadata search.
+
+
 ==== Controlled vocabularies
 
 For controlled vocabulary types, e.g., _Gender_ and _Species_ in the example, you should insert the allowed values in the database by uploading
@@ -2311,6 +2383,11 @@ Now everything should be ready to start using Fairspace:
 
 === Kubernetes and helm
 
+Requires:
+
+* Helm >= 3.5.x
+* kubectl >= 1.17.x
+
 You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Helm].
 Helm charts for Fairspace are published to the public helm repository at
 https://storage.googleapis.com/fairspace-helm.
@@ -2318,9 +2395,9 @@ https://storage.googleapis.com/fairspace-helm.
 We provide a number of charts for various components that can be used in combination, or separately:
 
 - _Fairspace Keycloak_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>.
-(Chart source: https://github.com/thehyve/fairspace-keycloak.)
+(Chart source: https://github.com/thehyve/fairspace-keycloak[].)
 - _Fairspace_: Installs the Fairspace application, including the _saturn_ backend, _pluto_ proxy, _mercury_ frontend and a PostgreSQL database, and configures an ingress node for Fairspace.
-- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/thehyve/jupyter.)
+- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/thehyve/fairspace-jupyter[].)
 
 ==== Instructions for deploying to Google Cloud
 
@@ -2334,7 +2411,7 @@ We provide a number of charts for various components that can be used in combina
 ~/bin/helm/helm version
 ----
 
-* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl].
+* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.6.x install version > 1.18.x).
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
@@ -2396,45 +2473,40 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 ----
 # Update repo
 ~/bin/helm/helm repo update
-# List available hyperspace chart versions
-~/bin/helm/helm search repo --versions fairspace/hyperspace
-# Fetch the hyperspace chart
-~/bin/helm/helm pull fairspace/hyperspace --version 0.6.4
+# List available fairspace-keycloak chart versions
+~/bin/helm/helm search repo --versions fairspace/fairspace-keycloak
+# Fetch the fairspace-keycloak chart
+~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.6.4
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.21
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.22
 ----
 
-===== Deploy Hyperspace
+===== Deploy Keycloak
 Create a new Kubernetes namespace:
 [source, shell]
 ----
-kubectl create namespace hyperspace-new
+kubectl create namespace keycloak-new
 ----
 Create a new deployment (called _release_ in helm terminology) and
-install the Hyperspace chart:
+install the Fairspace Keycloak chart:
 [source, shell]
 ----
-~/bin/helm/helm install hyperspace-new fairspace/hyperspace --version 0.6.4 --namespace hyperspace-new \
--f /path/to/hyperspace-values.yaml
+~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.6.4 --namespace keycloak-new \
+-f /path/to/fairspace-keycloak-values.yaml
 ----
 You can pass values files with ``-f``.
 
-Example ``hyperspace-values.yaml`` file:
+Example ``fairspace-keycloak-values.yaml`` file:
 [source, yaml]
 ----
-hyperspace:
-  name: hyperspace-new
-  ingress:
-    domain: keycloak.example.com
-    tls:
-      certificate:
-        force: true
-
-keycloak:
+fairspaceKeycloak:
+  name: keycloak-new
   postgresql:
     postgresPassword: # choose a strong database password
+
+keycloak:
   extraEnv: |
     - name: KEYCLOAK_USER
       value: keycloak
@@ -2442,6 +2514,12 @@ keycloak:
       value: # choose a strong Keycloak admin password
     - name: PROXY_ADDRESS_FORWARDING
       value: "true"
+
+ingress:
+  domain: keycloak.example.com
+  tls:
+    certificate:
+      force: true
 ----
 
 ===== Configure a Keycloak realm for Fairspace
@@ -2488,7 +2566,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.21 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.22 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2566,6 +2644,13 @@ pluto:
       storage-external-search:
         path: /api/storages/external/search/files/**
         url: ${pluto.storages.external.search-url}
+
+# Settings for a volume with PostgreSQL database used by Fairspace to store data for the metadata views.
+postgres:
+  persistance:
+    storage:
+      size: 60Gi
+      storageClass: expandable
 ----
 
 ===== Deploy Jupyter Hub
@@ -2578,7 +2663,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Jupyter Hub chart:
 [source, shell]
 ----
-~/bin/helm/helm install jupyterhub-new fairspace/jupyter --version 0.8.5 --namespace jupyterhub-new \
+~/bin/helm/helm install jupyterhub-new fairspace/jupyter --version 0.8.8 --namespace jupyterhub-new \
 -f /path/to/values.yaml
 ----
 You can pass values files with ``-f``.
@@ -2591,28 +2676,25 @@ ingress:
 
 # Specific settings for JupyterHub subchart
 jupyterhub:
-  auth:
-    state:
-      cryptoKey: # Generate strong secret
-    custom:
-      config:
+  hub:
+    extraEnv:
+      JUPYTERHUB_CRYPT_KEY: xxx # A random string, you can use 'openssl rand -hex 32'
+    config:
+      FairspaceOAuthenticator:
         client_id: fairspace-example-private
-        client_secret: # Configure Keycloak client secret
+        client_secret: # Copy the client secret from Keycloak
         authorize_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/auth
         token_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/token
         userdata_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/userinfo
         logout_redirect_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
-  hub:
     image:
       pullPolicy: Always
-    extraEnv:
-      JUPYTERHUB_CRYPT_KEY: # Same as jupyterhub.auth.state.cryptoKey
   singleuser:
     image:
       pullPolicy: Always
     extraEnv:
       TARGET_URL: https://fairspace.example.com
-      # EXTERNAL_TARGETS: external
+      # EXTERNAL_TARGETS: external   # Comma-separated list of names of external storages configured in Fairspace
   proxy:
     secretToken: # Generate strong secret
 ----
@@ -2621,10 +2703,22 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.21.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.22.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
+
+Upgrading to a new version of the application may fail with a message, saying:
+----
+Forbidden: updates to statefulset spec for fields other than 'replicas', 'template', and 'updateStrategy' are forbidden
+----
+To prevent that, you can remove the existing ``StatefulSet`` before the upgrade:
+[source,shell]
+----
+kubectl delete statefulset fairspace-new --namespace fairspace-new --cascade=orphan
+----
+This will remove the ``StatefulSet``, but keep all pods and volumes intact.
+After running ``helm upgrade --install`` the ``StatefulSet`` will be recreated and the running pod will be replaced with a pod running the new application version.
 
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm uninstall`` or ``kubectl delete``.
@@ -2799,7 +2893,12 @@ Fetching user information is not included in the audit log.
 ==== Data recovery using transaction log
 
 In case of corruption the RDF database can be restored at any point of time using the transaction log.
-In order to restore the RDF database, follow the steps below.
+
+
+Data recovery starts automatically on the Saturn application start, if the RDF database is empty
+and the transaction log containing entries is detected.
+
+If Fairspace is deployed using Kubernetes, follow the steps below in order to restore the RDF database.
 
 Stop (scale down) the application:
 [source, shell]
@@ -2807,13 +2906,28 @@ Stop (scale down) the application:
 kubectl scale --replicas=0 --namespace fairspace-new statefulset/fairspace-new
 ----
 
-Delete a persistent volume claim consisting transient data:
+Delete a persistent volume consisting transient data.
+If the reclaim policy of the pv is set to `Delete` or `Recycle`, delete the bound
+persistent volume claim and the volume will be removed as well:
 [source, shell]
 ----
 kubectl --namespace fairspace-new delete pvc database-fairspace-new-0
 ----
 
-Start (scale up) the application. The deleted pvc will be recreated and data recovery will start automatically:
+If the reclaim policy is set to `Retain`, you need to delete the pv manually.
+Find a name of pv bound to the deleted pvc (claim equals to `database-fairspace-new-0`):
+----
+kubectl --namespace fairspace-new get pv
+----
+
+and delete the pv:
+----
+kubectl delete pv <pv_name>
+----
+
+See link:https://kubernetes.io/docs/concepts/storage/persistent-volumes/#reclaiming[the reclaim policy documentation of Kubernetes] for more information.
+
+Start (scale up) the application. The deleted pvc and pv will be recreated and data recovery will start automatically:
 [source, shell]
 ----
 kubectl scale --replicas=1 --namespace fairspace-new statefulset/fairspace-new
@@ -2842,18 +2956,98 @@ The logs should contain the following information:
 
 As soon as you see "Saturn has started" the RDF database should be restored to the state preceding the crash.
 
-== Design
+== Architecture
 
-=== Storage
+image:docs/images/diagrams/Architecture.png[Architecture]
 
-RDF database using {Jena}[Apache Jena] for:
+There are three core components of Fairspace: Mercury front-end, Pluto proxy and Saturn back-end.
+Together with storages and Keycloak as an identity and access management solution
+they create a complete Fairspace environment.
+
+There could be additional applications integrated within the Fairspace environment,
+like Jupyter Hub and external storage systems.
+
+
+=== Mercury
+
+Web application developed using link:https://reactjs.org/[React] and link:https://mui.com/[Material-UI] component library.
+Mercury's generic components for data and metadata allow changing the data model without a need to make changes
+in the front-end code.
+
+Mercury connects to Pluto using session based authentication.
+
+=== Pluto
+
+Lightweight API gateway with OpenID Connect authentication support, that functions
+as a proxy between the microservices and the frontend.
+Pluto keeps track of user sessions, handles the OIDC authentication flow (authorization code based),
+JWT tokens (validation, refreshing) and redirects to back-end applications.
+
+Pluto is a link:https://spring.io/projects/spring-boot[Java Spring Boot] application,
+using link:https://github.com/Netflix/zuul[Netflix Zuul] as an embedded reverse proxy
+and link:https://bitbucket.org/connect2id/nimbus-jose-jwt[Nimbus JOSE + JWT library] to connect to Keycloak,
+follow the authentication flow and to handle JWT tokens.
+
+=== Saturn
+
+The heart of Fairspace, back-end application handling all the logic and connection to the storages.
+Data repository and catalog.
+
+Saturn is served as link:https://jena.apache.org/documentation/fuseki2/[Apache Jena Fuseki SPARQL] server,
+embedded into link:https://www.eclipse.org/jetty/[Jetty] Web server.
+
+Saturn uses link:https://jena.apache.org/documentation/rdf/[Apache Jena RDF] for handling RDF graphs,
+serialisation of triples and TDB triple store connection.
+All data within Fairspace, except to uploaded files and logs, are stored in Apache Jena RDF database.
+
+For security, Saturn is integrated with Keycloak using link:https://www.keycloak.org/docs/latest/securing_apps/#_jetty9_adapter[Keycloak Jetty client adapter].
+It enables user authentication with access tokens.
+
+Saturn is also responsible for authorization of users in Fairspace - it includes user access validators
+and storage of user records and permissions in the RDF database.
+
+Saturn uses link:https://milton.io/[Milton IO], Java Webdav Server Library, to enable file storage management,
+directory listings and file properties handling, adding, moving, replacing and deleting files, directories and collections.
+
+=== Storages
+
+There are two types of storages that Saturn connects to: primary for storing RDF triples and file blobs,
+and secondary for efficient data retrieval.
+
+==== Primary data storage
+
+RDF database (link:https://jena.apache.org/documentation/tdb2[Apache Jena TDB2]) stores:
 
 * File metadata
+* Metadata entities
 * Permissions
 * User metadata
 
-File system data stored as blocks on the file system in append-only fashion.
+Data model schema is defined as a set of RDF classes and properties and {SHACL}[SHACL] constraints over them.
 
+The virtual file system stores directory structure and file information in the RDF database
+and the files themselves in a separate append-only storage as blobs.
+Both adding a new file and updating an existing file result in adding a new file on the underlying storage.
+Every file version is stored as a separate blob and is normally never deleted
+(a deleted file is simply detached from the directory structure but remains in the blob store).
+
+In combination with the fact that all operations on the RDF database are stored in the transaction log,
+that makes it possible to (incrementally) backup full state of workspaces and metadata at any point in time without stopping it.
+
+==== Secondary data storage for efficient data retrieval
+
+To improve the performance of metadata views, especially for counts and pagination, a simple relational database
+(PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
+which enables recreation of the database at any point of time.
+
+
+== Acknowledgement
+
+This project was realized thanks to and funded by:
+
+* The generosity of donors supporting the Curie Foundation.
+* Food Nutrition Security Cloud (FNS-Cloud). FNS-Cloud has received funding from the European Union’s Horizon 2020 Research and Innovation programme (H2020-EU.3.2.2.3. – A sustainable and competitive agri-food industry) under Grant Agreement No. 863059.
+* The Hyve BV, enabling open science (link:https://thehyve.nl[www.thehyve.nl]).
 
 
 == License

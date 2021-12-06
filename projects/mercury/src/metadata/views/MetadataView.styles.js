@@ -1,4 +1,4 @@
-import {fade} from "@material-ui/core/styles/colorManipulator";
+import {alpha} from "@material-ui/core/styles/colorManipulator";
 import * as consts from "../../constants";
 
 const CENTRAL_PANEL_WIDTH = '70%';
@@ -16,6 +16,13 @@ const styles = theme => ({
         minWidth: 280,
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto'
+    },
+    facetHeaders: {
+        textAlign: 'left',
+        marginTop: 6,
+        fontSize: 13,
+        color: theme.palette.primary.light,
+        marginLeft: 4,
     },
     centralPanel: {
         width: CENTRAL_PANEL_WIDTH,
@@ -50,7 +57,7 @@ const styles = theme => ({
     },
     confirmFiltersButtonBlockActive: {
         position: 'sticky',
-        backgroundColor: fade(theme.palette.common.white, 0.8)
+        backgroundColor: alpha(theme.palette.common.white, 0.8)
     },
     confirmFiltersButton: {
         width: '100%'

@@ -4,9 +4,7 @@ import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Prologue;
 import org.apache.jena.sparql.core.Quad;
-import org.apache.jena.sparql.modify.request.QuadDataAcc;
-import org.apache.jena.sparql.modify.request.UpdateDataDelete;
-import org.apache.jena.sparql.modify.request.UpdateDataInsert;
+import org.apache.jena.sparql.modify.request.*;
 import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.util.NodeToLabelMap;
 import org.apache.jena.update.Update;
@@ -56,7 +54,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
             private void save(Update update) throws IOException {
                 var buff = new IndentedLineBuffer() ;
                 var sc = new SerializationContext(PROLOGUE, new NodeToLabelMap("b", true));
-                update.output(buff, sc) ;
+                UpdateWriter.output(update, buff, sc);
                 writer.append(buff.toString().replace('\n', ' ')).append(";\n");
             }
 

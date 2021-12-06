@@ -111,7 +111,7 @@ const UserRolesPage = () => {
     const toggleRole = (id, role, enable) => setUserRole(id, role, enable)
         .then(refresh)
         .catch(e => {
-            const message = e.hasOwnProperty('message') ? e.message : null;
+            const message = Object.prototype.hasOwnProperty.call(e, 'message') ? e.message : null;
             ErrorDialog.showError("Error assigning role", message);
         });
 
@@ -146,6 +146,7 @@ const UserRolesPage = () => {
                             {renderHeaderCellWithFilter(columns.username)}
                             {renderHeaderCellWithFilter(columns.email)}
                             {
+                                /* eslint-disable no-unused-vars */
                                 Object.entries(roleSelectionColumns).map(([key, column]) => (
                                     <TableCell key={column.valueExtractor}>
                                         <TableSortLabel
@@ -225,8 +226,8 @@ const UserRolesPage = () => {
                     count={users.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onChangePage={(e, p) => setPage(p)}
-                    onChangeRowsPerPage={e => setRowsPerPage(e.target.value)}
+                    onPageChange={(e, p) => setPage(p)}
+                    onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
                     style={{overflowX: "hidden"}}
                     ActionsComponent={TablePaginationActions}
                 />

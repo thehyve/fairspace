@@ -1,6 +1,5 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
-import {SHACL_PROPERTY, SUBCLASS_URI} from '../../constants';
 
 const TYPE_PROPERTY = {
     key: '@type',
@@ -112,13 +111,13 @@ export const typeShapeWithProperties = (vocabulary, typeUris) => {
     if (!shape) {
         return null;
     }
-    shape[SHACL_PROPERTY] = shape[SHACL_PROPERTY].map(propertyRef => {
+    shape[constants.SHACL_PROPERTY] = shape[constants.SHACL_PROPERTY].map(propertyRef => {
         const propertyId = propertyRef['@id'];
         return vocabulary.find(def => def['@id'] === propertyId);
     });
-    if (shape[SUBCLASS_URI]) {
-        const superclassShape = typeShapeWithProperties(vocabulary, shape[SUBCLASS_URI].map(ref => ref['@id']));
-        shape[SHACL_PROPERTY] = superclassShape[SHACL_PROPERTY].concat(shape[SHACL_PROPERTY]);
+    if (shape[constants.SUBCLASS_URI]) {
+        const superclassShape = typeShapeWithProperties(vocabulary, shape[constants.SUBCLASS_URI].map(ref => ref['@id']));
+        shape[constants.SHACL_PROPERTY] = superclassShape[constants.SHACL_PROPERTY].concat(shape[constants.SHACL_PROPERTY]);
     }
     return shape;
 };

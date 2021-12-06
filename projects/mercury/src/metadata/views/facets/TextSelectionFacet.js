@@ -44,6 +44,7 @@ const SelectMultiple = (props: SelectProperties) => {
         setState(defaultOptions);
     }, [activeFilterValues]);
 
+    /* eslint-disable no-unused-vars */
     useEffect(() => {
         if (accessFilterValue) {
             const selectedReadableOnly = Object.entries(state)
@@ -53,6 +54,7 @@ const SelectMultiple = (props: SelectProperties) => {
         }
     }, [accessFilterValue]);
 
+    /* eslint-disable no-unused-vars */
     const handleChange = (event) => {
         const newState = {...state, [event.target.name]: event.target.checked};
         const selected = Object.entries(newState)

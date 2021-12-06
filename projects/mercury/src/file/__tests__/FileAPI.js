@@ -1,5 +1,6 @@
 import {LocalFileAPI} from "../FileAPI";
 
+/* eslint-disable prefer-promise-reject-errors */
 describe('FileAPI', () => {
     describe('Retrieving', () => {
         it('retrieves files', async () => {

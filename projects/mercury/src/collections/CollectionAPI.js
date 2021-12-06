@@ -2,6 +2,7 @@
 // eslint-disable-next-line import/no-cycle
 import {mapFilePropertiesToCollection} from "./collectionUtils";
 import {handleHttpError} from '../common/utils/httpUtils';
+// eslint-disable-next-line import/no-cycle
 import {LocalFileAPI} from "../file/FileAPI";
 import MetadataAPI from "../metadata/common/MetadataAPI";
 import {COMMENT_URI} from "../constants";

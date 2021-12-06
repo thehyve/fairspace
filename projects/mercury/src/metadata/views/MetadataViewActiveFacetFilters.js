@@ -71,7 +71,7 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
             container
             item
             direction="row"
-            justify="flex-start"
+            justifyContent="flex-start"
             alignItems="stretch"
             spacing={1}
         >

@@ -119,6 +119,7 @@ export const shouldPropertyBeHidden = (key, domain) => {
         case consts.CAN_ADD_SHARED_METADATA_URI:
         case consts.CAN_VIEW_PUBLIC_METADATA_URI:
         case consts.CAN_VIEW_PUBLIC_DATA_URI:
+        case consts.CAN_QUERY_METADATA_URI:
         case consts.IS_ADMIN:
         case consts.IS_SUPERADMIN:
         case consts.IS_MEMBER_OF_URI:

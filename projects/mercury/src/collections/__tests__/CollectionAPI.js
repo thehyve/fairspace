@@ -9,12 +9,14 @@ afterEach(() => {
 
 describe('CollectionAPI', () => {
     describe('Retrieving', () => {
-        LocalFileAPI.list = jest.fn(() => Promise.resolve(
-            [{basename: 'collection1'}, {basename: 'collection2'}, {basename: 'collection3'}]
-        ));
-        LocalFileAPI.stat = jest.fn(() => Promise.resolve(
-            {iri: 'c_iri'}
-        ));
+        beforeEach(() => {
+            LocalFileAPI.list = jest.fn(() => Promise.resolve(
+                [{basename: 'collection1'}, {basename: 'collection2'}, {basename: 'collection3'}]
+            ));
+            LocalFileAPI.stat = jest.fn(() => Promise.resolve(
+                {iri: 'c_iri'}
+            ));
+        });
 
         it('retrieves data for collections', async () => {
             await CollectionAPI.getCollections();
@@ -33,9 +35,11 @@ describe('CollectionAPI', () => {
     });
 
     describe('Adding', () => {
-        LocalFileAPI.createDirectory = jest.fn(() => Promise.resolve());
-        LocalFileAPI.stat = jest.fn(() => Promise.resolve({iri: 'c_iri'}));
-        MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
+        beforeEach(() => {
+            LocalFileAPI.createDirectory = jest.fn(() => Promise.resolve());
+            LocalFileAPI.stat = jest.fn(() => Promise.resolve({iri: 'c_iri'}));
+            MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
+        });
 
         it('makes the proper calls to add a collection', async () => {
             await CollectionAPI.addCollection({
@@ -60,7 +64,9 @@ describe('CollectionAPI', () => {
     });
 
     describe('Updating', () => {
-        MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
+        beforeEach(() => {
+            MetadataAPI.updateEntity = jest.fn(() => Promise.resolve());
+        });
 
         it('makes a proper call to update a collection', async () => {
             await CollectionAPI.updateCollection({
@@ -81,7 +87,9 @@ describe('CollectionAPI', () => {
     });
 
     describe('Undeleting', () => {
-        LocalFileAPI.undelete = jest.fn(() => Promise.resolve());
+        beforeEach(() => {
+            LocalFileAPI.undelete = jest.fn(() => Promise.resolve());
+        });
 
         it('makes a proper call to undelete a collection', async () => {
             await CollectionAPI.undeleteCollection({
@@ -96,7 +104,9 @@ describe('CollectionAPI', () => {
     });
 
     describe('Deleting', () => {
-        LocalFileAPI.delete = jest.fn(() => Promise.resolve());
+        beforeEach(() => {
+            LocalFileAPI.delete = jest.fn(() => Promise.resolve());
+        });
 
         it('makes a proper call to delete a collection', async () => {
             await CollectionAPI.deleteCollection({

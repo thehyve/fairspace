@@ -19,6 +19,7 @@ import java.util.Set;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
+import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.util.stream.Collectors.joining;
 
 class CollectionResource extends DirectoryResource {
@@ -39,7 +40,7 @@ class CollectionResource extends DirectoryResource {
     @Override
     public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
         if (!canManage()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to copy the resource.", this, SC_FORBIDDEN);
         }
         if (!(rDest instanceof RootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
@@ -80,7 +81,7 @@ class CollectionResource extends DirectoryResource {
 
     public void setOwnedBy(Resource owner) throws NotAuthorizedException, BadRequestException {
         if (!canManage()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to set the resource owner.", this, SC_FORBIDDEN);
         }
         if (!owner.hasProperty(RDF.type, FS.Workspace)) {
             throw new BadRequestException(this, "Invalid owner");
@@ -284,7 +285,7 @@ class CollectionResource extends DirectoryResource {
 
     private void setStatus(Status status) throws NotAuthorizedException, ConflictException {
         if (!canManage()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to change the status of this resource.", this, SC_FORBIDDEN);
         }
         if (!availableStatuses().contains(status)) {
             throw new ConflictException(this);
@@ -299,7 +300,7 @@ class CollectionResource extends DirectoryResource {
 
     private void setAccessMode(AccessMode mode) throws NotAuthorizedException, ConflictException {
         if (!canManage()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to change the access mode of this resource.", this, SC_FORBIDDEN);
         }
         if (!availableAccessModes().contains(mode)) {
             throw new ConflictException(this);
@@ -309,7 +310,7 @@ class CollectionResource extends DirectoryResource {
 
     private void setPermission(Resource principal, Access grantedAccess) throws BadRequestException, NotAuthorizedException {
         if (!canManage()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to change permissions on this resource.", this, SC_FORBIDDEN);
         }
         if (principal.hasProperty(RDF.type, FS.User)) {
             if (grantedAccess == Access.Write || grantedAccess == Access.Manage) {
@@ -351,7 +352,7 @@ class CollectionResource extends DirectoryResource {
 
     private void unpublish() throws NotAuthorizedException, ConflictException {
         if (!factory.userService.currentUser().isAdmin()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to unpublish this resource.", this, SC_FORBIDDEN);
         }
         if (getAccessMode() != AccessMode.DataPublished) {
             throw new ConflictException(this, "Cannot unpublish collection that is not published.");

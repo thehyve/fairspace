@@ -17,7 +17,7 @@ const MarkdownValue = (props) => {
                     onBlur={() => setShowEdit(false)}
                     type="text"
                 />
-            ) : (<ReactMarkdown source={props.entry.value} />)}
+            ) : (<ReactMarkdown>{props.entry.value}</ReactMarkdown>)}
         </div>
     );
 };

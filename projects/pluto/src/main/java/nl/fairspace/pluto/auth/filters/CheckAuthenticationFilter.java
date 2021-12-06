@@ -51,7 +51,7 @@ public abstract class CheckAuthenticationFilter implements Filter {
     protected OAuthAuthenticationToken getAuthentication(HttpServletRequest request) {
         Object attribute = request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
 
-        if(attribute instanceof OAuthAuthenticationToken) {
+        if (attribute instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) attribute;
         } else {
             return null;

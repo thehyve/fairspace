@@ -181,7 +181,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 aria-label="Show more"
                 title="Access"
             >
-                <ExpandMore/>
+                <ExpandMore />
             </IconButton>
         </>
     );
@@ -192,7 +192,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 return (
                     <span>
                         Are you sure you want to change the view mode of
-                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br/>
+                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br />
                         Metadata and data files will only be findable and readable for users
                         that have been granted access to the collection explicitly.
                     </span>
@@ -200,15 +200,15 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             case 'MetadataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br/>
+                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br />
                         The metadata will be findable and readable for all users with access to public data.
                     </span>
                 );
             case 'DataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br/>
-                        The data will be findable and readable for all users with access to public data.<br/>
+                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br />
+                        The data will be findable and readable for all users with access to public data.<br />
                         <strong>
                             Warning: This action cannot be reverted.
                             Once published, the collection cannot be unpublished, moved or deleted.
@@ -225,7 +225,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             primary={camelCaseToWords(collection.accessMode)}
             secondary={descriptionForAccessMode(collection.accessMode)}
         />
-    )
+    );
     const showMultipleAccessModes = () => (
         <FormControl>
             <Select
@@ -233,7 +233,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 onChange={mode => handleSetAccessMode(mode)}
                 inputProps={{'aria-label': 'View mode'}}
             >
-                {/*show available access modes which user can select*/}
+                {/* show available access modes which user can select */}
                 {collection.availableAccessModes.map(mode => (
                     <MenuItem key={mode} value={mode}>
                         <ListItemText
@@ -242,7 +242,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                         />
                     </MenuItem>
                 ))}
-                {/*show not available modes as disabled menu item, so user knows it exists*/}
+                {/* show not available modes as disabled menu item, so user knows it exists */}
                 {accessModes.filter(mode => collection.availableAccessModes.indexOf(mode) < 0)
                     .map(unavailableMode => (
                         <MenuItem key={unavailableMode} value={unavailableMode} disabled>
@@ -251,8 +251,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                                 secondary={descriptionForAccessMode(unavailableMode)}
                             />
                         </MenuItem>
-                    ))
-                }
+                    ))}
             </Select>
         </FormControl>
     );
@@ -275,8 +274,8 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             <FormLabel>Public access</FormLabel>
             <Box className={classes.group}>
                 <FormGroup>
-                    {(collection.canManage && collection.availableAccessModes.length > 1) ?
-                        showMultipleAccessModes() : showSingleAccessMode()}
+                    {(collection.canManage && collection.availableAccessModes.length > 1)
+                        ? showMultipleAccessModes() : showSingleAccessMode()}
                 </FormGroup>
             </Box>
         </FormControl>

@@ -1,6 +1,8 @@
 import mockAxios, {AxiosError, AxiosResponse} from 'axios';
 import workspacesAPI, {Workspace} from '../WorkspacesAPI';
 
+jest.mock('axios');
+
 describe('WorkspacesAPI', () => {
     it('Fetches workspaces', async () => {
         const dummyWorkspaces = [{code: 'workspace1'}, {code: 'workspace2'}];
@@ -29,7 +31,7 @@ describe('WorkspacesAPI', () => {
         );
     });
 
-    it('Failure to create a workspace is handled correctly', async (done) => {
+    it('Failure to create a workspace is handled correctly', (done) => {
         const workspaceData: Workspace = {
             code: 'workspace1'
         };
@@ -39,13 +41,14 @@ describe('WorkspacesAPI', () => {
         };
         const errorResponse: AxiosError = {response: conflictResponse};
         mockAxios.put.mockImplementationOnce(() => Promise.reject(errorResponse));
-        try {
-            await workspacesAPI.createWorkspace(workspaceData);
-            done.fail('API call expected to fail');
-        } catch (error) {
-            expect(error.message).toEqual('Failure while creating a workspace');
-            done();
-        }
+        workspacesAPI.createWorkspace(workspaceData)
+            .then(() => {
+                done.fail('API call expected to fail');
+            })
+            .catch((error) => {
+                expect(error.message).toEqual('Failure while creating a workspace');
+                done();
+            });
     });
 
     it('Deletes a new workspace', async () => {

@@ -10,12 +10,13 @@ import LoadingInlay from "../../common/components/LoadingInlay";
 let collectionBrowser;
 
 const collectionsContextMock = {
-    addCollection: jest.fn(() => Promise.resolve()),
+    addCollection: jest.fn(),
     collections: [],
     setShowDeleted: () => {}
 };
 
 beforeEach(() => {
+    collectionsContextMock.addCollection.mockResolvedValue({});
     collectionBrowser = (
         <MemoryRouter>
             <CollectionsContext.Provider value={collectionsContextMock}>
@@ -50,7 +51,7 @@ describe('<CollectionBrowser />', () => {
         saveButton.simulate('click');
         jest.runAllTimers();
 
-        expect(collectionsContextMock.addCollection.mock.calls.length).toEqual(1);
+        expect(collectionsContextMock.addCollection).toBeCalledTimes(1);
     });
 
     it('should not show add button if adding disabled', async () => {

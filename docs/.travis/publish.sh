@@ -13,6 +13,7 @@ cp -r docs/build/* "${DOCS_DIR}/"
 pushd "${DOCS_DIR}"
 if [ ! "$(git status -s)" == "" ]; then
   echo "Committing changes to ${DOCUMENTATION_REPO} ..."
+  git add .
   git commit -a -m "Update from the documentation branch of ${TRAVIS_REPO_SLUG}."
   git push "https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/${DOCUMENTATION_REPO}" main
 else

@@ -30,6 +30,7 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.USER_VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.WebDAVServlet.includeMetadataLinks;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
+import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
 import static java.util.stream.Collectors.toList;
@@ -104,7 +105,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     protected void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
         if (purge) {
             if (!factory.userService.currentUser().isAdmin()) {
-                throw new NotAuthorizedException();
+                throw new NotAuthorizedException("Not authorized to purge the resource.", this, SC_FORBIDDEN);
             }
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
@@ -190,7 +191,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     public void copyTo(io.milton.resource.CollectionResource parent, String name)
             throws NotAuthorizedException, BadRequestException, ConflictException {
         if (!((DirectoryResource) parent).access.canWrite()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to copy this resource.", this, SC_FORBIDDEN);
         }
         if (name != null) {
             name = name.trim();
@@ -378,7 +379,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
 
     protected void undelete() throws BadRequestException, NotAuthorizedException, ConflictException {
         if (!canUndelete()) {
-            throw new NotAuthorizedException(this);
+            throw new NotAuthorizedException("Not authorized to undelete this resource.", this, SC_FORBIDDEN);
         }
         if (!subject.hasProperty(FS.dateDeleted)) {
             throw new ConflictException(this, "Cannot restore");

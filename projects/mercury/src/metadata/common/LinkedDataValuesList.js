@@ -21,11 +21,11 @@ const AddValueToList = (props: AddValueToListProps) => {
     const [newValue, setNewValue] = useState('');
     const isStringValue = (AddComponent === StringValue);
     return (
-        <Grid container spacing={1} alignItems='center' className={classes.addValue}>
+        <Grid container spacing={1} alignItems="center" className={classes.addValue}>
             <Grid item xs={isStringValue ? 10 : 12}>
                 <AddComponent
                     data-testid="add-value-input"
-                    variant='outlined'
+                    variant="outlined"
                     // label='New value'
                     key={serialNumber}
                     property={property}
@@ -86,11 +86,15 @@ type LinkedDataValuesListProps = {
 };
 
 export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
-    const {classes = {}, property, values = [], columnDefinition,
-        onOpen = () => {}, onAdd = null, onDelete = () => {},
+    const {
+        classes = {}, property, values = [], columnDefinition,
+        onOpen = () => {
+        }, onAdd = null, onDelete = () => {
+        },
         rowDecorator = (entry, children) => children,
         canEdit = true, showHeader = true,
-        labelId, addComponent: AddComponent} = props;
+        labelId, addComponent: AddComponent
+    } = props;
 
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -110,15 +114,17 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
     return (
         <>
             {showHeader ? (
-                    <Grid container spacing={1} alignItems='center'>
-                        <Grid item xs={property.isEditable ? 10 : 12}>
-                            {columnDefinition.label}
-                        </Grid>
+                <Grid container spacing={1} alignItems="center">
+                    <Grid item xs={property.isEditable ? 10 : 12}>
+                        {columnDefinition.label}
                     </Grid>
-                ) : undefined
-            }
+                </Grid>
+            ) : undefined}
             {values.map((entry, idx) => rowDecorator(entry, (
-                <Grid container spacing={1} alignItems='center'
+                <Grid
+                    container
+                    spacing={1}
+                    alignItems="center"
                     onMouseEnter={() => setHoveredIndex(idx)}
                     onFocus={() => setHoveredIndex(idx)}
                     onBlur={() => setHoveredIndex(null)}
@@ -133,7 +139,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                                 ? <Typography variant="h6">{columnDefinition.getValue(entry, idx)}</Typography>
                                 : columnDefinition.getValue(entry, idx)
                         }
-                        { showRowDividers && <Divider /> }
+                        {showRowDividers && <Divider />}
                     </Grid>
                     {
                         property.isEditable && isDeleteButtonEnabled(entry) && (
@@ -156,10 +162,10 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                 </Grid>
             )))}
 
-            { isAddButtonEnabled && (
+            {isAddButtonEnabled && (
                 (property.maxValuesCount === 1)
                     ? (
-                        <Grid container spacing={1} alignItems='center'>
+                        <Grid container spacing={1} alignItems="center">
                             <Grid item xs={10}>
                                 <AddComponent
                                     key={serialNumber}
@@ -177,23 +183,23 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                             </Grid>
                         </Grid>
                     )
-                : (
-                    <AddValueToList
-                        serialNumber={serialNumber}
-                        classes={classes}
-                        property={property}
-                        values={values}
-                        labelId={labelId}
-                        addComponent={AddComponent}
-                        onAdd={(val) => {
-                            if (val) {
-                                onAdd(val);
-                                incrementSerialNumber();
-                            }
-                        }}
-                    />
-                )
-            ) }
+                    : (
+                        <AddValueToList
+                            serialNumber={serialNumber}
+                            classes={classes}
+                            property={property}
+                            values={values}
+                            labelId={labelId}
+                            addComponent={AddComponent}
+                            onAdd={(val) => {
+                                if (val) {
+                                    onAdd(val);
+                                    incrementSerialNumber();
+                                }
+                            }}
+                        />
+                    )
+            )}
         </>
     );
 };

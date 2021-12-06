@@ -131,7 +131,7 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
                                 <TableCell style={{maxWidth: 500}}>
                                     <ListItemText
                                         primary={item.label}
-                                        secondary={<ShortText text={item.comment} maxLength={200} maxLines={3}/>}
+                                        secondary={<ShortText text={item.comment} maxLength={200} maxLines={3} />}
                                     />
                                 </TableCell>
                                 <TableCell>

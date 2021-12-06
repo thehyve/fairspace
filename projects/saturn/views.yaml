@@ -63,6 +63,7 @@ views:
         on: https://institut-curie.org/ontology#subject
         reverse: true
         include:
+          - id
           - nature
           - topography
           - origin
@@ -88,12 +89,12 @@ views:
         title: Tumor topography
         source: https://institut-curie.org/ontology#topography
         rdfType: https://institut-curie.org/ontology#Topography
-        type: term
+        type: termSet
       - name: morphology
         title: Morphology
         source: https://institut-curie.org/ontology#tumorMorphology
         rdfType: https://institut-curie.org/ontology#Morphology
-        type: term
+        type: termSet
       - name: laterality
         title: Laterality
         source: https://institut-curie.org/ontology#tumorLaterality
@@ -176,6 +177,7 @@ views:
         on: https://institut-curie.org/ontology#diagnosis
         reverse: true
         include:
+          - id
           - nature
           - origin
           - topography
@@ -205,7 +207,7 @@ views:
         title: Parent sample nature
         source: https://institut-curie.org/ontology#parentIsOfNature
         rdfType: https://institut-curie.org/ontology#SampleNature
-        type: term
+        type: termSet
         priority: 200
       - name: origin
         title: Sample origin
@@ -238,6 +240,7 @@ views:
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#diagnosis
         include:
+          - id
           - eventType
           - topography
           - morphology
@@ -325,13 +328,16 @@ views:
       - view: Subject
         on: https://institut-curie.org/ontology#aboutSubject
         include:
+          - id
           - gender
       - view: TumorPathologyEvent
         on: https://institut-curie.org/ontology#aboutEvent
         include:
+          - id
           - eventType
       - view: Sample
         on: https://institut-curie.org/ontology#sample
         include:
+          - id
           - nature
           - topography

@@ -30,7 +30,7 @@ import type {Match} from "../types";
 import {handleTextSearchRedirect} from "../search/searchUtils";
 
 type ContextualFilesPageProperties = {
-    match: Match,
+    match: Match;
     history: History;
     location: Location;
     classes: any;
@@ -118,7 +118,7 @@ export const FilesPage = (props: FilesPageProperties) => {
             <div className={classes.breadcrumbs}>
                 <BreadCrumbs additionalSegments={breadcrumbSegments} />
             </div>
-            <Grid container justify="space-between" spacing={1}>
+            <Grid container justifyContent="space-between" spacing={1}>
                 <Grid item className={classes.topBar}>
                     <Grid container>
                         <Grid item xs={6}>
@@ -128,7 +128,7 @@ export const FilesPage = (props: FilesPageProperties) => {
                             />
                         </Grid>
                         {showMetadataSearchButton && (
-                            <Grid item container xs={4} justify="flex-end">
+                            <Grid item container xs={4} justifyContent="flex-end">
                                 <Grid item>
                                     <Button
                                         variant="text"

@@ -2,14 +2,8 @@ package nl.fairspace.pluto.auth.config;
 
 import nl.fairspace.pluto.auth.AuthorizationFailedHandler;
 import nl.fairspace.pluto.auth.JwtTokenValidator;
-import nl.fairspace.pluto.auth.filters.AnonymousCheckAuthenticationFilter;
-import nl.fairspace.pluto.auth.filters.AuthenticatedCheckAuthenticationFilter;
-import nl.fairspace.pluto.auth.filters.AuthorizedCheckAuthenticationFilter;
-import nl.fairspace.pluto.auth.filters.HandleFailedAuthenticationFilter;
-import nl.fairspace.pluto.auth.filters.HeaderAuthenticationFilter;
+import nl.fairspace.pluto.auth.filters.*;
 import nl.fairspace.pluto.auth.OAuthFlow;
-import nl.fairspace.pluto.auth.filters.SessionAuthenticationFilter;
-import nl.fairspace.pluto.auth.filters.UsernamePasswordAuthenticationFilter;
 import nl.fairspace.pluto.config.dto.AppSecurityUrlConfig;
 import nl.fairspace.pluto.config.dto.OidcConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,9 +57,6 @@ public class AuthFilterConfiguration {
     public FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> authenticatedCheckAuthenticationFilter() {
         FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new AuthenticatedCheckAuthenticationFilter());
-
-        filterRegBean.addUrlPatterns(urlConfig.getNeedsAuthentication());
-
         filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 202);
         return filterRegBean;
     }

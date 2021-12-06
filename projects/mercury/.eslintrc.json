@@ -88,6 +88,10 @@
     "jest/no-test-callback": 0,
     "jest/no-try-expect": 0,
     "react/static-property-placement": 0,
-    "react/default-props-match-prop-types": 0
+    "react/default-props-match-prop-types": 0,
+    "no-cond-assign": 0,
+    "no-plusplus": 0,
+    "jsx-a11y/anchor-is-valid": 0,
+    "react/no-unused-prop-types": 0
   }
 }

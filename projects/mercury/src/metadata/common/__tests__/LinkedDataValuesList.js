@@ -30,8 +30,11 @@ describe('LinkedDataValuesList', () => {
     it('should render the title and values as specified', () => {
         const {queryByText} = render(
             <LinkedDataValuesList
-                columnDefinition={columnDefinition} property={defaultProperty} values={defaultValues}
-            />);
+                columnDefinition={columnDefinition}
+                property={defaultProperty}
+                values={defaultValues}
+            />
+        );
         expect(queryByText('Test column')).toBeInTheDocument();
         expect(queryByText('More info')).toBeInTheDocument();
         expect(queryByText('My first collection')).toBeInTheDocument();
@@ -42,8 +45,11 @@ describe('LinkedDataValuesList', () => {
         const {queryAllByText} = render(
             <LinkedDataValuesList
                 showHeader={false}
-                columnDefinition={columnDefinition} property={defaultProperty} values={defaultValues}
-            />);
+                columnDefinition={columnDefinition}
+                property={defaultProperty}
+                values={defaultValues}
+            />
+        );
         expect(queryAllByText('Test column').length).toBe(0);
     });
 
@@ -55,17 +61,24 @@ describe('LinkedDataValuesList', () => {
         const {queryAllByTestId} = render(
             <LinkedDataValuesList
                 currentUser={{admin: true}}
-                columnDefinition={columnDefinition} property={property} values={defaultValues}
-            />);
+                columnDefinition={columnDefinition}
+                property={property}
+                values={defaultValues}
+            />
+        );
         expect(queryAllByTestId('delete-btn').length).toBe(3);
     });
 
     it('should show an add input field when adding is allowed', () => {
         const {queryAllByTestId} = render(
             <LinkedDataValuesList
-                canAdd addComponent={StringValue}
-                columnDefinition={columnDefinition} property={defaultProperty} values={defaultValues}
-            />);
+                canAdd
+                addComponent={StringValue}
+                columnDefinition={columnDefinition}
+                property={defaultProperty}
+                values={defaultValues}
+            />
+        );
         expect(queryAllByTestId('add-value-input').length).toBe(1);
     });
 
@@ -73,9 +86,13 @@ describe('LinkedDataValuesList', () => {
         const property = {...defaultProperty, maxValuesCount: 3};
         const {queryAllByTestId} = render(
             <LinkedDataValuesList
-                canAdd addComponent={StringValue}
-                columnDefinition={columnDefinition} property={property} values={defaultValues}
-            />);
+                canAdd
+                addComponent={StringValue}
+                columnDefinition={columnDefinition}
+                property={property}
+                values={defaultValues}
+            />
+        );
         expect(queryAllByTestId('add-value-input').length).toBe(0);
     });
 });
