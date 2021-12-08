@@ -129,7 +129,9 @@ public class WebDAVPathRewritingFilter extends ZuulFilter {
             log.error("Error translating webdav response", e);
             throw new ZuulException(e, HttpStatus.BAD_GATEWAY.value(), "Error translating webdav response");
         }
-        ctx.setResponseBody(writer.toString());
+        var content = writer.toString();
+        ctx.setResponseBody(content);
+        ctx.setOriginContentLength(Long.valueOf(content.length()));
         ctx.setResponseDataStream(null);
         return null;
     }
