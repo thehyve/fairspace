@@ -91,8 +91,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
         if (filterCandidates.find(f => f.field === facet.name)) {
             let updatedFilters;
             const existingFilter = filters.find(f => f.field === facet.name);
-            if (!newValues || (newValues.filter(v => v !== null).length === 0) || (newValues && existingFilter && existingFilter.value
-                && _.isEqual(existingFilter.values.sort(), newValues.sort()))) {
+            if (!newValues || (existingFilter && _.isEqual(existingFilter.values.sort(), newValues.sort()) && (
+                (newValues.filter(v => v !== null).length === 0) || existingFilter.value))) {
                 updatedFilters = [...filterCandidates.filter(f => f.field !== facet.name)];
             } else {
                 updatedFilters = [...filterCandidates];
