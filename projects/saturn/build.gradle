@@ -74,7 +74,9 @@ dependencies {
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
+    testImplementation('com.github.stefanbirkner:system-rules:1.19.0') {
+        exclude group: 'junit', module:'junit-dep'
+    }
 
 //    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.8.0'
 
