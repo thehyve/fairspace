@@ -3040,6 +3040,18 @@ To improve the performance of metadata views, especially for counts and paginati
 (PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
 which enables recreation of the database at any point of time.
 
+=== Deployment architecture
+
+Below you can find a diagram presenting the architecture of Fairspace deployment on a Kubernetes cluster,
+using Fairspace Helm chart described in previous sections.
+
+image:docs/images/diagrams/Kubernetes architecture.png[Kubernetes architecture]
+
+If Keycloak and JupyterHub are deployed together with Fairspace, they should be placed in separate namespaces of
+the same Kubernetes cluster.
+
+For details on JupyterHub and Kubernetes see link:https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/architecture.html[The JupyterHub Architecture documentation].
+
 
 == Acknowledgement
 
