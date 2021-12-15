@@ -2480,7 +2480,7 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.23
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.24
 ----
 
 ===== Deploy Keycloak
@@ -2566,7 +2566,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.23 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.24 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2703,7 +2703,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.23.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.24.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
@@ -3039,6 +3039,18 @@ that makes it possible to (incrementally) backup full state of workspaces and me
 To improve the performance of metadata views, especially for counts and pagination, a simple relational database
 (PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
 which enables recreation of the database at any point of time.
+
+=== Deployment architecture
+
+Below you can find a diagram presenting the architecture of Fairspace deployment on a Kubernetes cluster,
+using Fairspace Helm chart described in previous sections.
+
+image:docs/images/diagrams/Kubernetes architecture.png[Kubernetes architecture]
+
+If Keycloak and JupyterHub are deployed together with Fairspace, they should be placed in separate namespaces of
+the same Kubernetes cluster.
+
+For details on JupyterHub and Kubernetes see link:https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/architecture.html[The JupyterHub Architecture documentation].
 
 
 == Acknowledgement
