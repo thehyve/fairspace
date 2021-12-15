@@ -57,7 +57,7 @@ dependencies {
     }
     implementation('org.bouncycastle:bcprov-jdk15on:1.65')
 
-    implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.15.0'
+    implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.16.0'
 
     implementation 'org.eclipse.jetty:jetty-proxy:9.4.42.v20210604'
 
@@ -68,9 +68,9 @@ dependencies {
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "com.zaxxer:HikariCP:3.4.5"
 
-    runtimeOnly 'org.apache.logging.log4j:log4j-api:2.15.0'
-    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.15.0'
-    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j18-impl:2.15.0'
+    runtimeOnly 'org.apache.logging.log4j:log4j-api:2.16.0'
+    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.16.0'
+    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j18-impl:2.16.0'
 
     testImplementation "junit:junit:4.12"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
