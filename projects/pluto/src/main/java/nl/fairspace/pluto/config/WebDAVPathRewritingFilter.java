@@ -19,6 +19,7 @@ import javax.xml.xpath.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.*;
 
 import static nl.fairspace.pluto.config.ExtendedHttpMethod.PROPFIND;
@@ -131,7 +132,7 @@ public class WebDAVPathRewritingFilter extends ZuulFilter {
         }
         var content = writer.toString();
         ctx.setResponseBody(content);
-        ctx.setOriginContentLength(Long.valueOf(content.length()));
+        ctx.setOriginContentLength(Long.valueOf(content.getBytes(StandardCharsets.UTF_8).length));
         ctx.setResponseDataStream(null);
         return null;
     }
