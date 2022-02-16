@@ -79,7 +79,7 @@ public class ViewUpdater implements AutoCloseable {
             case Number -> node.getLiteralValue();
             case Date -> {
                 try {
-                    if (node.getLiteralDatatype() == XSD.dateTime) {
+                    if (node.getLiteralDatatypeURI().equals(XSD.dateTime.getURI())) {
                         yield Instant.parse(node.getLiteralValue().toString());
                     } else {
                         yield LocalDate.parse(node.getLiteralValue().toString());
