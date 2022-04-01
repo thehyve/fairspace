@@ -2,7 +2,7 @@
 {{- if $ingress.enabled -}}
 {{- if $ingress.tls.enabled -}}
 {{- if $ingress.tls.certificate.obtain -}}
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-fairspace
@@ -15,7 +15,7 @@ spec:
   issuerRef:
 {{ toYaml . | indent 4 }}
 {{- end }}
-  commonName: '*.{{ $ingress.domain }}'
+  commonName: '{{ $ingress.domain }}'
   dnsNames:
   - '{{ $ingress.domain }}'
 {{- end -}}
