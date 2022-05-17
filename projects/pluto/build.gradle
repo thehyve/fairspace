@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.4.10'
+    id 'org.springframework.boot' version '2.6.7'
     id "io.freefair.lombok" version "6.1.0"
     id 'application'
     id 'jacoco'
@@ -37,8 +37,8 @@ repositories {
 }
 
 ext {
-    springCloudVersion = '2020.0.3'
-    jacksonVersion = '2.12.5'
+    springCloudVersion = '2021.0.2'
+    jacksonVersion = '2.13.3'
 }
 
 jacoco.toolVersion = "0.8.7"
@@ -47,7 +47,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
     implementation('javax.validation:validation-api:2.0.1.Final')
     implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.9.RELEASE')
+    implementation('org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.10.RELEASE')
     implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.session:spring-session-core')
     implementation('org.springframework.cloud:spring-cloud-starter-sleuth')
