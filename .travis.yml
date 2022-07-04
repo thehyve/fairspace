@@ -3,12 +3,12 @@ dist: xenial
 language: java
 
 jdk:
-- openjdk15
+- openjdk17
 
 env:
   global:
      - NODE_VERSION="14.17.6"
-     - PATH=/usr/lib/jvm/java-15-openjdk-amd64/bin/:$PATH
+     - PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin/:$PATH
      - APPNAME="fairspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
