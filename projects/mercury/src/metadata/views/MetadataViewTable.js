@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
+import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import {Link as RouterLink} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
@@ -53,6 +53,17 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const isResourcesView = view === RESOURCES_VIEW;
+    const {checkboxes, setCheckboxState} = props;
+
+    // initialize checkboxes
+    if (idColumn && data && data.rows) {
+        data.rows.forEach(row => {
+            const key = row[idColumn.name][0].value;
+            if (checkboxes[key] === undefined) {
+                setCheckboxState(key, false);
+            }
+        });
+    }
 
     const isCustomResourceColumn = (column: MetadataViewColumn) => (
         isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
@@ -72,6 +83,12 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             toggleRow();
         } else {
             toggleRow({label, iri, linkedFiles: linkedFiles || []});
+        }
+    };
+
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target) {
+            setCheckboxState(event.target.id, event.target.checked);
         }
     };
 
@@ -141,6 +158,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         <Table data-testid="results-table" size="small" stickyHeader={!loading}>
             <TableHead>
                 <TableRow>
+                    <TableCell />
                     {visibleColumns.map(column => (
                         <TableCell key={column.name} className={classes.headerCellContents}>
                             {column.title}
@@ -163,6 +181,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                         )}
                         onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
                     >
+                        <Checkbox id={row[idColumn.name][0].value} onChange={handleCheckboxChange} checked={checkboxes[row[idColumn.name][0].value]} />
                         {visibleColumns.map(column => renderTableCell(row, column))}
                     </TableRow>
                 ))}
