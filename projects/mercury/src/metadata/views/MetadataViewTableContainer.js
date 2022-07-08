@@ -101,7 +101,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const history = useHistory();
 
     const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
-    const [checkboxes, setCheckboxes] = React.useState({test: false});
+    const [checkboxes, setCheckboxes] = React.useState({});
 
     useEffect(() => {setPage(0);}, [filters]);
 
