@@ -17,11 +17,11 @@ class DateTimeValue extends React.Component {
 
     handleChange = (date) => {
         this.props.onChange({value: date});
-    }
+    };
 
     updateState = () => {
         this.setState({value: this.props.entry.value});
-    }
+    };
 
     render() {
         const {entry, property, currentValues, ...otherProps} = this.props;
