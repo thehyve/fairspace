@@ -2332,7 +2332,7 @@ Requires:
 
 * yarn
 * docker
-* Java 15
+* Java 17
 
 To run the development version, checkout this repository,
 navigate to ``projects/mercury`` and run

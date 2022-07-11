@@ -18,7 +18,7 @@ Prerequisites:
 - [nodejs and npm](https://www.npmjs.com/get-npm)
 - [yarn](https://yarnpkg.com/lang/en/)
 - docker
-- Java 15
+- Java 17
 
 The Mercury frontend app needs a backend to communicate with. For convenience, there are a few scripts to use for local development:
 
@@ -35,7 +35,7 @@ yarn dev
 This will start:
 - Keycloak (http://localhost:5100)
 - PostgreSQL (port `9432`)
-- Saturn (JDK 15 required, port `8090`)
+- Saturn (JDK 17 required, port `8090`)
 - Pluto (proxy, including Mercury frontend, http://localhost:8080)
 - Mercury frontend in development mode (http://localhost:3000)
 - a [backend proxy](src/setupProxy.js) for Mercury
