@@ -416,7 +416,7 @@ class FileAPI {
             properties[key] = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
         });
         return properties;
-    }
+    };
 }
 
 export const LocalFileAPI = new FileAPI();

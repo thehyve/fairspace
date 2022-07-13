@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        jena_version = '4.1.0'
+        jena_version = '4.3.2'
         milton_version = '3.0.1.269'
         mockitoVersion = '3.12.0'
         jacksonVersion = '2.11.3' // check what version is used by Jena
@@ -72,7 +72,7 @@ dependencies {
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.16.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-slf4j18-impl:2.16.0'
 
-    testImplementation "junit:junit:4.12"
+    testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation('com.github.stefanbirkner:system-rules:1.19.0') {
         exclude group: 'junit', module:'junit-dep'
