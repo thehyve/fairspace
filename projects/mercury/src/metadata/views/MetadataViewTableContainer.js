@@ -59,7 +59,7 @@ const styles = () => ({
         display: 'flex'
     },
     exportButton: {
-        width: 100,
+        width: 150,
         margin: 6,
         fontSize: 12
     },
@@ -103,7 +103,20 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
     const [checkboxes, setCheckboxes] = React.useState({});
 
-    useEffect(() => {setPage(0);}, [filters]);
+    const resetCheckboxes = () => {
+        // eslint-disable-next-line
+        setCheckboxes(oldState => ({}));
+    };
+
+    const setCheckboxState = (id: string, checked: boolean) => {
+        if (checkboxes) {
+            setCheckboxes(oldState => {
+                const newState = {...oldState};
+                newState[id] = checked;
+                return newState;
+            });
+        }
+    };
 
     const handleChangePage = (e, p) => {
         setPage(p);
@@ -130,14 +143,6 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const handleColumnSelectorClose = () => {
         setAnchorEl(null);
-    };
-
-    const setCheckboxState = (id: string, checked: boolean) => {
-        setCheckboxes(oldState => {
-            const newState = {...oldState};
-            newState[id] = checked;
-            return newState;
-        });
     };
 
     const exportTable = () => {
@@ -259,6 +264,16 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         );
     };
 
+    useEffect(() => {
+        setPage(0);
+    }, [filters]);
+
+    useEffect(() => {
+        resetCheckboxes();
+    }, [data]);
+
+    const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
+
     return (
         <Paper>
             {renderTableSettings()}
@@ -279,7 +294,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         variant="contained"
                         endIcon={<GetAppIcon fontSize="small" />}
                     >
-                        Export
+                        Download selection ({checkedCount})
                     </Button>
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
