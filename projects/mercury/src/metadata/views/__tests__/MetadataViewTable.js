@@ -42,8 +42,8 @@ describe('MetadataViewTable', () => {
         expect(queryByText('Nature')).toBeInTheDocument();
         expect(queryByText('Origin')).toBeInTheDocument();
         expect(queryByText('Files')).toBeInTheDocument();
-        // expect(queryByText('S01')).toBeInTheDocument();
-        // expect(queryByText('S02')).toBeInTheDocument();
+        expect(queryByText('S01')).toBeInTheDocument();
+        expect(queryByText('S02')).toBeInTheDocument();
         expect(queryAllByText('Tissue').length).toBe(2);
         expect(queryAllByText('DNA').length).toBe(2);
         expect(queryByText('Lip')).toBeInTheDocument();
