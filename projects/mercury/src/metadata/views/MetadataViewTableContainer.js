@@ -145,15 +145,45 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         setAnchorEl(null);
     };
 
-    const exportTable = () => {
-        const fileName = 'fairspace_export.csv';
-        let csvFile = 'id\n';
+    const getCsvHeader = () => {
+        let header = "id;";
+
+        if (data && data.rows) {
+            const row = data.rows[0];
+            header += Object.keys(row).join(";");
+        }
+
+        return header;
+    };
+
+    // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
+    const getCsvValuesForAttribute = (row, attributeValues) => Object.values(row[attributeValues])
+        .map(attribute => ((attribute && attribute.label) ?? "-").replaceAll(";", ".,")).join(",");
+
+    const getCsvValues = () => {
+        let values = "";
+        let index = 0;
 
         Object.keys(checkboxes).forEach(key => {
             if (checkboxes[key]) {
-                csvFile += key + '\n';
+                values += '\n' + key + ";";
+                const row = data.rows[index];
+                Object.keys(row).forEach(attribute => {
+                    values += getCsvValuesForAttribute(row, attribute) + ";";
+                });
+
+                index++;
             }
         });
+
+        return values;
+    };
+
+    const exportTableCsv = () => {
+        const fileName = "fairspace_export.csv";
+        // add header
+        let csvFile = getCsvHeader();
+        csvFile += getCsvValues();
 
         const blob = new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
         const link = document.createElement("a");
@@ -290,7 +320,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 <div className={classes.footerButtonDiv}>
                     <Button
                         className={classes.exportButton}
-                        onClick={exportTable}
+                        onClick={exportTableCsv}
                         variant="contained"
                         endIcon={<GetAppIcon fontSize="small" />}
                     >
