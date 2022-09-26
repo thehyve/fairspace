@@ -173,7 +173,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             <TableHead>
                 <TableRow>
                     <TableCell style={{padding: 0}}>
-                        <Checkbox id="checkAll" key={Math.random()} onChange={handleCheckallChange} defaultChecked={rowCount > 0 && checkedCount === rowCount} />
+                        <Checkbox id="checkAll" key={'checkall-key-' + checkedCount} onChange={handleCheckallChange} defaultChecked={rowCount > 0 && checkedCount === rowCount} />
                     </TableCell>
                     {visibleColumns.map(column => (
                         <TableCell key={column.name} className={classes.headerCellContents}>
