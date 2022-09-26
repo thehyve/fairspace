@@ -59,7 +59,7 @@ const styles = () => ({
         display: 'flex'
     },
     exportButton: {
-        width: 150,
+        width: 220,
         margin: 6,
         fontSize: 12
     },
@@ -323,6 +323,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         onClick={exportTableCsv}
                         variant="contained"
                         endIcon={<GetAppIcon fontSize="small" />}
+                        disabled={checkedCount === 0}
                     >
                         Download selection ({checkedCount})
                     </Button>

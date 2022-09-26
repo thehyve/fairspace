@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import {Link as RouterLink} from "react-router-dom";
@@ -55,16 +55,6 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const isResourcesView = view === RESOURCES_VIEW;
     const {checkboxes, setCheckboxState} = props;
 
-    // initialize checkboxes
-    if (idColumn && data && data.rows) {
-        data.rows.forEach(row => {
-            const key = row[idColumn.name][0].value;
-            if (checkboxes[key] === undefined) {
-                setCheckboxState(key, false);
-            }
-        });
-    }
-
     const isCustomResourceColumn = (column: MetadataViewColumn) => (
         isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
     );
@@ -85,6 +75,17 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             toggleRow({label, iri, linkedFiles: linkedFiles || []});
         }
     };
+
+    const initializeCheckboxes = useCallback(() => {
+        if (idColumn && data && data.rows) {
+            data.rows.forEach(row => {
+                const key = row[idColumn.name][0].value;
+                if (checkboxes[key] === undefined) {
+                    setCheckboxState(key, false);
+                }
+            });
+        }
+    }, [checkboxes, data, idColumn, setCheckboxState]);
 
     const handleCheckallChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target) {
@@ -160,6 +161,10 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         );
     };
 
+    useEffect(() => {
+        initializeCheckboxes();
+    }, [data, initializeCheckboxes]);
+
     const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
     const rowCount = data.rows && data.rows.length;
 
@@ -170,7 +175,6 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                     <TableCell style={{padding: 0}}>
                         <Checkbox id="checkAll" key={Math.random()} onChange={handleCheckallChange} defaultChecked={rowCount > 0 && checkedCount === rowCount} />
                     </TableCell>
-                    <TableCell />
                     {visibleColumns.map(column => (
                         <TableCell key={column.name} className={classes.headerCellContents}>
                             {column.title}
