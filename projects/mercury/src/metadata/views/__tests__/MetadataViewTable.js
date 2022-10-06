@@ -31,6 +31,8 @@ describe('MetadataViewTable', () => {
                 textFiltersObject={{}}
                 setTextFiltersObject={() => {}}
                 loading={false}
+                checkboxes={{}}
+                setCheckboxState={() => {}}
             />
         );
 
@@ -65,6 +67,8 @@ describe('MetadataViewTable', () => {
                 collections={[]}
                 textFiltersObject={{}}
                 setTextFiltersObject={() => {}}
+                checkboxes={{}}
+                setCheckboxState={() => {}}
             />
         );
 
@@ -99,6 +103,8 @@ describe('MetadataViewTable', () => {
             loading={false}
             textFiltersObject={{}}
             setTextFiltersObject={() => {}}
+            checkboxes={{}}
+            setCheckboxState={() => {}}
         />);
 
         const tableRows = wrapper.find(TableBody).find(TableRow);

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+    Button,
     CircularProgress,
     FormControlLabel,
     IconButton,
@@ -16,6 +17,7 @@ import FormControl from "@material-ui/core/FormControl";
 import Popover from "@material-ui/core/Popover";
 import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import FormGroup from "@material-ui/core/FormGroup";
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
@@ -53,8 +55,16 @@ const styles = () => ({
             backgroundColor: "white"
         }
     },
+    footerButtonDiv: {
+        display: 'flex'
+    },
+    exportButton: {
+        width: 220,
+        margin: 6,
+        fontSize: 12
+    },
     tableFooter: {
-        overflowX: "hidden"
+        flex: 1,
     },
     tableSettings: {
         position: 'relative',
@@ -91,8 +101,22 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const history = useHistory();
 
     const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
+    const [checkboxes, setCheckboxes] = React.useState({});
 
-    useEffect(() => {setPage(0);}, [filters]);
+    const resetCheckboxes = () => {
+        // eslint-disable-next-line
+        setCheckboxes(oldState => ({}));
+    };
+
+    const setCheckboxState = (id: string, checked: boolean) => {
+        if (checkboxes) {
+            setCheckboxes(oldState => {
+                const newState = {...oldState};
+                newState[id] = checked;
+                return newState;
+            });
+        }
+    };
 
     const handleChangePage = (e, p) => {
         setPage(p);
@@ -119,6 +143,60 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const handleColumnSelectorClose = () => {
         setAnchorEl(null);
+    };
+
+    const getCsvHeader = () => {
+        let header = "id;";
+
+        if (data && data.rows) {
+            const row = data.rows[0];
+            header += Object.keys(row).join(";");
+        }
+
+        return header;
+    };
+
+    // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
+    const getCsvValuesForAttribute = (row, attributeValues) => Object.values(row[attributeValues])
+        .map(attribute => ((attribute && attribute.label) ?? "-").replaceAll(";", ".,")).join(",");
+
+    const getCsvValues = () => {
+        let values = "";
+        let index = 0;
+
+        Object.keys(checkboxes).forEach(key => {
+            if (checkboxes[key]) {
+                values += '\n' + key + ";";
+                const row = data.rows[index];
+                Object.keys(row).forEach(attribute => {
+                    values += getCsvValuesForAttribute(row, attribute) + ";";
+                });
+
+                index++;
+            }
+        });
+
+        return values;
+    };
+
+    const exportTableCsv = () => {
+        const fileName = "fairspace_export.csv";
+        // add header
+        let csvFile = getCsvHeader();
+        csvFile += getCsvValues();
+
+        const blob = new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
+        const link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     };
 
     const renderMessages = () => (
@@ -210,9 +288,21 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 history={history}
                 textFiltersObject={textFiltersObject}
                 setTextFiltersObject={setTextFiltersObject}
+                checkboxes={checkboxes}
+                setCheckboxState={setCheckboxState}
             />
         );
     };
+
+    useEffect(() => {
+        setPage(0);
+    }, [filters]);
+
+    useEffect(() => {
+        resetCheckboxes();
+    }, [data]);
+
+    const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
 
     return (
         <Paper>
@@ -227,18 +317,29 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     {renderMessages()}
                     {renderMetadataViewTable()}
                 </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, 100]}
-                    component="div"
-                    count={count && isNonEmptyValue(count.count) ? count.count : -1}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    className={classes.tableFooter}
-                    labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
-                    ActionsComponent={TablePaginationActions}
-                />
+                <div className={classes.footerButtonDiv}>
+                    <Button
+                        className={classes.exportButton}
+                        onClick={exportTableCsv}
+                        variant="contained"
+                        endIcon={<GetAppIcon fontSize="small" />}
+                        disabled={checkedCount === 0}
+                    >
+                        Download selection ({checkedCount})
+                    </Button>
+                    <TablePagination
+                        rowsPerPageOptions={[5, 10, 25, 100]}
+                        component="div"
+                        count={count && isNonEmptyValue(count.count) ? count.count : -1}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        className={classes.tableFooter}
+                        labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
+                        ActionsComponent={TablePaginationActions}
+                    />
+                </div>
             </LoadingOverlayWrapper>
         </Paper>
     );
