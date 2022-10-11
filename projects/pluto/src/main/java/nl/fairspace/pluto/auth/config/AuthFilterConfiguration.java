@@ -54,6 +54,14 @@ public class AuthFilterConfiguration {
     }
 
     @Bean
+    public FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> authenticatedCheckAuthenticationFilter() {
+        FilterRegistrationBean<AuthenticatedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
+        filterRegBean.setFilter(new AuthenticatedCheckAuthenticationFilter());
+        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 202);
+        return filterRegBean;
+    }
+
+    @Bean
     public FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> authorizedCheckAuthenticationFilter() {
         FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
         filterRegBean.setFilter(new AuthorizedCheckAuthenticationFilter(oidcConfiguration.getRequiredAuthority()));
