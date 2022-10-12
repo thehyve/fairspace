@@ -1,4 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
+import useDeepCompareEffect from "use-deep-compare-effect";
+
 import {
     Table,
     TableBody,
@@ -87,7 +89,7 @@ const UserRolesPage = () => {
         !filterValue || (value && value.toLowerCase().includes(filterValue.toLowerCase()))
     );
 
-    useEffect(() => {
+    const updateFilteredUsers = () => {
         if (users && users.length > 0) {
             if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === "")) {
                 setFilteredUsers(users);
@@ -98,9 +100,18 @@ const UserRolesPage = () => {
                     && isValueMatchingFilterValue(u.email, filtersObject[columns.email.valueExtractor])
                 )));
             }
-            setPage(0);
         }
-    }, [filtersObject, users, setPage]);
+    };
+
+    useEffect(() => {
+        updateFilteredUsers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [users]);
+
+    useDeepCompareEffect(() => {
+        updateFilteredUsers();
+        setPage(0);
+    }, [filtersObject]);
 
     if (usersError) {
         return (<MessageDisplay message="An error occurred loading users" />);
@@ -223,7 +234,7 @@ const UserRolesPage = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25, 100]}
                     component="div"
-                    count={users.length}
+                    count={filteredUser.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
