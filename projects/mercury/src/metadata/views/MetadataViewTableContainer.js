@@ -146,9 +146,10 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     };
 
     const getCsvHeader = () => {
-        let header = "id;";
+        let header = "id";
 
         if (data && data.rows) {
+            header += ";";
             const row = data.rows[0];
             header += Object.keys(row).join(";");
         }
@@ -166,10 +167,10 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
         Object.keys(checkboxes).forEach(key => {
             if (checkboxes[key]) {
-                values += '\n' + key + ";";
+                values += '\n' + key;
                 const row = data.rows[index];
                 Object.keys(row).forEach(attribute => {
-                    values += getCsvValuesForAttribute(row, attribute) + ";";
+                    values += ";" + getCsvValuesForAttribute(row, attribute);
                 });
 
                 index++;
