@@ -18,7 +18,7 @@ data:
       transactionLogPath: "/data/saturn/files/log"
       bulkTransactions: {{ .Values.saturn.bulkTransactions }}
     auth:
-      authServerUrl: {{ .Values.external.keycloak.managementUrl | default .Values.external.keycloak.baseUrl }}/auth/
+      authServerUrl: {{ .Values.external.keycloak.managementUrl | default .Values.external.keycloak.baseUrl }}/
       realm: {{ .Values.external.keycloak.realm }}
       clientId: {{ .Values.external.keycloak.clientId }}
       enableBasicAuth: {{ .Values.saturn.auth.enableBasicAuth }}
