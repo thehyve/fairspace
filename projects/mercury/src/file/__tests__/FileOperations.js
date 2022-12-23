@@ -1,6 +1,6 @@
 import React from 'react';
 import {shallow} from "enzyme";
-import {IconButton} from "@material-ui/core";
+import {IconButton} from "@mui/material";
 
 import {FileOperations} from "../FileOperations";
 import {COPY, CUT} from "../../constants";

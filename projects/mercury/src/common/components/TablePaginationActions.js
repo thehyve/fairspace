@@ -1,8 +1,8 @@
 import React from 'react';
-import IconButton from "@material-ui/core/IconButton";
-import {KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage} from "@material-ui/icons";
-import {makeStyles} from '@material-ui/core/styles';
-import {Typography} from "@material-ui/core";
+import IconButton from "@mui/material/IconButton";
+import {KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage} from "@mui/icons-material";
+import makeStyles from '@mui/styles/makeStyles';
+import {Typography} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -44,10 +44,14 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleFirstPageButtonClick}
                 disabled={page === 0}
                 aria-label="first page"
-            >
+                size="large">
                 <FirstPage />
             </IconButton>
-            <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
+            <IconButton
+                onClick={handleBackButtonClick}
+                disabled={page === 0}
+                aria-label="previous page"
+                size="large">
                 <KeyboardArrowLeft />
             </IconButton>
             <Typography variant="body2" component="span" display="inline">{page + 1}</Typography>
@@ -55,14 +59,14 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleNextButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                 aria-label="next page"
-            >
+                size="large">
                 <KeyboardArrowRight />
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                 aria-label="last page"
-            >
+                size="large">
                 <LastPage />
             </IconButton>
         </div>

@@ -13,8 +13,8 @@ import {
     Menu,
     MenuItem,
     Typography
-} from '@material-ui/core';
-import {CloudDownload, Folder, MoreVert} from '@material-ui/icons';
+} from '@mui/material';
+import {CloudDownload, Folder, MoreVert} from '@mui/icons-material';
 import {useHistory, withRouter} from 'react-router-dom';
 
 import CollectionEditor from "./CollectionEditor";

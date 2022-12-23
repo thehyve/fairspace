@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from "react-markdown";
-import Switch from "@material-ui/core/Switch";
+import Switch from "@mui/material/Switch";
 import {formatDateTime} from '../../../common/utils/genericUtils';
 
 import LinkedDataLink from "../LinkedDataLink";

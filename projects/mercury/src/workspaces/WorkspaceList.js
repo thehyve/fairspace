@@ -13,10 +13,10 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@material-ui/core";
-import {Lock} from "@material-ui/icons";
+} from "@mui/material";
+import {Lock} from "@mui/icons-material";
 
-import TableContainer from "@material-ui/core/TableContainer";
+import TableContainer from "@mui/material/TableContainer";
 import type {Workspace} from './WorkspacesAPI';
 import MessageDisplay from "../common/components/MessageDisplay";
 import useSorting from "../common/hooks/UseSorting";

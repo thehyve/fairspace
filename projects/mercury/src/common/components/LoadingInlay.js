@@ -1,5 +1,7 @@
 import React from 'react';
-import {CircularProgress, withStyles} from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
+
+import withStyles from '@mui/styles/withStyles';
 
 const styles = theme => ({
     inlayProgress: {

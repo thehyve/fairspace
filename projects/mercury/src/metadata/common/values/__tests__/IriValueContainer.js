@@ -1,6 +1,6 @@
 import React from 'react';
 import {shallow} from "enzyme";
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import {IriValue} from "../IriValueContainer";
 

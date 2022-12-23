@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {ExpandMore} from "@material-ui/icons";
+import {ExpandMore} from "@mui/icons-material";
 import {
     Avatar,
     Box,
@@ -18,8 +18,8 @@ import {
     MenuItem,
     Select,
     Typography,
-    withStyles
-} from "@material-ui/core";
+} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
 import classnames from "classnames";
 
 import PermissionViewer from "./PermissionViewer";
@@ -180,7 +180,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 aria-expanded={expanded}
                 aria-label="Show more"
                 title="Access"
-            >
+                size="large">
                 <ExpandMore />
             </IconButton>
         </>

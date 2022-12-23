@@ -1,9 +1,10 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {IconButton, withStyles} from '@material-ui/core';
-import {Add} from "@material-ui/icons";
-import Toolbar from "@material-ui/core/Toolbar";
-import Tooltip from "@material-ui/core/Tooltip";
+import { IconButton } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {Add} from "@mui/icons-material";
+import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
 import PropTypes from "prop-types";
 import ErrorDialog from "../common/components/ErrorDialog";
 import ConfirmationDialog from "../common/components/ConfirmationDialog";
@@ -97,7 +98,7 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
                         aria-label="add user permission"
                         className={classes.addButton}
                         onClick={() => handleAlterUserPermissionsDialogShow()}
-                    >
+                        size="large">
                         <Add />
                     </IconButton>
                 </Tooltip>

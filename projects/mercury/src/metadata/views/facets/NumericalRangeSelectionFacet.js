@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import Grid from "@material-ui/core/Grid";
-import Input from "@material-ui/core/Input";
-import Slider from "@material-ui/core/Slider";
-import {Typography} from "@material-ui/core";
+import Grid from "@mui/material/Grid";
+import Input from "@mui/material/Input";
+import Slider from "@mui/material/Slider";
+import {Typography} from "@mui/material";
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {isNonEmptyValue} from "../../../common/utils/genericUtils";
 

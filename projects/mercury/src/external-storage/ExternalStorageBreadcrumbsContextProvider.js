@@ -1,5 +1,5 @@
 import React from "react";
-import {FolderSpecial} from "@material-ui/icons";
+import {FolderSpecial} from "@mui/icons-material";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import {getExternalStoragePathPrefix} from "./externalStorageUtils";
 

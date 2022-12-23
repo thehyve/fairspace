@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
-import {FormControl, FormHelperText, FormLabel} from "@material-ui/core";
+import {FormControl, FormHelperText, FormLabel} from "@mui/material";
 
 import IriValueContainer from "./values/IriValueContainer";
 

@@ -1,11 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import {withRouter} from "react-router-dom";
 import queryString from "query-string";
 
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {Divider, Switch, withStyles} from "@material-ui/core";
-import Button from "@material-ui/core/Button";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { Divider, Switch } from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import Button from "@mui/material/Button";
 import FileBrowser from "./FileBrowser";
 import CollectionInformationDrawer from '../collections/CollectionInformationDrawer';
 import {getPathInfoFromParams, splitPathIntoArray} from "./fileUtils";

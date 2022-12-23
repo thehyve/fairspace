@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {Tooltip} from "@material-ui/core";
-import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
-import AssignmentTurnedInOutlined from '@material-ui/icons/AssignmentTurnedInOutlined';
+import {Tooltip} from "@mui/material";
+import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
+import AssignmentTurnedInOutlined from '@mui/icons-material/AssignmentTurnedInOutlined';
 import useIsMounted from "react-is-mounted-hook";
 
 const DEFAULT_TIMEOUT = 1000;

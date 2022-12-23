@@ -1,10 +1,10 @@
-import {TextField} from "@material-ui/core";
+import {TextField} from "@mui/material";
 import React, {useEffect, useState} from "react";
-import {makeStyles} from "@material-ui/core/styles";
-import {alpha} from "@material-ui/core/styles/colorManipulator";
-import IconButton from "@material-ui/core/IconButton";
-import SearchIcon from "@material-ui/icons/Search";
-import InputAdornment from "@material-ui/core/InputAdornment";
+import { alpha } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const useStyles = makeStyles((theme) => ({
     search: {
@@ -100,7 +100,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useAp
                                     className={classes.adornedEndIcon}
                                     title="Apply filter"
                                     color="primary"
-                                >
+                                    size="large">
                                     <SearchIcon size="small" />
                                 </IconButton>
                             )}

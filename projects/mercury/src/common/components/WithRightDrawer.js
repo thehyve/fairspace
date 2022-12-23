@@ -1,10 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import Drawer from "@material-ui/core/Drawer/Drawer";
-import IconButton from "@material-ui/core/IconButton/IconButton";
-import {Close} from "@material-ui/icons";
+import {withStyles} from '@mui/styles';
+import Drawer from "@mui/material/Drawer/Drawer";
+import IconButton from "@mui/icons-material/IconButton/IconButton";
+import {Close} from "@mui/icons-material";
 import styles from "./WithRightDrawer.styles";
 
 function WithRightDrawer({

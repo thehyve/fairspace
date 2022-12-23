@@ -2,8 +2,8 @@ import {render} from "@testing-library/react";
 import React from "react";
 import '@testing-library/jest-dom/extend-expect';
 import {shallow} from "enzyme";
-import TableRow from "@material-ui/core/TableRow";
-import {TableBody} from "@material-ui/core";
+import TableRow from "@mui/material/TableRow";
+import {TableBody} from "@mui/material";
 import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";

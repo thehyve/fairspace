@@ -11,8 +11,8 @@ import {
     ListItemText,
     Radio,
     RadioGroup,
-    withStyles
-} from "@material-ui/core";
+} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
 import {camelCaseToWords} from "../common/utils/genericUtils";
 import ConfirmationButton from "../common/components/ConfirmationButton";
 import {descriptionForStatus} from "./collectionUtils";
@@ -132,10 +132,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                         Save
                     </Button>
                 </ConfirmationButton>
-                <Button
-                    onClick={handleCancel}
-                    color="default"
-                >
+                <Button onClick={handleCancel}>
                     Cancel
                 </Button>
             </DialogActions>

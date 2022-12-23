@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
-import {IconButton} from "@material-ui/core";
-import Delete from "@material-ui/icons/Delete";
+import {IconButton} from "@mui/material";
+import Delete from "@mui/icons-material/Delete";
 import useIsMounted from "react-is-mounted-hook";
 import LinkedDataContext from "../LinkedDataContext";
 import UserContext from "../../users/UserContext";
@@ -42,7 +42,7 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
                     aria-label="Delete this resource"
                     title="Delete"
                     disabled={!isDeletable}
-                >
+                    size="large">
                     <Delete />
                 </IconButton>
             </ConfirmationButton>

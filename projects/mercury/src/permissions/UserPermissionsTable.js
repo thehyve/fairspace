@@ -1,10 +1,11 @@
 // @flow
 import React from 'react';
-import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography, withStyles} from '@material-ui/core';
-import {Close, Person} from "@material-ui/icons";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import { IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {Close, Person} from "@mui/icons-material";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 import PropTypes from "prop-types";
 import {accessLevels} from "../collections/CollectionAPI";
 import type {AccessLevel, Permission, Principal} from "../collections/CollectionAPI";
@@ -121,7 +122,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                     <IconButton
                                         onClick={() => handleDeletePermission(p)}
                                         disabled={!canManageCurrentPermission}
-                                    >
+                                        size="large">
                                         <Close />
                                     </IconButton>
                                 </TableCell>

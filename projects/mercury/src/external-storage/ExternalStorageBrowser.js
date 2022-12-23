@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {withRouter} from "react-router-dom";
-import {withStyles} from "@material-ui/core";
+import withStyles from '@mui/styles/withStyles';
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import {useExternalStorage} from "./UseExternalStorage";

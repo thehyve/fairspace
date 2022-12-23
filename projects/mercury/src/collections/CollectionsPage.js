@@ -1,8 +1,9 @@
 import React, {useContext, useEffect, useState} from 'react';
-import Grid from '@material-ui/core/Grid';
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import {Divider, Switch, withStyles} from "@material-ui/core";
-import Button from "@material-ui/core/Button";
+import Grid from '@mui/material/Grid';
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { Divider, Switch } from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import Button from "@mui/material/Button";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
@@ -50,10 +51,10 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
 
     let unmounting = false;
 
-    useEffect(() => function cleanup() {
+    useEffect(() => (function cleanup() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         unmounting = true;
-    });
+    }));
 
     const toggleCollection = (collectionIri) => {
         if (unmounting) {

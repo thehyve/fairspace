@@ -1,6 +1,6 @@
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from "@mui/material/Tooltip";
 import React from "react";
-import {withStyles} from "@material-ui/core";
+import withStyles from '@mui/styles/withStyles';
 
 const styles = theme => ({
     tooltip: {

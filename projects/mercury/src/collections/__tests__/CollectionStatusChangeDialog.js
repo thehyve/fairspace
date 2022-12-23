@@ -1,6 +1,6 @@
 import React from 'react';
-import {createMount, createShallow} from '@material-ui/core/test-utils';
-import {Button} from '@material-ui/core';
+import {createMount, createShallow} from '@mui/material/test-utils';
+import {Button} from '@mui/material';
 import CollectionStatusChangeDialog from "../CollectionStatusChangeDialog";
 import {statuses} from "../CollectionAPI";
 

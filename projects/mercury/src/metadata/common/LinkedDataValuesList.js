@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
-import {Divider, Grid, IconButton, Typography, withStyles} from '@material-ui/core';
-import {Add, Clear} from '@material-ui/icons';
+import { Divider, Grid, IconButton, Typography } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {Add, Clear} from '@mui/icons-material';
 
 import {LABEL_URI, STRING_URI} from '../../constants';
 import styles from './LinkedDataValuesTable.styles';
@@ -55,7 +56,7 @@ const AddValueToList = (props: AddValueToListProps) => {
                             onAdd(value);
                         }}
                         aria-label="Add"
-                    >
+                        size="large">
                         <Add color={newValue ? 'primary' : 'inherit'} />
                     </IconButton>
                 </Grid>
@@ -111,97 +112,95 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
     const isDeleteButtonEnabled = () => property.isEditable && canEdit;
     const isAddButtonEnabled = canEdit && !maxValuesReached && AddComponent;
 
-    return (
-        <>
-            {showHeader ? (
-                <Grid container spacing={1} alignItems="center">
-                    <Grid item xs={property.isEditable ? 10 : 12}>
-                        {columnDefinition.label}
-                    </Grid>
+    return <>
+        {showHeader ? (
+            <Grid container spacing={1} alignItems="center">
+                <Grid item xs={property.isEditable ? 10 : 12}>
+                    {columnDefinition.label}
                 </Grid>
-            ) : undefined}
-            {values.map((entry, idx) => rowDecorator(entry, (
-                <Grid
-                    container
-                    spacing={1}
-                    alignItems="center"
-                    onMouseEnter={() => setHoveredIndex(idx)}
-                    onFocus={() => setHoveredIndex(idx)}
-                    onBlur={() => setHoveredIndex(null)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    onDoubleClick={() => onOpen(entry)}
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={idx}
-                >
-                    <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
-                        {
-                            columnDefinition.id === LABEL_URI
-                                ? <Typography variant="h6">{columnDefinition.getValue(entry, idx)}</Typography>
-                                : columnDefinition.getValue(entry, idx)
-                        }
-                        {showRowDividers && <Divider />}
-                    </Grid>
+            </Grid>
+        ) : undefined}
+        {values.map((entry, idx) => rowDecorator(entry, (
+            <Grid
+                container
+                spacing={1}
+                alignItems="center"
+                onMouseEnter={() => setHoveredIndex(idx)}
+                onFocus={() => setHoveredIndex(idx)}
+                onBlur={() => setHoveredIndex(null)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onDoubleClick={() => onOpen(entry)}
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
+            >
+                <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
                     {
-                        property.isEditable && isDeleteButtonEnabled(entry) && (
-                            <Grid item xs={2}>
-                                <IconButton
-                                    data-testid="delete-btn"
-                                    title="Delete"
-                                    onClick={() => {
-                                        onDelete(idx);
-                                        incrementSerialNumber();
-                                    }}
-                                    style={{opacity: hoveredIndex === idx ? 1 : 0}}
-                                    aria-label="Delete"
-                                >
-                                    <Clear />
-                                </IconButton>
-                            </Grid>
-                        )
+                        columnDefinition.id === LABEL_URI
+                            ? <Typography variant="h6">{columnDefinition.getValue(entry, idx)}</Typography>
+                            : columnDefinition.getValue(entry, idx)
                     }
+                    {showRowDividers && <Divider />}
                 </Grid>
-            )))}
-
-            {isAddButtonEnabled && (
-                (property.maxValuesCount === 1)
-                    ? (
-                        <Grid container spacing={1} alignItems="center">
-                            <Grid item xs={10}>
-                                <AddComponent
-                                    key={serialNumber}
-                                    property={property}
-                                    currentValues={values}
-                                    placeholder=""
-                                    aria-labelledby={labelId}
-                                    onChange={(val) => {
-                                        if (val) {
-                                            onAdd(val);
-                                            incrementSerialNumber();
-                                        }
-                                    }}
-                                />
-                            </Grid>
+                {
+                    property.isEditable && isDeleteButtonEnabled(entry) && (
+                        <Grid item xs={2}>
+                            <IconButton
+                                data-testid="delete-btn"
+                                title="Delete"
+                                onClick={() => {
+                                    onDelete(idx);
+                                    incrementSerialNumber();
+                                }}
+                                style={{opacity: hoveredIndex === idx ? 1 : 0}}
+                                aria-label="Delete"
+                                size="large">
+                                <Clear />
+                            </IconButton>
                         </Grid>
                     )
-                    : (
-                        <AddValueToList
-                            serialNumber={serialNumber}
-                            classes={classes}
-                            property={property}
-                            values={values}
-                            labelId={labelId}
-                            addComponent={AddComponent}
-                            onAdd={(val) => {
-                                if (val) {
-                                    onAdd(val);
-                                    incrementSerialNumber();
-                                }
-                            }}
-                        />
-                    )
-            )}
-        </>
-    );
+                }
+            </Grid>
+        )))}
+
+        {isAddButtonEnabled && (
+            (property.maxValuesCount === 1)
+                ? (
+                    <Grid container spacing={1} alignItems="center">
+                        <Grid item xs={10}>
+                            <AddComponent
+                                key={serialNumber}
+                                property={property}
+                                currentValues={values}
+                                placeholder=""
+                                aria-labelledby={labelId}
+                                onChange={(val) => {
+                                    if (val) {
+                                        onAdd(val);
+                                        incrementSerialNumber();
+                                    }
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                )
+                : (
+                    <AddValueToList
+                        serialNumber={serialNumber}
+                        classes={classes}
+                        property={property}
+                        values={values}
+                        labelId={labelId}
+                        addComponent={AddComponent}
+                        onAdd={(val) => {
+                            if (val) {
+                                onAdd(val);
+                                incrementSerialNumber();
+                            }
+                        }}
+                    />
+                )
+        )}
+    </>;
 };
 
 export default withStyles(styles)(LinkedDataValuesList);

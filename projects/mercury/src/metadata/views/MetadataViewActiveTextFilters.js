@@ -1,6 +1,7 @@
 import React from 'react';
-import {Chip, Divider, Grid, IconButton, Typography, withStyles} from '@material-ui/core';
-import {Close} from "@material-ui/icons";
+import { Chip, Divider, Grid, IconButton, Typography } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {Close} from "@mui/icons-material";
 import type {MetadataViewColumn} from "./MetadataViewAPI";
 
 const styles = theme => ({
@@ -66,7 +67,11 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
                         ))}
                 </Grid>
                 <Grid key="activeTextFiltersClearButton" item xs={2}>
-                    <IconButton onClick={clearTextFilters} title="Clear text filters" className={classes.clearButton}>
+                    <IconButton
+                        onClick={clearTextFilters}
+                        title="Clear text filters"
+                        className={classes.clearButton}
+                        size="large">
                         <Close color="error" />
                     </IconButton>
                 </Grid>

@@ -1,13 +1,14 @@
 import React, {useContext, useState} from 'react';
-import {Badge, IconButton, ListItem, ListItemText, withStyles} from "@material-ui/core";
-import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@material-ui/icons';
+import { Badge, IconButton, ListItem, ListItemText } from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@mui/icons-material';
 import ContentCopy from "mdi-material-ui/ContentCopy";
 import ContentCut from "mdi-material-ui/ContentCut";
 import ContentPaste from "mdi-material-ui/ContentPaste";
 import Download from "mdi-material-ui/Download";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import Divider from "@material-ui/core/Divider";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import Divider from "@mui/material/Divider";
 import ErrorDialog from "../common/components/ErrorDialog";
 
 import {getParentPath, isListOnlyFile, joinPaths} from "./fileUtils";
@@ -186,183 +187,181 @@ export const FileOperations = ({
             ErrorDialog.showError("An error occurred while undeleting file or directory", err, () => handleUndelete());
         });
 
-    return (
-        <>
-            <FileOperationsGroup>
-                {isWritingEnabled && (
-                    <>
-                        <ProgressButton active={activeOperation === Operations.MKDIR}>
-                            <CreateDirectoryButton
-                                onCreate={name => handleCreateDirectory(name)}
-                                disabled={busy}
-                            >
-                                <IconButton
-                                    aria-label="Create directory"
-                                    title="Create directory"
-                                    disabled={busy}
-                                >
-                                    <CreateNewFolder />
-                                </IconButton>
-                            </CreateDirectoryButton>
-                        </ProgressButton>
-
-                        <IconButton
-                            aria-label="Upload"
-                            title="Upload &hellip;"
+    return <>
+        <FileOperationsGroup>
+            {isWritingEnabled && (
+                <>
+                    <ProgressButton active={activeOperation === Operations.MKDIR}>
+                        <CreateDirectoryButton
+                            onCreate={name => handleCreateDirectory(name)}
                             disabled={busy}
-                            onClick={handleUploadMenuClick}
                         >
-                            <CloudUpload />
-                        </IconButton>
-                        <Menu
-                            id="upload-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleUploadMenuClose}
-                            className={classes.uploadMenu}
-                        >
-                            <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
-                            <MenuItem onClick={handleUploadFolder}>Upload folder</MenuItem>
-                            <Divider className={classes.uploadMenuHelperDivider} />
-                            <ListItem className={classes.uploadMenuHelper}>
-                                <ListItemText
-                                    secondary={`Size limit: ${maxFileSize}`}
-                                    className={classes.uploadMenuHelperText}
-                                />
-                            </ListItem>
-                        </Menu>
+                            <IconButton
+                                aria-label="Create directory"
+                                title="Create directory"
+                                disabled={busy}
+                                size="large">
+                                <CreateNewFolder />
+                            </IconButton>
+                        </CreateDirectoryButton>
+                    </ProgressButton>
 
-                    </>
-                )}
-            </FileOperationsGroup>
-            <FileOperationsGroup>
-                <IconButton
-                    title={`Download ${selectedItem.basename}`}
-                    aria-label={`Download ${selectedItem.basename}`}
-                    disabled={
-                        isDisabledForMoreThanOneSelection || selectedItem.type !== 'file'
-                        || isDeletedItemSelected || busy || isListOnlyItemSelected
-                    }
-                    component="a"
-                    href={fileActions.getDownloadLink(selectedItem.filename)}
-                    download
-                >
-                    <Download />
-                </IconButton>
-                {isWritingEnabled && (
-                    <>
-                        <ProgressButton active={activeOperation === Operations.RENAME}>
-                            <RenameButton
-                                currentName={selectedItem.basename}
-                                onRename={newName => handlePathRename(selectedItem, newName)}
+                    <IconButton
+                        aria-label="Upload"
+                        title="Upload &hellip;"
+                        disabled={busy}
+                        onClick={handleUploadMenuClick}
+                        size="large">
+                        <CloudUpload />
+                    </IconButton>
+                    <Menu
+                        id="upload-menu"
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleUploadMenuClose}
+                        className={classes.uploadMenu}
+                    >
+                        <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
+                        <MenuItem onClick={handleUploadFolder}>Upload folder</MenuItem>
+                        <Divider className={classes.uploadMenuHelperDivider} />
+                        <ListItem className={classes.uploadMenuHelper}>
+                            <ListItemText
+                                secondary={`Size limit: ${maxFileSize}`}
+                                className={classes.uploadMenuHelperText}
+                            />
+                        </ListItem>
+                    </Menu>
+
+                </>
+            )}
+        </FileOperationsGroup>
+        <FileOperationsGroup>
+            <IconButton
+                title={`Download ${selectedItem.basename}`}
+                aria-label={`Download ${selectedItem.basename}`}
+                disabled={
+                    isDisabledForMoreThanOneSelection || selectedItem.type !== 'file'
+                    || isDeletedItemSelected || busy || isListOnlyItemSelected
+                }
+                component="a"
+                href={fileActions.getDownloadLink(selectedItem.filename)}
+                download
+                size="large">
+                <Download />
+            </IconButton>
+            {isWritingEnabled && (
+                <>
+                    <ProgressButton active={activeOperation === Operations.RENAME}>
+                        <RenameButton
+                            currentName={selectedItem.basename}
+                            onRename={newName => handlePathRename(selectedItem, newName)}
+                            disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
+                        >
+                            <IconButton
+                                title={`Rename ${selectedItem.basename}`}
+                                aria-label={`Rename ${selectedItem.basename}`}
                                 disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
-                            >
-                                <IconButton
-                                    title={`Rename ${selectedItem.basename}`}
-                                    aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
-                                >
-                                    <BorderColor />
-                                </IconButton>
-                            </RenameButton>
-                        </ProgressButton>
-                        <ProgressButton active={activeOperation === Operations.DELETE}>
-                            <ConfirmationButton
-                                message={getDeletionConfirmationMessage()}
-                                agreeButtonText="Remove"
-                                dangerous
-                                onClick={handleDelete}
+                                size="large">
+                                <BorderColor />
+                            </IconButton>
+                        </RenameButton>
+                    </ProgressButton>
+                    <ProgressButton active={activeOperation === Operations.DELETE}>
+                        <ConfirmationButton
+                            message={getDeletionConfirmationMessage()}
+                            agreeButtonText="Remove"
+                            dangerous
+                            onClick={handleDelete}
+                            disabled={noPathSelected || busy}
+                        >
+                            <IconButton
+                                title="Delete"
+                                aria-label="Delete"
                                 disabled={noPathSelected || busy}
+                                size="large">
+                                <Delete />
+                            </IconButton>
+                        </ConfirmationButton>
+                    </ProgressButton>
+                    {showDeleted && (
+                        <ProgressButton active={activeOperation === Operations.UNDELETE}>
+                            <ConfirmationButton
+                                message={`Are you sure you want to undelete ${selectedPaths.length} item(s)?`}
+                                agreeButtonText="Undelete"
+                                dangerous
+                                onClick={handleUndelete}
+                                disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
                             >
                                 <IconButton
-                                    title="Delete"
-                                    aria-label="Delete"
-                                    disabled={noPathSelected || busy}
-                                >
-                                    <Delete />
+                                    title="Undelete"
+                                    aria-label="Undelete"
+                                    disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
+                                    size="large">
+                                    <RestoreFromTrash />
                                 </IconButton>
                             </ConfirmationButton>
                         </ProgressButton>
-                        {showDeleted && (
-                            <ProgressButton active={activeOperation === Operations.UNDELETE}>
-                                <ConfirmationButton
-                                    message={`Are you sure you want to undelete ${selectedPaths.length} item(s)?`}
-                                    agreeButtonText="Undelete"
-                                    dangerous
-                                    onClick={handleUndelete}
-                                    disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
-                                >
-                                    <IconButton
-                                        title="Undelete"
-                                        aria-label="Undelete"
-                                        disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
-                                    >
-                                        <RestoreFromTrash />
-                                    </IconButton>
-                                </ConfirmationButton>
-                            </ProgressButton>
-                        )}
+                    )}
 
-                    </>
-                )}
-            </FileOperationsGroup>
-            <FileOperationsGroup>
-                {!isExternalStorage && (
+                </>
+            )}
+        </FileOperationsGroup>
+        <FileOperationsGroup>
+            {!isExternalStorage && (
+                <IconButton
+                    aria-label="Copy"
+                    title="Copy"
+                    onClick={e => handleCopy(e)}
+                    disabled={noPathSelected || isDeletedItemSelected || busy}
+                    size="large">
+                    <ContentCopy />
+                </IconButton>
+            )}
+            {isWritingEnabled && (
+                <>
                     <IconButton
-                        aria-label="Copy"
-                        title="Copy"
-                        onClick={e => handleCopy(e)}
+                        aria-label="Cut"
+                        title="Cut"
+                        onClick={e => handleCut(e)}
                         disabled={noPathSelected || isDeletedItemSelected || busy}
-                    >
-                        <ContentCopy />
+                        size="large">
+                        <ContentCut />
                     </IconButton>
-                )}
-                {isWritingEnabled && (
-                    <>
+                    <ProgressButton active={activeOperation === Operations.PASTE}>
                         <IconButton
-                            aria-label="Cut"
-                            title="Cut"
-                            onClick={e => handleCut(e)}
-                            disabled={noPathSelected || isDeletedItemSelected || busy}
-                        >
-                            <ContentCut />
+                            aria-label="Paste"
+                            title="Paste"
+                            onClick={e => handlePaste(e)}
+                            disabled={isPasteDisabled || isDeletedItemSelected || busy}
+                            size="large">
+                            {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                         </IconButton>
-                        <ProgressButton active={activeOperation === Operations.PASTE}>
-                            <IconButton
-                                aria-label="Paste"
-                                title="Paste"
-                                onClick={e => handlePaste(e)}
-                                disabled={isPasteDisabled || isDeletedItemSelected || busy}
-                            >
-                                {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
-                            </IconButton>
-                        </ProgressButton>
-                    </>
-                )}
-            </FileOperationsGroup>
-            <FileOperationsGroup>
-                {!isExternalStorage && (
-                    <ProgressButton active={activeOperation === Operations.REVERT}>
-                        <ShowFileVersionsButton
-                            selectedFile={selectedItem}
-                            onRevert={handleRevert}
-                            disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
-                            isWritingEnabled={isWritingEnabled}
-                        >
-                            <IconButton
-                                aria-label="Show history"
-                                title="Show history"
-                                disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
-                            >
-                                <Restore />
-                            </IconButton>
-                        </ShowFileVersionsButton>
                     </ProgressButton>
-                )}
-            </FileOperationsGroup>
-        </>
-    );
+                </>
+            )}
+        </FileOperationsGroup>
+        <FileOperationsGroup>
+            {!isExternalStorage && (
+                <ProgressButton active={activeOperation === Operations.REVERT}>
+                    <ShowFileVersionsButton
+                        selectedFile={selectedItem}
+                        onRevert={handleRevert}
+                        disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                        isWritingEnabled={isWritingEnabled}
+                    >
+                        <IconButton
+                            aria-label="Show history"
+                            title="Show history"
+                            disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                            size="large">
+                            <Restore />
+                        </IconButton>
+                    </ShowFileVersionsButton>
+                </ProgressButton>
+            )}
+        </FileOperationsGroup>
+    </>;
 };
 
 const ContextualFileOperations = props => {

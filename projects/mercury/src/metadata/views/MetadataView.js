@@ -1,10 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
-import {Button, Grid, withStyles, Typography} from '@material-ui/core';
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import {Assignment, Close} from "@material-ui/icons";
+import { Button, Grid, Typography } from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import {Assignment, Close} from "@mui/icons-material";
 import styles from "./MetadataView.styles";
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
@@ -173,10 +174,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 <Button
                     onClick={clearFilterCandidates}
                     variant="contained"
-                    color="default"
                     className={classes.confirmFiltersButton}
-                    disabled={filterCandidates.length === 0}
-                >
+                    disabled={filterCandidates.length === 0}>
                     Cancel
                 </Button>
             </Grid>

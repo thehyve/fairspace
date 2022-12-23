@@ -9,12 +9,12 @@ import {
     MenuList,
     Paper,
     Popper
-} from '@material-ui/core';
-import {withStyles} from '@material-ui/core/styles';
-import {ErrorOutline} from '@material-ui/icons';
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {ErrorOutline} from '@mui/icons-material';
 
-import Divider from '@material-ui/core/Divider';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import Divider from '@mui/material/Divider';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";

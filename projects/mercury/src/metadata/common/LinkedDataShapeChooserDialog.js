@@ -8,7 +8,7 @@ import {
     List,
     ListItem,
     ListItemText
-} from "@material-ui/core";
+} from "@mui/material";
 import * as PropTypes from "prop-types";
 
 import {getLabel} from "./metadataUtils";

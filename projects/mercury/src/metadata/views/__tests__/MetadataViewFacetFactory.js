@@ -1,9 +1,9 @@
 import {mount} from "enzyme";
 import React from "react";
 // eslint-disable-next-line jest/no-mocks-import
-import {Checkbox, Slider} from "@material-ui/core";
-import FormLabel from "@material-ui/core/FormLabel";
-import Input from "@material-ui/core/Input";
+import {Checkbox, Slider} from "@mui/material";
+import FormLabel from "@mui/material/FormLabel";
+import Input from "@mui/material/Input";
 import {KeyboardDatePicker} from "@material-ui/pickers";
 import Facet from "../MetadataViewFacetFactory";
 import TextSelectionFacet from "../facets/TextSelectionFacet";

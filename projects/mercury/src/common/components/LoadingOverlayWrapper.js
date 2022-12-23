@@ -1,6 +1,6 @@
 import React from 'react';
-import {makeStyles} from '@material-ui/core/styles';
-import {Fade} from '@material-ui/core';
+import makeStyles from '@mui/styles/makeStyles';
+import {Fade} from '@mui/material';
 import LoadingInlay from './LoadingInlay';
 
 const useStyles = makeStyles((theme) => ({

@@ -1,6 +1,8 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import {AppBar, Toolbar, Typography, withStyles} from "@material-ui/core";
+import { AppBar, Toolbar, Typography } from "@mui/material";
+
+import withStyles from '@mui/styles/withStyles';
 
 import UserMenu from "./UserMenu";
 

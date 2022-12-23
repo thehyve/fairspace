@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from "prop-types";
 
-import {Chip, Divider, Grid, Tooltip, Typography, withStyles} from "@material-ui/core";
+import { Chip, Divider, Grid, Tooltip, Typography } from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
 import IriTooltip from "../../common/components/IriTooltip";
 import CollectionBrowserLink from "./CollectionBrowserLink";
 import {

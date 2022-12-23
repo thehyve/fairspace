@@ -4,7 +4,7 @@ import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 
 import {mount} from "enzyme";
-import {TableRow} from "@material-ui/core";
+import {TableRow} from "@mui/material";
 import FileList from '../FileList';
 
 afterEach(cleanup);

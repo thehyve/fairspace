@@ -8,17 +8,17 @@ import {
     TableContainer,
     TablePagination,
     Typography,
-    withStyles
-} from '@material-ui/core';
+} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import {useHistory} from "react-router-dom";
-import {ViewColumn} from "@material-ui/icons";
-import Checkbox from "@material-ui/core/Checkbox";
-import FormControl from "@material-ui/core/FormControl";
-import Popover from "@material-ui/core/Popover";
-import CheckBoxOutlineBlankIcon from "@material-ui/icons/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@material-ui/icons/CheckBox";
-import GetAppIcon from "@material-ui/icons/GetApp";
-import FormGroup from "@material-ui/core/FormGroup";
+import {ViewColumn} from "@mui/icons-material";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import Popover from "@mui/material/Popover";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import FormGroup from "@mui/material/FormGroup";
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -251,7 +251,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 aria-label="Show/hide columns"
                 title="Show/hide columns"
                 onClick={handleColumnSelectorButtonClick}
-            >
+                size="large">
                 <ViewColumn color="primary" />
             </IconButton>
             {renderColumnSelector()}

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import {render} from '@testing-library/react';
 
 import {mount} from "enzyme";
-import {TableRow} from "@material-ui/core";
+import {TableRow} from "@mui/material";
 import CollectionList from "../CollectionList";
 
 describe('CollectionList', () => {

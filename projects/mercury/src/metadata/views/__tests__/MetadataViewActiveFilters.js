@@ -1,7 +1,7 @@
 import {shallow} from "enzyme";
 import React from "react";
-import Chip from "@material-ui/core/Chip";
-import Typography from "@material-ui/core/Typography";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
 import MetadataViewActiveFacetFilters from "../MetadataViewActiveFacetFilters";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockFacets} from "../__mocks__/MetadataViewAPI";

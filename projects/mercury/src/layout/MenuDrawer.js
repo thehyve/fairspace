@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import {Divider, Drawer, IconButton} from "@material-ui/core";
-import {withStyles} from '@material-ui/core/styles';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import {Divider, Drawer, IconButton} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import styles from "./MenuDrawer.styles";
 
@@ -16,7 +16,7 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
         }}
     >
         <div className={classes.toolbar}>
-            <IconButton onClick={toggleMenuExpansion}>
+            <IconButton onClick={toggleMenuExpansion} size="large">
                 {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
         </div>

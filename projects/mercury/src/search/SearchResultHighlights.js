@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from "prop-types";
-import {List, ListItem, Typography} from '@material-ui/core';
+import {List, ListItem, Typography} from '@mui/material';
 import _ from 'lodash';
 import {SHACL_NAME, SHACL_PATH, SHACL_PROPERTY} from '../constants';
 

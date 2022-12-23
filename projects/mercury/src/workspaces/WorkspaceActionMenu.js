@@ -1,8 +1,8 @@
 // @flow
 import React, {useContext, useState} from 'react';
 import {useHistory} from 'react-router-dom';
-import {IconButton, Menu, MenuItem} from '@material-ui/core';
-import {MoreVert} from '@material-ui/icons';
+import {IconButton, Menu, MenuItem} from '@mui/material';
+import {MoreVert} from '@mui/icons-material';
 import type {Workspace} from './WorkspacesAPI';
 import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import ErrorDialog from '../common/components/ErrorDialog';

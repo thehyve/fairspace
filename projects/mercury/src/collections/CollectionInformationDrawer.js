@@ -1,14 +1,14 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, DialogContentText, IconButton, Typography} from '@material-ui/core';
+import {Card, CardContent, CardHeader, Collapse, DialogContentText, IconButton, Typography} from '@mui/material';
 import {withRouter} from 'react-router-dom';
 
-import {CloudUpload, ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {makeStyles} from '@material-ui/core/styles';
+import {CloudUpload, ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
+import makeStyles from '@mui/styles/makeStyles';
 import {useDropzone} from "react-dropzone";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Tooltip from "@material-ui/core/Tooltip";
-import Link from "@material-ui/core/Link";
+import CircularProgress from "@mui/material/CircularProgress";
+import Tooltip from "@mui/material/Tooltip";
+import Link from "@mui/material/Link";
 import table from "text-table";
 import {SnackbarProvider, useSnackbar} from "notistack";
 import {flatMap} from 'lodash';
@@ -203,7 +203,7 @@ const MetadataCard = (props) => {
                                         </>
                                     )}
                                 >
-                                    <IconButton onClick={open}><CloudUpload /></IconButton>
+                                    <IconButton onClick={open} size="large"><CloudUpload /></IconButton>
                                 </Tooltip>
                             ))}
                         <IconButton
@@ -211,7 +211,7 @@ const MetadataCard = (props) => {
                             aria-expanded={expanded}
                             aria-label="Show more"
                             className={expanded ? classes.expandOpen : ''}
-                        >
+                            size="large">
                             <ExpandMore />
                         </IconButton>
                     </>

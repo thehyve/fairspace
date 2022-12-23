@@ -1,6 +1,6 @@
 import React from 'react';
-import {Grid} from '@material-ui/core';
-import {Widgets} from '@material-ui/icons';
+import {Grid} from '@mui/material';
+import {Widgets} from '@mui/icons-material';
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 import * as consts from '../constants';

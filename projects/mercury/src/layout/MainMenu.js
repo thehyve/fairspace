@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {NavLink} from "react-router-dom";
-import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@material-ui/core";
-import {Assignment, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from "@material-ui/icons";
+import {Divider, List, ListItem, ListItemIcon, ListItemText} from "@mui/material";
+import {Assignment, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from "@mui/icons-material";
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";

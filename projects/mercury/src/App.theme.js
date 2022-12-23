@@ -1,7 +1,7 @@
-import {createTheme} from "@material-ui/core";
-import {blue, indigo, pink} from '@material-ui/core/colors';
+import { createTheme, adaptV4Theme } from "@mui/material";
+import {blue, indigo, pink} from '@mui/material/colors';
 
-export default createTheme({
+export default createTheme(adaptV4Theme({
     palette: {
         primary: process.env.NODE_ENV === 'development' ? blue : indigo,
         secondary: pink
@@ -11,4 +11,4 @@ export default createTheme({
             elevation: 1
         }
     },
-});
+}));

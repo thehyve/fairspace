@@ -1,6 +1,6 @@
 import React from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
-import {MuiThemeProvider} from '@material-ui/core/styles';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import ErrorDialog from './common/components/ErrorDialog';
@@ -15,19 +15,21 @@ import {UserProvider} from "./users/UserContext";
 const App = () => (
     <LogoutContextProvider>
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <MuiThemeProvider theme={theme}>
-                <UserProvider>
-                    <UploadsProvider>
-                        <ClipboardProvider>
-                            <ErrorDialog>
-                                <Router>
-                                    <GlobalRoutes />
-                                </Router>
-                            </ErrorDialog>
-                        </ClipboardProvider>
-                    </UploadsProvider>
-                </UserProvider>
-            </MuiThemeProvider>
+            <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={theme}>
+                    <UserProvider>
+                        <UploadsProvider>
+                            <ClipboardProvider>
+                                <ErrorDialog>
+                                    <Router>
+                                        <GlobalRoutes />
+                                    </Router>
+                                </ErrorDialog>
+                            </ClipboardProvider>
+                        </UploadsProvider>
+                    </UserProvider>
+                </ThemeProvider>
+            </StyledEngineProvider>
         </MuiPickersUtilsProvider>
     </LogoutContextProvider>
 );
