@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {mount} from "enzyme";
 import {MemoryRouter} from "react-router-dom";
 
@@ -21,11 +21,10 @@ describe('Layout', () => {
     // eslint-disable-next-line jest/expect-expect
     it('renders without crashing', () => {
         const element = wrap(<Layout renderMenu={() => null} />);
-
         const div = document.createElement('div');
-
-        ReactDOM.render(element, div);
-        ReactDOM.unmountComponentAtNode(div);
+        const root = createRoot(div);
+        root.render(element);
+        root.unmount();
     });
 
     it('should render content if no required authorization is specified', () => {
