@@ -1,10 +1,7 @@
 import React from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
-import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import {ThemeProvider, StyledEngineProvider} from '@mui/material/styles';
 import ErrorDialog from './common/components/ErrorDialog';
-
 import theme from './App.theme';
 import {UploadsProvider} from "./file/UploadsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';
@@ -13,25 +10,23 @@ import {LogoutContextProvider} from "./users/LogoutContext";
 import {UserProvider} from "./users/UserContext";
 
 const App = () => (
-    <LogoutContextProvider>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+    <ThemeProvider theme={theme}>
+        <LogoutContextProvider>
             <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={theme}>
-                    <UserProvider>
-                        <UploadsProvider>
-                            <ClipboardProvider>
-                                <ErrorDialog>
-                                    <Router>
-                                        <GlobalRoutes />
-                                    </Router>
-                                </ErrorDialog>
-                            </ClipboardProvider>
-                        </UploadsProvider>
-                    </UserProvider>
-                </ThemeProvider>
+                <UserProvider>
+                    <UploadsProvider>
+                        <ClipboardProvider>
+                            <ErrorDialog>
+                                <Router>
+                                    <GlobalRoutes />
+                                </Router>
+                            </ErrorDialog>
+                        </ClipboardProvider>
+                    </UploadsProvider>
+                </UserProvider>
             </StyledEngineProvider>
-        </MuiPickersUtilsProvider>
-    </LogoutContextProvider>
+        </LogoutContextProvider>
+    </ThemeProvider>
 );
 
 export default App;

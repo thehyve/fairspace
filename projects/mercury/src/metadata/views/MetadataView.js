@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
-import { Button, Grid, Typography } from '@mui/material';
+import {Button, Grid, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -175,7 +175,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     onClick={clearFilterCandidates}
                     variant="contained"
                     className={classes.confirmFiltersButton}
-                    disabled={filterCandidates.length === 0}>
+                    disabled={filterCandidates.length === 0}
+                >
                     Cancel
                 </Button>
             </Grid>

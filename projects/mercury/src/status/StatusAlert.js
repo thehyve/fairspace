@@ -1,8 +1,7 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import { Snackbar } from "@mui/material";
+import {Alert, Snackbar} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
-import { Alert } from '@mui/material';
 
 const styles = theme => ({
     alertRoot: {

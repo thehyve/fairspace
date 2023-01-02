@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import { IconButton } from '@mui/material';
+import {IconButton} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Add} from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
@@ -81,7 +81,8 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
                         aria-label="add workspace"
                         className={classes.addButton}
                         onClick={() => handleAlterWorkspacePermissionsDialogShow()}
-                        size="large">
+                        size="large"
+                    >
                         <Add />
                     </IconButton>
                 </Tooltip>

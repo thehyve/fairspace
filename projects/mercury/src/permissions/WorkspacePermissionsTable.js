@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Close, Widgets} from "@mui/icons-material";
 import PropTypes from "prop-types";

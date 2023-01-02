@@ -180,7 +180,8 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 aria-expanded={expanded}
                 aria-label="Show more"
                 title="Access"
-                size="large">
+                size="large"
+            >
                 <ExpandMore />
             </IconButton>
         </>

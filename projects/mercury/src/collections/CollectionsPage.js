@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { Divider, Switch } from "@mui/material";
+import {Divider, Switch} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import Button from "@mui/material/Button";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";

@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {ListItemText, TextField} from '@mui/material';
-import { Autocomplete } from '@mui/material';
+import {Autocomplete, ListItemText, TextField} from '@mui/material';
 import useIsMounted from 'react-is-mounted-hook';
 import {compareBy} from "../../../common/utils/genericUtils";
 

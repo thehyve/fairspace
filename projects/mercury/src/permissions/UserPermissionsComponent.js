@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import { IconButton } from '@mui/material';
+import {IconButton} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Add} from "@mui/icons-material";
 import Toolbar from "@mui/material/Toolbar";
@@ -98,7 +98,8 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
                         aria-label="add user permission"
                         className={classes.addButton}
                         onClick={() => handleAlterUserPermissionsDialogShow()}
-                        size="large">
+                        size="large"
+                    >
                         <Add />
                     </IconButton>
                 </Tooltip>

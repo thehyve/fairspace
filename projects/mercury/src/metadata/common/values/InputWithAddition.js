@@ -32,23 +32,26 @@ const InputWithAddition = ({
             return <MessageDisplay />;
         }
 
-        return <>
-            <IconButton
-                aria-label="Add"
-                title="Add a new"
-                onClick={() => setAdding(true)}
-                size="large">
-                <Add />
-            </IconButton>
-            {adding && (
-                <NewLinkedDataEntityDialog
-                    shape={shape}
-                    onCreate={onCreate}
-                    onClose={handleCloseDialog}
-                    requireIdentifier={requireIdentifier}
-                />
-            )}
-        </>;
+        return (
+            <>
+                <IconButton
+                    aria-label="Add"
+                    title="Add a new"
+                    onClick={() => setAdding(true)}
+                    size="large"
+                >
+                    <Add />
+                </IconButton>
+                {adding && (
+                    <NewLinkedDataEntityDialog
+                        shape={shape}
+                        onCreate={onCreate}
+                        onClose={handleCloseDialog}
+                        requireIdentifier={requireIdentifier}
+                    />
+                )}
+            </>
+        );
     };
 
     return (

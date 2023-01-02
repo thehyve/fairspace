@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import { IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Close, Person} from "@mui/icons-material";
 import FormControl from "@mui/material/FormControl";
@@ -122,7 +122,8 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                     <IconButton
                                         onClick={() => handleDeletePermission(p)}
                                         disabled={!canManageCurrentPermission}
-                                        size="large">
+                                        size="large"
+                                    >
                                         <Close />
                                     </IconButton>
                                 </TableCell>

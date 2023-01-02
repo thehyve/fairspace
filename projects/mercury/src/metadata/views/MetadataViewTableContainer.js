@@ -251,7 +251,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 aria-label="Show/hide columns"
                 title="Show/hide columns"
                 onClick={handleColumnSelectorButtonClick}
-                size="large">
+                size="large"
+            >
                 <ViewColumn color="primary" />
             </IconButton>
             {renderColumnSelector()}

@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
 import {Link as RouterLink} from 'react-router-dom';
-import { Breadcrumbs, Link, SvgIcon, Typography } from '@mui/material';
+import {Breadcrumbs, Link, SvgIcon, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import BreadcrumbsContext from "../contexts/BreadcrumbsContext";
 

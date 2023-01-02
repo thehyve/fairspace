@@ -132,7 +132,8 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                         aria-expanded={expanded}
                         aria-label="Show more"
                         className={expanded ? classes.expandOpen : ''}
-                        size="large">
+                        size="large"
+                    >
                         <ExpandMore />
                     </IconButton>
                 )}

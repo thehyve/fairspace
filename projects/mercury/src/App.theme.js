@@ -1,14 +1,16 @@
-import { createTheme, adaptV4Theme } from "@mui/material";
+import {createTheme} from "@mui/material";
 import {blue, indigo, pink} from '@mui/material/colors';
 
-export default createTheme(adaptV4Theme({
+export default createTheme({
     palette: {
         primary: process.env.NODE_ENV === 'development' ? blue : indigo,
         secondary: pink
     },
-    props: {
+    components: {
         MuiMenu: {
-            elevation: 1
-        }
+            defaultProps: {
+                elevation: 1
+            },
+        },
     },
-}));
+});

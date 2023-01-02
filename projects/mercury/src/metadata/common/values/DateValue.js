@@ -1,5 +1,5 @@
 import React from 'react';
-import {DatePicker} from "@material-ui/pickers";
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {format} from 'date-fns';
 
 import {DATE_FORMAT} from '../../../constants';

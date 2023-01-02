@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import TextField from "@mui/material/TextField";
 import LoadingOverlay from "../common/components/LoadingOverlay";
@@ -43,54 +43,56 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
         </span>
     );
 
-    return <>
-        <Dialog
-            open={!creating}
-            onClose={onClose}
-            aria-labelledby="form-dialog-title"
-            fullWidth
-            maxWidth="sm"
-        >
-            <DialogTitle id="form-dialog-title">
-                <div>
-                    <Typography variant="h5" component="h2">Create workspace</Typography>
-                </div>
-            </DialogTitle>
-            <DialogContent style={{overflowX: 'hidden'}}>
-                <TextField
-                    autoFocus
-                    margin="dense"
-                    id="code"
-                    label="Code"
-                    data-testid="Code"
-                    helperText={renderCodeHelperText()}
-                    value={value}
-                    name="code"
-                    onChange={(event) => setValue(event.target.value)}
-                    fullWidth
-                    required
-                    error={!isCodeValid()}
-                />
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    type="submit"
-                    form="formId"
-                    data-testid="submit-button"
-                    disabled={value === null || !isCodeValid()}
-                    color="primary"
-                    variant="contained"
-                    onClick={onDialogSubmit}
-                >
-                    Save
-                </Button>
-                <Button onClick={onClose} aria-label="Cancel">
-                    Cancel
-                </Button>
-            </DialogActions>
-        </Dialog>
-        <LoadingOverlay loading={creating} />
-    </>;
+    return (
+        <>
+            <Dialog
+                open={!creating}
+                onClose={onClose}
+                aria-labelledby="form-dialog-title"
+                fullWidth
+                maxWidth="sm"
+            >
+                <DialogTitle id="form-dialog-title">
+                    <div>
+                        <Typography variant="h5" component="h2">Create workspace</Typography>
+                    </div>
+                </DialogTitle>
+                <DialogContent style={{overflowX: 'hidden'}}>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="code"
+                        label="Code"
+                        data-testid="Code"
+                        helperText={renderCodeHelperText()}
+                        value={value}
+                        name="code"
+                        onChange={(event) => setValue(event.target.value)}
+                        fullWidth
+                        required
+                        error={!isCodeValid()}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        type="submit"
+                        form="formId"
+                        data-testid="submit-button"
+                        disabled={value === null || !isCodeValid()}
+                        color="primary"
+                        variant="contained"
+                        onClick={onDialogSubmit}
+                    >
+                        Save
+                    </Button>
+                    <Button onClick={onClose} aria-label="Cancel">
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <LoadingOverlay loading={creating} />
+        </>
+    );
 };
 
 export default (withStyles(styles))(WorkspaceDialog);

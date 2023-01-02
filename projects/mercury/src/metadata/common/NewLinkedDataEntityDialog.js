@@ -121,50 +121,52 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const typeDescription = getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION);
 
-    return <>
-        <Dialog
-            open
-            disableEnforceFocus
-            onClose={handleCloseDialog}
-            aria-labelledby="form-dialog-title"
-            fullWidth
-            maxWidth="md"
-        >
-            <DialogTitle id="form-dialog-title">
-                <Typography variant="h5">{typeLabel}</Typography>
-                <Typography variant="subtitle1">{typeDescription}</Typography>
-            </DialogTitle>
-            <DialogContent style={{overflowX: 'hidden'}}>
-                {renderDialogContent()}
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    data-testid="submit-button"
-                    type="submit"
-                    onClick={createEntity}
-                    color="primary"
-                    variant="contained"
-                    form={formId}
-                    disabled={!canCreate() || isUpdating || !isValid}
-                >
-                    {`Create ${typeLabel}`}
-                    {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
-                </Button>
-                <Button onClick={handleCloseDialog} disabled={isUpdating}>
-                    Cancel
-                </Button>
-            </DialogActions>
-        </Dialog>
-        <ConfirmationDialog
-            open={confirmationShown}
-            title="Close form"
-            content="You have unsaved changes, are you sure you want to close the form?"
-            agreeButtonText="Close form"
-            disagreeButtonText="back to form"
-            onAgree={() => onClose()}
-            onDisagree={hideConfirmation}
-        />
-    </>;
+    return (
+        <>
+            <Dialog
+                open
+                disableEnforceFocus
+                onClose={handleCloseDialog}
+                aria-labelledby="form-dialog-title"
+                fullWidth
+                maxWidth="md"
+            >
+                <DialogTitle id="form-dialog-title">
+                    <Typography variant="h5">{typeLabel}</Typography>
+                    <Typography variant="subtitle1">{typeDescription}</Typography>
+                </DialogTitle>
+                <DialogContent style={{overflowX: 'hidden'}}>
+                    {renderDialogContent()}
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        data-testid="submit-button"
+                        type="submit"
+                        onClick={createEntity}
+                        color="primary"
+                        variant="contained"
+                        form={formId}
+                        disabled={!canCreate() || isUpdating || !isValid}
+                    >
+                        {`Create ${typeLabel}`}
+                        {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
+                    </Button>
+                    <Button onClick={handleCloseDialog} disabled={isUpdating}>
+                        Cancel
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <ConfirmationDialog
+                open={confirmationShown}
+                title="Close form"
+                content="You have unsaved changes, are you sure you want to close the form?"
+                agreeButtonText="Close form"
+                disagreeButtonText="back to form"
+                onAgree={() => onClose()}
+                onDisagree={hideConfirmation}
+            />
+        </>
+    );
 };
 
 NewLinkedDataEntityDialog.propTypes = {

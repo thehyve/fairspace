@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import { Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography } from "@mui/material";
+import {Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from "@mui/icons-material";
 import LinearProgress from "@mui/material/LinearProgress";
@@ -67,7 +67,8 @@ export const UploadProgressComponent = ({classes}) => {
             })}
             aria-expanded={expanded}
             aria-label="Show more"
-            size="large">
+            size="large"
+        >
             <ExpandMore />
         </IconButton>
     );

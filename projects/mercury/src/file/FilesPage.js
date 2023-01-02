@@ -4,7 +4,7 @@ import {withRouter} from "react-router-dom";
 import queryString from "query-string";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { Divider, Switch } from "@mui/material";
+import {Divider, Switch} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import Button from "@mui/material/Button";
 import FileBrowser from "./FileBrowser";

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import Grid from "@mui/material/Grid";
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from '@date-io/date-fns';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import {LocalizationProvider} from '@mui/x-date-pickers';
+import DatePicker from '@mui/lab/DatePicker';
 import {format} from 'date-fns';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {DATE_FORMAT} from "../../../constants";
@@ -72,8 +73,8 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const renderDatePicker = (selectedDate, handleDateChange, label, min, max, placeholderDate) => (
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <KeyboardDatePicker
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
                 disableToolbar
                 variant="inline"
                 format={DATE_FORMAT}
@@ -97,7 +98,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                     className: classes.input
                 }}
             />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
     );
 
     return (

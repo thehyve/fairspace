@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chip, Divider, Grid, IconButton, Typography } from '@mui/material';
+import {Chip, Divider, Grid, IconButton, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Close} from "@mui/icons-material";
 import type {MetadataViewColumn} from "./MetadataViewAPI";
@@ -71,7 +71,8 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
                         onClick={clearTextFilters}
                         title="Clear text filters"
                         className={classes.clearButton}
-                        size="large">
+                        size="large"
+                    >
                         <Close color="error" />
                     </IconButton>
                 </Grid>

@@ -30,7 +30,7 @@
     "body-parser": "^1.19.0",
     "classnames": "^2.2.6",
     "cors": "^2.8.5",
-    "date-fns": "2.28.0",
+    "date-fns": "^2.29.3",
     "deepmerge": "^4.2.2",
     "escape-string-regexp": "^5.0.0",
     "filesize": "^8.0.7",

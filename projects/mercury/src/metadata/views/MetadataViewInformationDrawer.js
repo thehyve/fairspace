@@ -57,7 +57,8 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
                         aria-expanded={expanded}
                         aria-label="Show more"
                         className={expanded ? classes.expandOpen : ''}
-                        size="large">
+                        size="large"
+                    >
                         <ExpandMore />
                     </IconButton>
                 )}

@@ -1,4 +1,4 @@
-import { alpha } from '@mui/material/styles';
+import {alpha} from '@mui/material/styles';
 import * as consts from "../../constants";
 
 const CENTRAL_PANEL_WIDTH = '70%';

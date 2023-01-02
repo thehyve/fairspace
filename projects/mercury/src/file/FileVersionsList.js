@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Column, InfiniteLoader, Table} from 'react-virtualized';
 import 'react-virtualized/styles.css';
-import { IconButton } from "@mui/material";
+import {IconButton} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import {SettingsBackupRestore} from "@mui/icons-material";
 import TableCell from "@mui/material/TableCell";
@@ -150,7 +150,8 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                 component="a"
                 href={getDownloadLink(loadedData[rowIndex].version)}
                 download
-                size="large">
+                size="large"
+            >
                 <Download />
             </IconButton>
         </TableCell>
@@ -163,7 +164,8 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                 title="Revert to this version"
                 onClick={() => handleRevertToVersion(loadedData[rowIndex].version)}
                 disabled={loadedData[rowIndex].version === selectedFileVersion}
-                size="large">
+                size="large"
+            >
                 <SettingsBackupRestore />
             </IconButton>
         </TableCell>

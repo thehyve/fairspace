@@ -44,14 +44,16 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleFirstPageButtonClick}
                 disabled={page === 0}
                 aria-label="first page"
-                size="large">
+                size="large"
+            >
                 <FirstPage />
             </IconButton>
             <IconButton
                 onClick={handleBackButtonClick}
                 disabled={page === 0}
                 aria-label="previous page"
-                size="large">
+                size="large"
+            >
                 <KeyboardArrowLeft />
             </IconButton>
             <Typography variant="body2" component="span" display="inline">{page + 1}</Typography>
@@ -59,14 +61,16 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleNextButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                 aria-label="next page"
-                size="large">
+                size="large"
+            >
                 <KeyboardArrowRight />
             </IconButton>
             <IconButton
                 onClick={handleLastPageButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                 aria-label="last page"
-                size="large">
+                size="large"
+            >
                 <LastPage />
             </IconButton>
         </div>

@@ -79,7 +79,8 @@ const LinkedDataEntityFormContainer = ({
                     onClick={() => {
                         clearForm();
                         setEditingEnabled(!showEditButtons);
-                    }}>Cancel
+                    }}
+                >Cancel
                 </Button>
             </div>
         );
@@ -129,7 +130,9 @@ const LinkedDataEntityFormContainer = ({
                         onClick={() => {
                             setEditingEnabled(true);
                         }}
-                        size="large"><Edit />
+                        size="large"
+                    >
+                        <Edit />
                     </IconButton>
                 )}
                 {!editingEnabled && contextMenu}

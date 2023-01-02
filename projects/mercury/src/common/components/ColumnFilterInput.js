@@ -1,6 +1,6 @@
 import {TextField} from "@mui/material";
 import React, {useEffect, useState} from "react";
-import { alpha } from "@mui/material/styles";
+import {alpha} from "@mui/material/styles";
 import makeStyles from '@mui/styles/makeStyles';
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
@@ -100,7 +100,8 @@ const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useAp
                                     className={classes.adornedEndIcon}
                                     title="Apply filter"
                                     color="primary"
-                                    size="large">
+                                    size="large"
+                                >
                                     <SearchIcon size="small" />
                                 </IconButton>
                             )}

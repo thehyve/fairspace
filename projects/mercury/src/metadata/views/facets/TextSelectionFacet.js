@@ -192,7 +192,8 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                                 onClick={() => setTextFilterValue("")}
                                 disabled={!textFilterValue}
                                 style={{order: 1}}
-                                size="large">
+                                size="large"
+                            >
                                 <Clear color="disabled" fontSize="small" />
                             </IconButton>
                         )}
