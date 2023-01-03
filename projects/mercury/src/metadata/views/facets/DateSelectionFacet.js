@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Grid from "@mui/material/Grid";
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import {LocalizationProvider} from '@mui/x-date-pickers';
+import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker';
 import {format} from 'date-fns';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
