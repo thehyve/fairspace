@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react';
 import Grid from "@mui/material/Grid";
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
-import DatePicker from '@mui/lab/DatePicker';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {format} from 'date-fns';
+import TextField from '@mui/material/TextField';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {DATE_FORMAT} from "../../../constants";
 
@@ -97,6 +98,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 InputProps={{
                     className: classes.input
                 }}
+                renderInput={(params) => <TextField {...params} />}
             />
         </LocalizationProvider>
     );

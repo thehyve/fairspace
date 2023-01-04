@@ -16,7 +16,7 @@ import {
     ListItem,
     ListItemText,
     MenuItem,
-    Select,
+    TextField,
     Typography,
 } from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
@@ -52,7 +52,6 @@ const styles = theme => ({
     permissionsCard: {
         marginTop: 10
     },
-
     avatar: {
         width: 20,
         height: 20,
@@ -70,7 +69,8 @@ const styles = theme => ({
         marginTop: 10
     },
     group: {
-        marginLeft: 20
+        marginLeft: 20,
+        marginBottom: 0
     },
     accessIcon: {
         verticalAlign: 'middle'
@@ -229,10 +229,11 @@ export const PermissionCard = (props: PermissionCardProperties) => {
     );
     const showMultipleAccessModes = () => (
         <FormControl>
-            <Select
+            <TextField
                 value={collection.accessMode}
                 onChange={mode => handleSetAccessMode(mode)}
                 inputProps={{'aria-label': 'View mode'}}
+                select
             >
                 {/* show available access modes which user can select */}
                 {collection.availableAccessModes.map(mode => (
@@ -253,7 +254,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                             />
                         </MenuItem>
                     ))}
-            </Select>
+            </TextField>
         </FormControl>
     );
 
@@ -301,10 +302,11 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             <Box className={classes.group}>
                 <FormGroup>
                     {collection.canManage ? (
-                        <Select
+                        <TextField
                             value={ownerWorkspaceAccess}
                             onChange={access => handleSetOwnerWorkspaceAccess(access)}
                             inputProps={{'aria-label': 'Owner workspace access'}}
+                            select
                         >
                             {availableWorkspaceMembersAccessLevels.map(access => (
                                 <MenuItem key={access} value={access}>
@@ -312,7 +314,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                                     <span className={classes.accessName}>{access}</span>
                                 </MenuItem>
                             ))}
-                        </Select>
+                        </TextField>
                     ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
                 </FormGroup>
                 <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
@@ -349,7 +351,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    <div style={{overflowX: 'auto'}}>
+                    <div>
                         <List>
                             <ListItem disableGutters>
                                 {renderAccessMode()}

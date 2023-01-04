@@ -29,11 +29,13 @@ const styles = {
         display: "flex",
         paddingTop: 0,
         paddingBottom: 0,
-        height: 48,
-        minHeight: 48
+        height: 35,
+        minHeight: 35
     },
     addButton: {
-        marginLeft: "auto"
+        marginLeft: "auto",
+        paddingTop: 0,
+        paddingBottom: 0
     }
 };
 
