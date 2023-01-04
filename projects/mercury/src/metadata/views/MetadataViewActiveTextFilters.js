@@ -71,7 +71,7 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
                         onClick={clearTextFilters}
                         title="Clear text filters"
                         className={classes.clearButton}
-                        size="large"
+                        size="medium"
                     >
                         <Close color="error" />
                     </IconButton>

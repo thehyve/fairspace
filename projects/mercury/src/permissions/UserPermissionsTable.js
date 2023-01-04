@@ -122,7 +122,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
                                     <IconButton
                                         onClick={() => handleDeletePermission(p)}
                                         disabled={!canManageCurrentPermission}
-                                        size="large"
+                                        size="medium"
                                     >
                                         <Close />
                                     </IconButton>

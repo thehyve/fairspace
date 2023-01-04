@@ -21,7 +21,7 @@ const CollectionBrowserLink = ({type, filePath}) => {
 
     return (
         <Link to={`${COLLECTIONS_PATH}/${linkLocation}`}>
-            <IconButton aria-label="Go to item" title="Go" size="large">
+            <IconButton aria-label="Go to item" title="Go" size="medium">
                 <FolderOpen />
             </IconButton>
         </Link>

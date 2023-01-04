@@ -150,7 +150,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                 component="a"
                 href={getDownloadLink(loadedData[rowIndex].version)}
                 download
-                size="large"
+                size="medium"
             >
                 <Download />
             </IconButton>
@@ -164,7 +164,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                 title="Revert to this version"
                 onClick={() => handleRevertToVersion(loadedData[rowIndex].version)}
                 disabled={loadedData[rowIndex].version === selectedFileVersion}
-                size="large"
+                size="medium"
             >
                 <SettingsBackupRestore />
             </IconButton>

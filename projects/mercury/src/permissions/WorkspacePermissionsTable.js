@@ -59,7 +59,7 @@ export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermis
                             </TableCell>
                             <TableCell width={40} className={classes.iconCell} align="right">
                                 {canManage && (
-                                    <IconButton onClick={() => handleDeleteSelectedPermission(p)} size="large">
+                                    <IconButton onClick={() => handleDeleteSelectedPermission(p)} size="medium">
                                         <Close />
                                     </IconButton>
                                 )}

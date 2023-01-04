@@ -56,7 +56,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
             onClick={toggleExpand}
             aria-expanded={expanded}
             aria-label="Show more"
-            size="large"
+            size="medium"
         >
             <ExpandMore />
         </IconButton>
@@ -68,7 +68,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
                 onClick={clearFilter}
                 aria-label="Clear"
                 className={classes.headerIcon}
-                size="large"
+                size="medium"
             >
                 <Clear fontSize="small" color="primary" />
             </IconButton>

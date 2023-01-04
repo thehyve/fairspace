@@ -59,7 +59,7 @@ const SearchBar = ({
                                 className={classes.searchIcon}
                                 title="Apply filter"
                                 color="primary"
-                                size="large"
+                                size="medium"
                             >
                                 <SearchIcon />
                             </IconButton>

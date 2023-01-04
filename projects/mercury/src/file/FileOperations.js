@@ -201,7 +201,7 @@ export const FileOperations = ({
                                     aria-label="Create directory"
                                     title="Create directory"
                                     disabled={busy}
-                                    size="large"
+                                    size="medium"
                                 >
                                     <CreateNewFolder />
                                 </IconButton>
@@ -213,7 +213,7 @@ export const FileOperations = ({
                             title="Upload &hellip;"
                             disabled={busy}
                             onClick={handleUploadMenuClick}
-                            size="large"
+                            size="medium"
                         >
                             <CloudUpload />
                         </IconButton>
@@ -250,7 +250,7 @@ export const FileOperations = ({
                     component="a"
                     href={fileActions.getDownloadLink(selectedItem.filename)}
                     download
-                    size="large"
+                    size="medium"
                 >
                     <Download />
                 </IconButton>
@@ -266,7 +266,7 @@ export const FileOperations = ({
                                     title={`Rename ${selectedItem.basename}`}
                                     aria-label={`Rename ${selectedItem.basename}`}
                                     disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
-                                    size="large"
+                                    size="medium"
                                 >
                                     <BorderColor />
                                 </IconButton>
@@ -284,7 +284,7 @@ export const FileOperations = ({
                                     title="Delete"
                                     aria-label="Delete"
                                     disabled={noPathSelected || busy}
-                                    size="large"
+                                    size="medium"
                                 >
                                     <Delete />
                                 </IconButton>
@@ -303,7 +303,7 @@ export const FileOperations = ({
                                         title="Undelete"
                                         aria-label="Undelete"
                                         disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
-                                        size="large"
+                                        size="medium"
                                     >
                                         <RestoreFromTrash />
                                     </IconButton>
@@ -321,7 +321,7 @@ export const FileOperations = ({
                         title="Copy"
                         onClick={e => handleCopy(e)}
                         disabled={noPathSelected || isDeletedItemSelected || busy}
-                        size="large"
+                        size="medium"
                     >
                         <ContentCopy />
                     </IconButton>
@@ -333,7 +333,7 @@ export const FileOperations = ({
                             title="Cut"
                             onClick={e => handleCut(e)}
                             disabled={noPathSelected || isDeletedItemSelected || busy}
-                            size="large"
+                            size="medium"
                         >
                             <ContentCut />
                         </IconButton>
@@ -343,7 +343,7 @@ export const FileOperations = ({
                                 title="Paste"
                                 onClick={e => handlePaste(e)}
                                 disabled={isPasteDisabled || isDeletedItemSelected || busy}
-                                size="large"
+                                size="medium"
                             >
                                 {addBadgeIfNotEmpty(clipboard.length(), <ContentPaste />)}
                             </IconButton>
@@ -364,7 +364,7 @@ export const FileOperations = ({
                                 aria-label="Show history"
                                 title="Show history"
                                 disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
-                                size="large"
+                                size="medium"
                             >
                                 <Restore />
                             </IconButton>

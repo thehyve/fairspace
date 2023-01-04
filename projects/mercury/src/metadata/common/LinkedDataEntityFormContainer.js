@@ -130,7 +130,7 @@ const LinkedDataEntityFormContainer = ({
                         onClick={() => {
                             setEditingEnabled(true);
                         }}
-                        size="large"
+                        size="medium"
                     >
                         <Edit />
                     </IconButton>

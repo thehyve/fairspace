@@ -56,7 +56,7 @@ const AddValueToList = (props: AddValueToListProps) => {
                             onAdd(value);
                         }}
                         aria-label="Add"
-                        size="large"
+                        size="medium"
                     >
                         <Add color={newValue ? 'primary' : 'inherit'} />
                     </IconButton>
@@ -155,7 +155,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                                     }}
                                     style={{opacity: hoveredIndex === idx ? 1 : 0}}
                                     aria-label="Delete"
-                                    size="large"
+                                    size="medium"
                                 >
                                     <Clear />
                                 </IconButton>

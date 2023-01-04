@@ -42,7 +42,7 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
                     aria-label="Delete this resource"
                     title="Delete"
                     disabled={!isDeletable}
-                    size="large"
+                    size="medium"
                 >
                     <Delete />
                 </IconButton>

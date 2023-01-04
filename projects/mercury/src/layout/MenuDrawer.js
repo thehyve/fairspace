@@ -16,7 +16,7 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
         }}
     >
         <div className={classes.toolbar}>
-            <IconButton onClick={toggleMenuExpansion} size="large">
+            <IconButton onClick={toggleMenuExpansion} size="medium">
                 {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
         </div>

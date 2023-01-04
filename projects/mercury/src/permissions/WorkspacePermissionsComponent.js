@@ -83,7 +83,7 @@ export const WorkspacePermissionsComponent = ({permissions, setPermission, colle
                         aria-label="add workspace"
                         className={classes.addButton}
                         onClick={() => handleAlterWorkspacePermissionsDialogShow()}
-                        size="large"
+                        size="medium"
                     >
                         <Add />
                     </IconButton>

@@ -44,7 +44,7 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleFirstPageButtonClick}
                 disabled={page === 0}
                 aria-label="first page"
-                size="large"
+                size="medium"
             >
                 <FirstPage />
             </IconButton>
@@ -52,7 +52,7 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleBackButtonClick}
                 disabled={page === 0}
                 aria-label="previous page"
-                size="large"
+                size="medium"
             >
                 <KeyboardArrowLeft />
             </IconButton>
@@ -61,7 +61,7 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleNextButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                 aria-label="next page"
-                size="large"
+                size="medium"
             >
                 <KeyboardArrowRight />
             </IconButton>
@@ -69,7 +69,7 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
                 onClick={handleLastPageButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}
                 aria-label="last page"
-                size="large"
+                size="medium"
             >
                 <LastPage />
             </IconButton>

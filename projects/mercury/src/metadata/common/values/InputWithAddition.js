@@ -38,7 +38,7 @@ const InputWithAddition = ({
                     aria-label="Add"
                     title="Add a new"
                     onClick={() => setAdding(true)}
-                    size="large"
+                    size="medium"
                 >
                     <Add />
                 </IconButton>

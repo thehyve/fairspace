@@ -203,7 +203,7 @@ const MetadataCard = (props) => {
                                         </>
                                     )}
                                 >
-                                    <IconButton onClick={open} size="large"><CloudUpload /></IconButton>
+                                    <IconButton onClick={open} size="medium"><CloudUpload /></IconButton>
                                 </Tooltip>
                             ))}
                         <IconButton
@@ -211,7 +211,7 @@ const MetadataCard = (props) => {
                             aria-expanded={expanded}
                             aria-label="Show more"
                             className={expanded ? classes.expandOpen : ''}
-                            size="large"
+                            size="medium"
                         >
                             <ExpandMore />
                         </IconButton>

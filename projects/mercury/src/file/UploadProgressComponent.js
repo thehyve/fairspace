@@ -67,7 +67,7 @@ export const UploadProgressComponent = ({classes}) => {
             })}
             aria-expanded={expanded}
             aria-label="Show more"
-            size="large"
+            size="medium"
         >
             <ExpandMore />
         </IconButton>
@@ -122,7 +122,7 @@ export const UploadProgressComponent = ({classes}) => {
                                 <TableCell width={40} padding="none">
                                     { upload.status === UPLOAD_STATUS_ERROR
                                         && (
-                                            <IconButton aria-label="remove" onClick={() => removeUpload(upload)} size="large">
+                                            <IconButton aria-label="remove" onClick={() => removeUpload(upload)} size="medium">
                                                 <HighlightOffOutlined fontSize="small" />
                                             </IconButton>
                                         )}

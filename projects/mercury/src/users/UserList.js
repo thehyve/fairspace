@@ -195,7 +195,7 @@ const UserList = (props: UserListProps) => {
                                         agreeButtonText="Remove user"
                                         dangerous
                                     >
-                                        <IconButton disabled={!canManage} size="large">
+                                        <IconButton disabled={!canManage} size="medium">
                                             <HighlightOffSharp />
                                         </IconButton>
                                     </ConfirmationButton>

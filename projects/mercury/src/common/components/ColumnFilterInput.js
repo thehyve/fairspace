@@ -100,7 +100,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useAp
                                     className={classes.adornedEndIcon}
                                     title="Apply filter"
                                     color="primary"
-                                    size="large"
+                                    size="medium"
                                 >
                                     <SearchIcon size="small" />
                                 </IconButton>

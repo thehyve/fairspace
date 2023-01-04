@@ -100,7 +100,7 @@ export const UserPermissionsComponent = ({permissions, setPermission, collection
                         aria-label="add user permission"
                         className={classes.addButton}
                         onClick={() => handleAlterUserPermissionsDialogShow()}
-                        size="large"
+                        size="medium"
                     >
                         <Add />
                     </IconButton>
