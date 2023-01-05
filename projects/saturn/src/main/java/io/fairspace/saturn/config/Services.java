@@ -13,10 +13,13 @@ import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.webdav.BlobStore;
-import io.fairspace.saturn.webdav.DavFactory;
-import io.fairspace.saturn.webdav.LocalBlobStore;
-import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
+import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,6 +28,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
+import org.apache.jena.vocabulary.RDFS;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
@@ -35,8 +39,6 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 @Log4j2
 @Getter
 public class Services {
-    public static final Symbol FS_ROOT = Symbol.create("file_system_root");
-    public static final Symbol USER_SERVICE = Symbol.create("user_service");
     public static final Symbol METADATA_SERVICE = Symbol.create("metadata_service");
 
     private final Config config;
@@ -52,6 +54,10 @@ public class Services {
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
+
+    private final BlobStore extraBlobStore;
+    private final DavFactory extraDavFactory;
+    private final HttpServlet extraDavServlet;
     private final DatasetGraph filteredDatasetGraph;
     private final HealthService healthService;
     private final MaintenanceService maintenanceService;
@@ -61,12 +67,30 @@ public class Services {
         this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions);
-        dataset.getContext().set(USER_SERVICE, userService);
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(CONFIG.publicUrl + "/api/webdav"), blobStore, userService, dataset.getContext());
-        dataset.getContext().set(FS_ROOT, davFactory.root);
+        davFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"), blobStore, userService, dataset.getContext());
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
+
+        if (config.extraStorage.enabled) {
+            extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
+            extraDavFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"), extraBlobStore, userService, dataset.getContext());
+            extraDavServlet = new WebDAVServlet(extraDavFactory, transactions, extraBlobStore);
+                this.transactions.calculateWrite(ds2 -> {
+                    for (var rc : CONFIG.extraStorage.rootCollections) {
+                        try {
+                            extraDavFactory.root.createCollection(rc);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    return null;
+                });
+        } else {
+            extraBlobStore = null;
+            extraDavFactory = null;
+            extraDavServlet = null;
+        }
 
         workspaceService = new WorkspaceService(transactions, userService);
 

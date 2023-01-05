@@ -45,6 +45,7 @@ public class App {
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
+                .addServlet(API_PREFIX + "/extra-storage/*", svc.getExtraDavServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port);
         var server = serverBuilder

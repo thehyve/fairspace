@@ -1,5 +1,7 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

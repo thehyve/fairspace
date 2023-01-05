@@ -3,6 +3,8 @@ package io.fairspace.saturn.webdav;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.resources.CollectionResource;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import org.apache.jena.rdf.model.Model;

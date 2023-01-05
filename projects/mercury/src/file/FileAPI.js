@@ -114,6 +114,40 @@ class FileAPI {
             });
     }
 
+    /**
+     * Uploads a file
+     * @param file
+     * @param destinationFilename
+     * @param destinationPath
+     * @param deleteExistingBlob
+     * @returns {Promise<never>|Promise<any[]>}
+     */
+    upload(file, destinationFilename, destinationPath, deleteExistingBlob = false) {
+        if (!file) {
+            return Promise.reject(Error("No file given"));
+        }
+
+        const options = {...defaultOptions};
+        if (deleteExistingBlob) {
+            options.headers = {...options.headers, "Delete-Existing-Blob": true};
+        }
+
+        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("You are not authorized to add files \nto this storage.");
+                        case 413:
+                            throw new Error("Payload too large");
+                    }
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
     uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
         const totalSize = files.reduce((size, file) => size + file.size, 0);
         if (totalSize > maxFileSizeBytes) {
@@ -420,5 +454,7 @@ class FileAPI {
 }
 
 export const LocalFileAPI = new FileAPI();
+
+export const ExtraLocalStorage = new FileAPI('/api/extra-storage');
 
 export default FileAPI;

@@ -7,6 +7,8 @@ import io.fairspace.saturn.services.metadata.validation.*;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.*;
 import io.milton.resource.*;
@@ -27,7 +29,6 @@ import java.util.stream.*;
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.config.Services.*;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,7 +70,6 @@ public class ViewServiceTest {
         var context = new Context();
 
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
-        ds.getContext().set(FS_ROOT, davFactory.root);
 
         viewService = new ViewService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, ds, viewStoreClientFactory);
 

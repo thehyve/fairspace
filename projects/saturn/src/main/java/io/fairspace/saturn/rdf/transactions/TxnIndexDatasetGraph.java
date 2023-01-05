@@ -10,6 +10,9 @@ import org.apache.jena.sparql.core.*;
 
 import java.util.Date;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
 @Slf4j
 public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
@@ -52,18 +55,22 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void commit() {
         if (isInWriteTransaction()) {
-            log.debug("Commit updated subjects: {}", updatedSubjects);
-            var start = new Date().getTime();
-            try (var viewStoreClient = viewStoreClientFactory.build();
-                 var viewUpdater = new ViewUpdater(viewStoreClient, dsg)) {
-                updatedSubjects.forEach(viewUpdater::updateSubject);
-                viewUpdater.commit();
-                log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);
-            } catch(Exception e) {
-                log.error("Updating {} subjects failed after {}ms", updatedSubjects.size(), new Date().getTime() - start, e);
-                throw e;
-            } finally {
+            if (updatedSubjects.stream().anyMatch(r -> r.isURI() && r.getURI().startsWith(CONFIG.publicUrl + "/api/extra-storage"))) {
                 updatedSubjects.clear();
+            } else {
+                log.debug("Commit updated subjects: {}", updatedSubjects);
+                var start = new Date().getTime();
+                try (var viewStoreClient = viewStoreClientFactory.build();
+                     var viewUpdater = new ViewUpdater(viewStoreClient, dsg)) {
+                    updatedSubjects.forEach(viewUpdater::updateSubject);
+                    viewUpdater.commit();
+                    log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);
+                } catch (Exception e) {
+                    log.error("Updating {} subjects failed after {}ms", updatedSubjects.size(), new Date().getTime() - start, e);
+                    throw e;
+                } finally {
+                    updatedSubjects.clear();
+                }
             }
         }
         super.commit();

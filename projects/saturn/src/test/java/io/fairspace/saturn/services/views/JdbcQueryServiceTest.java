@@ -10,6 +10,8 @@ import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.*;
 import io.milton.resource.*;
@@ -30,7 +32,6 @@ import java.util.stream.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.config.Services.FS_ROOT;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.Mockito.*;
@@ -94,7 +95,6 @@ public class JdbcQueryServiceTest {
         var context = new Context();
 
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
-        ds.getContext().set(FS_ROOT, davFactory.root);
 
         queryService = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClientFactory, tx, davFactory.root);
 

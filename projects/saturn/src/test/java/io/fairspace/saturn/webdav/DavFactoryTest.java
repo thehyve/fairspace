@@ -10,6 +10,8 @@ import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceRole;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;

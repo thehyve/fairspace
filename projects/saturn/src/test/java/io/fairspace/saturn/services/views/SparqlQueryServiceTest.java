@@ -10,6 +10,8 @@ import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.*;
 import io.milton.resource.*;
@@ -28,7 +30,6 @@ import java.util.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.config.Services.*;
 import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.junit.Assert.*;
@@ -105,7 +106,6 @@ public class SparqlQueryServiceTest {
 
         var context = new Context();
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
-        ds.getContext().set(FS_ROOT, davFactory.root);
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);

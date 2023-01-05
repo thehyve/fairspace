@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     Button,
     CircularProgress,
@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {useHistory} from "react-router-dom";
-import {ViewColumn} from "@mui/icons-material";
+import {Addchart, ViewColumn} from "@mui/icons-material";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import Popover from "@mui/material/Popover";
@@ -30,6 +30,8 @@ import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 import TablePaginationActions from "../../common/components/TablePaginationActions";
+import {ExtraLocalStorage} from "../../file/FileAPI";
+import UserContext from "../../users/UserContext";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -87,7 +89,7 @@ const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_C
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
-
+    const {currentUser} = useContext(UserContext);
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
@@ -180,13 +182,15 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return values;
     };
 
-    const exportTableCsv = () => {
-        const fileName = "fairspace_export.csv";
-        // add header
+    const createCsvBlob = (): Blob => {
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
+        return new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
+    };
 
-        const blob = new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
+    const exportTable = () => {
+        const blob = createCsvBlob();
+        const fileName = "fairspace_export.csv";
         const link = document.createElement("a");
         if (link.download !== undefined) { // feature detection
             // Browsers that support HTML5 download attribute
@@ -198,6 +202,13 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             link.click();
             document.body.removeChild(link);
         }
+    };
+
+    const saveTableExtraStorage = () => {
+        let csvFile = getCsvHeader();
+        csvFile += getCsvValues();
+        const fileName = `fairspace_export_${currentUser.id}.csv`;
+        ExtraLocalStorage.upload(csvFile, fileName, "/analysis-export", true);
     };
 
     const renderMessages = () => (
@@ -321,13 +332,24 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 </TableContainer>
                 <div className={classes.footerButtonDiv}>
                     <Button
+                        color="primary"
                         className={classes.exportButton}
-                        onClick={exportTableCsv}
+                        onClick={exportTable}
                         variant="contained"
                         endIcon={<GetAppIcon fontSize="small" />}
                         disabled={checkedCount === 0}
                     >
                         Download selection ({checkedCount})
+                    </Button>
+                    <Button
+                        color="primary"
+                        className={classes.exportButton}
+                        onClick={saveTableExtraStorage}
+                        variant="contained"
+                        endIcon={<Addchart fontSize="small" />}
+                        disabled={checkedCount === 0}
+                    >
+                        Export to analysis ({checkedCount})
                     </Button>
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
