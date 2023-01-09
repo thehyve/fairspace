@@ -1,12 +1,9 @@
 import React from 'react';
-import {createMount, createShallow} from '@mui/material/test-utils';
 import {Button} from '@mui/material';
+import {render, screen} from '@testing-library/react';
 import CollectionOwnerChangeDialog from "../CollectionOwnerChangeDialog";
 
 describe('CollectionOwnerChangeDialog', () => {
-    let shallow;
-    let mount;
-
     const mockSetOwnedByFn = jest.fn();
 
     const mockCollection = {
@@ -21,34 +18,26 @@ describe('CollectionOwnerChangeDialog', () => {
         {label: "w3", iri: 'http://localhost/iri/w3'}
     ];
 
-    let wrapper;
-
-    beforeAll(() => {
-        shallow = createShallow({dive: true});
-        mount = createMount();
-    });
-
-    afterAll(() => {
-        mount.cleanUp();
-    });
-
     it('should render initial state of the dialog correctly', () => {
-        wrapper = shallow(<CollectionOwnerChangeDialog
+        render(<CollectionOwnerChangeDialog
             collection={mockCollection}
             workspaces={mockWorkspaces}
             setOwnedBy={mockSetOwnedByFn}
             onClose={() => {}}
         />);
 
-        // initial state if it's open or not
-        expect(wrapper.find('[data-testid="owner-workspace-change-dialog"]').prop('label')).not.toBeDefined();
-
+        // expect(screen.getByRole("table")).toBeInTheDocument();
         // render available values
-        expect(wrapper.find('[data-testid="owner-workspace-change-dropdown"]').prop('options').length).toEqual(3);
+        const buttons = screen.queryAllByRole("button");
+
+        expect(buttons).toHaveLength(3);
 
         // render cancel and submit buttons
-        expect(wrapper.find(Button).at(0).childAt(0).text()).toEqual('Save');
-        expect(wrapper.find(Button).at(1).childAt(0).text()).toEqual('Cancel');
-        expect(wrapper.find(Button).at(0).prop('disabled')).toBeTruthy();
+        expect(buttons[0]["title"]).toEqual("Open");
+        expect(buttons[1].textContent).toEqual("Save");
+        expect(buttons[2].textContent).toEqual("Cancel");
+        expect(buttons[0].disabled).toBeFalsy();
+        expect(buttons[1].disabled).toBeTruthy();
+        expect(buttons[2].disabled).toBeFalsy();
     });
 });

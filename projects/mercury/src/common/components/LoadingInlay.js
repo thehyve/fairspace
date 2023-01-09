@@ -12,7 +12,7 @@ const styles = theme => ({
 });
 
 const loadingInlay = (props) => (
-    <div className={props.inlayProgress}>
+    <div className={props.inlayProgress} data-testid="loading">
         <CircularProgress />
     </div>
 );

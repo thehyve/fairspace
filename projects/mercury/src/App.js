@@ -1,7 +1,7 @@
 import React from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
-import {ThemeProvider, StyledEngineProvider} from '@mui/material/styles';
 import ErrorDialog from './common/components/ErrorDialog';
+import {ThemeProvider, StyledEngineProvider} from '@mui/material/styles';
 import theme from './App.theme';
 import {UploadsProvider} from "./file/UploadsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';

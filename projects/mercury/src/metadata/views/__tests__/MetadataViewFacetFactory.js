@@ -1,4 +1,4 @@
-import {mount} from "enzyme";
+import {configure, mount} from "enzyme";
 import React from "react";
 // eslint-disable-next-line jest/no-mocks-import
 import {Checkbox, Slider} from "@mui/material";
@@ -11,16 +11,26 @@ import TextSelectionFacet from "../facets/TextSelectionFacet";
 import {mockFacets} from "../__mocks__/MetadataViewAPI";
 import NumericalRangeSelectionFacet from "../facets/NumericalRangeSelectionFacet";
 import DateSelectionFacet from "../facets/DateSelectionFacet";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../../App.theme';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 describe('MetadataViewFacetFactory', () => {
     it('should properly handle invalid facet type', () => {
-        const wrapper = mount(<Facet
-            title="Facet1"
-            options={[]}
-            type="unknown_type"
-            onChange={() => {}}
-            activeFilterValues={[]}
-        />);
+        const wrapper = mount(
+            <ThemeProvider theme={theme}>
+                <Facet
+                title="Facet1"
+                options={[]}
+                type="unknown_type"
+                onChange={() => {}}
+                activeFilterValues={[]}
+                />
+            </ThemeProvider>);
 
         expect(wrapper.find(FormLabel).length).toEqual(0);
     });
@@ -28,13 +38,16 @@ describe('MetadataViewFacetFactory', () => {
     it('should render a text selection facet', () => {
         const title = "Gender";
         const options = mockFacets("Subject").find(v => v.title === title).values;
-        const wrapper = mount(<Facet
-            title={title}
-            options={options}
-            type="Term"
-            onChange={() => {}}
-            activeFilterValues={[]}
-        />);
+        const wrapper = mount(
+            <ThemeProvider theme={theme}>
+                <Facet
+                title={title}
+                options={options}
+                type="Term"
+                onChange={() => {}}
+                activeFilterValues={[]}
+                />
+            </ThemeProvider>);
 
         const textSelectionFacet = wrapper.find(TextSelectionFacet);
         expect(textSelectionFacet.length).toEqual(1);
@@ -50,13 +63,16 @@ describe('MetadataViewFacetFactory', () => {
     it('should render a numerical range selection facet', () => {
         const title = "Tumor cellularity";
         const mockFacet = mockFacets("Sample").find(v => v.title === title);
-        const wrapper = mount(<Facet
-            title={title}
-            options={[mockFacet.min, mockFacet.max]}
-            type="Number"
-            onChange={() => {}}
-            activeFilterValues={[]}
-        />);
+        const wrapper = mount(
+            <ThemeProvider theme={theme}>
+                <Facet
+                    title={title}
+                    options={[mockFacet.min, mockFacet.max]}
+                    type="Number"
+                    onChange={() => {}}
+                    activeFilterValues={[]}
+                />
+            </ThemeProvider>);
 
         const numericalRangeSelectionFacet = wrapper.find(NumericalRangeSelectionFacet);
         expect(numericalRangeSelectionFacet.length).toEqual(1);
@@ -76,13 +92,16 @@ describe('MetadataViewFacetFactory', () => {
     it('should render a date selection facet', () => {
         const title = "Birth date";
         const mockFacet = mockFacets("Subject").find(v => v.title === title);
-        const wrapper = mount(<Facet
+        const wrapper = mount(
+        <ThemeProvider theme={theme}>
+            <Facet
             title={title}
             options={[mockFacet.min, mockFacet.max]}
             type="Date"
             onChange={() => {}}
             activeFilterValues={[]}
-        />);
+            />
+        </ThemeProvider>);
 
         const dateSelectionFacet = wrapper.find(DateSelectionFacet);
         expect(dateSelectionFacet.length).toEqual(1);

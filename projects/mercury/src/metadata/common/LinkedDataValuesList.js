@@ -22,7 +22,7 @@ const AddValueToList = (props: AddValueToListProps) => {
     const [newValue, setNewValue] = useState('');
     const isStringValue = (AddComponent === StringValue);
     return (
-        <Grid container spacing={1} alignItems="center" className={classes.addValue}>
+        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={"" + labelId}>
             <Grid item xs={isStringValue ? 10 : 12}>
                 <AddComponent
                     data-testid="add-value-input"

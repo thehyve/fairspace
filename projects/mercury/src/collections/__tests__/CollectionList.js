@@ -1,14 +1,20 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {render} from '@testing-library/react';
-
-import {mount} from "enzyme";
+import {configure, mount} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {TableRow} from "@mui/material";
 import CollectionList from "../CollectionList";
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../App.theme';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 describe('CollectionList', () => {
     it('shows warning message when no collections available', () => {
-        const {getByText} = render(<CollectionList />);
+        const {getByText} = render(<ThemeProvider theme={theme}><CollectionList /></ThemeProvider>);
         expect(getByText(/No collections available/i)).toBeInTheDocument();
     });
 
@@ -23,7 +29,7 @@ describe('CollectionList', () => {
         }];
 
         const {queryByText} = render(
-            <CollectionList collections={collections} showDeleted={false} />
+            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted={false} /></ThemeProvider>
         );
 
         expect(queryByText('Name')).toBeInTheDocument();
@@ -48,7 +54,7 @@ describe('CollectionList', () => {
         }];
 
         const {getByText} = render(
-            <CollectionList collections={collections} showDeleted />
+            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted /></ThemeProvider>
         );
 
         expect(getByText('Name')).toBeInTheDocument();
@@ -83,7 +89,7 @@ describe('CollectionList', () => {
             }];
 
         const wrapper = mount(
-            <CollectionList collections={collections} />
+            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 
@@ -117,7 +123,7 @@ describe('CollectionList', () => {
             }];
 
         const wrapper = mount(
-            <CollectionList collections={collections} />
+            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 

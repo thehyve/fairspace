@@ -1,12 +1,18 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React from 'react';
-import {mount} from "enzyme";
+import {configure, mount} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+
 import {Router} from 'react-router-dom';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {createMemoryHistory} from 'history';
 import LinkedDataLink from "../LinkedDataLink";
 import {METADATA_PATH} from "../../../constants";
 import UserContext from '../../../users/UserContext';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 describe('LinkedDataLink', () => {
     it('should render internal link for any uri', () => {
