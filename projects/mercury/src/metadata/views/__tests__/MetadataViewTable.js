@@ -2,7 +2,6 @@ import {render, screen} from "@testing-library/react";
 import userEvent from "@testing-library/user-event"
 import React from "react";
 import '@testing-library/jest-dom/extend-expect';
-import TableRow from "@mui/material/TableRow";
 import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";

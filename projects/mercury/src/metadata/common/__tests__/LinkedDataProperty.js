@@ -2,7 +2,7 @@
 import React from 'react';
 import { MemoryRouter } from "react-router-dom"; // use to render useRouter wrapped components
 import {configure, mount, shallow} from "enzyme";
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 // import '@testing-library/jest-dom/extend-expect';
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
