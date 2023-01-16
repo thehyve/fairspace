@@ -11,7 +11,7 @@
     "pluto": "wait-on http://localhost:8090/api/health/ && cd ../pluto/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew bootRun --args='--spring.profiles.active=local'",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-app-rewired test --env=jsdom",
     "test:coverage": "react-app-rewired test --env=jsdom --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint ./src",
@@ -86,9 +86,12 @@
     "not op_mini all"
   ],
   "engines": {
-    "node": ">=14.15.0"
+    "node": ">=16.19.0"
   },
   "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    },
     "transformIgnorePatterns": [
       "\\.pnp\\.[^\\/]+$"
     ]
