@@ -1,4 +1,5 @@
 import React, {useContext} from 'react';
+import withStyles from '@mui/styles/withStyles';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
 import {Assignment, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from "@mui/icons-material";
@@ -9,7 +10,13 @@ import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
 import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
 
-export default () => {
+const styles = {
+    mainMenuButton: {
+        paddingTop: 15,
+        paddingBottom: 15
+    }
+};
+const MainMenu = ({classes}) => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
@@ -21,6 +28,7 @@ export default () => {
         <>
             <List>
                 <ListItemButton
+                    className={classes.mainMenuButton}
                     component={NavLink}
                     to="/workspaces"
                     selected={pathname.startsWith('/workspace')}
@@ -31,6 +39,7 @@ export default () => {
                     <ListItemText primary="Workspaces" />
                 </ListItemButton>
                 <ListItemButton
+                    className={classes.mainMenuButton}
                     key="collections"
                     component={NavLink}
                     to="/collections"
@@ -43,6 +52,7 @@ export default () => {
                 </ListItemButton>
                 {externalStorages && externalStorages.map(storage => (
                     <ListItemButton
+                        className={classes.mainMenuButton}
                         key={getExternalStoragePathPrefix(storage.name)}
                         component={NavLink}
                         to={getExternalStoragePathPrefix(storage.name)}
@@ -56,6 +66,7 @@ export default () => {
                 ))}
                 {views && views.length > 0 && currentUser.canViewPublicMetadata && (
                     <ListItemButton
+                        className={classes.mainMenuButton}
                         key="metadata-views"
                         component={NavLink}
                         to="/metadata-views"
@@ -69,6 +80,7 @@ export default () => {
                 )}
                 {isAdmin(currentUser) && (
                     <ListItemButton
+                        className={classes.mainMenuButton}
                         key="users"
                         component={NavLink}
                         to="/users"
@@ -87,7 +99,13 @@ export default () => {
                 <List>
                     {
                         Object.keys(services).map(key => (
-                            <ListItemButton component="a" target="_blank" href={interpolate(services[key])} key={'service-' + key}>
+                            <ListItemButton
+                                className={classes.mainMenuButton}
+                                component="a"
+                                target="_blank"
+                                href={interpolate(services[key])}
+                                key={'service-' + key}
+                            >
                                 <ListItemIcon>
                                     <OpenInNew />
                                 </ListItemIcon>
@@ -100,3 +118,5 @@ export default () => {
         </>
     );
 };
+
+export default withStyles(styles)(MainMenu);

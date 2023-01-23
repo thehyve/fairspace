@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {Badge, IconButton, ListItem, ListItemText} from "@mui/material";
+import {Badge, IconButton, ListItemText} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@mui/icons-material';
 import ContentCopy from "mdi-material-ui/ContentCopy";
@@ -227,13 +227,13 @@ export const FileOperations = ({
                         >
                             <MenuItem onClick={handleUploadFile}>Upload files</MenuItem>
                             <MenuItem onClick={handleUploadFolder}>Upload folder</MenuItem>
-                            <Divider className={classes.uploadMenuHelperDivider} />
-                            <ListItem className={classes.uploadMenuHelper}>
+                            <Divider />
+                            <MenuItem className={classes.uploadMenuHelper}>
                                 <ListItemText
                                     secondary={`Size limit: ${maxFileSize}`}
                                     className={classes.uploadMenuHelperText}
                                 />
-                            </ListItem>
+                            </MenuItem>
                         </Menu>
 
                     </>

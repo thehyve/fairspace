@@ -15,7 +15,7 @@ export default createTheme({
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    marginTop: 4
+                    marginTop: 0
                 },
             },
             defaultProps: {
@@ -23,11 +23,19 @@ export default createTheme({
                 variant: "standard"
             }
         },
+        MuiDivider: {
+            styleOverrides: {
+                root: {
+                    margin: 0,
+                },
+                margin: 0,
+            }
+        },
         MuiMenuItem: {
             styleOverrides: {
                 root: {
                     marginTop: 0,
-                    padding: 0,
+                    padding: 5,
                     border: 0
                 }
             }
@@ -52,9 +60,9 @@ export default createTheme({
         MuiListItem: {
             styleOverrides: {
                 root: {
-                    marginTop: 15,
+                    marginTop: 0,
                     marginBottom: 0,
-                    padding: 0,
+                    paddingRight: 0,
                     border: 0
                 }
             },
@@ -65,10 +73,18 @@ export default createTheme({
         MuiListItemText: {
             styleOverrides: {
                 root: {
-                    // backgroundColor: "yellow",
                     margin: 0,
                     padding: 0,
                     border: 0
+                }
+            }
+        },
+        MuiListItemButton: {
+            styleOverrides: {
+                root: {
+                    margin: 0,
+                    paddingBottom: 0,
+                    border: 0,
                 }
             }
         },
@@ -76,7 +92,7 @@ export default createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: "whitesmoke",
-                    marginBotton: 0,
+                    marginBottom: 0,
                     padding: 5
                 }
             }

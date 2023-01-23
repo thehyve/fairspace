@@ -10,9 +10,7 @@ const styles = () => ({
     },
     uploadMenuHelper: {
         borderLeft: '8px solid #999',
-    },
-    uploadMenuHelperDivider: {
-        marginTop: 4
+        padding: 20
     },
     uploadMenuHelperText: {
         margin: 0,
