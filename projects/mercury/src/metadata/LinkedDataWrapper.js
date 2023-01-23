@@ -1,5 +1,5 @@
 import React from 'react';
-import {Assignment} from "@material-ui/icons";
+import {Assignment} from "@mui/icons-material";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
 

@@ -1,11 +1,18 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {cleanup, render} from '@testing-library/react';
+import {cleanup, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {shallow} from "enzyme";
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {ExternalStorageBrowser} from "../ExternalStorageBrowser";
 import type {ExternalStorage} from "../ExternalStoragesContext";
 import LoadingInlay from "../../common/components/LoadingInlay";
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../App.theme';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 afterEach(cleanup);
 
@@ -42,9 +49,11 @@ const initialProps = {
 describe('ExternalStorageBrowser', () => {
     it('renders proper view', () => {
         const {queryByTestId} = render(
-            <ExternalStorageBrowser
-                {...initialProps}
-            />
+            <ThemeProvider theme={theme}>
+                <ExternalStorageBrowser
+                    {...initialProps}
+                />
+            </ThemeProvider>
         );
 
         expect(queryByTestId('externals-storage-view')).toBeInTheDocument();
@@ -52,23 +61,27 @@ describe('ExternalStorageBrowser', () => {
 
     it('show data loading error when ehn error on fetching files occurs', () => {
         const {getByText} = render(
-            <ExternalStorageBrowser
-                {...initialProps}
-                error="some error"
-            />
+            <ThemeProvider theme={theme}>
+                <ExternalStorageBrowser
+                    {...initialProps}
+                    error="some error"
+                />
+            </ThemeProvider>
         );
 
         expect(getByText("An error occurred while loading data from Test storage.")).toBeInTheDocument();
     });
 
     it('show loading inlay as long as the files are pending', () => {
-        const wrapper = shallow(
-            <ExternalStorageBrowser
-                {...initialProps}
-                loading
-            />
+        render(
+            <ThemeProvider theme={theme}>
+                <ExternalStorageBrowser
+                    {...initialProps}
+                    loading
+                />
+            </ThemeProvider>
         );
 
-        expect(wrapper.find(LoadingInlay).length).toBe(1);
+        expect(screen.getByTestId("loading")).toBeInTheDocument();
     });
 });

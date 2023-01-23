@@ -10,11 +10,12 @@ import {
     TableRow,
     Tooltip,
     Typography,
-    withStyles
-} from '@material-ui/core';
+} from '@mui/material';
+
+import withStyles from '@mui/styles/withStyles';
 
 import {Link as RouterLink} from 'react-router-dom';
-import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
+import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
 import useAsync from "../common/hooks/UseAsync";
 import {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@material-ui/core';
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 
 const confirmationDialog = ({
     title = 'Confirmation',
@@ -34,10 +34,7 @@ const confirmationDialog = ({
             >
                 {agreeButtonText}
             </Button>
-            <Button
-                onClick={onDisagree}
-                color="default"
-            >
+            <Button onClick={onDisagree}>
                 {disagreeButtonText}
             </Button>
         </DialogActions>

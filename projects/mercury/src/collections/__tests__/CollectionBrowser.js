@@ -1,11 +1,18 @@
 import React from 'react';
-import {mount, shallow} from "enzyme";
+import {configure, mount, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {MemoryRouter} from "react-router-dom";
 
 import CollectionsContext from "../CollectionsContext";
 import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import LoadingInlay from "../../common/components/LoadingInlay";
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../App.theme';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 let collectionBrowser;
 
@@ -18,11 +25,13 @@ const collectionsContextMock = {
 beforeEach(() => {
     collectionsContextMock.addCollection.mockResolvedValue({});
     collectionBrowser = (
-        <MemoryRouter>
-            <CollectionsContext.Provider value={collectionsContextMock}>
-                <ContextualCollectionBrowser />
-            </CollectionsContext.Provider>
-        </MemoryRouter>
+        <ThemeProvider theme={theme}>
+            <MemoryRouter>
+                <CollectionsContext.Provider value={collectionsContextMock}>
+                    <ContextualCollectionBrowser />
+                </CollectionsContext.Provider>
+            </MemoryRouter>
+        </ThemeProvider>
     );
 
     global.window = Object.create(window);
@@ -38,7 +47,7 @@ describe('<CollectionBrowser />', () => {
     it('should dispatch an action on collection save', async () => {
         const wrapper = mount(collectionBrowser);
 
-        const addButton = wrapper.find('[aria-label="Add"]').first();
+        const addButton = wrapper.find('button').first();
         addButton.simulate('click');
 
         const nameField = wrapper.find('input#name').first();

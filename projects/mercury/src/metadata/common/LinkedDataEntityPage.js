@@ -1,5 +1,5 @@
 import React from 'react';
-import {Paper} from "@material-ui/core";
+import {Paper} from "@mui/material";
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
 import useLinkedData from './UseLinkedData';
 import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";

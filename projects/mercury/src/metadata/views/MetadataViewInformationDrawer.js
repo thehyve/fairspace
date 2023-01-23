@@ -1,10 +1,10 @@
 // @flow
 import React, {useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, IconButton} from '@material-ui/core';
+import {Card, CardContent, CardHeader, Collapse, IconButton} from '@mui/material';
 import {withRouter} from 'react-router-dom';
 
-import {ExpandMore} from '@material-ui/icons';
-import {makeStyles} from '@material-ui/core/styles';
+import {ExpandMore} from '@mui/icons-material';
+import makeStyles from '@mui/styles/makeStyles';
 import EmptyInformationDrawer from "../../common/components/EmptyInformationDrawer";
 import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -57,6 +57,7 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
                         aria-expanded={expanded}
                         aria-label="Show more"
                         className={expanded ? classes.expandOpen : ''}
+                        size="medium"
                     >
                         <ExpandMore />
                     </IconButton>

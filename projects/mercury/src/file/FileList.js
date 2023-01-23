@@ -11,9 +11,9 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    withStyles
-} from "@material-ui/core";
-import {FolderOpen, NoteOutlined} from "@material-ui/icons";
+} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import {FolderOpen, NoteOutlined} from "@mui/icons-material";
 import filesize from 'filesize';
 
 import styles from './FileList.styles';

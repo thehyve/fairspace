@@ -1,13 +1,13 @@
-import {render} from "@testing-library/react";
+import {render, screen} from "@testing-library/react";
+import userEvent from "@testing-library/user-event"
 import React from "react";
 import '@testing-library/jest-dom/extend-expect';
-import {shallow} from "enzyme";
-import TableRow from "@material-ui/core/TableRow";
-import {TableBody} from "@material-ui/core";
 import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";
 import {RESOURCES_VIEW} from "../metadataViewUtils";
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../../App.theme';
 
 describe('MetadataViewTable', () => {
     const historyMock = {
@@ -19,21 +19,23 @@ describe('MetadataViewTable', () => {
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const {queryByText, queryAllByText} = render(
-            <MetadataViewTable
-                columns={columns}
-                visibleColumnNames={columns.map(c => c.name)}
-                data={data}
-                locationContext=""
-                toggleRow={() => {}}
-                history={historyMock}
-                idColumn={columns[0]}
-                collections={[]}
-                textFiltersObject={{}}
-                setTextFiltersObject={() => {}}
-                loading={false}
-                checkboxes={{}}
-                setCheckboxState={() => {}}
-            />
+            <ThemeProvider theme={theme}>
+                <MetadataViewTable
+                    columns={columns}
+                    visibleColumnNames={columns.map(c => c.name)}
+                    data={data}
+                    locationContext=""
+                    toggleRow={() => {}}
+                    history={historyMock}
+                    idColumn={columns[0]}
+                    collections={[]}
+                    textFiltersObject={{}}
+                    setTextFiltersObject={() => {}}
+                    loading={false}
+                    checkboxes={{}}
+                    setCheckboxState={() => {}}
+                />
+            </ThemeProvider>
         );
 
         expect(queryByText('Sample')).toBeInTheDocument();
@@ -55,21 +57,23 @@ describe('MetadataViewTable', () => {
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
         const {queryByText, queryAllByText} = render(
-            <MetadataViewTable
-                columns={columns}
-                visibleColumnNames={['Sample', 'Sample_sampleType', 'Sample_origin']}
-                data={data}
-                view=""
-                locationContext=""
-                toggleRow={() => {}}
-                history={historyMock}
-                idColumn={columns[0]}
-                collections={[]}
-                textFiltersObject={{}}
-                setTextFiltersObject={() => {}}
-                checkboxes={{}}
-                setCheckboxState={() => {}}
-            />
+            <ThemeProvider theme={theme}>
+                <MetadataViewTable
+                    columns={columns}
+                    visibleColumnNames={['Sample', 'Sample_sampleType', 'Sample_origin']}
+                    data={data}
+                    view=""
+                    locationContext=""
+                    toggleRow={() => {}}
+                    history={historyMock}
+                    idColumn={columns[0]}
+                    collections={[]}
+                    textFiltersObject={{}}
+                    setTextFiltersObject={() => {}}
+                    checkboxes={{}}
+                    setCheckboxState={() => {}}
+                />
+            </ThemeProvider>
         );
 
         expect(queryByText('Sample')).toBeInTheDocument();
@@ -86,31 +90,35 @@ describe('MetadataViewTable', () => {
         expect(queryByText('Tongue')).not.toBeInTheDocument();
     });
 
-    it('should redirect when opening collection entry', () => {
+    it('should redirect when opening collection entry', async() => {
+        const user = userEvent.setup()
         const view = RESOURCES_VIEW;
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
-        const wrapper = shallow(<MetadataViewTable
-            view={view}
-            columns={columns}
-            visibleColumnNames={columns.map(c => c.name)}
-            data={data}
-            collections={[{iri: 'http://localhost:8080/api/webdav/c01', access: 'Read'}]}
-            locationContext=""
-            toggleRow={() => {}}
-            history={historyMock}
-            idColumn={columns[0]}
-            loading={false}
-            textFiltersObject={{}}
-            setTextFiltersObject={() => {}}
-            checkboxes={{}}
-            setCheckboxState={() => {}}
-        />);
+        render(
+            <ThemeProvider theme={theme}>
+                <MetadataViewTable
+                    view={view}
+                    columns={columns}
+                    visibleColumnNames={columns.map(c => c.name)}
+                    data={data}
+                    collections={[{iri: 'http://localhost:8080/api/webdav/c01', access: 'Read'}]}
+                    locationContext=""
+                    toggleRow={() => {}}
+                    history={historyMock}
+                    idColumn={columns[0]}
+                    loading={false}
+                    textFiltersObject={{}}
+                    setTextFiltersObject={() => {}}
+                    checkboxes={{}}
+                    setCheckboxState={() => {}}
+                />
+            </ThemeProvider>);
 
-        const tableRows = wrapper.find(TableBody).find(TableRow);
-        expect(tableRows.length).toEqual(1);
-        tableRows.first().prop("onDoubleClick")();
+        const tableRows = screen.queryAllByRole("row");
+        expect(tableRows.length).toEqual(2);
 
+        await user.dblClick(tableRows[1]);
         expect(historyMock.push).toHaveBeenCalledTimes(1);
         expect(historyMock.push).toHaveBeenCalledWith('/collections/c01');
     });

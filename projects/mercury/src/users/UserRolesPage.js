@@ -9,11 +9,11 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import Checkbox from "@material-ui/core/Checkbox";
-import TableContainer from "@material-ui/core/TableContainer";
-import Paper from "@material-ui/core/Paper";
+import Checkbox from "@mui/material/Checkbox";
+import TableContainer from "@mui/material/TableContainer";
+import Paper from "@mui/material/Paper";
 import UsersContext from "./UsersContext";
 import useSorting from "../common/hooks/UseSorting";
 import usePagination from "../common/hooks/UsePagination";

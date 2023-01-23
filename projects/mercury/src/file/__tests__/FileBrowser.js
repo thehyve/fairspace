@@ -2,9 +2,10 @@
 import React from 'react';
 import {cleanup, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-
 import {FileBrowser} from '../FileBrowser';
 import {UploadsProvider} from "../UploadsContext";
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../App.theme';
 
 afterEach(cleanup);
 
@@ -63,11 +64,13 @@ describe('FileBrowser', () => {
 
     it('renders proper view', () => {
         const {queryByTestId} = renderWithProviders(
-            <FileBrowser
-                openedCollection={openedCollection}
-                fileActions={fileActionsMock}
-                {...initialProps}
-            />
+            <ThemeProvider theme={theme}>
+                <FileBrowser
+                    openedCollection={openedCollection}
+                    fileActions={fileActionsMock}
+                    {...initialProps}
+                />
+            </ThemeProvider>
         );
 
         expect(queryByTestId('files-view')).toBeInTheDocument();

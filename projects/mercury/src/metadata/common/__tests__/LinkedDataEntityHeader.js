@@ -1,6 +1,7 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
-import {mount} from "enzyme";
+import {configure, mount} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
 import LinkedDataEntityHeader from "../LinkedDataEntityHeader";
 import DeleteEntityButton from "../DeleteEntityButton";
@@ -13,6 +14,12 @@ import {
     FILE_URI,
 } from "../../../constants";
 import VocabularyContext from '../../vocabulary/VocabularyContext';
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../../App.theme';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 describe('LinkedDataEntityHeader', () => {
     const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
@@ -22,18 +29,20 @@ describe('LinkedDataEntityHeader', () => {
     describe('delete button', () => {
         const testDeleteButtonDeletableState = (values, expectedState: DeleteButtonState, editingEnabled = true) => {
             const wrapper = mount(
-                <VocabularyContext.Provider
-                    value={{
-                        vocabulary: []
-                    }}
-                >
-                    <LinkedDataEntityHeader
-                        subject={subject}
-                        enableDelete={editingEnabled}
-                        values={values}
-                        isDeleted={values[DATE_DELETED_URI]}
-                    />
-                </VocabularyContext.Provider>
+                <ThemeProvider theme={theme}>
+                    <VocabularyContext.Provider
+                        value={{
+                            vocabulary: []
+                        }}
+                    >
+                        <LinkedDataEntityHeader
+                            subject={subject}
+                            enableDelete={editingEnabled}
+                            values={values}
+                            isDeleted={values[DATE_DELETED_URI]}
+                        />
+                    </VocabularyContext.Provider>
+                </ThemeProvider>
             );
 
             const button = wrapper.find(DeleteEntityButton);

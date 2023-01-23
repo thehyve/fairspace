@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {List, ListItem} from '@material-ui/core';
+import {List, ListItem} from '@mui/material';
 
 import LinkedDataProperty from "./LinkedDataProperty";
 import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";

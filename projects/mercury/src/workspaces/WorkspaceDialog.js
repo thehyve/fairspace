@@ -1,7 +1,8 @@
 import React, {useState} from "react";
 
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, withStyles} from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import TextField from "@mui/material/TextField";
 import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const styles = theme => ({
@@ -84,7 +85,7 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
                     >
                         Save
                     </Button>
-                    <Button onClick={onClose} aria-label="Cancel" color="default">
+                    <Button onClick={onClose} aria-label="Cancel">
                         Cancel
                     </Button>
                 </DialogActions>

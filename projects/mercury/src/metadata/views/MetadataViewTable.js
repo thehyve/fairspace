@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect} from 'react';
-import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@material-ui/core';
-import {makeStyles} from '@material-ui/core/styles';
+import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import {Link as RouterLink} from "react-router-dom";
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import {TextualValueTypes} from "./MetadataViewAPI";

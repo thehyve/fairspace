@@ -1,4 +1,4 @@
-import {alpha} from '@material-ui/core/styles/colorManipulator';
+import {alpha} from '@mui/material/styles';
 
 const styles = theme => ({
     search: {

@@ -1,7 +1,8 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
-import {Typography, withStyles} from "@material-ui/core";
+import {Typography} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
 import FileList from "./FileList";
 import FileOperations from "./FileOperations";
 import {useFiles} from "./UseFiles";

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Chip, Grid, Typography} from '@material-ui/core';
+import {Chip, Grid, Typography} from '@mui/material';
 import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
 import {ofRangeValueType} from "./metadataViewUtils";
 import {formatDate, isNonEmptyValue} from "../../common/utils/genericUtils";

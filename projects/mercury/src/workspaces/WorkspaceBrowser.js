@@ -1,6 +1,6 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import {useHistory, withRouter} from "react-router-dom";
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';

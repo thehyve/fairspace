@@ -1,8 +1,12 @@
 import React from "react";
-import {shallow} from "enzyme";
-
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {CollectionEditor, isInputValid} from '../CollectionEditor';
 import type {CollectionProperties} from '../CollectionAPI';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 let collectionEditor;
 let wrapper;

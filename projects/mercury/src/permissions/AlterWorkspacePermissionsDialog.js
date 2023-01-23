@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogActions from '@material-ui/core/DialogActions';
-import {withStyles} from '@material-ui/core/styles';
-import {Typography} from "@material-ui/core";
-import Divider from "@material-ui/core/Divider";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import withStyles from '@mui/styles/withStyles';
+import {Typography} from "@mui/material";
+import Divider from "@mui/material/Divider";
 import PermissionCandidateSelect from "./PermissionCandidateSelect";
 import type {Permission} from "../collections/CollectionAPI";
 import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
@@ -113,10 +113,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
                 >
                     Save
                 </Button>
-                <Button
-                    onClick={handleClose}
-                    color="default"
-                >
+                <Button onClick={handleClose}>
                     Cancel
                 </Button>
             </DialogActions>

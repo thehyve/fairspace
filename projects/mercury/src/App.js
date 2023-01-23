@@ -1,10 +1,7 @@
 import React from 'react';
 import {BrowserRouter as Router} from "react-router-dom";
-import {MuiThemeProvider} from '@material-ui/core/styles';
-import {MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import {ThemeProvider, StyledEngineProvider} from '@mui/material/styles';
 import ErrorDialog from './common/components/ErrorDialog';
-
 import theme from './App.theme';
 import {UploadsProvider} from "./file/UploadsContext";
 import {ClipboardProvider} from './common/contexts/ClipboardContext';
@@ -13,9 +10,9 @@ import {LogoutContextProvider} from "./users/LogoutContext";
 import {UserProvider} from "./users/UserContext";
 
 const App = () => (
-    <LogoutContextProvider>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+        <LogoutContextProvider>
+            <StyledEngineProvider injectFirst>
                 <UserProvider>
                     <UploadsProvider>
                         <ClipboardProvider>
@@ -27,9 +24,9 @@ const App = () => (
                         </ClipboardProvider>
                     </UploadsProvider>
                 </UserProvider>
-            </MuiThemeProvider>
-        </MuiPickersUtilsProvider>
-    </LogoutContextProvider>
+            </StyledEngineProvider>
+        </LogoutContextProvider>
+    </ThemeProvider>
 );
 
 export default App;

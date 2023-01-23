@@ -1,4 +1,4 @@
-import {alpha} from "@material-ui/core/styles/colorManipulator";
+import {alpha} from '@mui/material/styles';
 import * as consts from "../../constants";
 
 const CENTRAL_PANEL_WIDTH = '70%';

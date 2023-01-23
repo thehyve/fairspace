@@ -1,7 +1,14 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {mount} from "enzyme";
+import {configure, mount} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import WorkspaceDialog from '../WorkspaceDialog';
+import {ThemeProvider} from '@mui/material/styles';
+import theme from '../../App.theme';
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 let onSubmit;
 let onClose;
@@ -18,12 +25,14 @@ beforeEach(() => {
     onSubmit = jest.fn();
     onClose = jest.fn();
     workspaceDialog = (
-        <WorkspaceDialog
-            onSubmit={onSubmit}
-            onClose={onClose}
-            creating={false}
-            workspaces={[{code: "w1"}]}
-        />
+        <ThemeProvider theme={theme}>
+            <WorkspaceDialog
+                onSubmit={onSubmit}
+                onClose={onClose}
+                creating={false}
+                workspaces={[{code: "w1"}]}
+            />
+        </ThemeProvider>
     );
     wrapper = mount(workspaceDialog);
 });
@@ -37,7 +46,7 @@ describe('WorkspaceDialog', () => {
 
     it('should send all entered parameters to the creation method', () => {
         enterValue('a');
-        const submitButton = wrapper.find('[data-testid="submit-button"]').first();
+        const submitButton = wrapper.find('button').first();
         submitButton.simulate('click');
         expect(onSubmit).toHaveBeenCalledTimes(1);
         expect(onSubmit).toHaveBeenCalledWith({code: 'a'});

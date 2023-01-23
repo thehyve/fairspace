@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import PropTypes from "prop-types";
-import {Button, CircularProgress, Grid, IconButton} from "@material-ui/core";
-import {Edit} from '@material-ui/icons';
+import {Button, CircularProgress, Grid, IconButton} from "@mui/material";
+import {Edit} from '@mui/icons-material';
 
 import LinkedDataEntityForm from "./LinkedDataEntityForm";
 import useFormData from './UseFormData';
@@ -75,7 +75,6 @@ const LinkedDataEntityFormContainer = ({
                     Update
                 </Button>
                 <Button
-                    color="default"
                     disabled={!hasFormUpdates && !showEditButtons}
                     onClick={() => {
                         clearForm();
@@ -131,7 +130,9 @@ const LinkedDataEntityFormContainer = ({
                         onClick={() => {
                             setEditingEnabled(true);
                         }}
-                    ><Edit />
+                        size="medium"
+                    >
+                        <Edit />
                     </IconButton>
                 )}
                 {!editingEnabled && contextMenu}

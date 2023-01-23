@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react';
-import Grid from '@material-ui/core/Grid';
-import {withStyles} from "@material-ui/core";
+import Grid from '@mui/material/Grid';
+import withStyles from '@mui/styles/withStyles';
 import {useHistory} from "react-router-dom";
 import queryString from "query-string";
 import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";

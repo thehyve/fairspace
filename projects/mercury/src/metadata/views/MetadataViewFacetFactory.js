@@ -1,8 +1,8 @@
 import React, {useState} from "react";
-import {Card, CardContent, CardHeader, Collapse, IconButton} from "@material-ui/core";
+import {Card, CardContent, CardHeader, Collapse, IconButton} from "@mui/material";
 import classnames from "classnames";
-import {withStyles} from '@material-ui/core/styles';
-import {Clear, ExpandMore} from "@material-ui/icons";
+import withStyles from '@mui/styles/withStyles';
+import {Clear, ExpandMore} from "@mui/icons-material";
 import type {ValueType} from "./MetadataViewAPI";
 import TextSelectionFacet from "./facets/TextSelectionFacet";
 import DateSelectionFacet from "./facets/DateSelectionFacet";
@@ -56,6 +56,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
             onClick={toggleExpand}
             aria-expanded={expanded}
             aria-label="Show more"
+            size="medium"
         >
             <ExpandMore />
         </IconButton>
@@ -67,6 +68,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
                 onClick={clearFilter}
                 aria-label="Clear"
                 className={classes.headerIcon}
+                size="medium"
             >
                 <Clear fontSize="small" color="primary" />
             </IconButton>

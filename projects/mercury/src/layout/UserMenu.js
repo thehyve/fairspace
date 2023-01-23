@@ -4,17 +4,17 @@ import {
     Button,
     ClickAwayListener,
     Grow,
-    ListItem, ListItemIcon, ListItemText,
+    ListItemIcon, ListItemText,
     MenuItem,
     MenuList,
     Paper,
     Popper
-} from '@material-ui/core';
-import {withStyles} from '@material-ui/core/styles';
-import {ErrorOutline} from '@material-ui/icons';
+} from '@mui/material';
+import Divider from "@mui/material/Divider";
+import withStyles from '@mui/styles/withStyles';
 
-import Divider from '@material-ui/core/Divider';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import {ErrorOutline} from '@mui/icons-material';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";
@@ -36,8 +36,9 @@ const styles = {
         paddingTop: 0
     },
     userMenu: {
-        borderLeft: '8px solid #999'
-    }
+        borderLeft: '8px solid #999',
+        padding: 20
+    },
 };
 
 const UserMenu = ({classes}) => {
@@ -90,13 +91,13 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
-                                    <ListItem className={classes.userMenu}>
+                                    <MenuItem className={classes.userMenu}>
                                         <ListItemText
                                             primary={currentUser.username}
                                             secondary={currentUser.email}
                                             style={{cursor: 'default'}}
                                         />
-                                    </ListItem>
+                                    </MenuItem>
                                     <Divider />
                                     <MenuItem onClick={handleLogout}>
                                         <ListItemIcon>

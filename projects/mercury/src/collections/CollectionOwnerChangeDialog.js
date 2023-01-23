@@ -1,10 +1,10 @@
 // @flow
 import React, {useState} from 'react';
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
 import {compareBy} from "../common/utils/genericUtils";
 import Dropdown from "../metadata/common/values/Dropdown";
 import ConfirmationButton from "../common/components/ConfirmationButton";
@@ -82,10 +82,7 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
                         Save
                     </Button>
                 </ConfirmationButton>
-                <Button
-                    onClick={handleCancel}
-                    color="default"
-                >
+                <Button onClick={handleCancel}>
                     Cancel
                 </Button>
             </DialogActions>

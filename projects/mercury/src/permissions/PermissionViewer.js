@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import PropTypes from "prop-types";
-import {Box, FormHelperText, FormLabel} from "@material-ui/core";
-import {makeStyles} from "@material-ui/core/styles";
+import {Box, FormHelperText, FormLabel} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import MessageDisplay from "../common/components/MessageDisplay";
 import LoadingInlay from "../common/components/LoadingInlay";
 import UserPermissionsComponent from "./UserPermissionsComponent";

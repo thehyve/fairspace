@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 
-import {IconButton} from '@material-ui/core';
-import {ArrowDropDown, ArrowDropUp} from '@material-ui/icons';
+import {IconButton} from '@mui/material';
+import {ArrowDropDown, ArrowDropUp} from '@mui/icons-material';
 
 type ShortTextProps = {
     text: string;

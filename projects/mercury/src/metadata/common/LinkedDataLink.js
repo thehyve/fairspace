@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import {Link as RouterLink} from "react-router-dom";
 import * as PropTypes from "prop-types";
-import {Link} from '@material-ui/core';
+import {Link} from '@mui/material';
 import {METADATA_PATH} from "../../constants";
 import UserContext from '../../users/UserContext';
 

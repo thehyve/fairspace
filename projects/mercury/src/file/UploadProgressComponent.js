@@ -1,21 +1,13 @@
 import React, {useContext, useState} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    Collapse,
-    IconButton,
-    TableHead,
-    Typography,
-    withStyles
-} from "@material-ui/core";
-import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from "@material-ui/icons";
-import LinearProgress from "@material-ui/core/LinearProgress";
+import {Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
+import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from "@mui/icons-material";
+import LinearProgress from "@mui/material/LinearProgress";
 import classnames from "classnames";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
 import UploadsContext, {
     UPLOAD_STATUS_ERROR,
     UPLOAD_STATUS_FINISHED,
@@ -75,6 +67,7 @@ export const UploadProgressComponent = ({classes}) => {
             })}
             aria-expanded={expanded}
             aria-label="Show more"
+            size="medium"
         >
             <ExpandMore />
         </IconButton>
@@ -129,7 +122,7 @@ export const UploadProgressComponent = ({classes}) => {
                                 <TableCell width={40} padding="none">
                                     { upload.status === UPLOAD_STATUS_ERROR
                                         && (
-                                            <IconButton aria-label="remove" onClick={() => removeUpload(upload)}>
+                                            <IconButton aria-label="remove" onClick={() => removeUpload(upload)} size="medium">
                                                 <HighlightOffOutlined fontSize="small" />
                                             </IconButton>
                                         )}
