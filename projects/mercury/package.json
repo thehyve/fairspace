@@ -40,7 +40,7 @@
     "jsonld": "^5.2.0",
     "lodash": "^4.17.21",
     "mdi-material-ui": "^7.2.0",
-    "notistack": "^2.0.3",
+    "notistack": "^2.0.8",
     "prop-types": "^15.7.2",
     "qs": "^6.9.4",
     "query-string": "^7.1.1",
