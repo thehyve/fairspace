@@ -5955,10 +5955,10 @@ hosted-git-info@^2.1.4:
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.8.9.tgz#dffc0bf9a21c02209090f2aa69429e1414daf3f9"
   integrity sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==
 
-hot-patcher@^0.5.0:
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/hot-patcher/-/hot-patcher-0.5.0.tgz#9d401424585aaf3a91646b816ceff40eb6a916b9"
-  integrity sha512-2Uu2W0s8+dnqXzdlg0MRsRzPoDCs1wVjOGSyMRRaMzLDX4bgHw6xDYKccsWafXPPxQpkQfEjgW6+17pwcg60bw==
+hot-patcher@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/hot-patcher/-/hot-patcher-1.0.0.tgz#7124d2dc4ca71bcb58b1551603cd13e4fc3fcecd"
+  integrity sha512-3H8VH0PreeNsKMZw16nTHbUp4YoHCnPlawpsPXGJUR4qENDynl79b6Xk9CIFvLcH1qungBsCuzKcWyzoPPalTw==
 
 hpack.js@^2.1.6:
   version "2.1.6"
@@ -7969,6 +7969,13 @@ minimatch@^5.0.1:
   version "5.1.0"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.0.tgz#1717b464f4971b144f6aabe8f2d0b8e4511e09c7"
   integrity sha512-9TPBGGak4nHfGZsPBohm9AWg6NoT7QTCehS3BIJABslyZbzxfV78QM2Y6+i741OPZIafFAaiiEMh5OyIrJPgtg==
+  dependencies:
+    brace-expansion "^2.0.1"
+
+minimatch@^5.1.0:
+  version "5.1.6"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.6.tgz#1cfcb8cf5522ea69952cd2af95ae09477f122a96"
+  integrity sha512-lKwV/1brpG6mBUFHtb7NUmtABCb2WZZmm2wNiOA5hAb8VdCS4B3dtMWyvcoViccwAW/COERjXLt0zP1zXUN26g==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -11360,20 +11367,20 @@ wbuf@^1.1.0, wbuf@^1.7.3:
   dependencies:
     minimalistic-assert "^1.0.0"
 
-webdav@^4.0.0:
-  version "4.10.0"
-  resolved "https://registry.yarnpkg.com/webdav/-/webdav-4.10.0.tgz#6b8c15be426f601addf0a732199ee99174b6d60f"
-  integrity sha512-8PevPYhFsgbDhVGQQyrfBDYHiCYtN01qVX9zjFDA/OjIFqu28SsZuZdvGxBIQu2/e3Wp8M5oUpYvLM3uLP8g6A==
+webdav@^4.11.2:
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/webdav/-/webdav-4.11.2.tgz#49cde29e33538bc9f3d3a0a4da0f3d16215f5794"
+  integrity sha512-Ht9TPD5EB7gYW0YmhRcE5NW0/dn/HQfyLSPQY1Rw1coQ5MQTUooAQ9Bpqt4EU7QLw0b95tX4cU59R+SIojs9KQ==
   dependencies:
     axios "^0.27.2"
     base-64 "^1.0.0"
     byte-length "^1.0.2"
     fast-xml-parser "^3.19.0"
     he "^1.2.0"
-    hot-patcher "^0.5.0"
+    hot-patcher "^1.0.0"
     layerr "^0.1.2"
     md5 "^2.3.0"
-    minimatch "^5.0.1"
+    minimatch "^5.1.0"
     nested-property "^4.0.0"
     path-posix "^1.0.0"
     url-join "^4.0.1"
