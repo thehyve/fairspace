@@ -23,7 +23,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/lab": "^5.0.0-alpha.113",
-    "@mui/material": "^5.11.1",
+    "@mui/material": "^5.11.3",
     "@mui/styles": "^5.11.1",
     "@mui/x-date-pickers": "^5.0.11",
     "@testing-library/react-hooks": "^8.0.1",
