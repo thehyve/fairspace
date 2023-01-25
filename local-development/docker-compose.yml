@@ -20,22 +20,19 @@ services:
         tag: fairspace-keycloak-postgres
 
   fairspace-keycloak:
-    image: jboss/keycloak:12.0.4
+    image: keycloak/keycloak:latest
     container_name: fairspace-keycloak
     environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: fairspace-keycloak-postgres
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_PASSWORD: keycloak
-      KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME:?Please configure KEYCLOAK_HOSTNAME.}
-      KEYCLOAK_HTTP_PORT: ${KEYCLOAK_PORT:-5100}
-      KEYCLOAK_IMPORT: /tmp/realm-export.json
-      KEYCLOAK_REALM: ${KEYCLOAK_REALM:?Please configure KEYCLOAK_REALM}
-      WORKSPACE_CLIENT_ID: ${WORKSPACE_CLIENT_ID:?Please configure WORKSPACE_CLIENT_ID}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://fairspace-keycloak-postgres/keycloak?user=keycloak&password=keycloak
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:?Please configure KEYCLOAK_HOSTNAME.}
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak
+      KC_STORAGE_AREA_CLIENT: ${WORKSPACE_CLIENT_ID:?Please configure WORKSPACE_CLIENT_ID}
       PROXY_ADDRESS_FORWARDING: 'true'
       WORKSPACE_URL: ${WORKSPACE_URL:?Please configure WORKSPACE_URL.}
       WORKSPACE_DEBUG_URL: ${WORKSPACE_DEBUG_URL:?Please configure WORKSPACE_DEBUG_URL.}
+      KC_HEALTH_ENABLED: true
     ports:
       - ${KEYCLOAK_PORT:-5100}:8080
     depends_on:
@@ -44,14 +41,18 @@ services:
       - fairspace-keycloak-db-network
     volumes:
       - ./keycloak/setup-realm.sh:/opt/jboss/startup-scripts/setup-realm.sh
-      - ./keycloak/realm-template.json:/tmp/realm-template.json
-      - ./keycloak/keycloak-add-user.json:/opt/jboss/keycloak/standalone/configuration/keycloak-add-user.json
+      # - ./keycloak/realm-template.json:/tmp/realm-template.json
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
     restart: unless-stopped
     logging:
       driver: ${DOCKER_LOGGING_DRIVER:-journald}
       options:
         labels: application
         tag: fairspace-keycloak
+    command: 
+      - start-dev 
+      - --import-realm 
+      - --http-relative-path=/auth
 
   fairspace-postgres:
     image: postgres:13-alpine
