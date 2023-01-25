@@ -101,7 +101,7 @@ public class UserService {
                                 user.setCanViewPublicData(true);
                             }
 
-                            for (var role : config.defaultRoles) {
+                            for (var role : config.defaultUserRoles) {
                                 switch (role) {
                                     case "canViewPublicMetadata" -> user.setCanViewPublicMetadata(true);
                                     case "canViewPublicData" -> user.setCanViewPublicData(true);
