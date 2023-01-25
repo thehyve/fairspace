@@ -101,6 +101,15 @@ public class UserService {
                                 user.setCanViewPublicData(true);
                             }
 
+                            for (var role : config.defaultRoles) {
+                                switch (role) {
+                                    case "canViewPublicMetadata" -> user.setCanViewPublicMetadata(true);
+                                    case "canViewPublicData" -> user.setCanViewPublicData(true);
+                                    case "canAddSharedMetadata" -> user.setCanAddSharedMetadata(true);
+                                    case "canQueryMetadata" -> user.setCanQueryMetadata(true);
+                                }
+                            }
+
                             updated.add(user);
                         }
 

@@ -68,6 +68,7 @@ public class Config {
         public String clientId = "workspace-client";
         public boolean enableBasicAuth;
         public String superAdminUser = "organisation-admin";
+        public String[] defaultRoles = new String[0];
     }
 
     public static class WebDAV {
