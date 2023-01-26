@@ -42,6 +42,8 @@ auth:
   clientId: workspace-client
   enableBasicAuth: true
   superAdminUser: organisation-admin
+  defaultUserRoles:
+    - canViewPublicMetadata
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
