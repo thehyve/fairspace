@@ -2334,19 +2334,19 @@ Requires:
 * docker
 * Java 17
 
+On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
+Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
+[source, shell]
+----
+DOCKER_LOGGING_DRIVER=json-file
+----
+
 To run the development version, checkout this repository,
 navigate to ``projects/mercury`` and run
 
 [source, shell]
 ----
 yarn dev
-----
-
-On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
-Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
-[source, shell]
-----
-DOCKER_LOGGING_DRIVER=json-file
 ----
 
 This will start a Keycloak instance for authentication at port ``5100``,
@@ -2358,12 +2358,14 @@ At first run, you need to configure the service account in Keycloak.
 * Navigate to link:http://localhost:5100[http://localhost:5100]
 * Login with credentials ``keycloak``, ``keycloak``
 * Grant the ``view-users`` role to the client service account:
-** In the realm, select `Clients` -> Select client
+** In the fairspace realm, click `Clients` in the left menu -> Select 'workspace-client'
 ** Choose tab `Service Account Roles`
-** Select `realm-management` from the `Client Roles` dropdown
-** Select `view-users` from the available roles, click `Add selected`.
-+
-image:docs/images/screenshots/Keycloak service account roles.png[Keycloak service account roles, role="th", align="center"]
+** Click `Assign Role`
+** Filter by clients -> Select `realm-management  view-users` from the available roles, click `Asign role`.
+* Load initial users:
+** Still in the fairspace realm, click `Realm settings` in the left menu
+** In the top right corner, click `Action`, then click `Partial import`
+** Click `Browse` and select `local-development/keycloak/keycloak-add-user.json` -> Click `Upload`
 
 Now everything should be ready to start using Fairspace:
 
