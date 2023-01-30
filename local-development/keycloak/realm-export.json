@@ -993,13 +993,13 @@
         "id": "62255d6f-5519-4765-8e13-37c6bb8ac30b",
         "clientId": "security-admin-console",
         "name": "${client_security-admin-console}",
-        "baseUrl": "/auth/admin/ci/console/index.html",
+        "baseUrl": "/admin/ci/console/index.html",
         "surrogateAuthRequired": false,
         "enabled": true,
         "clientAuthenticatorType": "client-secret",
         "secret": "**********",
         "redirectUris": [
-          "/auth/admin/ci/console/*"
+          "/admin/ci/console/*"
         ],
         "webOrigins": [],
         "notBefore": 0,
@@ -1129,7 +1129,7 @@
         "id": "24e598a2-6bf6-4986-a7a2-dc158a3cb110",
         "clientId": "account",
         "name": "${client_account}",
-        "baseUrl": "/auth/realms/ci/account",
+        "baseUrl": "/realms/ci/account",
         "surrogateAuthRequired": false,
         "enabled": true,
         "clientAuthenticatorType": "client-secret",
@@ -1139,7 +1139,7 @@
           "manage-account"
         ],
         "redirectUris": [
-          "/auth/realms/ci/account/*"
+          "/realms/ci/account/*"
         ],
         "webOrigins": [],
         "notBefore": 0,

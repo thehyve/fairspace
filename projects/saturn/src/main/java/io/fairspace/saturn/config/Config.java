@@ -63,7 +63,7 @@ public class Config {
     }
 
     public static class Auth {
-        public String authServerUrl = "http://localhost:5100/auth/";
+        public String authServerUrl = "http://localhost:5100/";
         public String realm = "fairspace";
         public String clientId = "workspace-client";
         public boolean enableBasicAuth;

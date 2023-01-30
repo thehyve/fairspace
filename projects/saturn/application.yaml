@@ -37,7 +37,7 @@ jena:
   transactionLogPath: "data/log"
   bulkTransactions: true
 auth:
-  authServerUrl: http://localhost:5100/auth/
+  authServerUrl: http://localhost:5100/
   realm: fairspace
   clientId: workspace-client
   enableBasicAuth: true
