@@ -20,7 +20,7 @@ services:
         tag: fairspace-keycloak-postgres
 
   fairspace-keycloak:
-    image: keycloak/keycloak:latest
+    image: keycloak/keycloak:20.0.3
     container_name: fairspace-keycloak
     environment:
       KC_DB: postgres
@@ -52,7 +52,6 @@ services:
     command: 
       - start-dev 
       - --import-realm 
-      - --http-relative-path=/auth
 
   fairspace-postgres:
     image: postgres:13-alpine

@@ -7,7 +7,7 @@
     "dev-be": "concurrently \"yarn localdevelopment\" \"yarn saturn\" \"yarn pluto\"",
     "dev-fe": "yarn build && yarn start",
     "localdevelopment": "cd ../../local-development && docker-compose up",
-    "saturn": "wait-on http://localhost:5100/auth && wait-on tcp:9432 && cd ../saturn/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew run",
+    "saturn": "wait-on http://localhost:5100/ && wait-on tcp:9432 && cd ../saturn/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew run",
     "pluto": "wait-on http://localhost:8090/api/health/ && cd ../pluto/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew bootRun --args='--spring.profiles.active=local'",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
