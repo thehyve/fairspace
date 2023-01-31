@@ -33,24 +33,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         }
     }, [activeFilterValues]);
 
-    const isValid = (val: Date | null): boolean => {
-        if (val === null) {
-            return true;
-        }
-        if (val.toString() === 'Invalid Date') {
-            return false;
-        }
-        return (val >= minDate && val <= maxDate);
-    };
-
     const handleChange = (newValue) => {
         if (value !== newValue) {
             setValue(newValue);
-            if (isValid(newValue[0]) && isValid(newValue[1])) {
-                onChange(newValue);
-            } else {
-                onChange(null);
-            }
+            onChange(newValue);
         }
     };
 
@@ -73,7 +59,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         }
     };
 
-    const renderDatePicker = (selectedDate, handleDateChange, label, min, max, placeholderDate) => (
+    const renderDatePicker = (selectedDate, handleDateChange, label, max, placeholderDate) => (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
                 disableToolbar
@@ -85,8 +71,6 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 value={selectedDate}
                 onChange={handleDateChange}
                 autoOk
-                minDate={min || minDate}
-                maxDate={max || maxDate}
                 initialFocusedDate={placeholderDate}
                 placeholder={renderDate(placeholderDate)}
                 KeyboardButtonProps={{
@@ -106,10 +90,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <Grid container>
             <Grid item>
-                {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1], minDate)}
+                {renderDatePicker(value[0], handleMinDateChange, "Start date", value[1], minDate)}
             </Grid>
             <Grid item>
-                {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate, maxDate)}
+                {renderDatePicker(value[1], handleMaxDateChange, "End date", maxDate, maxDate)}
             </Grid>
         </Grid>
 
