@@ -72,7 +72,7 @@ public class Services {
         davFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"), blobStore, userService, dataset.getContext());
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        if (config.extraStorage.enabled) {
+        if (CONFIG.features.contains(Feature.ExtraStorage)) {
             extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
             extraDavFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"), extraBlobStore, userService, dataset.getContext());
             extraDavServlet = new WebDAVServlet(extraDavFactory, transactions, extraBlobStore);

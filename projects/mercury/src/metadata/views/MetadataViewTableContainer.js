@@ -32,6 +32,7 @@ import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 import TablePaginationActions from "../../common/components/TablePaginationActions";
 import {ExtraLocalStorage} from "../../file/FileAPI";
 import UserContext from "../../users/UserContext";
+import FeaturesContext from "../../common/contexts/FeaturesContext";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -90,6 +91,10 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
     const {currentUser} = useContext(UserContext);
+
+    const {isFeatureEnabled} = useContext(FeaturesContext);
+    const exportToJupyterEnabled = isFeatureEnabled('ExtraStorage');
+
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
@@ -341,16 +346,18 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     >
                         Download selection ({checkedCount})
                     </Button>
-                    <Button
-                        color="primary"
-                        className={classes.exportButton}
-                        onClick={saveTableExtraStorage}
-                        variant="contained"
-                        endIcon={<Addchart fontSize="small" />}
-                        disabled={checkedCount === 0}
-                    >
-                        Export to analysis ({checkedCount})
-                    </Button>
+                    {exportToJupyterEnabled && (
+                        <Button
+                            color="primary"
+                            className={classes.exportButton}
+                            onClick={saveTableExtraStorage}
+                            variant="contained"
+                            endIcon={<Addchart fontSize="small" />}
+                            disabled={checkedCount === 0}
+                        >
+                            Export to analysis ({checkedCount})
+                        </Button>
+                    )}
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
                         component="div"

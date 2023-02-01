@@ -14,7 +14,8 @@ fairspace:
     domain: fairspace.local
     tls:
       enabled: false
-  features: []
+  features:
+    - ExtraStorage
   services:
     JupyterHub: http://jupyterhub.local/user/${username}/lab
 

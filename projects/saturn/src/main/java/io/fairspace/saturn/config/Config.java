@@ -91,9 +91,7 @@ public class Config {
     }
 
     public static class ExtraStorage {
-        public boolean enabled = false;
         public String blobStorePath = "data/extra-blobs";
-
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public final Set<String> rootCollections = new HashSet<>();
     }

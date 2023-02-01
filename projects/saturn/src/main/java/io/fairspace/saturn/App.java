@@ -45,18 +45,16 @@ public class App {
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
-                .addServlet(API_PREFIX + "/extra-storage/*", svc.getExtraDavServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port);
-        var server = serverBuilder
-                .build();
+        if (CONFIG.features.contains(Feature.ExtraStorage)) {
+            serverBuilder.addServlet(API_PREFIX + "/extra-storage/*", svc.getExtraDavServlet());
+        }
 
+        var server = serverBuilder.build();
         server.getJettyServer().insertHandler(new SessionHandler());
-
         server.start();
-
         log.info("Saturn has started");
-
         return server;
     }
 

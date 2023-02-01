@@ -36,7 +36,7 @@ public abstract class BaseApp implements SparkApplication {
     public final void init() {
         path(basePath, () -> {
             notFound((req, res) -> {
-                if (req.pathInfo().startsWith("/api/webdav") || req.pathInfo().startsWith("/api/extra-storage") ) {
+                if (req.pathInfo().startsWith("/api/webdav") || req.pathInfo().startsWith("/api/extra-storage")) {
                     return null;
                 }
                 return errorBody(SC_NOT_FOUND, "Not found");
