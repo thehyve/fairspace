@@ -30,7 +30,7 @@ import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 import TablePaginationActions from "../../common/components/TablePaginationActions";
-import {ExtraLocalStorage} from "../../file/FileAPI";
+import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
 import UserContext from "../../users/UserContext";
 import FeaturesContext from "../../common/contexts/FeaturesContext";
 
@@ -213,7 +213,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
         const fileName = `fairspace_export_${currentUser.id}.csv`;
-        ExtraLocalStorage.upload(csvFile, fileName, "/analysis-export", true);
+        ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true);
     };
 
     const renderMessages = () => (

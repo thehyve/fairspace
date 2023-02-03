@@ -88,10 +88,7 @@ public class DavFactory implements ResourceFactory {
 
     public Access getAccess(org.apache.jena.rdf.model.Resource subject) {
         if(root instanceof ExtraStorageRootResource) {
-            if (subject.equals(this.rootSubject) || subject.hasProperty(FS.createdBy, currentUserResource())) {
-                return Access.Manage;
-            }
-            return Access.None;
+            return getExtraStorageAccess(subject);
         }
 
         var uri = subject.getURI();
@@ -144,6 +141,16 @@ public class DavFactory implements ResourceFactory {
         }
 
         return access;
+    }
+
+    private Access getExtraStorageAccess(org.apache.jena.rdf.model.Resource subject) {
+        if (subject.hasProperty(FS.createdBy, currentUserResource()) && subject.hasProperty(RDF.type, FS.File)) {
+            return Access.Manage;
+        }
+        if (subject.equals(this.rootSubject) || subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
+            return Access.Write;
+        }
+        return Access.None;
     }
 
     public static Access getGrantedPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {

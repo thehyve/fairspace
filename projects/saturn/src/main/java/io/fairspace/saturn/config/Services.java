@@ -17,9 +17,6 @@ import io.fairspace.saturn.webdav.*;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.NonNull;
@@ -28,7 +25,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
-import org.apache.jena.vocabulary.RDFS;
 
 import javax.servlet.http.HttpServlet;
 import java.io.File;
@@ -76,16 +72,7 @@ public class Services {
             extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
             extraDavFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"), extraBlobStore, userService, dataset.getContext());
             extraDavServlet = new WebDAVServlet(extraDavFactory, transactions, extraBlobStore);
-                this.transactions.calculateWrite(ds2 -> {
-                    for (var rc : CONFIG.extraStorage.rootCollections) {
-                        try {
-                            extraDavFactory.root.createCollection(rc);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                    return null;
-                });
+            initExtraStorageRootDirectories();
         } else {
             extraBlobStore = null;
             extraDavFactory = null;
@@ -120,5 +107,18 @@ public class Services {
         searchService = new SearchService(filteredDataset);
 
         healthService = new HealthService(viewStoreClientFactory == null ? null : viewStoreClientFactory.dataSource);
+    }
+
+    private void initExtraStorageRootDirectories() {
+        this.transactions.calculateWrite(ds2 -> {
+            for (var rc : CONFIG.extraStorage.defaultRootCollections) {
+                try {
+                    extraDavFactory.root.createCollection(rc);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            return null;
+        });
     }
 }

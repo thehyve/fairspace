@@ -11,7 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
 public interface BlobStore {
-    String write(InputStream in) throws IOException;    
+    String write(InputStream in) throws IOException;
 
     void read(String id, OutputStream out, long start, Long finish) throws IOException;
 

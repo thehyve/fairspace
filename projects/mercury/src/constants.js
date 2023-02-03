@@ -14,13 +14,6 @@ export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';
 export const TOOLTIP_ENTER_DELAY = 350;
 export const DATE_FORMAT = 'dd-MM-yyyy';
 
-// Search
-export const COLLECTION_SEARCH_TYPE = 'collections';
-export const FILES_SEARCH_TYPE = 'files';
-export const SEARCH_MAX_SIZE = 10000;
-export const SEARCH_DEFAULT_SIZE = 10;
-export const SEARCH_DROPDOWN_DEFAULT_SIZE = 100;
-
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
 export const XMLSCHEMA_NS = 'http://www.w3.org/2001/XMLSchema#';

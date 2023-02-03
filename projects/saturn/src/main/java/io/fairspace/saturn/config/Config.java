@@ -17,7 +17,6 @@ import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
-import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -93,7 +92,7 @@ public class Config {
     public static class ExtraStorage {
         public String blobStorePath = "data/extra-blobs";
         @JsonSetter(nulls = Nulls.AS_EMPTY)
-        public final Set<String> rootCollections = new HashSet<>();
+        public final Set<String> defaultRootCollections = new HashSet<>(List.of("analysis-export"));
     }
 
     @Override

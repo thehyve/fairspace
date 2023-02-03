@@ -10,7 +10,6 @@ import org.apache.jena.sparql.core.*;
 
 import java.util.Date;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
@@ -55,7 +54,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
     @Override
     public void commit() {
         if (isInWriteTransaction()) {
-            if (updatedSubjects.stream().anyMatch(r -> r.isURI() && r.getURI().startsWith(CONFIG.publicUrl + "/api/extra-storage"))) {
+            if (isExtraStorageTransaction()) {
                 updatedSubjects.clear();
             } else {
                 log.debug("Commit updated subjects: {}", updatedSubjects);
@@ -87,5 +86,9 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     private boolean isInWriteTransaction() {
         return transactionMode() == ReadWrite.WRITE;
+    }
+
+    private boolean isExtraStorageTransaction() {
+        return updatedSubjects.stream().anyMatch(r -> r.isURI() && r.getURI().startsWith(CONFIG.publicUrl + "/api/extra-storage"));
     }
 }

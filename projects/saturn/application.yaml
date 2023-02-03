@@ -59,6 +59,3 @@ viewDatabase:
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
-extraStorage:
-  rootCollections:
-    - "analysis-export"

@@ -41,9 +41,9 @@ import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor;
 import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
-abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
+public abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected final DavFactory factory;
-    protected final Resource subject;
+    public final Resource subject;
     protected final Access access;
 
     BaseResource(DavFactory factory, Resource subject, Access access) {

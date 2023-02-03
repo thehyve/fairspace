@@ -18,6 +18,8 @@ const defaultOptions = {withCredentials: true, headers: {"X-Requested-With": "XM
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
+export const ANALYSIS_EXPORT_SUBPATH = "/analysis-export";
+
 export type File = {
     iri: string;
     filename: string;
