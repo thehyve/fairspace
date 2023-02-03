@@ -93,7 +93,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const {currentUser} = useContext(UserContext);
 
     const {isFeatureEnabled} = useContext(FeaturesContext);
-    const exportToJupyterEnabled = isFeatureEnabled('ExtraStorage');
+    const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
 
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
@@ -108,16 +108,15 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const history = useHistory();
 
     const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
-    const [checkboxes, setCheckboxes] = React.useState({});
+    const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
-    const resetCheckboxes = () => {
-        // eslint-disable-next-line
-        setCheckboxes(oldState => ({}));
+    const resetRowCheckboxes = () => {
+        setRowCheckboxes(() => ({}));
     };
 
-    const setCheckboxState = (id: string, checked: boolean) => {
-        if (checkboxes) {
-            setCheckboxes(oldState => {
+    const setRowCheckboxState = (id: string, checked: boolean) => {
+        if (rowCheckboxes) {
+            setRowCheckboxes(oldState => {
                 const newState = {...oldState};
                 newState[id] = checked;
                 return newState;
@@ -157,33 +156,35 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
         if (data && data.rows) {
             header += ";";
-            const row = data.rows[0];
-            header += Object.keys(row).join(";");
+            header += visibleColumnNames.join(";");
         }
 
         return header;
     };
 
     // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
-    const getCsvValuesForAttribute = (row, attributeValues) => Object.values(row[attributeValues])
-        .map(attribute => ((attribute && attribute.label) ?? "-").replaceAll(";", ".,")).join(",");
+    const getCsvValuesForAttribute = (row, attribute) => {
+        if (row[attribute] === undefined) {
+            return "-";
+        }
+        return Object.values(row[attribute])
+            .map(value => ((value && value.label) ?? "-").replaceAll(";", ".,"))
+            .join(",");
+    };
 
     const getCsvValues = () => {
         let values = "";
-        let index = 0;
-
-        Object.keys(checkboxes).forEach(key => {
-            if (checkboxes[key]) {
-                values += '\n' + key;
-                const row = data.rows[index];
-                Object.keys(row).forEach(attribute => {
-                    values += ";" + getCsvValuesForAttribute(row, attribute);
-                });
-
-                index++;
-            }
-        });
-
+        if (Object.keys(rowCheckboxes).length > 0) {
+            data.rows.forEach(row => {
+                const rowKey = row[idColumn.name][0].value;
+                if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
+                    values += '\n' + rowKey;
+                    visibleColumnNames.forEach(attribute => {
+                        values += ";" + getCsvValuesForAttribute(row, attribute);
+                    });
+                }
+            });
+        }
         return values;
     };
 
@@ -306,8 +307,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 history={history}
                 textFiltersObject={textFiltersObject}
                 setTextFiltersObject={setTextFiltersObject}
-                checkboxes={checkboxes}
-                setCheckboxState={setCheckboxState}
+                checkboxes={rowCheckboxes}
+                setCheckboxState={setRowCheckboxState}
             />
         );
     };
@@ -317,10 +318,10 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     }, [filters]);
 
     useEffect(() => {
-        resetCheckboxes();
+        resetRowCheckboxes();
     }, [data]);
 
-    const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
+    const checkedCount = (Object.values(rowCheckboxes) ? Object.values(rowCheckboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
 
     return (
         <Paper>
@@ -346,7 +347,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     >
                         Download selection ({checkedCount})
                     </Button>
-                    {exportToJupyterEnabled && (
+                    {exportToAnalysisEnabled && (
                         <Button
                             color="primary"
                             className={classes.exportButton}
