@@ -26,6 +26,9 @@ saturn:
     image: saturn-local
     tag: latest
     pullPolicy: Never
+  persistence:
+    extra-file-storage:
+      size: 5Gi
 
 # Specific settings for Pluto subchart
 pluto:

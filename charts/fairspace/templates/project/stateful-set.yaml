@@ -93,6 +93,10 @@ spec:
               mountPath: /data/saturn/files
             - name: audit
               mountPath: /data/saturn/audit
+{{- if has "ExtraStorage" .Values.fairspace.features }}
+            - name: extra-file-storage
+              mountPath: /data/saturn/extra-files
+{{- end }}
           livenessProbe:
             httpGet:
               path:  /liveness
@@ -194,4 +198,27 @@ spec:
   {{- else }}
       storageClassName: {{ .Values.saturn.persistence.files.storageClass | quote }}
   {{- end }}
+{{- end }}
+{{- if has "ExtraStorage" .Values.fairspace.features }}
+  - metadata:
+      name: extra-file-storage
+      labels:
+        app: saturn
+{{- include "fairspace.labels" . | nindent 8 }}
+{{- if index .Values "saturn" "persistence" "extra-file-storage" "annotations" }}
+      annotations:
+{{ toYaml index .Values "saturn" "persistence" "extra-file-storage" "annotations" | indent 8 }}
+{{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ index .Values "saturn" "persistence" "extra-file-storage" "size" | quote }}
+{{- if index .Values "saturn" "persistence" "extra-file-storage" "storageClass" }}
+  {{- if (eq "-" index .Values "saturn" "persistence" "extra-file-storage" "storageClass") }}
+      storageClassName: ""
+  {{- else }}
+      storageClassName: {{ index .Values "saturn" "persistence" "extra-file-storage" "storageClass" | quote }}
+  {{- end }}
+{{- end }}
 {{- end }}
