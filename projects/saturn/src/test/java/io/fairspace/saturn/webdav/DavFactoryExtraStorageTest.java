@@ -41,7 +41,6 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DavFactoryExtraStorageTest {
     static final long FILE_SIZE = 3L;
-    static final String BASE_PATH = "/api/webdav";
     static final String EXTRA_STORAGE_PATH = "/api/extra-storage";
     static final QName VERSION = new QName(FS.NS, "version");
     static final String extraStorageUri = "http://example.com" + EXTRA_STORAGE_PATH;
@@ -122,7 +121,7 @@ public class DavFactoryExtraStorageTest {
 
     @Test
     public void testOverwriteFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
-        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
         var file = coll.createNew("file", input, FILE_SIZE, "text/abc");
@@ -141,7 +140,7 @@ public class DavFactoryExtraStorageTest {
 
     @Test
     public void testGetVersion() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
-        var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
+        var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
         var file = coll.createNew("file", input, FILE_SIZE, "text/abc");
