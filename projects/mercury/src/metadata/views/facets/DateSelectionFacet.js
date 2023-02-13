@@ -33,33 +33,23 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         }
     }, [activeFilterValues]);
 
-    const isValid = (val: Date | null): boolean => {
-        if (val === null) {
-            return true;
-        }
-        if (val.toString() === 'Invalid Date') {
-            return false;
-        }
-        return (val >= minDate && val <= maxDate);
-    };
-
     const handleChange = (newValue) => {
         if (value !== newValue) {
             setValue(newValue);
-            if (isValid(newValue[0]) && isValid(newValue[1])) {
-                onChange(newValue);
-            } else {
-                onChange(null);
-            }
+            onChange(newValue);
         }
     };
 
     const handleMinDateChange = (newValue) => {
-        handleChange([getRangeLimit(newValue), value[1]]);
+        if (newValue && newValue.getFullYear() > 1900) {
+            handleChange([getRangeLimit(newValue), value[1]]);
+        }
     };
 
     const handleMaxDateChange = (newValue) => {
-        handleChange([value[0], getRangeLimit(newValue, true)]);
+        if (newValue && newValue.getFullYear() > 1900) {
+            handleChange([value[0], getRangeLimit(newValue, true)]);
+        }
     };
 
     const renderDate = (val: any): string => {
