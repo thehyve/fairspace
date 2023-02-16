@@ -2,6 +2,7 @@ import React, {useCallback, useEffect} from 'react';
 import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {Link as RouterLink} from "react-router-dom";
+import qs from 'qs';
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import {TextualValueTypes} from "./MetadataViewAPI";
 import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -64,6 +65,11 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         return col ? col.access : 'None';
     };
 
+    const getIdColumnFilterFromSearchParams = () => {
+        const idColumnName = idColumn.name.toLowerCase();
+        return qs.parse(window.location.search, {ignoreQueryPrefix: true})[idColumnName];
+    };
+
     const getResourceType = (row: Map<string, any>) => (
         row[RESOURCE_TYPE_COLUMN] && row[RESOURCE_TYPE_COLUMN][0] && row[RESOURCE_TYPE_COLUMN][0].value
     );
@@ -75,6 +81,15 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             toggleRow({label, iri, linkedFiles: linkedFiles || []});
         }
     };
+    useEffect(() => {
+        if (!textFiltersObject || !textFiltersObject.keys || !textFiltersObject.keys.includes(idColumn)) {
+            const idColumnTextFilter = getIdColumnFilterFromSearchParams();
+            if (idColumnTextFilter) {
+                setTextFiltersObject({...textFiltersObject, [idColumn.name]: idColumnTextFilter});
+            }
+        }
+    // eslint-disable-next-line
+    }, []);
 
     const initializeCheckboxes = useCallback(() => {
         if (idColumn && data && data.rows) {
@@ -166,7 +181,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     }, [data, initializeCheckboxes]);
 
     const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
-    const rowCount = data.rows && data.rows.length;
+    const rowCount = data && data.rows && data.rows.length;
 
     return (
         <Table data-testid="results-table" size="small" stickyHeader={!loading}>
