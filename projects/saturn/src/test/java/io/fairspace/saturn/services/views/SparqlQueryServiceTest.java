@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.dao.*;
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.metadata.*;
@@ -110,6 +111,7 @@ public class SparqlQueryServiceTest {
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
+//        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
         queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, filteredDataset);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);

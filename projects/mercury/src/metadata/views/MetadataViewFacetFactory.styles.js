@@ -29,6 +29,9 @@ const styles = theme => ({
     numericalContent: {
         padding: 8
     },
+    booleanContent: {
+        textAlign: "center",
+    },
     expand: {
         transform: "rotate(0deg)",
         marginLeft: "auto",

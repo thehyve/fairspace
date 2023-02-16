@@ -1,5 +1,6 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.users.User;
 import org.apache.jena.rdf.model.Model;
@@ -10,6 +11,8 @@ import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
 
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
@@ -65,5 +68,17 @@ public class TestUtils {
         setCurrentRequest(request);
         var auth = mockAuthentication("userid");
         when(request.getAuthentication()).thenReturn(auth);
+    }
+
+    public static ViewsConfig loadViewsConfig(String path) {
+        var settingsFile = new File(path);
+        if (settingsFile.exists()) {
+            try {
+                return ViewsConfig.MAPPER.readValue(settingsFile, ViewsConfig.class);
+            } catch (IOException e) {
+                throw new RuntimeException("Error loading search configuration", e);
+            }
+        }
+        return new ViewsConfig();
     }
 }

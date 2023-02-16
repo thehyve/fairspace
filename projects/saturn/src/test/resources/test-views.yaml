@@ -1,0 +1,49 @@
+views:
+  - name: Resource
+    title: Files
+    itemName: Name
+    types:
+      - https://sils.uva.nl/ontology#ExternalFile
+    columns:
+      - name: externalFileLink
+        title: File link
+        source: https://sils.uva.nl/ontology#externalFileLink
+        type: link
+    joinColumns:
+      - name: studyName
+        title: Study name
+        source: http://www.w3.org/2000/01/rdf-schema#label
+        sourceClass: https://sils.uva.nl/ontology#Study
+        sourceClassName: Study
+        type: text
+      - name: projectName
+        title: Project name
+        source: http://www.w3.org/2000/01/rdf-schema#label
+        sourceClass: https://sils.uva.nl/ontology#Project
+        sourceClassName: Project
+        type: text
+      - name: objectSpecies
+        title: Object species
+        source: https://sils.uva.nl/ontology#objectSpecies
+        rdfType: https://sils.uva.nl/ontology#Species
+        sourceClass: https://sils.uva.nl/ontology#Object
+        sourceClassName: Object
+        type: term
+      - name: objectAltitude
+        title: Object altitude
+        source: https://sils.uva.nl/ontology#objectAltitude
+        sourceClass: https://sils.uva.nl/ontology#Object
+        sourceClassName: Object
+        type: number
+      - name: objectDepth
+        title: Object depth
+        source: https://sils.uva.nl/ontology#objectDepth
+        sourceClass: https://sils.uva.nl/ontology#Object
+        sourceClassName: Object
+        type: number
+      - name: sampleCollectionTemperature
+        title: Sample collection temperature
+        source: https://sils.uva.nl/ontology#sampleCollectionTemperature
+        sourceClass: https://sils.uva.nl/ontology#Sample
+        sourceClassName: Sample
+        type: number

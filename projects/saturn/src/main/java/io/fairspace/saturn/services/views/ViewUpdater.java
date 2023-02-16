@@ -76,6 +76,7 @@ public class ViewUpdater implements AutoCloseable {
 
     public Object getValue(ViewsConfig.View.Column column, Node node) throws SQLException {
         return switch (column.type) {
+            case Boolean -> node.getLiteralValue();
             case Number -> node.getLiteralValue();
             case Date -> {
                 try {

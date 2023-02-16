@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
+import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Boolean;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
 /**
@@ -216,6 +217,13 @@ public class ViewStoreReader implements AutoCloseable {
                 return finalFieldName + " like ? escape '\\'";
             }).collect(Collectors.joining(" or "));
             constraints.add("(" + prefixes + ")");
+        }
+        if(filter.booleanValue != null) {
+            if (filter.booleanValue) {
+                constraints.add("(" + fieldName + "=true)");
+            } else {
+                constraints.add("(" + fieldName + "=false OR " + fieldName + " IS NULL)");
+            }
         }
         if (!constraints.isEmpty()) {
             return String.join(" and ", constraints);
