@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {useHistory} from "react-router-dom";
-import {Addchart, ViewColumn} from "@mui/icons-material";
+import {Addchart, ViewColumn, Check} from "@mui/icons-material";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import Popover from "@mui/material/Popover";
@@ -19,6 +19,8 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import FormGroup from "@mui/material/FormGroup";
+import useDeepCompareEffect from "use-deep-compare-effect";
+
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -30,9 +32,11 @@ import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 import TablePaginationActions from "../../common/components/TablePaginationActions";
-import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
 import UserContext from "../../users/UserContext";
 import FeaturesContext from "../../common/contexts/FeaturesContext";
+import ProgressButton from "../../common/components/ProgressButton";
+import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
+import ErrorDialog from "../../common/components/ErrorDialog";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -94,6 +98,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const {isFeatureEnabled} = useContext(FeaturesContext);
     const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
+    const [exportToAnalysisLoading, setExportToAnalysisLoading] = useState(false);
+    const [currentSelectionExported, setCurrentSelectionExported] = useState(false);
 
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
@@ -211,10 +217,14 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     };
 
     const saveTableExtraStorage = () => {
+        setExportToAnalysisLoading(true);
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
         const fileName = `fairspace_export_${currentUser.id}.csv`;
-        ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true);
+        ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true)
+            .then(() => setCurrentSelectionExported(true))
+            .catch((err: Error) => (ErrorDialog.showError('Could not export the selection to analysis', err.message)))
+            .finally(() => (setExportToAnalysisLoading(false)));
     };
 
     const renderMessages = () => (
@@ -321,6 +331,12 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         resetRowCheckboxes();
     }, [data]);
 
+    useDeepCompareEffect(() => {
+        if (rowCheckboxes && Object.keys(rowCheckboxes).length > 0 && Object.values(rowCheckboxes).includes(true)) {
+            setCurrentSelectionExported(false);
+        }
+    }, [rowCheckboxes]);
+
     const checkedCount = (Object.values(rowCheckboxes) ? Object.values(rowCheckboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
 
     return (
@@ -348,16 +364,18 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         Download selection ({checkedCount})
                     </Button>
                     {exportToAnalysisEnabled && (
-                        <Button
-                            color="primary"
-                            className={classes.exportButton}
-                            onClick={saveTableExtraStorage}
-                            variant="contained"
-                            endIcon={<Addchart fontSize="small" />}
-                            disabled={checkedCount === 0}
-                        >
-                            Export to analysis ({checkedCount})
-                        </Button>
+                        <ProgressButton active={exportToAnalysisLoading}>
+                            <Button
+                                color="primary"
+                                className={classes.exportButton}
+                                onClick={saveTableExtraStorage}
+                                variant="contained"
+                                endIcon={(currentSelectionExported ? <Check fontSize="small" /> : <Addchart fontSize="small" />)}
+                                disabled={checkedCount === 0 || currentSelectionExported}
+                            >
+                                {currentSelectionExported ? "Exported to analysis" : `Export to analysis (${checkedCount})`}
+                            </Button>
+                        </ProgressButton>
                     )}
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
