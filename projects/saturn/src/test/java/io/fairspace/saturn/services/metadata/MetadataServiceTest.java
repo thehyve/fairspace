@@ -7,9 +7,11 @@ import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -21,8 +23,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.FS.NS;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
@@ -52,7 +54,13 @@ public class MetadataServiceTest {
         setupRequestContext();
         when(permissions.canReadMetadata(any())).thenReturn(true);
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(txn, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
+
+        var dsg = DatasetGraphFactory.createTxnMem();
+        Dataset ds = wrap(dsg);
+        Model model = ds.getDefaultModel();
+        var vocabulary = model.read("test-vocabulary.ttl");
+
+        api = new MetadataService(txn, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
     }
 
     @Test

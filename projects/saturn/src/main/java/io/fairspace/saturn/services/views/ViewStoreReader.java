@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
-import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Boolean;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
 /**

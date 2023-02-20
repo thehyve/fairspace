@@ -25,6 +25,10 @@ views:
         title: Age at death
         source: https://institut-curie.org/ontology#ageAtDeath
         type: number
+      - name: hasSequenceData
+        title: Has sequence data
+        source: https://institut-curie.org/ontology#hasSequenceData
+        type: boolean
       - name: availableForResearch
         title: Available for research
         source: https://institut-curie.org/ontology#availableForResearch

@@ -10,6 +10,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 import org.junit.Before;
@@ -22,8 +23,8 @@ import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.assertFalse;
@@ -58,7 +59,12 @@ public class MetadataServiceValidationTest {
         ds = createTxnMem();
         txn = new SimpleTransactions(ds);
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(txn, VOCABULARY, validator, permissions);
+
+        var dsg = DatasetGraphFactory.createTxnMem();
+        Dataset ds = wrap(dsg);
+        Model model = ds.getDefaultModel();
+        var vocabulary = model.read("test-vocabulary.ttl");
+        api = new MetadataService(txn, vocabulary, validator, permissions);
 
         setupRequestContext();
     }

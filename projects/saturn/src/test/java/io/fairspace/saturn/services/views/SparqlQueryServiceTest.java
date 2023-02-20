@@ -31,7 +31,6 @@ import java.util.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -102,6 +101,7 @@ public class SparqlQueryServiceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
+        var vocabulary = model.read("test-vocabulary.ttl");
 
         workspaceService = new WorkspaceService(tx, userService);
 
@@ -114,7 +114,7 @@ public class SparqlQueryServiceTest {
         queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
         setupUsers(model);
 
