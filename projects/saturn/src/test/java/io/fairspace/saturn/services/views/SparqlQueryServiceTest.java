@@ -111,8 +111,7 @@ public class SparqlQueryServiceTest {
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-//        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
-        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, filteredDataset);
+        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
