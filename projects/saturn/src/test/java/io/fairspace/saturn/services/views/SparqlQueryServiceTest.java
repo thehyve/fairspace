@@ -123,7 +123,7 @@ public class SparqlQueryServiceTest {
 
         selectAdmin();
 
-        var taxonomies = model.read("taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies);
 
         var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());

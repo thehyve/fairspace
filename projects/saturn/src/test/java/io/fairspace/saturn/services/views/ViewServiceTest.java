@@ -79,7 +79,7 @@ public class ViewServiceTest {
         setupRequestContext();
         var request = getCurrentRequest();
 
-        var taxonomies = model.read("taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies);
 
         User user = createTestUser("user", true);
