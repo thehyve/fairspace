@@ -47,15 +47,14 @@ public class App {
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
                 .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port);
-        var server = serverBuilder
-                .build();
+        if (CONFIG.features.contains(Feature.ExtraStorage)) {
+            serverBuilder.addServlet(API_PREFIX + "/extra-storage/*", svc.getExtraDavServlet());
+        }
 
+        var server = serverBuilder.build();
         server.getJettyServer().insertHandler(new SessionHandler());
-
         server.start();
-
         log.info("Saturn has started");
-
         return server;
     }
 

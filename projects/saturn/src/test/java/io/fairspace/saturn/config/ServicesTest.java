@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
@@ -7,8 +8,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import java.util.HashSet;
+
+import static org.junit.Assert.*;
 
 public class ServicesTest {
     private Dataset dataset = DatasetFactory.create();
@@ -48,5 +50,13 @@ public class ServicesTest {
     @Test
     public void getMetadataService() {
         assertNotNull(svc.getMetadataService());
+    }
+
+    @Test
+    public void getExtraDavServlet() {
+        assertNotNull(svc.getExtraBlobStore());
+        assertNotNull(svc.getExtraDavFactory());
+        assertNotNull(svc.getExtraDavServlet());
+        assertTrue(svc.getExtraDavFactory().root instanceof ExtraStorageRootResource);
     }
 }

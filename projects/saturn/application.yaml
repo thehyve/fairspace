@@ -52,6 +52,7 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
+  - ExtraStorage
 viewDatabase:
   enabled: true
   url: jdbc:postgresql://localhost:9432/fairspace

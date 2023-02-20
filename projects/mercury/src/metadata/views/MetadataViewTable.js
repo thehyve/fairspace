@@ -207,7 +207,12 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                         selected={selected && selected.iri === row[idColumn.name][0].value}
                         onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
                     >
-                        <Checkbox id={row[idColumn.name][0].value} key={Math.random()} defaultChecked={checkboxes[row[idColumn.name][0].value]} onChange={handleCheckboxChange} />
+                        <Checkbox
+                            id={row[idColumn.name][0].value}
+                            key={Math.random()}
+                            defaultChecked={checkboxes[row[idColumn.name][0].value]}
+                            onChange={handleCheckboxChange}
+                        />
                         {visibleColumns.map(column => renderTableCell(row, column, () => handleResultSingleClick(
                             row[idColumn.name][0].value,
                             row[idColumn.name][0].label,

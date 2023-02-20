@@ -1,22 +1,21 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.resources;
 
 import io.fairspace.saturn.vocabulary.FS;
-import io.milton.http.Auth;
-import io.milton.http.Request;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.AccessMode;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.Status;
 import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.property.PropertySource;
 import io.milton.resource.CollectionResource;
-import io.milton.resource.MakeCollectionableResource;
-import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
-import lombok.extern.log4j.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,44 +27,21 @@ import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 
 @Log4j2
-class RootResource implements io.milton.resource.CollectionResource, MakeCollectionableResource, PropFindableResource {
+public class CollectionRootResource extends RootResource {
 
-    private final DavFactory factory;
-
-    public RootResource(DavFactory factory) {
-        this.factory = factory;
+    public CollectionRootResource(DavFactory factory) {
+        super(factory);
     }
-
-    @Override
-    public Resource child(String childName) throws NotAuthorizedException {
-        return factory.getResource(childSubject(factory.rootSubject, childName));
-    }
-
+    
     @Override
     public List<? extends Resource> getChildren() {
         return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(factory::getResource)
                 .filterDrop(Objects::isNull)
-                .filterKeep(r -> ((io.fairspace.saturn.webdav.CollectionResource)r).access.canList())
+                .filterKeep(r -> ((io.fairspace.saturn.webdav.resources.CollectionResource)r).access.canList())
                 .toList();
     }
-
-    public Optional<Resource> findCollectionWithName(String name) {
-        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
-                .mapWith(child -> factory.getResourceByType(child, Access.List))
-                .filterDrop(Objects::isNull)
-                .filterKeep(collection -> collection.getName().equals(name))
-                .nextOptional();
-    }
-
-    protected void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
-        validateCollectionName(name);
-        var existing = findCollectionWithName(name);
-        if (existing.isPresent()) {
-            throw new ConflictException(existing.get(), "Target collection with this name already exists.");
-        }
-    }
-
+    
     /**
      * Creates a new collection resource, sets the owner workspaces and assigns
      * manage permission on the collection to the current user.
@@ -130,42 +106,19 @@ class RootResource implements io.milton.resource.CollectionResource, MakeCollect
     }
 
     @Override
-    public String getUniqueId() {
-        return factory.rootSubject.getURI();
+    public void validateTargetCollectionName(String name) throws ConflictException, BadRequestException {
+        validateCollectionName(name);
+        var existing = findCollectionWithName(name);
+        if (existing.isPresent()) {
+            throw new ConflictException(existing.get(), "Target collection with this name already exists.");
+        }
     }
 
-    @Override
-    public String getName() {
-        return "";
-    }
-
-    @Override
-    public Object authenticate(String user, String password) {
-        return null;
-    }
-
-    @Override
-    public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return true;
-    }
-
-    @Override
-    public String getRealm() {
-        return null;
-    }
-
-    @Override
-    public Date getModifiedDate() {
-        return null;
-    }
-
-    @Override
-    public String checkRedirect(Request request) {
-        return null;
-    }
-
-    @Override
-    public Date getCreateDate() {
-        return null;
+    private Optional<Resource> findCollectionWithName(String name) {
+        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
+                .mapWith(child -> factory.getResourceByType(child, Access.List))
+                .filterDrop(Objects::isNull)
+                .filterKeep(collection -> collection.getName().equals(name))
+                .nextOptional();
     }
 }

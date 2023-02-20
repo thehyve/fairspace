@@ -18,6 +18,8 @@ const defaultOptions = {withCredentials: true, headers: {"X-Requested-With": "XM
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
+export const ANALYSIS_EXPORT_SUBPATH = "/analysis-export";
+
 export type File = {
     iri: string;
     filename: string;
@@ -107,6 +109,40 @@ class FileAPI {
                             throw new Error("You do not have authorization to create a directory \nin this collection.");
                         case 405:
                             throw new Error("A directory or file with this name already exists. \nPlease choose another name");
+                    }
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
+    /**
+     * Uploads a file
+     * @param file
+     * @param destinationFilename
+     * @param destinationPath
+     * @param deleteExistingBlob
+     * @returns {Promise<never>|Promise<any[]>}
+     */
+    upload(file, destinationFilename, destinationPath, deleteExistingBlob = false) {
+        if (!file) {
+            return Promise.reject(Error("No file given"));
+        }
+
+        const options = {...defaultOptions};
+        if (deleteExistingBlob) {
+            options.headers = {...options.headers, "Delete-Existing-Blob": true};
+        }
+
+        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("You are not authorized to add files \nto this storage.");
+                        case 413:
+                            throw new Error("Payload too large");
                     }
                 }
 
@@ -420,5 +456,7 @@ class FileAPI {
 }
 
 export const LocalFileAPI = new FileAPI();
+
+export const ExtraLocalStorage = new FileAPI('/api/extra-storage');
 
 export default FileAPI;

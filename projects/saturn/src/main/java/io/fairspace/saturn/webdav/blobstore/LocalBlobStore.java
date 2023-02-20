@@ -1,4 +1,4 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.blobstore;
 
 
 import io.milton.common.RangeUtils;

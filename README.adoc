@@ -3014,6 +3014,10 @@ directory listings and file properties handling, adding, moving, replacing and d
 There are two types of storages that Saturn connects to: primary for storing RDF triples and file blobs,
 and secondary for efficient data retrieval.
 
+There is also a possibility to configure an extra file storage for Saturn,
+separate from the primary one to keep e.g. search result exports created by users,
+so they could be mounted in the JupyterHub environment for further analysis.
+
 ==== Primary data storage
 
 RDF database (link:https://jena.apache.org/documentation/tdb2[Apache Jena TDB2]) stores:
@@ -3039,6 +3043,21 @@ that makes it possible to (incrementally) backup full state of workspaces and me
 To improve the performance of metadata views, especially for counts and pagination, a simple relational database
 (PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
 which enables recreation of the database at any point of time.
+
+==== Extra file storage
+
+Similar to the primary file storage, the extra storage is a virtual file system
+that stores directory structure and basic file information in the RDF database.
+Unlike the primary one, the additional storage cannot be annotated with metadata from the defined model.
+Files themselves are stored in an extra storage as blobs. This storage however is NOT append-only.
+Blobs can be overwritten, if a request contains `"Delete-Existing-Blob": true` header.
+
+There is a basic, file-level access control over the storage - each user has "modify" access only to the files added by that user.
+Users cannot overwrite, read or even list each others files. This includes users with admin role.
+
+To configure the extra storage to allow storage of metadata search results and to include the "Export to analysis" button in the user interface,
+add `ExtraStorage` feature to the configured features list.
+This will enable `/api/extra-storage` webdav endpoint with default `analysis-export` root directory created to store exported files.
 
 === Deployment architecture
 

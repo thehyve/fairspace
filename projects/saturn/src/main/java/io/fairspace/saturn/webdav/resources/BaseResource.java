@@ -1,6 +1,9 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.resources;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Request;
@@ -38,9 +41,9 @@ import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor;
 import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
-abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
+public abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
     protected final DavFactory factory;
-    protected final Resource subject;
+    public final Resource subject;
     protected final Access access;
 
     BaseResource(DavFactory factory, Resource subject, Access access) {
@@ -234,7 +237,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
     @Override
     public List<QName> getAllPropertyNames() {
         return Stream.of(getPropertyDescriptors(getClass()))
-                .filter(p -> p.getReadMethod().isAnnotationPresent(Property.class))
+                .filter(p -> p.getReadMethod().isAnnotationPresent(io.fairspace.saturn.webdav.Property.class))
                 .map(p -> new QName(FS.NS, p.getName()))
                 .collect(toList());
     }
@@ -281,17 +284,17 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
         return null;
     }
 
-    @Property
+    @io.fairspace.saturn.webdav.Property
     public String getIri() {
         return subject.getURI();
     }
 
-    @Property
+    @io.fairspace.saturn.webdav.Property
     public Date getDateDeleted() {
         return parseDate(subject, FS.dateDeleted);
     }
 
-    @Property
+    @io.fairspace.saturn.webdav.Property
     public String getMetadataLinks() {
         if(includeMetadataLinks()) {
             return String.join(",", metadataLinks());
@@ -311,7 +314,7 @@ abstract class BaseResource implements PropFindableResource, DeletableResource, 
                 .toSet();
     }
 
-    @Property
+    @io.fairspace.saturn.webdav.Property
     public String getDeletedBy() {
         var deletedBy = subject.getPropertyResourceValue(FS.deletedBy);
         if (deletedBy != null) {

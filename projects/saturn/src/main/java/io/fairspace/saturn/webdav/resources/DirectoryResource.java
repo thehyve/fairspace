@@ -1,8 +1,13 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.resources;
 
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
@@ -42,7 +47,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
-class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
+public class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
     public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
         super(factory, subject, access);
     }

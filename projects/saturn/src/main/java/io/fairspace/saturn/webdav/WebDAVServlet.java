@@ -1,6 +1,9 @@
 package io.fairspace.saturn.webdav;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
 import io.milton.http.*;
@@ -116,7 +119,7 @@ public class WebDAVServlet extends HttpServlet {
     }
 
 
-    static Integer fileVersion() {
+    public static Integer fileVersion() {
         return Optional.ofNullable(getCurrentRequest())
                 .map(r -> (isEmpty(r.getParameter("version"))
                         ? r.getHeader("Version")
@@ -126,37 +129,41 @@ public class WebDAVServlet extends HttpServlet {
                 .orElse(null);
     }
 
-    static String owner() {
+    public static String owner() {
         return Optional.ofNullable(getCurrentRequest())
                 .map(r -> r.getHeader("Owner"))
                 .orElse(null);
     }
 
-    static boolean showDeleted() {
+    public static boolean showDeleted() {
         return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
     }
 
-    static boolean includeMetadataLinks() {
+    public static boolean deleteExistingBlob() {
+        return "true".equalsIgnoreCase(getCurrentRequest().getHeader("Delete-Existing-Blob"));
+    }
+
+    public static boolean includeMetadataLinks() {
         return "true".equalsIgnoreCase(getCurrentRequest().getHeader("With-Metadata-Links"));
     }
 
-    static boolean isMetadataRequest() {
+    public static boolean isMetadataRequest() {
         return (API_PREFIX + "/metadata/").equalsIgnoreCase(getCurrentRequest().getServletPath());
     }
 
-    static BlobInfo getBlob() {
+    public static BlobInfo getBlob() {
         return (BlobInfo) getCurrentRequest().getAttribute(BLOB_ATTRIBUTE);
     }
 
-    static void setErrorMessage(String message) {
+    public static void setErrorMessage(String message) {
         getCurrentRequest().setAttribute(ERROR_MESSAGE, message);
     }
 
-    static String getErrorMessage() {
+    public static String getErrorMessage() {
         return (String) getCurrentRequest().getAttribute(ERROR_MESSAGE);
     }
 
-    static Literal timestampLiteral() {
+    public static Literal timestampLiteral() {
         var r = getCurrentRequest();
         var t = (Literal) r.getAttribute(TIMESTAMP_ATTRIBUTE);
         if (t == null) {

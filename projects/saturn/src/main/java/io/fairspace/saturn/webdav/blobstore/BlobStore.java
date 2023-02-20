@@ -1,4 +1,4 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.blobstore;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     Button,
     CircularProgress,
@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {useHistory} from "react-router-dom";
-import {ViewColumn} from "@mui/icons-material";
+import {Addchart, ViewColumn, Check} from "@mui/icons-material";
 import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
 import Popover from "@mui/material/Popover";
@@ -19,6 +19,8 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import FormGroup from "@mui/material/FormGroup";
+import useDeepCompareEffect from "use-deep-compare-effect";
+
 import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -30,6 +32,11 @@ import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 import TablePaginationActions from "../../common/components/TablePaginationActions";
+import UserContext from "../../users/UserContext";
+import FeaturesContext from "../../common/contexts/FeaturesContext";
+import ProgressButton from "../../common/components/ProgressButton";
+import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
+import ErrorDialog from "../../common/components/ErrorDialog";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -87,6 +94,12 @@ const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_C
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
+    const {currentUser} = useContext(UserContext);
+
+    const {isFeatureEnabled} = useContext(FeaturesContext);
+    const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
+    const [exportToAnalysisLoading, setExportToAnalysisLoading] = useState(false);
+    const [currentSelectionExported, setCurrentSelectionExported] = useState(false);
 
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
@@ -101,16 +114,15 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const history = useHistory();
 
     const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
-    const [checkboxes, setCheckboxes] = React.useState({});
+    const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
-    const resetCheckboxes = () => {
-        // eslint-disable-next-line
-        setCheckboxes(oldState => ({}));
+    const resetRowCheckboxes = () => {
+        setRowCheckboxes(() => ({}));
     };
 
-    const setCheckboxState = (id: string, checked: boolean) => {
-        if (checkboxes) {
-            setCheckboxes(oldState => {
+    const setRowCheckboxState = (id: string, checked: boolean) => {
+        if (rowCheckboxes) {
+            setRowCheckboxes(oldState => {
                 const newState = {...oldState};
                 newState[id] = checked;
                 return newState;
@@ -150,43 +162,47 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
         if (data && data.rows) {
             header += ";";
-            const row = data.rows[0];
-            header += Object.keys(row).join(";");
+            header += visibleColumnNames.join(";");
         }
 
         return header;
     };
 
     // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
-    const getCsvValuesForAttribute = (row, attributeValues) => Object.values(row[attributeValues])
-        .map(attribute => ((attribute && attribute.label) ?? "-").replaceAll(";", ".,")).join(",");
+    const getCsvValuesForAttribute = (row, attribute) => {
+        if (row[attribute] === undefined) {
+            return "-";
+        }
+        return Object.values(row[attribute])
+            .map(value => ((value && value.label) ?? "-").replaceAll(";", ".,"))
+            .join(",");
+    };
 
     const getCsvValues = () => {
         let values = "";
-        let index = 0;
-
-        Object.keys(checkboxes).forEach(key => {
-            if (checkboxes[key]) {
-                values += '\n' + key;
-                const row = data.rows[index];
-                Object.keys(row).forEach(attribute => {
-                    values += ";" + getCsvValuesForAttribute(row, attribute);
-                });
-
-                index++;
-            }
-        });
-
+        if (Object.keys(rowCheckboxes).length > 0) {
+            data.rows.forEach(row => {
+                const rowKey = row[idColumn.name][0].value;
+                if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
+                    values += '\n' + rowKey;
+                    visibleColumnNames.forEach(attribute => {
+                        values += ";" + getCsvValuesForAttribute(row, attribute);
+                    });
+                }
+            });
+        }
         return values;
     };
 
-    const exportTableCsv = () => {
-        const fileName = "fairspace_export.csv";
-        // add header
+    const createCsvBlob = (): Blob => {
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
+        return new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
+    };
 
-        const blob = new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
+    const exportTable = () => {
+        const blob = createCsvBlob();
+        const fileName = "fairspace_export.csv";
         const link = document.createElement("a");
         if (link.download !== undefined) { // feature detection
             // Browsers that support HTML5 download attribute
@@ -198,6 +214,17 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             link.click();
             document.body.removeChild(link);
         }
+    };
+
+    const saveTableExtraStorage = () => {
+        setExportToAnalysisLoading(true);
+        let csvFile = getCsvHeader();
+        csvFile += getCsvValues();
+        const fileName = `fairspace_export_${currentUser.id}.csv`;
+        ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true)
+            .then(() => setCurrentSelectionExported(true))
+            .catch((err: Error) => (ErrorDialog.showError('Could not export the selection to analysis', err.message)))
+            .finally(() => (setExportToAnalysisLoading(false)));
     };
 
     const renderMessages = () => (
@@ -290,8 +317,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 history={history}
                 textFiltersObject={textFiltersObject}
                 setTextFiltersObject={setTextFiltersObject}
-                checkboxes={checkboxes}
-                setCheckboxState={setCheckboxState}
+                checkboxes={rowCheckboxes}
+                setCheckboxState={setRowCheckboxState}
             />
         );
     };
@@ -301,10 +328,16 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     }, [filters]);
 
     useEffect(() => {
-        resetCheckboxes();
+        resetRowCheckboxes();
     }, [data]);
 
-    const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
+    useDeepCompareEffect(() => {
+        if (rowCheckboxes && Object.keys(rowCheckboxes).length > 0 && Object.values(rowCheckboxes).includes(true)) {
+            setCurrentSelectionExported(false);
+        }
+    }, [rowCheckboxes]);
+
+    const checkedCount = (Object.values(rowCheckboxes) ? Object.values(rowCheckboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
 
     return (
         <Paper>
@@ -321,14 +354,29 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 </TableContainer>
                 <div className={classes.footerButtonDiv}>
                     <Button
+                        color="primary"
                         className={classes.exportButton}
-                        onClick={exportTableCsv}
+                        onClick={exportTable}
                         variant="contained"
                         endIcon={<GetAppIcon fontSize="small" />}
                         disabled={checkedCount === 0}
                     >
                         Download selection ({checkedCount})
                     </Button>
+                    {exportToAnalysisEnabled && (
+                        <ProgressButton active={exportToAnalysisLoading}>
+                            <Button
+                                color="primary"
+                                className={classes.exportButton}
+                                onClick={saveTableExtraStorage}
+                                variant="contained"
+                                endIcon={(currentSelectionExported ? <Check fontSize="small" /> : <Addchart fontSize="small" />)}
+                                disabled={checkedCount === 0 || currentSelectionExported}
+                            >
+                                {currentSelectionExported ? "Exported to analysis" : `Export to analysis (${checkedCount})`}
+                            </Button>
+                        </ProgressButton>
+                    )}
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
                         component="div"
