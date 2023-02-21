@@ -293,6 +293,8 @@ public class SparqlQueryService implements QueryService {
             expr = new E_OneOf(variable, new ExprList(values));
         } else if (filter.prefix != null && !filter.prefix.isBlank()) {
             expr = new E_StrStartsWith(new E_StrLowerCase(variable), makeString(filter.prefix.trim().toLowerCase()));
+        } else if (filter.booleanValue != null) {
+            expr = new E_Equals(variable, makeBoolean(filter.booleanValue));
         } else {
             return null;
         }
@@ -350,7 +352,12 @@ public class SparqlQueryService implements QueryService {
             case Text, Set -> makeString(o.toString());
             case Number -> makeDecimal(o.toString());
             case Date -> makeDateTime(convertDateValue(o.toString()));
+            case Boolean -> makeBoolean(convertBooleanValue(o.toString()));
         };
+    }
+
+    private static boolean convertBooleanValue(String value) {
+        return Boolean.getBoolean(value);
     }
 
     public CountDTO count(CountRequest request) {

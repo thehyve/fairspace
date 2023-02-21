@@ -30,6 +30,7 @@ public class ViewStoreClientFactory {
             case Text, Term -> "text";
             case Date -> "timestamp";
             case Number -> "numeric";
+            case Boolean -> "boolean";
             case Identifier -> H2_DATABASE ? "varchar not null" : "text not null";
             case Set, TermSet -> throw new IllegalArgumentException("No database type for column type set.");
         };

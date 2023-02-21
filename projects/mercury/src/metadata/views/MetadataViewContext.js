@@ -31,7 +31,7 @@ export const MetadataViewProvider = ({children, metadataViewApi = MetadataViewAP
         setFilters([
             ...filters.filter(f => !filterCandidates.some(u => u.field === f.field)),
             ...filterCandidates.filter(f => (
-                (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max) || f.prefix != null
+                (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max) || f.prefix != null || f.booleanValue !== null
             ))
         ]);
     };

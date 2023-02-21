@@ -32,7 +32,6 @@ import java.util.stream.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.Mockito.*;
 
@@ -79,7 +78,7 @@ public class JdbcQueryServiceTest {
         viewDatabase.url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE";
         viewDatabase.username = "sa";
         viewDatabase.password = "";
-        ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
+        ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
         ViewStoreClientFactory.H2_DATABASE = true;
         var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
 
@@ -87,6 +86,7 @@ public class JdbcQueryServiceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
+        var vocabulary = model.read("test-vocabulary.ttl");
 
         maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory);
 
@@ -99,7 +99,8 @@ public class JdbcQueryServiceTest {
         queryService = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClientFactory, tx, davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
+
+        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
         userAuthentication = mockAuthentication("user");
         user = createTestUser("user", false);
@@ -116,7 +117,7 @@ public class JdbcQueryServiceTest {
 
         selectAdmin();
 
-        var taxonomies = model.read("taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies);
 
         var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());

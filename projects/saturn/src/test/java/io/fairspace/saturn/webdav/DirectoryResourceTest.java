@@ -45,7 +45,6 @@ import java.util.Map;
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.junit.Assert.assertEquals;
@@ -92,10 +91,11 @@ public class DirectoryResourceTest {
         Transactions tx = new SimpleTransactions(ds);
         model = ds.getDefaultModel();
         var workspaceService = new WorkspaceService(tx, userService);
+        var vocabulary = model.read("test-vocabulary.ttl");
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         Context context = new Context();
-        metadataService = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        metadataService = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
         context.set(METADATA_SERVICE, metadataService);
         davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
@@ -108,7 +108,7 @@ public class DirectoryResourceTest {
 
         selectAdmin();
 
-        var taxonomies = model.read("taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl");
         metadataService.put(taxonomies);
 
         var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());

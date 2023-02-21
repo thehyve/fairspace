@@ -18,6 +18,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static io.fairspace.saturn.TestUtils.loadViewsConfig;
+
 @RunWith(MockitoJUnitRunner.class)
 public class HealthServiceTest {
     HealthService healthService;
@@ -29,7 +31,7 @@ public class HealthServiceTest {
         viewDatabase.url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE";
         viewDatabase.username = "sa";
         viewDatabase.password = "";
-        ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
+        ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
         ViewStoreClientFactory.H2_DATABASE = true;
         viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
 

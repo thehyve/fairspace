@@ -29,7 +29,6 @@ import java.util.stream.*;
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -55,7 +54,7 @@ public class ViewServiceTest {
         viewDatabase.url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE";
         viewDatabase.username = "sa";
         viewDatabase.password = "";
-        ViewsConfig config = ConfigLoader.VIEWS_CONFIG;
+        ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
         ViewStoreClientFactory.H2_DATABASE = true;
         var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
 
@@ -64,6 +63,7 @@ public class ViewServiceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
+        var vocabulary = model.read("test-vocabulary.ttl");
 
         var workspaceService = new WorkspaceService(tx, userService);
 
@@ -71,15 +71,19 @@ public class ViewServiceTest {
 
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
-        viewService = new ViewService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, ds, viewStoreClientFactory);
+        viewService = new ViewService(
+                ConfigLoader.CONFIG.search,
+                config,
+                ds,
+                viewStoreClientFactory);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
         setupRequestContext();
         var request = getCurrentRequest();
 
-        var taxonomies = model.read("taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies);
 
         User user = createTestUser("user", true);
@@ -105,8 +109,12 @@ public class ViewServiceTest {
         var facets = viewService.getFacets();
         var dateFacets = facets.stream()
                 .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Date)
-                .collect(Collectors.toList());
+                .toList();
         Assert.assertEquals(2, dateFacets.size());
-        viewService.getViews();
+
+        var boolFacets = facets.stream()
+                .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Boolean)
+                .toList();
+        Assert.assertEquals(1, boolFacets.size());
     }
 }

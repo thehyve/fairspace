@@ -14,7 +14,7 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
+import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
 import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -80,9 +80,21 @@ export const MetadataView = (props: MetadataViewProperties) => {
         clearFilterCandidates();
     };
 
+    const getFilterValues = (type: ValueType, filter: MetadataViewFilter): any[] => {
+        if (ofRangeValueType(type)) {
+            return [filter.min, filter.max];
+        }
+        if (ofBooleanValueType(type)) {
+            return filter.booleanValue === null ? [] : [filter.booleanValue];
+        }
+        return filter.values;
+    };
+
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
             [filter.min, filter.max] = values;
+        } else if (ofBooleanValueType(type)) {
+            filter.booleanValue = values.length > 0 ? values[0] : null;
         } else {
             filter.values = values;
         }
@@ -143,11 +155,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
     };
 
     const renderSingleFacet = (facet: MetadataViewFacet) => {
-        const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
+        const facetOptions = getFilterValues(facet.type, facet);
         const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
         let activeFilterValues = [];
         if (activeFilter) {
-            activeFilterValues = ofRangeValueType(facet.type) ? [activeFilter.min, activeFilter.max] : activeFilter.values;
+            activeFilterValues = getFilterValues(facet.type, activeFilter);
         }
         return facetOptions && facetOptions.length > 0 && (
             <Grid key={facet.name} item>
