@@ -215,7 +215,7 @@ spec:
         requests:
           storage: {{ index .Values "saturn" "persistence" "extra-file-storage" "size" | quote }}
 {{- if index .Values "saturn" "persistence" "extra-file-storage" "storageClass" }}
-  {{- if (eq "-" index .Values "saturn" "persistence" "extra-file-storage" "storageClass") }}
+  {{- if (eq "-" (index .Values "saturn" "persistence" "extra-file-storage" "storageClass")) }}
       storageClassName: ""
   {{- else }}
       storageClassName: {{ index .Values "saturn" "persistence" "extra-file-storage" "storageClass" | quote }}
