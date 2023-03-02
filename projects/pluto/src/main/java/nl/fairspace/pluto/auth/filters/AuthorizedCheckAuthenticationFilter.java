@@ -38,7 +38,7 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
         // check for that in the authorities list
         OAuthAuthenticationToken authentication = getAuthentication(request);
         if (authentication == null) {
-            log.warn("No token provided");
+            log.trace("No token provided");
             return false;
         }
         if (authentication.getAuthorities() == null) {
