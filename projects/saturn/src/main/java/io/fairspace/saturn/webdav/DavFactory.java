@@ -60,6 +60,9 @@ public class DavFactory implements ResourceFactory {
     }
 
     public Resource getResource(org.apache.jena.rdf.model.Resource subject, Access access) {
+        if (isExtraStoreResource() && subject.hasProperty(RDF.type, FS.File) && !subject.hasProperty(FS.createdBy, currentUserResource())) {
+            return null;
+        }
         if (subject.hasProperty(FS.dateDeleted) && !showDeleted()) {
             return null;
         }
@@ -80,14 +83,18 @@ public class DavFactory implements ResourceFactory {
             return new CollectionResource(this, subject, access);
         }
         if (subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
-            return new DirectoryResource(this, subject, Access.Manage);
+            return new DirectoryResource(this, subject, access);
         }
 
         return null;
     }
 
+    public boolean isExtraStoreResource() {
+        return root instanceof ExtraStorageRootResource;
+    }
+
     public Access getAccess(org.apache.jena.rdf.model.Resource subject) {
-        if(root instanceof ExtraStorageRootResource) {
+        if (isExtraStoreResource()) {
             return getExtraStorageAccess(subject);
         }
 
@@ -104,7 +111,7 @@ public class DavFactory implements ResourceFactory {
 
         var access = getGrantedPermission(coll, user);
 
-        if(user.hasProperty(FS.isManagerOf, ownerWs)) {
+        if (user.hasProperty(FS.isManagerOf, ownerWs)) {
             access = Access.Manage;
         }
 
@@ -136,7 +143,7 @@ public class DavFactory implements ResourceFactory {
             access = min(access, Access.List);
         }
 
-        if(access == Access.None && userService.currentUser().isAdmin()) {
+        if (access == Access.None && userService.currentUser().isAdmin()) {
             return Access.List;
         }
 
@@ -144,10 +151,11 @@ public class DavFactory implements ResourceFactory {
     }
 
     private Access getExtraStorageAccess(org.apache.jena.rdf.model.Resource subject) {
-        if (subject.hasProperty(FS.createdBy, currentUserResource()) && subject.hasProperty(RDF.type, FS.File)) {
-            return Access.Manage;
+        if (subject.equals(this.rootSubject)) {
+            return Access.Read;
         }
-        if (subject.equals(this.rootSubject) || subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
+        if (subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)
+                || subject.hasProperty(FS.createdBy, currentUserResource())) {
             return Access.Write;
         }
         return Access.None;

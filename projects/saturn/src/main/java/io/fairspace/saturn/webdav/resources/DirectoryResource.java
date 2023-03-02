@@ -135,7 +135,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
     }
 
     @Override
-    public void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void delete(boolean purge) throws ConflictException, BadRequestException {
         for (var child : getChildren()) {
             ((BaseResource) child).delete(purge);
         }

@@ -64,6 +64,8 @@ public class DavFactoryExtraStorageTest {
     private Transactions tx = new SimpleTransactions(ds);
     private Model model = ds.getDefaultModel();
 
+    private final String defaultExtraStorageRootName = "analysis-export";
+
     private void selectRegularUser() {
         lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
         lenient().when(userService.currentUser()).thenReturn(user);
@@ -104,9 +106,9 @@ public class DavFactoryExtraStorageTest {
     @Test
     public void testCreateRootExtraStorageFolder() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
-        var coll = root.createCollection("ex1");
+        var coll = root.createCollection(defaultExtraStorageRootName);
 
-        var collName = "ex1";
+        var collName = defaultExtraStorageRootName;
         assertTrue(coll instanceof FolderResource);
         assertEquals(collName, coll.getName());
         assertNotNull(root.child(collName));
@@ -122,7 +124,7 @@ public class DavFactoryExtraStorageTest {
     @Test
     public void testOverwriteFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
-        var coll = (FolderResource) root.createCollection("coll");
+        var coll = (FolderResource) root.createCollection(defaultExtraStorageRootName);
 
         var file = coll.createNew("file", input, FILE_SIZE, "text/abc");
 
@@ -141,7 +143,7 @@ public class DavFactoryExtraStorageTest {
     @Test
     public void testGetVersion() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
-        var coll = (FolderResource) root.createCollection("coll");
+        var coll = (FolderResource) root.createCollection(defaultExtraStorageRootName);
 
         var file = coll.createNew("file", input, FILE_SIZE, "text/abc");
 
@@ -165,28 +167,28 @@ public class DavFactoryExtraStorageTest {
     public void testExtraStorageAccess() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = factory.getResource(null, EXTRA_STORAGE_PATH);
         var rootResource = model.createResource(extraStorageUri);
-        var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection("store1");
-        var subdirResource = model.createResource(extraStorageUri + "/store1");
+        var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection(defaultExtraStorageRootName);
+        var subdirResource = model.createResource(extraStorageUri + "/" + defaultExtraStorageRootName);
         var file = ((FolderResource) extraStorageSubdir1).createNew("file", input, FILE_SIZE, "text/abc");
-        var fileResource = model.createResource(extraStorageUri + "/store1/file");
+        var fileResource = model.createResource(extraStorageUri + "/" + defaultExtraStorageRootName + "/file");
 
         assertTrue(root instanceof ExtraStorageRootResource);
         assertTrue(extraStorageSubdir1 instanceof DirectoryResource);
         assertTrue(file instanceof FileResource);
 
-        assertEquals(Access.Write, ((DavFactory) factory).getAccess(rootResource));
+        assertEquals(Access.Read, ((DavFactory) factory).getAccess(rootResource));
         assertEquals(Access.Write, ((DavFactory) factory).getAccess(subdirResource));
-        assertEquals(Access.Manage, ((DavFactory) factory).getAccess(fileResource));
+        assertEquals(Access.Write, ((DavFactory) factory).getAccess(fileResource));
 
         selectAdmin();
-        assertEquals(Access.Write, ((DavFactory) factory).getAccess(rootResource));
+        assertEquals(Access.Read, ((DavFactory) factory).getAccess(rootResource));
         assertEquals(Access.Write, ((DavFactory) factory).getAccess(subdirResource));
         assertEquals(Access.None, ((DavFactory) factory).getAccess(fileResource));
     }
 
     @Test
     public void testOverwriteExtraStorageFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
-        var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection("store1");
+        var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection(defaultExtraStorageRootName);
         var file1 = ((FolderResource) extraStorageSubdir1).createNew("file1", input, FILE_SIZE, "text/abc");
 
         assertTrue(file1 instanceof ReplaceableResource);
@@ -212,5 +214,18 @@ public class DavFactoryExtraStorageTest {
         assertEquals(1, children.size());
         assertEquals(1, ((MultiNamespaceCustomPropertyResource) file3).getProperty(VERSION));
         verify(store).delete("id1");
+    }
+
+    @Test(expected = NotAuthorizedException.class)
+    public void testThrowsErrorWhenNonDefaultRootDirectoryName() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
+        var coll = (FolderResource) root.createCollection("coll1");
+    }
+
+    @Test()
+    public void testThrowsErrorWhenDeletingRootDirectory() throws NotAuthorizedException, BadRequestException, ConflictException {
+        var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
+        var coll = (FolderResource) root.createCollection(defaultExtraStorageRootName);
+        assertThrows(NotAuthorizedException.class, coll::delete);
     }
 }

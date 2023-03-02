@@ -7,6 +7,7 @@ import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.CollectionResource;
 import io.milton.resource.Resource;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +18,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
+import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 
 @Log4j2
 public class ExtraStorageRootResource extends RootResource {
@@ -39,7 +42,12 @@ public class ExtraStorageRootResource extends RootResource {
     }
 
     @Override
-    public CollectionResource createCollection(String name) throws ConflictException, BadRequestException {
+    public CollectionResource createCollection(String name) throws ConflictException, BadRequestException, NotAuthorizedException {
+        if (!CONFIG.extraStorage.defaultRootCollections.contains(name)){
+            // Currently all root extra storage directories should be specified in the extra storage config
+            throw new NotAuthorizedException( String.format("Directory with name %s not specified in the configuration.", name), this, SC_FORBIDDEN);
+        }
+
         if (name != null) {
             name = name.trim();
         }
@@ -48,11 +56,8 @@ public class ExtraStorageRootResource extends RootResource {
         if (existing.isPresent()) {
             return (CollectionResource) existing.get();
         }
-        var subj = childSubject(factory.rootSubject, name);
-        if (subj.hasProperty(RDF.type) && !subj.hasProperty(FS.dateDeleted)) {
-            throw new ConflictException();
-        }
 
+        var subj = childSubject(factory.rootSubject, name);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
         subj.addProperty(RDF.type, FS.ExtraStorageDirectory)
                 .addProperty(RDFS.label, name);

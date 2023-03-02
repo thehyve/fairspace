@@ -390,7 +390,7 @@ public class CollectionResource extends DirectoryResource {
     }
 
     @Override
-    public void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void delete(boolean purge) throws ConflictException, BadRequestException {
         if (!canDelete()) {
             throw new ConflictException(this);
         }
