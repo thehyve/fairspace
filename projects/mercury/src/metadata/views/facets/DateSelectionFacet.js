@@ -72,10 +72,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <Grid container>
             <Grid item>
-                {renderDatePicker(beginDate, handleMinDateChange, "Start date", minDate, maxDate)}
+                {renderDatePicker(beginDate, handleMinDateChange, "Start date", minDate, endDate ?? maxDate)}
             </Grid>
             <Grid item>
-                {renderDatePicker(endDate, handleMaxDateChange, "End date", minDate, maxDate)}
+                {renderDatePicker(endDate, handleMaxDateChange, "End date", beginDate ?? minDate, maxDate)}
             </Grid>
         </Grid>
 
