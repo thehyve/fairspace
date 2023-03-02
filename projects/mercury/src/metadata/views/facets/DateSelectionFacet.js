@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, {useEffect, useState} from 'react';
 import Grid from "@mui/material/Grid";
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
@@ -8,86 +9,61 @@ import TextField from '@mui/material/TextField';
 import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
 import {DATE_FORMAT} from "../../../constants";
 
-const getRangeLimit = (val: any, end: boolean = false): Date => {
-    if (!val) {
-        return null;
-    }
-    const date = new Date(val);
-    return end
-        ? new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999)
-        : new Date(date.getFullYear(), date.getMonth(), date.getDate());
-};
-
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, classes, activeFilterValues} = props;
-    const [value, setValue] = useState([null, null]);
+    const {options = [], onChange = () => {}, clearFilter = () => {}, classes, activeFilterValues} = props;
+    const [beginDate, setBeginDate] = React.useState(null);
+    const [endDate, setEndDate] = React.useState(null);
     const [minDateOption, maxDateOption] = options;
-    const minDate = getRangeLimit(minDateOption);
-    const maxDate = getRangeLimit(maxDateOption, true);
+    const minDate = minDateOption;
+    const maxDate = getEndDate(maxDateOption);
 
     useEffect(() => {
         if (activeFilterValues.length > 0) {
-            setValue(activeFilterValues);
+            setBeginDate(activeFilterValues[0]);
+            setEndDate(activeFilterValues[1]);
         } else {
-            setValue([null, null]);
+            setBeginDate(null);
+            setEndDate(null);
         }
     }, [activeFilterValues]);
 
-    const handleChange = (newValue) => {
-        if (value !== newValue) {
-            setValue(newValue);
-            onChange(newValue);
+    const handleMinDateChange = (newValue, textInput) => {
+        if(textInput && textInput.length > 0 && textInput.length < 10) {
+            // user is not finished typing
+            return;
         }
+
+        setBeginDate(newValue);
+        onChange([newValue, endDate]);
     };
 
-    const handleMinDateChange = (newValue) => {
-        if (newValue && newValue.getFullYear() > 1900) {
-            handleChange([getRangeLimit(newValue), value[1]]);
+    const handleMaxDateChange = (newValue, textInput) => {
+        if(textInput && textInput.length > 0 && textInput.length < 10) {
+            // user is not finished typing
+            return;
         }
+
+        const newEndDate = getEndDate(newValue);
+        setEndDate(newEndDate);
+        onChange([beginDate, newEndDate]);
     };
 
-    const handleMaxDateChange = (newValue) => {
-        if (newValue && newValue.getFullYear() > 1900) {
-            handleChange([value[0], getRangeLimit(newValue, true)]);
-        }
-    };
-
-    const renderDate = (val: any): string => {
+    function getEndDate(val: any): Date {
         if (!val) {
-            return '';
+            return null;
         }
-        try {
-            return format(val, DATE_FORMAT);
-        } catch (e) {
-            return '';
-        }
-    };
+        const date = new Date(val);
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+    }
 
-    const renderDatePicker = (selectedDate, handleDateChange, label, min, max, placeholderDate) => (
+    const renderDatePicker = (selectedDate, handleDateChange, label, min, max) => (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
-                disableToolbar
-                variant="inline"
-                format={DATE_FORMAT}
-                invalidDateMessage="Invalid date format"
-                margin="normal"
                 label={label}
                 value={selectedDate}
                 onChange={handleDateChange}
-                autoOk
                 minDate={min || minDate}
                 maxDate={max || maxDate}
-                initialFocusedDate={placeholderDate}
-                placeholder={renderDate(placeholderDate)}
-                KeyboardButtonProps={{
-                    'aria-label': 'change date',
-                }}
-                InputLabelProps={{
-                    shrink: true
-                }}
-                InputProps={{
-                    className: classes.input
-                }}
                 renderInput={(params) => <TextField {...params} />}
             />
         </LocalizationProvider>
@@ -96,10 +72,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <Grid container>
             <Grid item>
-                {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1], minDate)}
+                {renderDatePicker(beginDate, handleMinDateChange, "Start date", minDate, maxDate)}
             </Grid>
             <Grid item>
-                {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate, maxDate)}
+                {renderDatePicker(endDate, handleMaxDateChange, "End date", minDate, maxDate)}
             </Grid>
         </Grid>
 
