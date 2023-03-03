@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {useContext, useEffect, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
@@ -22,6 +23,7 @@ import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
+import ViewTabs from "./ViewTabs";
 
 import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
@@ -59,11 +61,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
-
-    const a11yProps = (index) => ({
-        'key': `metadata-view-tab-${index}`,
-        'aria-controls': `metadata-view-tab-${index}`,
-    });
 
     const changeTab = (event, tabIndex) => {
         toggle();
@@ -140,20 +137,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
         values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
     };
 
-    const appendCustomColumns = (view: MetadataViewOptions) => {
-        if (view.name === RESOURCES_VIEW) {
-            const pathColumn = {title: "Path", name: "path", type: "Custom"};
-            const accessColumn = {title: "Access", name: "access", type: "Custom"};
-            return [
-                view.columns.find(c => c.name === RESOURCES_VIEW),
-                pathColumn,
-                ...view.columns.filter(c => c.name !== RESOURCES_VIEW),
-                accessColumn
-            ];
-        }
-        return view.columns;
-    };
-
     const renderSingleFacet = (facet: MetadataViewFacet) => {
         const facetOptions = getFilterValues(facet.type, facet);
         const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
@@ -228,41 +211,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
         );
     };
 
-    const renderViewTabs = () => (
-        <div>
-            <Tabs
-                value={currentViewIndex}
-                onChange={changeTab}
-                indicatorColor="primary"
-                textColor="primary"
-                variant="scrollable"
-                scrollButtons="auto"
-                aria-label="metadata view tabs"
-                className={classes.tabsPanel}
-            >
-                {views.map((view, index) => (
-                    <Tab label={view.title} {...a11yProps(index)} />
-                ))}
-            </Tabs>
-            {views.map((view, index) => (
-                <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
-                    <MetadataViewTableContainer
-                        columns={appendCustomColumns(view)}
-                        view={view.name}
-                        filters={filters}
-                        locationContext={locationContext}
-                        selected={selected}
-                        toggleRow={toggleRow}
-                        hasInactiveFilters={filterCandidates.length > 0}
-                        collections={collections}
-                        textFiltersObject={textFiltersObject}
-                        setTextFiltersObject={setTextFiltersObject}
-                    />
-                </TabPanel>
-            ))}
-        </div>
-    );
-
     const getPathSegments = () => {
         const segments = ((locationContext && getPathFromIri(locationContext)) || '').split('/');
         const result = [];
@@ -317,7 +265,19 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             </Grid>
                         </Grid>
                         <Grid item className={classes.metadataViewTabs}>
-                            {renderViewTabs()}
+                            <ViewTabs
+                                currentViewIndex={currentViewIndex}
+                                changeTab={changeTab}
+                                views={views}
+                                filters={filters}
+                                locationContext={locationContext}
+                                selected={selected}
+                                toggleRow={toggleRow}
+                                filterCandidates={filterCandidates}
+                                collections={collections}
+                                textFiltersObject={textFiltersObject}
+                                setTextFiltersObject={setTextFiltersObject}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
