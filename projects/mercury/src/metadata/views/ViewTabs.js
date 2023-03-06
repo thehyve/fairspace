@@ -31,13 +31,6 @@ import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
 import {accessLevelForCollection} from "../../collections/collectionUtils";
 
 const styles = theme => ({
-    metadataViewTabs: {
-        marginTop: 10,
-        overflowX: 'auto',
-        width: '100%',
-        overflowY: 'hidden',
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
-    },
     tabsPanel: {
         paddingRight: 70
     },

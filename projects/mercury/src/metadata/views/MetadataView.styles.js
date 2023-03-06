@@ -1,28 +1,15 @@
-import {alpha} from '@mui/material/styles';
 import * as consts from "../../constants";
 
 const CENTRAL_PANEL_WIDTH = '70%';
 const RIGHT_PANEL_WIDTH = '30%';
 
 const styles = theme => ({
-    facet: {
-        borderColor: theme.palette.primary.light,
-        borderWidth: 1.5,
-        borderRadius: 6
-    },
     facets: {
         marginTop: 10,
         paddingBottom: 10,
         minWidth: 280,
         maxHeight: 'calc(100vh - 210px)',
         overflowY: 'auto'
-    },
-    facetHeaders: {
-        textAlign: 'left',
-        marginTop: 6,
-        fontSize: 13,
-        color: theme.palette.primary.light,
-        marginLeft: 4,
     },
     centralPanel: {
         width: CENTRAL_PANEL_WIDTH,
@@ -40,27 +27,6 @@ const styles = theme => ({
         width: '100%',
         overflowY: 'hidden',
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
-    },
-    tabsPanel: {
-        paddingRight: 70
-    },
-    tab: {
-        '& .MuiBox-root': {
-            padding: 0,
-        },
-    },
-    confirmFiltersButtonBlock: {
-        bottom: 0,
-        marginTop: 8,
-        marginLeft: 4,
-        width: 253
-    },
-    confirmFiltersButtonBlockActive: {
-        position: 'sticky',
-        backgroundColor: alpha(theme.palette.common.white, 0.8)
-    },
-    confirmFiltersButton: {
-        width: '100%'
     },
     clearAllButtonContainer: {
         textAlign: 'end'
