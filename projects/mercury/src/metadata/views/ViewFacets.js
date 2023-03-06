@@ -22,7 +22,6 @@ import {useSingleSelection} from "../../file/UseSelection";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
-import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
 import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
@@ -142,11 +141,6 @@ export const ViewFacets = (props) => {
             </Grid>
         </Grid>
     );
-
-    // eslint-disable-next-line
-    console.log("FRANK03");
-    // eslint-disable-next-line
-    console.log(views);
 
     return (
         <Grid container item direction="column" justifyContent="flex-start" spacing={1}>

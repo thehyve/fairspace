@@ -41,28 +41,29 @@ const styles = theme => ({
     }
 });
 
-const a11yProps = (index) => ({
-    'key': `metadata-view-tab-${index}`,
-    'aria-controls': `metadata-view-tab-${index}`,
-});
-
-const appendCustomColumns = (view: MetadataViewOptions) => {
-    if (view.name === RESOURCES_VIEW) {
-        const pathColumn = {title: "Path", name: "path", type: "Custom"};
-        const accessColumn = {title: "Access", name: "access", type: "Custom"};
-        return [
-            view.columns.find(c => c.name === RESOURCES_VIEW),
-            pathColumn,
-            ...view.columns.filter(c => c.name !== RESOURCES_VIEW),
-            accessColumn
-        ];
-    }
-    return view.columns;
-};
-
 export const ViewTabs = (props) => {
-    const {currentViewIndex, changeTab, views, filters, locationContext, selected, toggleRow, filterCandidates, collections} = props;
+    const {currentViewIndex, changeTab, views, filters, locationContext, selected, toggleRow, filterCandidates, collections, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
+
+    const a11yProps = (index) => ({
+        'key': `metadata-view-tab-${index}`,
+        'aria-controls': `metadata-view-tab-${index}`,
+    });
+
+    const appendCustomColumns = (view: MetadataViewOptions) => {
+        if (view.name === RESOURCES_VIEW) {
+            const pathColumn = {title: "Path", name: "path", type: "Custom"};
+            const accessColumn = {title: "Access", name: "access", type: "Custom"};
+            return [
+                view.columns.find(c => c.name === RESOURCES_VIEW),
+                pathColumn,
+                ...view.columns.filter(c => c.name !== RESOURCES_VIEW),
+                accessColumn
+            ];
+        }
+        return view.columns;
+    };
+
     return (
         <div>
             <Tabs
@@ -73,14 +74,14 @@ export const ViewTabs = (props) => {
                 variant="scrollable"
                 scrollButtons="auto"
                 aria-label="metadata view tabs"
-                className={styles.tabsPanel}
+                className={classes.tabsPanel}
             >
                 {views.map((view, index) => (
                     <Tab label={view.title} {...a11yProps(index)} />
                 ))}
             </Tabs>
             {views.map((view, index) => (
-                <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={styles.tab}>
+                <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
                         columns={appendCustomColumns(view)}
                         view={view.name}

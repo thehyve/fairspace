@@ -62,11 +62,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
 
-    // eslint-disable-next-line
-    console.log("FRANK01");
-    // eslint-disable-next-line
-    console.log(views);
-
     const changeTab = useCallback((event, tabIndex) => {
         toggle();
         setTextFiltersObject({});
@@ -74,14 +69,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [views]);
 
-    const clearFilterCandidates = () => {
+    const clearFilterCandidates = useCallback(() => {
         setFilterCandidates([]);
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates]);
 
-    const applyFilters = () => {
+    const applyFilters = useCallback(() => {
         updateFilters(filterCandidates);
         clearFilterCandidates();
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates, updateFilters]);
 
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
@@ -93,7 +90,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
     };
 
-    const updateFilterCandidates = (facet: MetadataViewFacet, newValues: any[]) => {
+    const updateFilterCandidates = useCallback((facet: MetadataViewFacet, newValues: any[]) => {
         if (filterCandidates.find(f => f.field === facet.name)) {
             let updatedFilters;
             const existingFilter = filters.find(f => f.field === facet.name);
@@ -113,7 +110,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
             setFilterValues(facet.type, newFilter, newValues);
             setFilterCandidates([...filterCandidates, newFilter]);
         }
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates]);
 
     const handleClearAllFilters = () => {
         setFilterCandidates([]);
@@ -121,10 +119,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
         clearAllFilters();
     };
 
-    const handleClearFilter = (facetName: string) => {
+    const handleClearFilter = useCallback((facetName: string) => {
         setFilterCandidates([...filterCandidates.filter(f => f.field !== facetName)]);
         clearFilter(facetName);
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates]);
 
     const collectionsFacet = !locationContext && collections && {
         name: 'location',
@@ -154,10 +153,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
     const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
 
-    // eslint-disable-next-line
-    console.log("FRANK02");
-    // eslint-disable-next-line
-    console.log(views);
     return (
         <BreadcrumbsContext.Provider value={{
             segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]

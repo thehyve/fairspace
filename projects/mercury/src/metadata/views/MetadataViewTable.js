@@ -203,7 +203,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                     <TableRow
                         className={classes.row}
                         key={row[idColumn.name][0].value}
-                        hover={isResourcesView}
+                        hover
                         selected={selected && selected.iri === row[idColumn.name][0].value}
                         onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
                     >

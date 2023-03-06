@@ -63,12 +63,16 @@ const styles = () => ({
         }
     },
     footerButtonDiv: {
-        display: 'flex'
+        display: 'flex',
+        padding: 0,
+        margin: 4,
     },
     exportButton: {
-        width: 220,
-        margin: 6,
-        fontSize: 12
+        width: 130,
+        height: 40,
+        margin: 3,
+        fontSize: 10,
+        padding: 2
     },
     tableFooter: {
         flex: 1,
@@ -361,7 +365,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         endIcon={<GetAppIcon fontSize="small" />}
                         disabled={checkedCount === 0}
                     >
-                        Download selection ({checkedCount})
+                        Download ({checkedCount})
                     </Button>
                     {exportToAnalysisEnabled && (
                         <ProgressButton active={exportToAnalysisLoading}>
@@ -373,7 +377,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                                 endIcon={(currentSelectionExported ? <Check fontSize="small" /> : <Addchart fontSize="small" />)}
                                 disabled={checkedCount === 0 || currentSelectionExported}
                             >
-                                {currentSelectionExported ? "Exported to analysis" : `Export to analysis (${checkedCount})`}
+                                {currentSelectionExported ? "Exported" : `Export (${checkedCount})`}
                             </Button>
                         </ProgressButton>
                     )}
