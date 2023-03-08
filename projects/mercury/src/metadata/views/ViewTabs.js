@@ -1,36 +1,13 @@
-/* eslint-disable no-unused-vars */
-import React, {useContext, useEffect, useState} from 'react';
-import _ from 'lodash';
-import {useHistory} from "react-router-dom";
-import {Button, Grid, Typography} from '@mui/material';
+import React from 'react';
 import withStyles from '@mui/styles/withStyles';
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import {Assignment, Close} from "@mui/icons-material";
-import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
-import BreadCrumbs from '../../common/components/BreadCrumbs';
-import MetadataViewContext from "./MetadataViewContext";
-import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
-import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
-import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
-import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
-import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
-import {useSingleSelection} from "../../file/UseSelection";
+import type {MetadataViewOptions} from "./MetadataViewAPI";
+import {RESOURCES_VIEW} from "./metadataViewUtils";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
-import * as consts from "../../constants";
 
-import CollectionsContext from "../../collections/CollectionsContext";
-import {getParentPath, getPathFromIri} from "../../file/fileUtils";
-import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
-import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
-import {accessLevelForCollection} from "../../collections/collectionUtils";
-
-const styles = theme => ({
+const styles = () => ({
     tabsPanel: {
         paddingRight: 70
     },
@@ -42,7 +19,7 @@ const styles = theme => ({
 });
 
 export const ViewTabs = (props) => {
-    const {currentViewIndex, changeTab, views, filters, locationContext, selected, toggleRow, filterCandidates, collections, classes} = props;
+    const {currentViewIndex, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const a11yProps = (index) => ({
@@ -89,7 +66,7 @@ export const ViewTabs = (props) => {
                         locationContext={locationContext}
                         selected={selected}
                         toggleRow={toggleRow}
-                        hasInactiveFilters={filterCandidates.length > 0}
+                        hasInactiveFilters={hasInactiveFilters}
                         collections={collections}
                         textFiltersObject={textFiltersObject}
                         setTextFiltersObject={setTextFiltersObject}

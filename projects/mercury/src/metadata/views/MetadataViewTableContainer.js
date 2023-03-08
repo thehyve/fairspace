@@ -1,12 +1,12 @@
 import React, {useContext, useEffect, useState} from 'react';
 import {
-    Button,
     CircularProgress,
     FormControlLabel,
     IconButton,
     Paper,
     TableContainer,
     TablePagination,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
@@ -52,7 +52,21 @@ type MetadataViewTableContainerProperties = {
     classes: any;
 };
 
-const styles = () => ({
+const styles = (theme) => ({
+    footerButtonDiv: {
+        display: 'flex',
+        padding: 0,
+        margin: 4,
+    },
+    footerCountDiv: {
+        marginTop: 10,
+        color: theme.palette.primary.light,
+    },
+    exportButton: {
+        margin: 3,
+        fontSize: 12,
+        padding: 2
+    },
     tableContents: {
         "minHeight": '200px',
         "maxHeight": 'calc(100vh - 270px)',
@@ -61,18 +75,6 @@ const styles = () => ({
         '& .MuiTableCell-stickyHeader': {
             backgroundColor: "white"
         }
-    },
-    footerButtonDiv: {
-        display: 'flex',
-        padding: 0,
-        margin: 4,
-    },
-    exportButton: {
-        width: 130,
-        height: 40,
-        margin: 3,
-        fontSize: 10,
-        padding: 2
     },
     tableFooter: {
         flex: 1,
@@ -357,28 +359,35 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     {renderMetadataViewTable()}
                 </TableContainer>
                 <div className={classes.footerButtonDiv}>
-                    <Button
-                        color="primary"
-                        className={classes.exportButton}
-                        onClick={exportTable}
-                        variant="contained"
-                        endIcon={<GetAppIcon fontSize="small" />}
-                        disabled={checkedCount === 0}
-                    >
-                        Download ({checkedCount})
-                    </Button>
+                    <div className={classes.footerCountDiv}>
+                        export items: {checkedCount}
+                    </div>
+                    <Tooltip title="Download as csv" className={classes.exportButton}>
+                        <span>
+                            <IconButton
+                                aria-label="Download as csv"
+                                color="primary"
+                                disabled={checkedCount === 0}
+                                onClick={exportTable}
+                            >
+                                <GetAppIcon fontSize="small" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
                     {exportToAnalysisEnabled && (
                         <ProgressButton active={exportToAnalysisLoading}>
-                            <Button
-                                color="primary"
-                                className={classes.exportButton}
-                                onClick={saveTableExtraStorage}
-                                variant="contained"
-                                endIcon={(currentSelectionExported ? <Check fontSize="small" /> : <Addchart fontSize="small" />)}
-                                disabled={checkedCount === 0 || currentSelectionExported}
-                            >
-                                {currentSelectionExported ? "Exported" : `Export (${checkedCount})`}
-                            </Button>
+                            <Tooltip title="Export to Jupiter Analysis" className={classes.exportButton}>
+                                <span>
+                                    <IconButton
+                                        aria-label="Export to Jupiter Analysis"
+                                        color="primary"
+                                        disabled={checkedCount === 0 || currentSelectionExported}
+                                        onClick={saveTableExtraStorage}
+                                    >
+                                        {currentSelectionExported ? (<Check fontSize="small" />) : (<Addchart fontSize="small" />)}
+                                    </IconButton>
+                                </span>
+                            </Tooltip>
                         </ProgressButton>
                     )}
                     <TablePagination

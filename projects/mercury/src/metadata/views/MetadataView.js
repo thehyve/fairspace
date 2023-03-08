@@ -1,14 +1,10 @@
-/* eslint-disable no-unused-vars */
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
 import {Button, Grid, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import {Assignment, Close} from "@mui/icons-material";
 import styles from "./MetadataView.styles";
-import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
@@ -19,7 +15,6 @@ import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, RESOURCES_VI
 import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
-import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
 import ViewFacets from "./ViewFacets";
@@ -57,7 +52,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
 
-    const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const toggleRow = useCallback((entity: MetadataViewEntity) => (toggle(entity)), []);
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
@@ -202,7 +198,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 locationContext={locationContext}
                                 selected={selected}
                                 toggleRow={toggleRow}
-                                filterCandidates={filterCandidates}
+                                hasInactiveFilters={filterCandidates.length > 0}
                                 collections={collections}
                                 textFiltersObject={textFiltersObject}
                                 setTextFiltersObject={setTextFiltersObject}
