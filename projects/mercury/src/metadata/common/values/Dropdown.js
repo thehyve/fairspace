@@ -67,8 +67,8 @@ const Dropdown = ({
                     label={label}
                 />
             )}
-            renderOption={(option) => (
-                <ListItemText primary={option.label} secondary={option.description} />
+            renderOption={(props, option) => (
+                <ListItemText {...props} primary={option.label} secondary={option.description} />
             )}
         />
     );

@@ -108,6 +108,15 @@ export default createTheme({
             defaultProps: {
                 variant: "dense"
             }
+        },
+        MuiAutocomplete: {
+            styleOverrides: {
+                listbox: {
+                    '& .MuiAutocomplete-option': {
+                        display: "block"
+                    }
+                }
+            }
         }
     },
 });
