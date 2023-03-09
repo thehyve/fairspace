@@ -79,7 +79,7 @@ public class OAuthAuthenticationToken implements Serializable {
         Object authorities = claimsSet.get(AUTHORITIES_CLAIM);
 
         if(authorities == null) {
-            log.warn("No authorities provided in OAuth token");
+            log.trace("No authorities provided in OAuth token");
             return null;
         }
 

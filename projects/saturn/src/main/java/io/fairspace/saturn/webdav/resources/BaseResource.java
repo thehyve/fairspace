@@ -94,8 +94,19 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
     }
 
     @Override
-    public final void delete() throws NotAuthorizedException, ConflictException, BadRequestException {
-        var purge = subject.hasProperty(FS.dateDeleted);
+    public void delete() throws NotAuthorizedException, ConflictException, BadRequestException {
+        boolean purge;
+        if (factory.isExtraStoreResource()) {
+            if (subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
+                throw new NotAuthorizedException("Not authorized to purge the extra store root directory.", this, SC_FORBIDDEN);
+            }
+            purge = true;
+        } else {
+            purge = subject.hasProperty(FS.dateDeleted);
+            if (purge && !factory.userService.currentUser().isAdmin()) {
+                throw new NotAuthorizedException("Not authorized to purge the resource.", this, SC_FORBIDDEN);
+            }
+        }
         delete(purge);
         updateParents(subject);
         if (purge) {
@@ -105,11 +116,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
         }
     }
 
-    protected void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
+    protected void delete(boolean purge) throws ConflictException, BadRequestException {
         if (purge) {
-            if (!factory.userService.currentUser().isAdmin()) {
-                throw new NotAuthorizedException("Not authorized to purge the resource.", this, SC_FORBIDDEN);
-            }
             subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
         } else if (!subject.hasProperty(FS.dateDeleted)) {
             subject.addProperty(FS.dateDeleted, timestampLiteral())
