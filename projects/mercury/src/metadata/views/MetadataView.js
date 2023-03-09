@@ -6,6 +6,7 @@ import withStyles from '@mui/styles/withStyles';
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import {Assignment, Close} from "@mui/icons-material";
+import queryString from "query-string";
 import styles from "./MetadataView.styles";
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
@@ -14,15 +15,20 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
+import {
+    getMetadataViewsPath,
+    ofBooleanValueType,
+    ofRangeValueType,
+    RESOURCES_VIEW
+} from "./metadataViewUtils";
 import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
-import MetadataViewTableContainer from "./MetadataViewTableContainer";
 
+import MetadataViewTableContainer from "./MetadataViewTableContainer";
 import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
 import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
@@ -54,11 +60,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
+    const [isClosedPanel, setIsClosedPanel] = useState(true);
 
-    const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
+    const toggleRow = (entity: MetadataViewEntity) => {
+        setIsClosedPanel(!entity);
+        toggle(entity);
+    };
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
+    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier'); // first column of id type
 
     const a11yProps = (index) => ({
         'key': `metadata-view-tab-${index}`,
@@ -66,6 +77,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     });
 
     const changeTab = (event, tabIndex) => {
+        setIsClosedPanel(true);
         toggle();
         setTextFiltersObject({});
         handleViewChangeRedirect(views[tabIndex].name);
@@ -248,6 +260,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
                         columns={appendCustomColumns(view)}
+                        idColumn={currentViewIdColumn}
                         view={view.name}
                         filters={filters}
                         locationContext={locationContext}
@@ -282,6 +295,18 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
     const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
 
+    const getPrefilteringRedirectionLink = () => {
+        if (!selected) {
+            return "";
+        }
+        const metadataURL = window.location.host + getMetadataViewsPath();
+        const prefilteringQueryString = queryString.stringify({
+            view: currentView.name,
+            [currentViewIdColumn.name.toLowerCase()]: selected.label
+        });
+        return metadataURL + "?" + prefilteringQueryString;
+    };
+
     return (
         <BreadcrumbsContext.Provider value={{
             segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
@@ -308,7 +333,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
-                <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
+                <Grid item className={`${classes.centralPanel} ${isClosedPanel && classes.centralPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.facets}>
                             <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
@@ -321,11 +346,12 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item className={classes.sidePanel} hidden={!selected}>
+                <Grid item className={classes.sidePanel} hidden={isClosedPanel}>
                     <MetadataViewInformationDrawer
-                        forceExpand
+                        handleCloseCard={() => setIsClosedPanel(true)}
                         entity={selected}
                         viewIcon=<Assignment />
+                        textFilterLink={getPrefilteringRedirectionLink(selected)}
                     />
                 </Grid>
             </Grid>

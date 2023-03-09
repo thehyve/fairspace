@@ -1,13 +1,14 @@
 // @flow
-import React, {useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, IconButton} from '@mui/material';
+import React from 'react';
+import {Card, CardContent, CardHeader, IconButton} from '@mui/material';
 import {withRouter} from 'react-router-dom';
 
-import {ExpandMore} from '@mui/icons-material';
+import {Close} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
 import EmptyInformationDrawer from "../../common/components/EmptyInformationDrawer";
 import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
 import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
+import CopyButton from "../../common/components/CopyButton";
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
@@ -29,15 +30,13 @@ const useStyles = makeStyles(() => ({
 
 type MetadataViewInformationDrawerProps = {
     entity: MetadataViewEntityWithLinkedFiles;
-    forceExpand: boolean;
     viewIcon: any;
+    handleCloseCard: () => {};
+    textFilterLink: string;
 };
 
 const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps) => {
-    const {forceExpand, entity, viewIcon} = props;
-    const [expandedManually, setExpandedManually] = useState(null); // true | false | null
-    const expanded = (expandedManually != null) ? expandedManually : forceExpand;
-    const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
+    const {entity, viewIcon, textFilterLink, handleCloseCard} = props;
     const classes = useStyles();
 
     if (!entity) {
@@ -48,29 +47,34 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
         <Card className={classes.card}>
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
-                title={`Metadata for ${entity.label}`}
+                title={(
+                    <div>
+                        Metadata for {entity.label}
+                        <CopyButton
+                            style={{marginLeft: 10}}
+                            value={textFilterLink}
+                            labelPreCopy="Copy the link"
+                        />
+                    </div>
+                )}
                 avatar={viewIcon}
                 style={{wordBreak: 'break-word'}}
                 action={(
                     <IconButton
-                        onClick={toggleExpand}
-                        aria-expanded={expanded}
-                        aria-label="Show more"
-                        className={expanded ? classes.expandOpen : ''}
+                        title="Close"
+                        onClick={handleCloseCard}
                         size="medium"
                     >
-                        <ExpandMore />
+                        <Close />
                     </IconButton>
                 )}
             />
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>
-                    <LinkedDataEntityFormWithLinkedData
-                        subject={entity.iri}
-                        hasEditRight={false}
-                    />
-                </CardContent>
-            </Collapse>
+            <CardContent>
+                <LinkedDataEntityFormWithLinkedData
+                    subject={entity.iri}
+                    hasEditRight={false}
+                />
+            </CardContent>
         </Card>
     );
 };

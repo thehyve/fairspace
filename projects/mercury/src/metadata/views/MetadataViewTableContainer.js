@@ -40,6 +40,7 @@ import ErrorDialog from "../../common/components/ErrorDialog";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
+    idColumn: MetadataViewColumn;
     filters: MetadataViewFilter[];
     textFiltersObject: Object;
     setTextFiltersObject: () => {};
@@ -92,7 +93,7 @@ const LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY = 'FAIRSPACE_METADATA_TABLE_ROWS
 const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_COLUMNS';
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const {view, filters, columns, hasInactiveFilters, locationContext, classes} = props;
+    const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
     const {currentUser} = useContext(UserContext);
 
@@ -109,7 +110,6 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [rowsPerPage, setRowsPerPage] = useStateWithLocalStorage(LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY, 10);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const idColumn = columns.find(c => c.type === 'Identifier'); // first column of id type
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
