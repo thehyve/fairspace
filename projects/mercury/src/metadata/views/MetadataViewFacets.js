@@ -6,6 +6,18 @@ import {ofBooleanValueType, ofRangeValueType} from "./metadataViewUtils";
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 
+type MetadataViewFacetsProperties = {
+    views: MetadataViewOptions[];
+    filters: MetadataViewFilter[];
+    facetsEx: MetadataViewFacet[];
+    filterCandidates: MetadataViewFilter[];
+    clearFilterCandidates: () => {};
+    updateFilterCandidates: () => {};
+    handleClearFilter: () => {};
+    applyFilters: () => {};
+    classes: any;
+};
+
 const styles = theme => ({
     confirmFiltersButtonBlock: {
         bottom: 0,
@@ -34,7 +46,7 @@ const styles = theme => ({
     }
 });
 
-export const ViewFacets = (props) => {
+export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
     const {views, filters, facetsEx, clearFilterCandidates, filterCandidates, updateFilterCandidates, handleClearFilter, applyFilters, classes} = props;
 
     const getFilterValues = (type: ValueType, filter: MetadataViewFilter): any[] => {
@@ -127,4 +139,4 @@ export const ViewFacets = (props) => {
     );
 };
 
-export default withStyles(styles)(ViewFacets);
+export default withStyles(styles)(MetadataViewFacets);

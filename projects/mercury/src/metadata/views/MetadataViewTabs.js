@@ -2,10 +2,24 @@ import React from 'react';
 import withStyles from '@mui/styles/withStyles';
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import type {MetadataViewOptions} from "./MetadataViewAPI";
+import type {MetadataViewOptions, MetadataViewFilter} from "./MetadataViewAPI";
 import {RESOURCES_VIEW} from "./metadataViewUtils";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
+import CollectionsContext from "../../collections/CollectionsContext";
+
+type MetadataViewTabsProperties = {
+    currentViewIndex: Number;
+    changeTab: () => {};
+    views: MetadataViewOptions[];
+    filters: MetadataViewFilter[];
+    locationContext: string;
+    selected: [];
+    toggleRow: () => [];
+    hasInactiveFilters: Boolean;
+    collections: CollectionsContext;
+    classes: any;
+};
 
 const styles = () => ({
     tabsPanel: {
@@ -18,7 +32,7 @@ const styles = () => ({
     }
 });
 
-export const ViewTabs = (props) => {
+export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
     const {currentViewIndex, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
@@ -77,4 +91,4 @@ export const ViewTabs = (props) => {
     );
 };
 
-export default withStyles(styles)(ViewTabs);
+export default withStyles(styles)(MetadataViewTabs);

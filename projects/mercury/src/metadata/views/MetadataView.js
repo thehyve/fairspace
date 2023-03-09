@@ -17,8 +17,8 @@ import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
-import ViewFacets from "./ViewFacets";
-import ViewTabs from "./ViewTabs";
+import MetadataViewFacets from "./MetadataViewFacets";
+import MetadataViewTabs from "./MetadataViewTabs";
 
 import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
@@ -178,7 +178,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.facets}>
-                            <ViewFacets
+                            <MetadataViewFacets
                                 views={views}
                                 filters={filters}
                                 facetsEx={facetsEx}
@@ -190,7 +190,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             />
                         </Grid>
                         <Grid item className={classes.metadataViewTabs}>
-                            <ViewTabs
+                            <MetadataViewTabs
                                 currentViewIndex={currentViewIndex}
                                 changeTab={changeTab}
                                 views={views}

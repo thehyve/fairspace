@@ -116,7 +116,6 @@ const SelectMultiple = (props: SelectProperties) => {
                 {renderCheckboxListElementWindowed}
             </List>
         );
-        // filteredOptions.map(option => renderCheckboxListElement(option));
     };
 
     return (
