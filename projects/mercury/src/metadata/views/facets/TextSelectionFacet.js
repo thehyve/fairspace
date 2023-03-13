@@ -106,15 +106,23 @@ const SelectMultiple = (props: SelectProperties) => {
                 </Grid>
             ));
         }
-        return (
-            <List
-                height={150}
-                itemCount={filteredOptions.length}
-                itemSize={35}
-            >
-                {renderCheckboxListElementWindowed}
-            </List>
-        );
+
+        if (filteredOptions.leng > 20) {
+            // Large lists dramatically decrease browser performance, MUI generates many thousands of dom nodes
+            // Solution is windowed rendering. For really small lists the fixed height of 150 is not suitable,
+            // therefor only windowed rendering large lists
+            return (
+                <List
+                    height={150}
+                    itemCount={filteredOptions.length}
+                    itemSize={35}
+                >
+                    {renderCheckboxListElementWindowed}
+                </List>
+            );
+        }
+
+        return filteredOptions.map(option => renderCheckboxListElement(option));
     };
 
     return (
