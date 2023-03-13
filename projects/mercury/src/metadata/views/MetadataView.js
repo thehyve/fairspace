@@ -4,6 +4,8 @@ import {useHistory} from "react-router-dom";
 import {Button, Grid, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Assignment, Close} from "@mui/icons-material";
+import queryString from "query-string";
+
 import styles from "./MetadataView.styles";
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
@@ -51,14 +53,20 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
+    const [isClosedPanel, setIsClosedPanel] = useState(true);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const toggleRow = useCallback((entity: MetadataViewEntity) => (toggle(entity)), []);
+    const toggleRow = useCallback((entity: MetadataViewEntity) => {
+        setIsClosedPanel(!entity);
+        toggle(entity);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
+    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier'); // first column of id type
 
     const changeTab = useCallback((event, tabIndex) => {
+        setIsClosedPanel(true);
         toggle();
         setTextFiltersObject({});
         handleViewChangeRedirect(views[tabIndex].name);
@@ -149,6 +157,18 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
     const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
 
+    const getPrefilteringRedirectionLink = () => {
+        if (!selected) {
+            return "";
+        }
+        const metadataURL = window.location.host + getMetadataViewsPath();
+        const prefilteringQueryString = queryString.stringify({
+            view: currentView.name,
+            [currentViewIdColumn.name.toLowerCase()]: selected.label
+        });
+        return metadataURL + "?" + prefilteringQueryString;
+    };
+
     return (
         <BreadcrumbsContext.Provider value={{
             segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
@@ -175,7 +195,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
-                <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
+                <Grid item className={`${classes.centralPanel} ${isClosedPanel && classes.centralPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.facets}>
                             <MetadataViewFacets
@@ -192,6 +212,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         <Grid item className={classes.metadataViewTabs}>
                             <MetadataViewTabs
                                 currentViewIndex={currentViewIndex}
+                                idColumn={currentViewIdColumn}
                                 changeTab={changeTab}
                                 views={views}
                                 filters={filters}
@@ -206,11 +227,12 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item className={classes.sidePanel} hidden={!selected}>
+                <Grid item className={classes.sidePanel} hidden={isClosedPanel}>
                     <MetadataViewInformationDrawer
-                        forceExpand
+                        handleCloseCard={() => setIsClosedPanel(true)}
                         entity={selected}
                         viewIcon=<Assignment />
+                        textFilterLink={getPrefilteringRedirectionLink(selected)}
                     />
                 </Grid>
             </Grid>

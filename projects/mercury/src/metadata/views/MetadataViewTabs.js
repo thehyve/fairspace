@@ -2,7 +2,7 @@ import React from 'react';
 import withStyles from '@mui/styles/withStyles';
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import type {MetadataViewOptions, MetadataViewFilter} from "./MetadataViewAPI";
+import type {MetadataViewOptions, MetadataViewFilter, MetadataViewColumn} from "./MetadataViewAPI";
 import {RESOURCES_VIEW} from "./metadataViewUtils";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
@@ -10,6 +10,7 @@ import CollectionsContext from "../../collections/CollectionsContext";
 
 type MetadataViewTabsProperties = {
     currentViewIndex: Number;
+    idColumn: MetadataViewColumn;
     changeTab: () => {};
     views: MetadataViewOptions[];
     filters: MetadataViewFilter[];
@@ -33,7 +34,7 @@ const styles = () => ({
 });
 
 export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
-    const {currentViewIndex, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
+    const {currentViewIndex, idColumn, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const a11yProps = (index) => ({
@@ -75,6 +76,7 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                 <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
                         columns={appendCustomColumns(view)}
+                        idColumn={idColumn}
                         view={view.name}
                         filters={filters}
                         locationContext={locationContext}
