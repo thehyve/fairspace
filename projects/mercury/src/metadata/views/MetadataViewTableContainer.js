@@ -57,10 +57,11 @@ const styles = (theme) => ({
         display: 'flex',
         padding: 0,
         margin: 4,
+        color: theme.palette.primary.dark,
     },
     footerCountDiv: {
         marginTop: 10,
-        color: theme.palette.primary.light,
+        color: theme.palette.primary.dark,
     },
     exportButton: {
         margin: 3,
@@ -78,6 +79,7 @@ const styles = (theme) => ({
     },
     tableFooter: {
         flex: 1,
+        color: theme.palette.primary.dark,
     },
     tableSettings: {
         position: 'relative',
@@ -360,7 +362,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                 </TableContainer>
                 <div className={classes.footerButtonDiv}>
                     <div className={classes.footerCountDiv}>
-                        export items: {checkedCount}
+                        <Typography variant="body2" component="span" display="inline">
+                            Selected rows: {checkedCount}
+                        </Typography>
                     </div>
                     <Tooltip title="Download as csv" className={classes.exportButton}>
                         <span>

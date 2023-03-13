@@ -111,7 +111,6 @@ const SelectMultiple = (props: SelectProperties) => {
                 height={150}
                 itemCount={filteredOptions.length}
                 itemSize={35}
-                width={300}
             >
                 {renderCheckboxListElementWindowed}
             </List>
