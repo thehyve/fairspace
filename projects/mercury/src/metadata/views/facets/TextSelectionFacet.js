@@ -6,6 +6,10 @@ import {
     FormControlLabel,
     FormGroup
 } from "@mui/material";
+
+// react-window https://react-window.vercel.app/#/examples/
+import {FixedSizeList as List} from 'react-window';
+
 import {Clear, Search} from "@mui/icons-material";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -63,9 +67,10 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
-    const renderCheckboxListElement = (option) => (
+    const renderCheckboxListElement = (option, style) => (
         <FormControlLabel
             key={option.value}
+            style={style}
             control={(
                 <Checkbox
                     checked={!!state[option.value]}
@@ -86,6 +91,8 @@ const SelectMultiple = (props: SelectProperties) => {
         />
     );
 
+    const renderCheckboxListElementWindowed = ({index, style}) => renderCheckboxListElement(filteredOptions[index], style);
+
     const renderCheckboxList = () => {
         if (showAccessFilter) {
             return filteredOptions.map(option => (
@@ -99,6 +106,22 @@ const SelectMultiple = (props: SelectProperties) => {
                 </Grid>
             ));
         }
+
+        if (filteredOptions.leng > 20) {
+            // Large lists dramatically decrease browser performance, MUI generates many thousands of dom nodes
+            // Solution is windowed rendering. For really small lists the fixed height of 150 is not suitable,
+            // therefor only windowed rendering large lists
+            return (
+                <List
+                    height={150}
+                    itemCount={filteredOptions.length}
+                    itemSize={35}
+                >
+                    {renderCheckboxListElementWindowed}
+                </List>
+            );
+        }
+
         return filteredOptions.map(option => renderCheckboxListElement(option));
     };
 
