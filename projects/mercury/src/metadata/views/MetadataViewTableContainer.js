@@ -61,6 +61,7 @@ const styles = (theme) => ({
     },
     footerCountDiv: {
         marginTop: 10,
+        marginLeft: 7,
         color: theme.palette.primary.dark,
     },
     exportButton: {
