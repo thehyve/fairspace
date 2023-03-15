@@ -9,6 +9,8 @@ import com.nimbusds.oauth2.sdk.id.ClientID;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
+import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.auth.config.OidcConfig;
 import nl.fairspace.pluto.auth.model.*;
@@ -58,8 +60,9 @@ public class OAuthFlow {
 
     private OAuthAuthenticationToken retrieveToken(AuthorizationGrant authorizationGrant, ClientAuthentication clientAuthentication) throws IOException, ParseException {
         // Make the token request
-        TokenRequest request = new TokenRequest(configuration.getTokenUrl(), clientAuthentication, authorizationGrant);
-        TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
+        Scope scope = new Scope(OIDCScopeValue.OPENID, OIDCScopeValue.EMAIL, OIDCScopeValue.PROFILE);
+        TokenRequest request = new TokenRequest(configuration.getTokenUrl(), clientAuthentication, authorizationGrant, scope);
+        OIDCTokenResponse response = OIDCTokenResponse.parse(request.toHTTPRequest().send());
 
         // On failure, tell the user
         if (!response.indicatesSuccess()) {
@@ -74,9 +77,10 @@ public class OAuthFlow {
         }
 
         // Parse the response
-        AccessTokenResponse successResponse = response.toSuccessResponse();
+        OIDCTokenResponse successResponse = response.toSuccessResponse();
         AccessToken accessToken = successResponse.getTokens().getAccessToken();
         RefreshToken refreshToken = successResponse.getTokens().getRefreshToken();
+        String idTokenString = successResponse.getOIDCTokens().getIDTokenString();
 
         // Retrieve JWT claimsset
         Map<String, Object> claims = accessTokenValidator.parseAndValidate(accessToken.getValue());
@@ -87,10 +91,8 @@ public class OAuthFlow {
             return null;
         }
 
-        // Store the access token and refresh token
-        OAuthAuthenticationToken token = new OAuthAuthenticationToken(accessToken.getValue(), refreshToken.getValue(), claims);
-
-        return token;
+        // Store the access token, refresh token and id token
+        return new OAuthAuthenticationToken(accessToken.getValue(), refreshToken.getValue(), idTokenString, claims);
     }
 
     public OAuthAuthenticationToken refreshToken(OAuthAuthenticationToken token) throws IOException, ParseException {
@@ -100,12 +102,16 @@ public class OAuthFlow {
 
         // Make the token request
         TokenRequest request = new TokenRequest(configuration.getTokenUrl(), getClientAuthentication(), refreshTokenGrant);
-        TokenResponse response = TokenResponse.parse(request.toHTTPRequest().send());
+        OIDCTokenResponse response = OIDCTokenResponse.parse(request.toHTTPRequest().send());
 
         if (response.indicatesSuccess()) {
-            AccessTokenResponse successResponse = response.toSuccessResponse();
+            OIDCTokenResponse successResponse = response.toSuccessResponse();
 
-            return new OAuthAuthenticationToken(successResponse.getTokens().getAccessToken().getValue(), successResponse.getTokens().getRefreshToken().getValue());
+            return new OAuthAuthenticationToken(
+                    successResponse.getTokens().getAccessToken().getValue(),
+                    successResponse.getTokens().getRefreshToken().getValue(),
+                    successResponse.getOIDCTokens().getIDTokenString()
+            );
         } else {
             // We got an error response...
             ErrorObject errorObject = response.toErrorResponse().getErrorObject();

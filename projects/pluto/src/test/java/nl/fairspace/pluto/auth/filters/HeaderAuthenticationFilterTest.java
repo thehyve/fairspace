@@ -54,7 +54,7 @@ public class HeaderAuthenticationFilterTest {
 
     @Test
     void testTokenAlreadyExists() throws IOException, ServletException {
-        doReturn(new OAuthAuthenticationToken("token", "refresh")).when(request).getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
+        doReturn(new OAuthAuthenticationToken("token", "refresh", "id")).when(request).getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
         filter.doFilter(request, response, filterChain);
 
         verify(request, times(0)).setAttribute(any(), any());

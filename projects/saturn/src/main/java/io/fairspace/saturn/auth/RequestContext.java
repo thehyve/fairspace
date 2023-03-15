@@ -49,4 +49,12 @@ public class RequestContext {
                 .map(KeycloakSecurityContext::getToken)
                 .orElse(null);
     }
+
+    public static String getIdTokenString() {
+        return getPrincipal()
+                .map(x -> (KeycloakPrincipal<?>)x)
+                .map(KeycloakPrincipal::getKeycloakSecurityContext)
+                .map(KeycloakSecurityContext::getIdTokenString)
+                .orElse(null);
+    }
 }

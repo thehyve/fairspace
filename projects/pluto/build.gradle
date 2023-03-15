@@ -53,8 +53,8 @@ dependencies {
     implementation('org.springframework.cloud:spring-cloud-starter-sleuth')
     implementation('org.springframework.cloud:spring-cloud-sleuth-zipkin')
 
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.13'
-    implementation 'com.nimbusds:oauth2-oidc-sdk:9.15'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.31'
+    implementation 'com.nimbusds:oauth2-oidc-sdk:10.7'
 
     testImplementation 'junit:junit:4.12'
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"

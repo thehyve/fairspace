@@ -28,14 +28,16 @@ public class OAuthAuthenticationToken implements Serializable {
 
     private final String accessToken;
     private final String refreshToken;
+    private final String idToken;
+
     private final Map<String,Object> claimsSet;
 
     public OAuthAuthenticationToken(String accessToken, Map<String,Object> claimsSet) {
-        this(accessToken, null, claimsSet);
+        this(accessToken, null, null, claimsSet);
     }
 
-    public OAuthAuthenticationToken(String accessToken, String refreshToken) {
-        this(accessToken, refreshToken, null);
+    public OAuthAuthenticationToken(String accessToken, String refreshToken, String idToken) {
+        this(accessToken, refreshToken, idToken, null);
     }
 
     public String getStringClaim(String claim) {

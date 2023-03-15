@@ -41,10 +41,10 @@ public class SessionAuthenticationFilterTest {
     HttpSession session;
 
     Map<String,Object> claims;
-    OAuthAuthenticationToken token = new OAuthAuthenticationToken("test-token", "refresh-token");
+    OAuthAuthenticationToken token = new OAuthAuthenticationToken("test-token", "refresh-token", "id-token");
     OAuthAuthenticationToken tokenWithClaims;
-    OAuthAuthenticationToken refreshedToken = new OAuthAuthenticationToken("refreshed-test-token", "refreshed-refresh-token");
-    OAuthAuthenticationToken tokenWithoutRefreshToken = new OAuthAuthenticationToken("test-token", (String) null);
+    OAuthAuthenticationToken refreshedToken = new OAuthAuthenticationToken("refreshed-test-token", "refreshed-refresh-token", "refreshed-id-token");
+    OAuthAuthenticationToken tokenWithoutRefreshToken = new OAuthAuthenticationToken("test-token", (String) null, "id-token");
 
     @Before
     public void setUp() {
@@ -70,7 +70,7 @@ public class SessionAuthenticationFilterTest {
 
     @Test
     public void testTokenAlreadyExists() throws IOException, ServletException {
-        doReturn(new OAuthAuthenticationToken("token", "refresh-token")).when(request).getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
+        doReturn(new OAuthAuthenticationToken("token", "refresh-token", "id-token")).when(request).getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
         filter.doFilter(request, response, filterChain);
 
         verify(request, times(0)).setAttribute(any(), any());

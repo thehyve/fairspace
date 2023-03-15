@@ -34,7 +34,7 @@ public class AuthorizedCheckAuthenticationFilterTest {
     public void setUp() {
         filter = new AuthorizedCheckAuthenticationFilter(requiredAuthority);
         claims = new HashMap<>();
-        token = new OAuthAuthenticationToken("access", "refresh", claims);
+        token = new OAuthAuthenticationToken("access", "refresh", "id", claims);
     }
 
     @Test

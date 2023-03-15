@@ -61,8 +61,8 @@ dependencies {
 
     implementation 'org.eclipse.jetty:jetty-proxy:9.4.42.v20210604'
 
-    implementation 'org.keycloak:keycloak-jetty94-adapter:13.0.1'
-    implementation 'org.keycloak:keycloak-admin-client:13.0.1'
+    implementation 'org.keycloak:keycloak-jetty94-adapter:21.0.1'
+    implementation 'org.keycloak:keycloak-admin-client:21.0.1'
 
     testImplementation 'com.h2database:h2:2.1.214'
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
