@@ -1,10 +1,11 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.services.*;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.services.BaseApp;
 
-import static javax.servlet.http.HttpServletResponse.*;
-import static spark.Spark.*;
+import static io.fairspace.saturn.auth.RequestContext.getIdTokenString;
+import static javax.servlet.http.HttpServletResponse.SC_SEE_OTHER;
+import static spark.Spark.get;
 
 public class LogoutApp extends BaseApp {
     private final UserService service;
@@ -19,13 +20,17 @@ public class LogoutApp extends BaseApp {
     @Override
     protected void initApp() {
         get("", (req, res) -> {
+            var idToken = getIdTokenString();
             service.logoutCurrent();
             res.status(SC_SEE_OTHER);
-            res.header("Location", "%srealms/%s/protocol/openid-connect/logout?redirect_uri=%s".formatted(
+            res.header(
+                    "Location",
+                    "%srealms/%s/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s".formatted(
                     config.auth.authServerUrl,
                     config.auth.realm,
-                    config.publicUrl
-                    )
+                    config.publicUrl,
+                    idToken
+                )
             );
             return "";
         });

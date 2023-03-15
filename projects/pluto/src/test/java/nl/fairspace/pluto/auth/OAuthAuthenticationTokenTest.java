@@ -9,7 +9,7 @@ import java.util.*;
 public class OAuthAuthenticationTokenTest {
     @Test
     void testTokenSerialization() {
-        OAuthAuthenticationToken token = new OAuthAuthenticationToken("ACCESSTOKEN", "REFRESHTOKEN");
+        OAuthAuthenticationToken token = new OAuthAuthenticationToken("ACCESSTOKEN", "REFRESHTOKEN", "IDTOKEN");
         byte[] serialized = SerializationUtils.serialize(token);
         OAuthAuthenticationToken deserialized = SerializationUtils.deserialize(serialized);
 
