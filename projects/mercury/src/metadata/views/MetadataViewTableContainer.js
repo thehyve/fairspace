@@ -32,7 +32,6 @@ import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
 import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
 import TablePaginationActions from "../../common/components/TablePaginationActions";
-import UserContext from "../../users/UserContext";
 import FeaturesContext from "../../common/contexts/FeaturesContext";
 import ProgressButton from "../../common/components/ProgressButton";
 import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
@@ -104,7 +103,6 @@ const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_C
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
     const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
-    const {currentUser} = useContext(UserContext);
 
     const {isFeatureEnabled} = useContext(FeaturesContext);
     const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
@@ -229,8 +227,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         setExportToAnalysisLoading(true);
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
-        const fileName = `fairspace_export_${currentUser.id}.csv`;
-        ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true)
+        const fileName = `fairspace_export_${Date.now()}.csv`;
+        ExtraLocalStorage.deleteAllInDirectory(ANALYSIS_EXPORT_SUBPATH)
+            .then(() => ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true))
             .then(() => setCurrentSelectionExported(true))
             .catch((err: Error) => (ErrorDialog.showError('Could not export the selection to analysis', err.message)))
             .finally(() => (setExportToAnalysisLoading(false)));

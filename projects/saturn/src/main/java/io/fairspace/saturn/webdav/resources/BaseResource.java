@@ -31,8 +31,7 @@ import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.Vocabularies.USER_VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.WebDAVServlet.includeMetadataLinks;
-import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
+import static io.fairspace.saturn.webdav.WebDAVServlet.*;
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
@@ -99,6 +98,9 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
         if (factory.isExtraStoreResource()) {
             if (subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
                 throw new NotAuthorizedException("Not authorized to purge the extra store root directory.", this, SC_FORBIDDEN);
+            }
+            if (subject.hasProperty(RDF.type, FS.File)) {
+                ((FileResource) factory.getResource(subject)).deleteContent();
             }
             purge = true;
         } else {

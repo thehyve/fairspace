@@ -30,6 +30,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.xml.namespace.QName;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
@@ -187,33 +188,35 @@ public class DavFactoryExtraStorageTest {
     }
 
     @Test
-    public void testOverwriteExtraStorageFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+    public void testDeleteExtraStoreFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection(defaultExtraStorageRootName);
-        var file1 = ((FolderResource) extraStorageSubdir1).createNew("file1", input, FILE_SIZE, "text/abc");
+        var file = ((FolderResource) extraStorageSubdir1).createNew("file", input, FILE_SIZE, "text/abc");
 
-        assertTrue(file1 instanceof ReplaceableResource);
+        assertTrue(file instanceof DeletableResource);
+        ((DeletableResource)file).delete();
 
-        when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id1", FILE_SIZE + 1, "md5"));
-        ((ReplaceableResource) file1).replaceContent(input, FILE_SIZE + 1);
+        verify(store, times(1)).delete("id"); // check if blob is deleted
 
-        var children = extraStorageSubdir1.getChildren();
-        var file2 = extraStorageSubdir1.child("file1");
+        assertEquals(0, extraStorageSubdir1.getChildren().size());
+        assertNull(extraStorageSubdir1.child("file"));
+    }
 
-        assertEquals(1, children.size());
-        assertEquals(FILE_SIZE + 1, ((GetableResource) file2).getContentLength().longValue());
-        assertEquals(2, ((MultiNamespaceCustomPropertyResource) file2).getProperty(VERSION));
+    @Test
+    public void testDeleteAllInFolder() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
+        var coll = (FolderResource) root.createCollection(defaultExtraStorageRootName);
+        var file1 = coll.createNew("file1", input, FILE_SIZE, "text/abc");
+        var file2 = coll.createNew("file2", input, FILE_SIZE, "text/abc");
+        var file3 = coll.createNew("file3", input, FILE_SIZE, "text/abc");
 
-        verifyNoInteractions(input, store);
+        ((PostableResource)root.child(defaultExtraStorageRootName)).processForm(Map.of("action", "delete_all_in_directory"), Map.of());
 
-        // Set request header to overwrite blob
-        when(request.getHeader("Delete-Existing-Blob")).thenReturn("true");
-        when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id2", FILE_SIZE + 1, "md5"));
-        var file3 = ((FolderResource) extraStorageSubdir1).createNew("file3", input, FILE_SIZE, "text/abc");
-        ((ReplaceableResource) file2).replaceContent(input, FILE_SIZE + 1);
+        verify(store, times(3)).delete(any()); // check if all blob are deleted
 
-        assertEquals(1, children.size());
-        assertEquals(1, ((MultiNamespaceCustomPropertyResource) file3).getProperty(VERSION));
-        verify(store).delete("id1");
+        assertEquals(0, coll.getChildren().size());
+        assertNull(coll.child("file1"));
+        assertNull(coll.child("file2"));
+        assertNull(coll.child("file3"));
     }
 
     @Test(expected = NotAuthorizedException.class)

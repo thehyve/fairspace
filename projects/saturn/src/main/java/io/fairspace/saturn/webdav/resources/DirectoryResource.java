@@ -177,6 +177,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
             // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/webdav/c1/
             case "upload_metadata" -> uploadMetadata(files.get("file"));
+            case "delete_all_in_directory" -> deleteAllInDirectory();
             default -> super.performAction(action, parameters, files);
         }
     }
@@ -184,6 +185,12 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
     private void uploadFiles(Map<String, FileItem> files) throws NotAuthorizedException, ConflictException, BadRequestException {
         for(var entry: files.entrySet()) {
             uploadFile(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void deleteAllInDirectory() throws ConflictException, BadRequestException, NotAuthorizedException {
+        for (var child : getChildren()) {
+            ((BaseResource) child).delete();
         }
     }
 
