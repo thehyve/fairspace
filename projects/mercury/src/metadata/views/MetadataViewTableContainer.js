@@ -53,17 +53,15 @@ type MetadataViewTableContainerProperties = {
     classes: any;
 };
 
-const styles = (theme) => ({
+const styles = () => ({
     footerButtonDiv: {
         display: 'flex',
         padding: 0,
-        margin: 4,
-        color: theme.palette.primary.dark,
+        margin: 4
     },
     footerCountDiv: {
         marginTop: 10,
-        marginLeft: 7,
-        color: theme.palette.primary.dark,
+        marginLeft: 7
     },
     exportButton: {
         margin: 3,
@@ -80,8 +78,7 @@ const styles = (theme) => ({
         }
     },
     tableFooter: {
-        flex: 1,
-        color: theme.palette.primary.dark,
+        flex: 1
     },
     tableSettings: {
         position: 'relative',
