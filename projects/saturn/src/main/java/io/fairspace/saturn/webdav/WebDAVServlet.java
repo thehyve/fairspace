@@ -139,10 +139,6 @@ public class WebDAVServlet extends HttpServlet {
         return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
     }
 
-    public static boolean deleteExistingBlob() {
-        return "true".equalsIgnoreCase(getCurrentRequest().getHeader("Delete-Existing-Blob"));
-    }
-
     public static boolean includeMetadataLinks() {
         return "true".equalsIgnoreCase(getCurrentRequest().getHeader("With-Metadata-Links"));
     }

@@ -765,6 +765,27 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=undelete" "${FAIRS
 ----
 ====
 
+===== Delete directory content
+
+|===
+2+| ``POST /api/webdav/{path}`` +
+    ``action=delete_all_in_directory``
+
+2+| Delete directory content
+2+| _Request data_:
+| ``action``
+| ``delete_all_in_directory``
+|===
+
+.Example delete all in directory (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=delete_all_in_directory" "${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
 ===== Revert to a file version
 
 |===
@@ -3050,7 +3071,7 @@ Similar to the primary file storage, the extra storage is a virtual file system
 that stores directory structure and basic file information in the RDF database.
 Unlike the primary one, the additional storage cannot be annotated with metadata from the defined model.
 Files themselves are stored in an extra storage as blobs. This storage however is NOT append-only.
-Blobs can be overwritten, if a request contains `"Delete-Existing-Blob": true` header.
+File blobs will be removed on deletion.
 
 There is a basic, file-level access control over the storage - each user has "modify" access only to the files added by that user.
 Users cannot overwrite, read or even list each others files. This includes users with admin role.

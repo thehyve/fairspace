@@ -228,6 +228,24 @@ class FileAPI {
     }
 
     /**
+     * Deletes all in a directory given by path
+     * @param path
+     * @returns Promise<any>
+     */
+    deleteAllInDirectory(path) {
+        if (!path) return Promise.reject(Error("No path specified for deletion"));
+
+        return this.post(path, {action: 'delete_all_in_directory'})
+            .catch(e => {
+                if (e && e.response) {
+                    throw new Error("Could not delete content of a directory.");
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
+    /**
      * Undeletes the file given by path
      * @param path
      * @returns Promise<any>
@@ -399,7 +417,7 @@ class FileAPI {
     post(path, data, showDeleted = false) {
         const requestOptions = {
             method: "POST",
-            url: joinPathsAvoidEmpty('/api/webdav', encodePath(path)),
+            url: joinPathsAvoidEmpty(this.remoteURL, encodePath(path)),
             headers: {
                 "Accept": "text/plain",
                 "Content-Type": "application/x-www-form-urlencoded",

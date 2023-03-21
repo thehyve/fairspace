@@ -40,6 +40,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import static io.fairspace.saturn.TestUtils.*;
@@ -47,11 +48,9 @@ import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DirectoryResourceTest {
@@ -70,6 +69,8 @@ public class DirectoryResourceTest {
     FileItem file;
     @Mock
     BlobFileItem blobFileItem;
+    @Mock
+    InputStream input;
     @Mock
     private MetadataPermissions permissions;
 
@@ -143,6 +144,26 @@ public class DirectoryResourceTest {
         var file = (FileResource) subdir.child("file.ext");
 
         assertEquals(FILE_SIZE, (long) file.getContentLength());
+    }
+
+    @Test
+    public void testDeleteAllInDirectory() throws NotAuthorizedException, ConflictException, BadRequestException, IOException {
+        dir = new DirectoryResource(davFactory, model.getResource(baseUri + "/dir"), Access.Manage);
+        dir.subject.addProperty(RDF.type, FS.Directory);
+
+        dir.createNew("file1", input, 3L, "text/abc");
+        dir.createNew("file2", input, 3L, "text/abc");
+        dir.createNew("file3", input, 3L, "text/abc");
+
+        assertEquals(3, dir.getChildren().size());
+
+        dir.processForm(Map.of("action", "delete_all_in_directory"), Map.of());
+
+        verifyNoInteractions(store);
+        assertEquals(0, dir.getChildren().size());
+        assertNull(dir.child("file1"));
+        assertNull(dir.child("file2"));
+        assertNull(dir.child("file3"));
     }
 
     @Test

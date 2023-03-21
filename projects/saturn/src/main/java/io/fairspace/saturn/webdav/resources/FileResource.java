@@ -92,13 +92,10 @@ public class FileResource extends BaseResource implements io.milton.resource.Fil
 
     @Override
     public void replaceContent(InputStream in, Long length) throws BadRequestException, ConflictException, NotAuthorizedException {
-        if (factory.store instanceof DeletableLocalBlobStore && deleteExistingBlob()) {
-            replaceContentDeletePrevious(getBlob());
-        }
         replaceContent(getBlob());
     }
 
-    void replaceContent(BlobInfo blobInfo) throws BadRequestException, ConflictException, NotAuthorizedException {
+    void replaceContent(BlobInfo blobInfo) throws BadRequestException, ConflictException {
         if (subject.hasProperty(FS.dateDeleted)) {
             throw new ConflictException(this, "Target file with this name already exists and is marked as deleted. " +
                     "Deleted file cannot be overwritten.");
@@ -114,22 +111,6 @@ public class FileResource extends BaseResource implements io.milton.resource.Fil
 
         loadVersion();
     }
-
-    private void replaceContentDeletePrevious(BlobInfo blobInfo) throws ConflictException {
-        var previousBlobId = blobId;
-
-        var newVersion = newVersion(blobInfo);
-        blobId = newVersion.getRequiredProperty(FS.blobId).getString();
-        contentLength = newVersion.getRequiredProperty(FS.fileSize).getLong();
-        modifiedDate = parseDate(newVersion, FS.dateModified);
-
-        try {
-            ((DeletableLocalBlobStore) factory.store).delete(previousBlobId);
-        } catch (IOException e) {
-            throw new ConflictException(this, "Original blob cannot be deleted. " + e.getMessage());
-        }
-    }
-
     @Override
     public Date getModifiedDate() {
         return modifiedDate;
@@ -180,5 +161,13 @@ public class FileResource extends BaseResource implements io.milton.resource.Fil
                 .removeAll(FS.currentVersion)
                 .addProperty(FS.versions, versions)
                 .addLiteral(FS.currentVersion, current);
+    }
+
+    protected void deleteContent() throws ConflictException {
+        try {
+            factory.store.delete(blobId);
+        } catch (IOException e) {
+            throw new ConflictException(this, "File blob cannot be deleted. " + e.getMessage());
+        }
     }
 }
