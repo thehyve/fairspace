@@ -15,7 +15,6 @@ import ColumnFilterInput from "../../common/components/ColumnFilterInput";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
-    loading: boolean;
     columns: MetadataViewColumn[];
     visibleColumnNames: string[];
     idColumn: MetadataViewColumn;
@@ -48,7 +47,7 @@ const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
 const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} = props;
+    const {columns, visibleColumnNames, data, toggleRow, selected, view, idColumn, history, collections} = props;
     const classes = useStyles();
     const {textFiltersObject, setTextFiltersObject} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
@@ -184,7 +183,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const rowCount = data && data.rows && data.rows.length;
 
     return (
-        <Table data-testid="results-table" size="small" stickyHeader={!loading}>
+        <Table data-testid="results-table" size="small" stickyHeader>
             <TableHead>
                 <TableRow>
                     <TableCell style={{padding: 0}}>
