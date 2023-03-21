@@ -23,6 +23,7 @@ const styles = theme => ({
         marginTop: 10,
         overflowX: 'auto',
         width: '100%',
+        overflowY: 'hidden',
         maxHeight: 'calc(100vh - 210px)',
     },
     clearAllButtonContainer: {
