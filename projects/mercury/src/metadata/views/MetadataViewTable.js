@@ -15,6 +15,7 @@ import ColumnFilterInput from "../../common/components/ColumnFilterInput";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
+    loading: boolean;
     columns: MetadataViewColumn[];
     visibleColumnNames: string[];
     idColumn: MetadataViewColumn;
