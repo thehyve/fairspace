@@ -69,7 +69,7 @@ const styles = () => ({
     },
     tableContents: {
         "minHeight": '200px',
-        "maxHeight": 'calc(100vh - 270px)',
+        "maxHeight": 'calc(100vh - 310px)',
         "overflowY": 'auto',
         "overflowX": 'auto',
         '& .MuiTableCell-stickyHeader': {

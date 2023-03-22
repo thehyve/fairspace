@@ -1,5 +1,3 @@
-import * as consts from "../../constants";
-
 const CENTRAL_PANEL_WIDTH = '70%';
 const RIGHT_PANEL_WIDTH = '30%';
 
@@ -13,7 +11,7 @@ const styles = theme => ({
     },
     centralPanel: {
         width: CENTRAL_PANEL_WIDTH,
-        overflowX: 'auto',
+        overflowX: 'auto'
     },
     centralPanelFullWidth: {
         width: '100%'
@@ -26,7 +24,7 @@ const styles = theme => ({
         overflowX: 'auto',
         width: '100%',
         overflowY: 'hidden',
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
+        maxHeight: 'calc(100vh - 210px)',
     },
     clearAllButtonContainer: {
         textAlign: 'end'
