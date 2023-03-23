@@ -206,7 +206,7 @@ public class ViewStoreReader implements AutoCloseable {
             if (prefixFieldName.endsWith(".id")) {
                 prefixFieldName = prefixFieldName.replaceAll("\\.id$", ".label");
             }
-            values.add(escapeLikeString(filter.getPrefix().trim().toLowerCase()) + "%");
+            values.add(escapeLikeString("%" + filter.getPrefix().trim().toLowerCase()) + "%");
             constraints.add(prefixFieldName + " ilike ? escape '\\'");
         }
         if (filter.getPrefixes() != null && !filter.getPrefixes().isEmpty()) {
