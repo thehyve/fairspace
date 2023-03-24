@@ -53,6 +53,8 @@ saturn:
   # loglevel: debug
   auth:
     enableBasicAuth: true
+    defaultUserRoles:
+      - canViewPublicMetadata
   persistence:
     files:
       ## A manually managed Persistent Volume and Claim
