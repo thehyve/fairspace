@@ -3,7 +3,7 @@ buildscript {
         jena_version = '4.3.2'
         milton_version = '3.0.1.269'
         mockitoVersion = '3.12.0'
-        jacksonVersion = '2.11.3' // check what version is used by Jena
+        jacksonVersion = '2.14.2' // check what version is used by Jena
         postgresqlVersion = '42.3.3'
     }
 }
@@ -14,7 +14,7 @@ plugins {
     id 'application'
     id 'jacoco'
 //    id  'com.github.spotbugs' version '1.6.10'
-    id "org.owasp.dependencycheck" version "6.0.2"
+    id "org.owasp.dependencycheck" version "8.2.1"
 }
 
 group 'io.fairspace'
