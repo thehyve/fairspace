@@ -3,12 +3,13 @@ dist: xenial
 language: java
 
 jdk:
-- openjdk15
+- openjdk17
 
 env:
   global:
-     - NODE_VERSION="14.17.6"
-     - PATH=/usr/lib/jvm/java-15-openjdk-amd64/bin/:$PATH
+     - NODE_VERSION="16.19.0"
+     - NODE_OPTIONS="--max-old-space-size=8192"
+     - PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin/:$PATH
      - APPNAME="fairspace"
      - ORG="fairspace"
      - ARTIFACT_BUILD_FILE=""
@@ -21,13 +22,15 @@ env:
      - DOCKER_USERNAME="fairspace"
      - GITHUB_USERNAME="fairspace-ci"
      - GCP_PROJECT="fairspace-207108"
-     - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
-     - SNAPSHOT_CLUSTER_NAME="fairspacecicluster"
-     - SNAPSHOT_CLUSTER_ZONE="europe-west1-b"
-     - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
-     - RELEASE_CLUSTER_NAME="fairspacecicluster"
-     - RELEASE_CLUSTER_ZONE="europe-west1-b"
      - GIT_TAG_FILES_OVERRIDE="charts/fairspace/Chart.yaml charts/fairspace/values.yaml projects/"
+     - SHOULD_DEPLOY=false
+     # DEPLOYMENT RELATED VARIABLES - REQUIRED IF SHOULD_DEPLOY=true
+     # - SNAPSHOT_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
+     # - SNAPSHOT_CLUSTER_NAME="fairspacecicluster"
+     # - SNAPSHOT_CLUSTER_ZONE="europe-west1-b"
+     # - RELEASE_CONTEXT="gke_fairspace-207108_europe-west1-b_fairspacecicluster"
+     # - RELEASE_CLUSTER_NAME="fairspacecicluster"
+     # - RELEASE_CLUSTER_ZONE="europe-west1-b"
 
      # DOCKER_PASSWORD=
      - secure: "FJTXKY792rdmQZ6DLU5Dlm1W9ZAmFwBFWEJDO4dLJySBO/clUUV0OfRkNX4OaachKUlRCFGxYbXaXCioYtMTVg54aD1d+hjBO5azPzUiT8V2mz2w3MkvxsvnvivziJtcSfol/PNHQdEK8qZhZ9IwdCnQM9LQ3YVwv9tkNpR//qNmUjA4ZdcbQrBLQ63wm/UX2vCo4D3/J24TfCJrmlu9AyoIAqiFsRczsQGixQLRzeRgwH3yFgACZrMt42ySrx4rL+Yi3Ro/ZftY+YrZPRs+wrObh++OmdzjQWXH4KBg8HTFEIJXYMOVnpG0OSdNO7j7oVS8qVRHJmFAG0VHrmSIMMbjU+3js3SVJxtwXRc3xEPJzKzhtyqGaQa5mr3pI1Q8YingcsEBEpWOh9zXBzJm1uh7JhgTgcEbBwQl12/SctMjejyAFFqVHhlSAEzuDBwTkXLiv6z6sF+SUpww8I6eKmQrJUN1HVPm9+n1nsBy1j3PIM0RmTAf+jZCuAMDg0Dg0dlY/in/Jz1k/QuFDbJ4ura4YBBQ315UDoki5rucDi2poxq9YoAaMpMouso9ilAwOms3guVaU/rgOHZsmIPqv2ccH6FEoOh2UeEq3RCGbprLAj88f2rcGNPaHNWRkeek31c+TI9JZPmeL5eh5tJ64cN+feVVk8lbqNWtR9VHRrI="
@@ -47,10 +50,10 @@ before_install:
   - export KUBE_CONFIG_ENC_IV=$encrypted_5162cfbd2a53_iv
   - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$BUILD_SCRIPTS_REPO ci
   - export BUILD_SCRIPTS_DIR=$(pwd)/ci
-  - git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$DEPLOYMENT_CONFIG_REPO ci-config
-  - export DEPLOYMENT_CONFIG_DIR="$(pwd)/ci-config/fairspace"
-  - 'if [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE" ; fi'
-  - 'if [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE" ; fi'
+  - 'if [[ "$SHOULD_DEPLOY" = "true" ]]; then git clone https://$GITHUB_USERNAME:$GITHUB_PASSWORD@github.com/$DEPLOYMENT_CONFIG_REPO ci-config ; fi'
+  - 'if [[ "$SHOULD_DEPLOY" = "true" ]]; then export DEPLOYMENT_CONFIG_DIR="$(pwd)/ci-config/fairspace" ; fi'
+  - 'if [[ "$SHOULD_DEPLOY" = "true" ]] && [[ "$TRAVIS_BRANCH" = "$SNAPSHOT_BRANCH" ]]; then export ALLOW_SNAPSHOTS=1 DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$SNAPSHOT_CONTEXT" CLUSTER_NAME="$SNAPSHOT_CLUSTER_NAME" CLUSTER_ZONE="$SNAPSHOT_CLUSTER_ZONE" ; fi'
+  - 'if [[ "$SHOULD_DEPLOY" = "true" ]] && [[ "$TRAVIS_BRANCH" = "$RELEASE_BRANCH" ]]; then export DEPLOY_TARGET=ci DEPLOY_PLATFORM="GCP" KUBERNETES_CONTEXT="$RELEASE_CONTEXT" CLUSTER_NAME="$RELEASE_CLUSTER_NAME" CLUSTER_ZONE="$RELEASE_CLUSTER_ZONE" ; fi'
   - export INFRASTRUCTURE_PLATFORM="${DEPLOY_PLATFORM:-NONE}"
   - source ./ci/setup_env.sh
   - 'if [[ "$SHOULD_RELEASE" ]]; then export OIDC_AUTH_VERSION=$VERSION; fi'
@@ -83,9 +86,9 @@ jobs:
       - "ci/versioning/set_next_version.sh"
     - stage: deploy
       cache: false
-      if: branch = dev and type != pull_request
+      if: env(SHOULD_DEPLOY) = true and branch = dev and type != pull_request
       install:
-        - source charts/.travis/install.sh
+      - source charts/.travis/install.sh
       script:
       - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET -f projects/saturn/views.yaml
     - if: branch = documentation and type != pull_request

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import PropTypes from "prop-types";
-import {Button} from "@material-ui/core";
+import {Button} from "@mui/material";
 import useIsMounted from "react-is-mounted-hook";
 
 import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";

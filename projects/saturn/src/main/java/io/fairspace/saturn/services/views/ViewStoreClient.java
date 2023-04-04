@@ -34,6 +34,8 @@ public class ViewStoreClient implements AutoCloseable {
     public static void setQueryValue(PreparedStatement query, int index, Object value) {
         if (value == null) {
             query.setNull(index, Types.NULL);
+        } else if (value instanceof Boolean) {
+            query.setBoolean(index, (Boolean) value);
         } else if (value instanceof Number) {
             query.setFloat(index, ((Number) value).floatValue());
         } else if (value instanceof Instant) {

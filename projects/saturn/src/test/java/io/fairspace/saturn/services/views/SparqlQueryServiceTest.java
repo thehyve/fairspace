@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.dao.*;
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.metadata.*;
@@ -10,6 +11,8 @@ import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.workspaces.*;
 import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.*;
 import io.milton.resource.*;
@@ -28,8 +31,6 @@ import java.util.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
-import static io.fairspace.saturn.config.Services.*;
-import static io.fairspace.saturn.vocabulary.Vocabularies.*;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -100,20 +101,20 @@ public class SparqlQueryServiceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
+        var vocabulary = model.read("test-vocabulary.ttl");
 
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
-        ds.getContext().set(FS_ROOT, davFactory.root);
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, ConfigLoader.VIEWS_CONFIG, filteredDataset);
+        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, VOCABULARY, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
         setupUsers(model);
 
@@ -122,7 +123,7 @@ public class SparqlQueryServiceTest {
 
         selectAdmin();
 
-        var taxonomies = model.read("taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies);
 
         var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());

@@ -206,7 +206,7 @@ public class ViewStoreReader implements AutoCloseable {
             if (prefixFieldName.endsWith(".id")) {
                 prefixFieldName = prefixFieldName.replaceAll("\\.id$", ".label");
             }
-            values.add(escapeLikeString(filter.getPrefix().trim().toLowerCase()) + "%");
+            values.add(escapeLikeString("%" + filter.getPrefix().trim().toLowerCase()) + "%");
             constraints.add(prefixFieldName + " ilike ? escape '\\'");
         }
         if (filter.getPrefixes() != null && !filter.getPrefixes().isEmpty()) {
@@ -216,6 +216,13 @@ public class ViewStoreReader implements AutoCloseable {
                 return finalFieldName + " like ? escape '\\'";
             }).collect(Collectors.joining(" or "));
             constraints.add("(" + prefixes + ")");
+        }
+        if(filter.booleanValue != null) {
+            if (filter.booleanValue) {
+                constraints.add("(" + fieldName + "=true)");
+            } else {
+                constraints.add("(" + fieldName + "=false OR " + fieldName + " IS NULL)");
+            }
         }
         if (!constraints.isEmpty()) {
             return String.join(" and ", constraints);

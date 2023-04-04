@@ -5,10 +5,11 @@ import nl.fairspace.pluto.auth.*;
 import nl.fairspace.pluto.auth.model.*;
 
 import javax.servlet.http.*;
+import java.util.Arrays;
 import java.util.stream.*;
 
 /**
- * This filter will mark every request that has a valid JWT token and that has a certain authority as authenticated
+ * This filter will mark every request that has a valid JWT token and that has a certain authority (if specified) as authenticated
  * <p>
  * The constructor takes one or more authorities that are considered valid.
  * <p>
@@ -26,7 +27,9 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
     String[] validAuthorities;
 
     public AuthorizedCheckAuthenticationFilter(String... authorities) {
-        this.validAuthorities = authorities;
+        this.validAuthorities = Arrays.stream(authorities)
+                .filter(authority -> authority != null && !authority.isBlank())
+                .toArray(String[]::new);
     }
 
     @Override
@@ -34,12 +37,16 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
         // If not specified otherwise, specific authorization is needed,
         // check for that in the authorities list
         OAuthAuthenticationToken authentication = getAuthentication(request);
-        if (authentication == null || authentication.getAuthorities() == null) {
-            log.trace("No token provided or no authorities provided");
+        if (authentication == null) {
+            log.trace("No token provided");
             return false;
         }
+        if (authentication.getAuthorities() == null) {
+            log.trace("No authorities provided");
+            return validAuthorities.length == 0;
+        }
 
-        boolean hasAuthority = Stream.of(validAuthorities)
+        boolean hasAuthority = validAuthorities.length == 0 || Stream.of(validAuthorities)
                 .anyMatch(authority -> authentication.getAuthorities().contains(authority));
 
         if (!hasAuthority) {

@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
-import {Divider, Grid, IconButton, Typography, withStyles} from '@material-ui/core';
-import {Add, Clear} from '@material-ui/icons';
+import {Divider, Grid, IconButton, Typography} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {Add, Clear} from '@mui/icons-material';
 
 import {LABEL_URI, STRING_URI} from '../../constants';
 import styles from './LinkedDataValuesTable.styles';
@@ -21,7 +22,7 @@ const AddValueToList = (props: AddValueToListProps) => {
     const [newValue, setNewValue] = useState('');
     const isStringValue = (AddComponent === StringValue);
     return (
-        <Grid container spacing={1} alignItems="center" className={classes.addValue}>
+        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={"" + labelId}>
             <Grid item xs={isStringValue ? 10 : 12}>
                 <AddComponent
                     data-testid="add-value-input"
@@ -55,6 +56,7 @@ const AddValueToList = (props: AddValueToListProps) => {
                             onAdd(value);
                         }}
                         aria-label="Add"
+                        size="medium"
                     >
                         <Add color={newValue ? 'primary' : 'inherit'} />
                     </IconButton>
@@ -153,6 +155,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                                     }}
                                     style={{opacity: hoveredIndex === idx ? 1 : 0}}
                                     aria-label="Delete"
+                                    size="medium"
                                 >
                                     <Clear />
                                 </IconButton>

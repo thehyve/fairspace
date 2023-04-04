@@ -2,6 +2,8 @@ package io.fairspace.saturn.webdav;
 
 import com.pivovarit.function.ThrowingConsumer;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.resource.FolderResource;
 import org.junit.Before;

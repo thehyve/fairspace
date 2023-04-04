@@ -1,5 +1,5 @@
 import React from "react";
-import {Create, MenuBook, Settings, Toc} from "@material-ui/icons";
+import {Create, MenuBook, Settings, Toc} from "@mui/icons-material";
 // eslint-disable-next-line import/no-cycle
 import type {
     AccessLevel,

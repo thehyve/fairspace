@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import {ListItemText, TextField} from '@material-ui/core';
-import {Autocomplete} from '@material-ui/lab';
+import {Autocomplete, ListItemText, TextField} from '@mui/material';
 import useIsMounted from 'react-is-mounted-hook';
 import {compareBy} from "../../../common/utils/genericUtils";
 
@@ -68,8 +67,8 @@ const Dropdown = ({
                     label={label}
                 />
             )}
-            renderOption={(option) => (
-                <ListItemText primary={option.label} secondary={option.description} />
+            renderOption={(props, option) => (
+                <ListItemText {...props} primary={option.label} secondary={option.description} />
             )}
         />
     );

@@ -1,5 +1,5 @@
 import React from 'react';
-import {DatePicker} from "@material-ui/pickers";
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {format} from 'date-fns';
 
 import {DATE_FORMAT} from '../../../constants';
@@ -21,11 +21,11 @@ class DateValue extends React.Component {
         // Formatting is required because the backend expect the date with no time
         const value = date && format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
         this.props.onChange({value});
-    }
+    };
 
     updateState = () => {
         this.setState({value: this.props.entry.value});
-    }
+    };
 
     render() {
         const {entry, property, currentValues, ...otherProps} = this.props;

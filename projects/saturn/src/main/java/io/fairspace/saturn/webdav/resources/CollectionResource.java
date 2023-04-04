@@ -1,6 +1,7 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.resources;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.*;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Request;
@@ -22,7 +23,7 @@ import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.util.stream.Collectors.joining;
 
-class CollectionResource extends DirectoryResource {
+public class CollectionResource extends DirectoryResource {
 
     public CollectionResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
@@ -42,7 +43,7 @@ class CollectionResource extends DirectoryResource {
         if (!canManage()) {
             throw new NotAuthorizedException("Not authorized to copy the resource.", this, SC_FORBIDDEN);
         }
-        if (!(rDest instanceof RootResource)) {
+        if (!(rDest instanceof CollectionRootResource)) {
             throw new BadRequestException(this, "Cannot move a collection to a non-root folder.");
         }
         if (getAccessMode() == AccessMode.DataPublished) {
@@ -57,7 +58,7 @@ class CollectionResource extends DirectoryResource {
 
     @Override
     public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
-        if (!(toCollection instanceof RootResource)) {
+        if (!(toCollection instanceof CollectionRootResource)) {
             throw new BadRequestException(this, "Cannot copy a collection to a non-root folder.");
         }
         if (name != null) {
@@ -389,7 +390,7 @@ class CollectionResource extends DirectoryResource {
     }
 
     @Override
-    public void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void delete(boolean purge) throws ConflictException, BadRequestException {
         if (!canDelete()) {
             throw new ConflictException(this);
         }

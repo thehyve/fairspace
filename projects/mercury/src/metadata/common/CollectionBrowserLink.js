@@ -1,6 +1,6 @@
 import React from 'react';
-import {IconButton} from "@material-ui/core";
-import FolderOpen from "@material-ui/icons/FolderOpen";
+import {IconButton} from "@mui/material";
+import FolderOpen from "@mui/icons-material/FolderOpen";
 import {Link} from "react-router-dom";
 
 import {COLLECTION_URI, COLLECTIONS_PATH, DIRECTORY_URI, FILE_URI} from "../../constants";
@@ -21,10 +21,7 @@ const CollectionBrowserLink = ({type, filePath}) => {
 
     return (
         <Link to={`${COLLECTIONS_PATH}/${linkLocation}`}>
-            <IconButton
-                aria-label="Go to item"
-                title="Go"
-            >
+            <IconButton aria-label="Go to item" title="Go" size="medium">
                 <FolderOpen />
             </IconButton>
         </Link>

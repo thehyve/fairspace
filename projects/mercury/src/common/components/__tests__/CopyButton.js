@@ -1,6 +1,6 @@
 import React from 'react';
 import {act} from 'react-dom/test-utils';
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 // eslint-disable-next-line jest/no-mocks-import
 import '../__mocks__/clipboard.mock';
@@ -12,20 +12,19 @@ describe('<CopyButton />', () => {
     });
 
     it('changes the icon and title after copying', () => {
-        const {getByTestId, getByTitle} = render(<CopyButton
+        render(<CopyButton
             labelPreCopy="Copy full IRI"
             labelAfterCopy="Copied!"
         />);
 
-        const uncopiedIcon = getByTestId('uncopied');
-
-        expect(getByTitle(/Copy full IRI/i)).toBeInTheDocument();
+        const uncopiedIcon = screen.getByTestId('uncopied');
+        expect(screen.getByLabelText(/Copy full IRI/i)).toBeInTheDocument();
         expect(uncopiedIcon).toBeInTheDocument();
 
-        fireEvent.click(getByTestId('tooltip'));
+        fireEvent.click(screen.getByTestId('tooltip'));
 
-        const copiedIcon = getByTestId('copied');
-        expect(getByTitle(/Copied!/i)).toBeInTheDocument();
+        const copiedIcon = screen.getByTestId('copied');
+        expect(screen.getByLabelText(/Copied!/i)).toBeInTheDocument();
         expect(copiedIcon).toBeInTheDocument();
     });
 

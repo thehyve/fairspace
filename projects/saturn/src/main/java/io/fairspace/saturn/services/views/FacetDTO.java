@@ -14,6 +14,7 @@ public class FacetDTO {
     String title;
     ViewsConfig.ColumnType type;
     List<ValueDTO> values;
+    Boolean booleanValue;
     Object min;
     Object max;
 }

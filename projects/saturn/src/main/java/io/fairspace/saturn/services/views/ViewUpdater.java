@@ -76,8 +76,19 @@ public class ViewUpdater implements AutoCloseable {
 
     public Object getValue(ViewsConfig.View.Column column, Node node) throws SQLException {
         return switch (column.type) {
+            case Boolean -> node.getLiteralValue();
             case Number -> node.getLiteralValue();
-            case Date -> Instant.parse(node.getLiteralValue().toString());
+            case Date -> {
+                try {
+                    if (node.getLiteralDatatypeURI().equals(XSD.dateTime.getURI())) {
+                        yield Instant.parse(node.getLiteralValue().toString());
+                    } else {
+                        yield LocalDate.parse(node.getLiteralValue().toString());
+                    }
+                } catch (DateTimeException e) {
+                    throw new SQLException("Failed to parse date value.", e);
+                }
+            }
             case Term, TermSet -> {
                 var label = getLabel(graph, node);
                 viewStoreClient.addLabel(node.getURI(), column.rdfType, label);

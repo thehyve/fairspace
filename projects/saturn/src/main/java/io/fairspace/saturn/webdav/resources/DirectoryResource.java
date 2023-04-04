@@ -1,8 +1,13 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.resources;
 
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
@@ -42,7 +47,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
-class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
+public class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
     public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
         super(factory, subject, access);
     }
@@ -130,7 +135,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     }
 
     @Override
-    public void delete(boolean purge) throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void delete(boolean purge) throws ConflictException, BadRequestException {
         for (var child : getChildren()) {
             ((BaseResource) child).delete(purge);
         }
@@ -172,6 +177,7 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
             // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
             // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/webdav/c1/
             case "upload_metadata" -> uploadMetadata(files.get("file"));
+            case "delete_all_in_directory" -> deleteAllInDirectory();
             default -> super.performAction(action, parameters, files);
         }
     }
@@ -179,6 +185,12 @@ class DirectoryResource extends BaseResource implements FolderResource, Deletabl
     private void uploadFiles(Map<String, FileItem> files) throws NotAuthorizedException, ConflictException, BadRequestException {
         for(var entry: files.entrySet()) {
             uploadFile(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void deleteAllInDirectory() throws ConflictException, BadRequestException, NotAuthorizedException {
+        for (var child : getChildren()) {
+            ((BaseResource) child).delete();
         }
     }
 

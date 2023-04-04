@@ -11,8 +11,8 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-    withStyles,
-} from "@material-ui/core";
+} from "@mui/material";
+import withStyles from '@mui/styles/withStyles';
 import styles from './CollectionList.styles';
 import MessageDisplay from "../common/components/MessageDisplay";
 import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";

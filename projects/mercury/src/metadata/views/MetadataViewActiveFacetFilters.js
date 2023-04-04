@@ -1,7 +1,7 @@
 import React from 'react';
-import {Chip, Grid, Typography} from '@material-ui/core';
+import {Chip, Grid, Typography} from '@mui/material';
 import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
-import {ofRangeValueType} from "./metadataViewUtils";
+import {ofBooleanValueType, ofRangeValueType} from "./metadataViewUtils";
 import {formatDate, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 type MetadataViewActiveFacetFiltersProperties = {
@@ -46,6 +46,21 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                 />
             );
         }
+        if (ofBooleanValueType(facet.type)) {
+            return (
+                <Chip
+                    className={facet.backgroundColor}
+                    key={`chip-${facet.name}`}
+                    label={filter.booleanValue}
+                    style={{marginLeft: 5}}
+                    onDelete={() => {
+                        const index = filters.indexOf(filter);
+                        delete filters[index];
+                        setFilters(filters);
+                    }}
+                />
+            );
+        }
         return filter.values.map(valueIri => {
             const value = facet.values.find(val => val.value === valueIri);
             return (
@@ -77,7 +92,9 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
         >
             {
                 filters && filters.map(filter => {
-                    if ((!isNonEmptyValue(filter.min) && !isNonEmptyValue(filter.max) && (!filter.values || filter.values.length === 0))) {
+                    if (!isNonEmptyValue(filter.min) && !isNonEmptyValue(filter.max)
+                        && (!filter.values || filter.values.length === 0)
+                        && filter.booleanValue === null) {
                         return null;
                     }
                     const facet = facets.find(f => f.name === filter.field);

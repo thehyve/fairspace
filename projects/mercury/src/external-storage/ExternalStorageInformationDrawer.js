@@ -12,11 +12,11 @@ import {
     List,
     ListItem,
     ListItemText,
-} from '@material-ui/core';
+} from '@mui/material';
 import {withRouter} from 'react-router-dom';
 
-import {ExpandMore, FolderOpenOutlined, InsertDriveFileOutlined} from '@material-ui/icons';
-import {makeStyles} from '@material-ui/core/styles';
+import {ExpandMore, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
+import makeStyles from '@mui/styles/makeStyles';
 import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
 import {getPathHierarchy} from "../file/fileUtils";
 import type {ExternalStorage} from "./externalStorageUtils";
@@ -132,6 +132,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                         aria-expanded={expanded}
                         aria-label="Show more"
                         className={expanded ? classes.expandOpen : ''}
+                        size="medium"
                     >
                         <ExpandMore />
                     </IconButton>

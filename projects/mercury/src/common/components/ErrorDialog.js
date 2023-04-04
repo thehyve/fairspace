@@ -8,9 +8,9 @@ import {
     Grid,
     Slide,
     Typography,
-} from '@material-ui/core';
-import {Error as ErrorIcon} from '@material-ui/icons';
-import DialogContentText from "@material-ui/core/DialogContentText";
+} from '@mui/material';
+import {Error as ErrorIcon} from '@mui/icons-material';
+import DialogContentText from "@mui/material/DialogContentText";
 
 const Transition = React.forwardRef(
     (props, ref) => <Slide ref={ref} direction="up" {...props} />

@@ -18,11 +18,11 @@ data:
       transactionLogPath: "/data/saturn/files/log"
       bulkTransactions: {{ .Values.saturn.bulkTransactions }}
     auth:
-      authServerUrl: {{ .Values.external.keycloak.baseUrl }}/auth/
+      authServerUrl: {{ .Values.external.keycloak.managementUrl | default .Values.external.keycloak.baseUrl }}/
       realm: {{ .Values.external.keycloak.realm }}
       clientId: {{ .Values.external.keycloak.clientId }}
       enableBasicAuth: {{ .Values.saturn.auth.enableBasicAuth }}
-      superAdminUser: organisation-admin-{{ .Values.external.keycloak.realm }}
+      superAdminUser: {{ .Values.external.keycloak.superAdminUser | default (printf "organisation-admin-%s" .Values.external.keycloak.realm ) }}
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     viewDatabase:
@@ -31,6 +31,11 @@ data:
 {{ toYaml .Values.fairspace.services | indent 6 }}
     features:
 {{ toYaml .Values.fairspace.features | indent 6 }}
+{{ if has "ExtraStorage" .Values.fairspace.features }}
+    extraStorage:
+      blobStorePath: "/data/saturn/extrafiles/blobs"
+{{ end }}
+
   vocabulary.ttl: |
 {{ if .Values.saturn.vocabulary -}}
 {{ .Values.saturn.vocabulary | indent 4 -}}

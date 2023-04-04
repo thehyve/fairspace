@@ -1,6 +1,12 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.resources;
 
 import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.Property;
+import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
@@ -21,12 +27,11 @@ import java.util.Date;
 import java.util.Map;
 
 import static io.fairspace.saturn.rdf.ModelUtils.*;
-import static io.fairspace.saturn.webdav.WebDAVServlet.fileVersion;
-import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
+import static io.fairspace.saturn.webdav.WebDAVServlet.*;
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.lang.Integer.parseInt;
 
-class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
+public class FileResource extends BaseResource implements io.milton.resource.FileResource, ReplaceableResource {
     private int version;
     private String blobId;
     private long contentLength;
@@ -34,7 +39,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
     private boolean singleVersion;
 
     @SneakyThrows
-    FileResource(DavFactory factory, Resource subject, Access access) {
+    public FileResource(DavFactory factory, Resource subject, Access access) {
         super(factory, subject, access);
 
         loadVersion();
@@ -90,7 +95,7 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
         replaceContent(getBlob());
     }
 
-    void replaceContent(BlobInfo blobInfo) throws BadRequestException, ConflictException, NotAuthorizedException {
+    void replaceContent(BlobInfo blobInfo) throws BadRequestException, ConflictException {
         if (subject.hasProperty(FS.dateDeleted)) {
             throw new ConflictException(this, "Target file with this name already exists and is marked as deleted. " +
                     "Deleted file cannot be overwritten.");
@@ -106,7 +111,6 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
 
         loadVersion();
     }
-
     @Override
     public Date getModifiedDate() {
         return modifiedDate;
@@ -157,5 +161,13 @@ class FileResource extends BaseResource implements io.milton.resource.FileResour
                 .removeAll(FS.currentVersion)
                 .addProperty(FS.versions, versions)
                 .addLiteral(FS.currentVersion, current);
+    }
+
+    protected void deleteContent() throws ConflictException {
+        try {
+            factory.store.delete(blobId);
+        } catch (IOException e) {
+            throw new ConflictException(this, "File blob cannot be deleted. " + e.getMessage());
+        }
     }
 }

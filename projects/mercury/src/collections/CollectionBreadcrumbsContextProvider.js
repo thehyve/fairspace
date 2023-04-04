@@ -1,5 +1,5 @@
 import React from "react";
-import {Folder} from "@material-ui/icons";
+import {Folder} from "@mui/icons-material";
 import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
 
 export default ({children}) => (

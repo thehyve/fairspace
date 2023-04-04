@@ -15,6 +15,7 @@
 subject:s1 a curie:Subject ;
            rdfs:label "Subject 1" ;
            curie:isOfGender gender:female ;
+           curie:hasSequenceData true ;
            curie:isOfSpecies ncbitaxon:9606 .
 
 subject:s2 a curie:Subject ;

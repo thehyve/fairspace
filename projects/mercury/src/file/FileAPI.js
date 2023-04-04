@@ -18,6 +18,8 @@ const defaultOptions = {withCredentials: true, headers: {"X-Requested-With": "XM
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
+export const ANALYSIS_EXPORT_SUBPATH = "/analysis-export";
+
 export type File = {
     iri: string;
     filename: string;
@@ -114,6 +116,40 @@ class FileAPI {
             });
     }
 
+    /**
+     * Uploads a file
+     * @param file
+     * @param destinationFilename
+     * @param destinationPath
+     * @param deleteExistingBlob
+     * @returns {Promise<never>|Promise<any[]>}
+     */
+    upload(file, destinationFilename, destinationPath, deleteExistingBlob = false) {
+        if (!file) {
+            return Promise.reject(Error("No file given"));
+        }
+
+        const options = {...defaultOptions};
+        if (deleteExistingBlob) {
+            options.headers = {...options.headers, "Delete-Existing-Blob": true};
+        }
+
+        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
+            .catch(e => {
+                if (e && e.response) {
+                    // eslint-disable-next-line default-case
+                    switch (e.response.status) {
+                        case 403:
+                            throw new Error("You are not authorized to add files \nto this storage.");
+                        case 413:
+                            throw new Error("Payload too large");
+                    }
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
     uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
         const totalSize = files.reduce((size, file) => size + file.size, 0);
         if (totalSize > maxFileSizeBytes) {
@@ -185,6 +221,24 @@ class FileAPI {
                         case 403:
                             throw new Error("Could not delete file or directory. Only admins can delete them.");
                     }
+                }
+
+                return Promise.reject(e);
+            });
+    }
+
+    /**
+     * Deletes all in a directory given by path
+     * @param path
+     * @returns Promise<any>
+     */
+    deleteAllInDirectory(path) {
+        if (!path) return Promise.reject(Error("No path specified for deletion"));
+
+        return this.post(path, {action: 'delete_all_in_directory'})
+            .catch(e => {
+                if (e && e.response) {
+                    throw new Error("Could not delete content of a directory.");
                 }
 
                 return Promise.reject(e);
@@ -363,7 +417,7 @@ class FileAPI {
     post(path, data, showDeleted = false) {
         const requestOptions = {
             method: "POST",
-            url: joinPathsAvoidEmpty('/api/webdav', encodePath(path)),
+            url: joinPathsAvoidEmpty(this.remoteURL, encodePath(path)),
             headers: {
                 "Accept": "text/plain",
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -416,9 +470,11 @@ class FileAPI {
             properties[key] = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
         });
         return properties;
-    }
+    };
 }
 
 export const LocalFileAPI = new FileAPI();
+
+export const ExtraLocalStorage = new FileAPI('/api/extra-storage');
 
 export default FileAPI;

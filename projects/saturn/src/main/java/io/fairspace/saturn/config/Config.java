@@ -17,7 +17,6 @@ import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
-import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -41,6 +40,8 @@ public class Config {
     public WebDAV webDAV = new WebDAV();
 
     public ViewDatabase viewDatabase = new ViewDatabase();
+
+    public ExtraStorage extraStorage = new ExtraStorage();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public final Set<Feature> features = new HashSet<>();
@@ -68,6 +69,8 @@ public class Config {
         public String clientId = "workspace-client";
         public boolean enableBasicAuth;
         public String superAdminUser = "organisation-admin";
+        @JsonSetter(nulls = Nulls.AS_EMPTY)
+        public final Set<String> defaultUserRoles = new HashSet<>();
     }
 
     public static class WebDAV {
@@ -79,26 +82,17 @@ public class Config {
         public long countRequestTimeout = 100_1000;
     }
 
-    public static class Storage {
-        @NotBlank public String name;
-        @NotBlank public String label;
-        @NotBlank public String url;
-        public String rootDirectoryIri;
-        public String searchUrl;
-
-        public String getRootDirectoryIri() {
-            if (rootDirectoryIri == null || rootDirectoryIri.trim().isEmpty()) {
-                return url;
-            }
-            return rootDirectoryIri;
-        }
-    }
-
     public static class ViewDatabase {
         public boolean enabled = false;
         public String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 5432, "fairspace");
         public String username = "fairspace";
         public String password = "fairspace";
+    }
+
+    public static class ExtraStorage {
+        public String blobStorePath = "data/extra-blobs";
+        @JsonSetter(nulls = Nulls.AS_EMPTY)
+        public final Set<String> defaultRootCollections = new HashSet<>(List.of("analysis-export"));
     }
 
     @Override

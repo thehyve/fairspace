@@ -3,7 +3,7 @@ import axios, {CancelTokenSource} from "axios";
 import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
 import type {AccessLevel} from "../../collections/CollectionAPI";
 
-export type ValueType = 'Identifier' | 'Text' | 'Number' | 'Date' | 'Term' | 'Set' | 'TermSet';
+export type ValueType = 'Identifier' | 'Text' | 'Number' | 'Date' | 'Term' | 'Set' | 'TermSet' | 'Boolean';
 export const TextualValueTypes: ValueType[] = ['Identifier', 'Text', 'Set'];
 
 export type MetadataViewFilter = {
@@ -12,6 +12,7 @@ export type MetadataViewFilter = {
     min: any;
     max: any;
     prefix: string;
+    booleanValue?: boolean;
 }
 
 export type MetadataViewFacetValue = {
@@ -27,6 +28,7 @@ export type MetadataViewFacet = {
     values: MetadataViewFacetValue[];
     min: any;
     max: any;
+    booleanValue?: boolean;
 };
 
 export type MetadataViewColumn = {

@@ -1,9 +1,15 @@
 import React from 'react';
 
-import {mount} from "enzyme";
+import {configure, confiure, mount} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+
 import {act} from "@testing-library/react";
 import UploadsContext, {UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UploadsProvider} from "../UploadsContext";
 import {LocalFileAPI} from "../FileAPI";
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 const getUploadsProviderValue = props => {
     let contextValue;

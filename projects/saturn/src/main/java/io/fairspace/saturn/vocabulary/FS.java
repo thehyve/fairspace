@@ -15,6 +15,9 @@ public class FS {
     public static final String DIRECTORY_URI = NS + "Directory";
     public static final Resource Directory = createResource(DIRECTORY_URI);
 
+    public static final String EXTRA_STORAGE_DIRECTORY_URI = NS + "ES_Directory";
+    public static final Resource ExtraStorageDirectory = createResource(EXTRA_STORAGE_DIRECTORY_URI);
+
     public static final String FILE_URI = NS + "File";
     public static final Resource File = createResource(FILE_URI);
 

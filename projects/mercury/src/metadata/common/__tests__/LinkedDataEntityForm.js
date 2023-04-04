@@ -1,11 +1,17 @@
 import React from 'react';
-import {shallow} from "enzyme";
-import {List} from '@material-ui/core';
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+
+import {List} from '@mui/material';
 import MessageDisplay from '../../../common/components/MessageDisplay';
 
 import LinkedDataEntityForm from "../LinkedDataEntityForm";
 import {STRING_URI} from "../../../constants";
 import LinkedDataProperty from "../LinkedDataProperty";
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 describe('LinkedDataEntityForm', () => {
     const defaultMetadata = [{

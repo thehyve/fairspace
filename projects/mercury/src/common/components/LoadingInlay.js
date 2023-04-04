@@ -1,5 +1,7 @@
 import React from 'react';
-import {CircularProgress, withStyles} from '@material-ui/core';
+import {CircularProgress} from '@mui/material';
+
+import withStyles from '@mui/styles/withStyles';
 
 const styles = theme => ({
     inlayProgress: {
@@ -10,7 +12,7 @@ const styles = theme => ({
 });
 
 const loadingInlay = (props) => (
-    <div className={props.inlayProgress}>
+    <div className={props.inlayProgress} data-testid="loading">
         <CircularProgress />
     </div>
 );

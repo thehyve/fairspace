@@ -1,26 +1,26 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
-import {Button, Grid, withStyles, Typography} from '@material-ui/core';
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
-import {Assignment, Close} from "@material-ui/icons";
+import {Button, Grid, Typography} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import {Assignment, Close} from "@mui/icons-material";
+import queryString from "query-string";
+
 import styles from "./MetadataView.styles";
-import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
+import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
 import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
-import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
-import MetadataViewTableContainer from "./MetadataViewTableContainer";
+import MetadataViewFacets from "./MetadataViewFacets";
+import MetadataViewTabs from "./MetadataViewTabs";
 
 import CollectionsContext from "../../collections/CollectionsContext";
 import {getParentPath, getPathFromIri} from "../../file/fileUtils";
@@ -53,45 +53,52 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
+    const [isClosedPanel, setIsClosedPanel] = useState(true);
 
-    const toggleRow = (entity: MetadataViewEntity) => (toggle(entity));
+    const toggleRow = useCallback((entity: MetadataViewEntity) => {
+        setIsClosedPanel(!entity);
+        toggle(entity);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
+    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier'); // first column of id type
 
-    const a11yProps = (index) => ({
-        'key': `metadata-view-tab-${index}`,
-        'aria-controls': `metadata-view-tab-${index}`,
-    });
-
-    const changeTab = (event, tabIndex) => {
+    const changeTab = useCallback((event, tabIndex) => {
+        setIsClosedPanel(true);
         toggle();
         setTextFiltersObject({});
         handleViewChangeRedirect(views[tabIndex].name);
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [views]);
 
-    const clearFilterCandidates = () => {
+    const clearFilterCandidates = useCallback(() => {
         setFilterCandidates([]);
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates]);
 
-    const applyFilters = () => {
+    const applyFilters = useCallback(() => {
         updateFilters(filterCandidates);
         clearFilterCandidates();
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates, updateFilters]);
 
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
             [filter.min, filter.max] = values;
+        } else if (ofBooleanValueType(type)) {
+            filter.booleanValue = values.length > 0 ? values[0] : null;
         } else {
             filter.values = values;
         }
     };
 
-    const updateFilterCandidates = (facet: MetadataViewFacet, newValues: any[]) => {
+    const updateFilterCandidates = useCallback((facet: MetadataViewFacet, newValues: any[]) => {
         if (filterCandidates.find(f => f.field === facet.name)) {
             let updatedFilters;
             const existingFilter = filters.find(f => f.field === facet.name);
-            if (!newValues || (existingFilter && _.isEqual(existingFilter.values.sort(), newValues.sort()) && (
+            if (!newValues || (existingFilter && existingFilter.values && _.isEqual(existingFilter.values.sort(), newValues.sort()) && (
                 (newValues.filter(v => v !== null).length === 0) || existingFilter.value))) {
                 updatedFilters = [...filterCandidates.filter(f => f.field !== facet.name)];
             } else {
@@ -107,7 +114,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
             setFilterValues(facet.type, newFilter, newValues);
             setFilterCandidates([...filterCandidates, newFilter]);
         }
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates]);
 
     const handleClearAllFilters = () => {
         setFilterCandidates([]);
@@ -115,10 +123,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
         clearAllFilters();
     };
 
-    const handleClearFilter = (facetName: string) => {
+    const handleClearFilter = useCallback((facetName: string) => {
         setFilterCandidates([...filterCandidates.filter(f => f.field !== facetName)]);
         clearFilter(facetName);
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterCandidates]);
 
     const collectionsFacet = !locationContext && collections && {
         name: 'location',
@@ -127,129 +136,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
     };
 
-    const appendCustomColumns = (view: MetadataViewOptions) => {
-        if (view.name === RESOURCES_VIEW) {
-            const pathColumn = {title: "Path", name: "path", type: "Custom"};
-            const accessColumn = {title: "Access", name: "access", type: "Custom"};
-            return [
-                view.columns.find(c => c.name === RESOURCES_VIEW),
-                pathColumn,
-                ...view.columns.filter(c => c.name !== RESOURCES_VIEW),
-                accessColumn
-            ];
-        }
-        return view.columns;
-    };
-
-    const renderSingleFacet = (facet: MetadataViewFacet) => {
-        const facetOptions = ofRangeValueType(facet.type) ? [facet.min, facet.max] : facet.values;
-        const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
-        let activeFilterValues = [];
-        if (activeFilter) {
-            activeFilterValues = ofRangeValueType(facet.type) ? [activeFilter.min, activeFilter.max] : activeFilter.values;
-        }
-        return facetOptions && facetOptions.length > 0 && (
-            <Grid key={facet.name} item>
-                <Facet
-                    type={facet.type}
-                    title={facet.title}
-                    options={facetOptions}
-                    onChange={(values) => updateFilterCandidates(facet, values)}
-                    extraClasses={classes.facet}
-                    activeFilterValues={activeFilterValues}
-                    clearFilter={() => handleClearFilter(facet.name)}
-                />
-            </Grid>
-        );
-    };
-
-    const renderFacetConfirmButtons = (
-        <Grid
-            container
-            spacing={1}
-            className={`${classes.confirmFiltersButtonBlock} ${filterCandidates.length > 0 && classes.confirmFiltersButtonBlockActive}`}
-        >
-            <Grid item xs={4}>
-                <Button
-                    onClick={clearFilterCandidates}
-                    variant="contained"
-                    color="default"
-                    className={classes.confirmFiltersButton}
-                    disabled={filterCandidates.length === 0}
-                >
-                    Cancel
-                </Button>
-            </Grid>
-            <Grid item xs={8}>
-                <Button
-                    onClick={applyFilters}
-                    variant="contained"
-                    color="secondary"
-                    className={classes.confirmFiltersButton}
-                    disabled={filterCandidates.length === 0}
-                >
-                    Apply filters
-                </Button>
-            </Grid>
-        </Grid>
-    );
-
     const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
-
-    const renderFacets = (view: MetadataViewOptions) => {
-        const viewFacets = facetsEx.filter(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase())));
-        return viewFacets.length > 0 && (
-            <Grid key={view.name} container item direction="column" justifyContent="flex-start" spacing={1}>
-                <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
-                {
-                    viewFacets.map(facet => renderSingleFacet(facet))
-                }
-                {
-                    // location is the collection location, which we will group under resources
-                    (view.name.toLowerCase() === 'resource') ? (
-                        facetsEx
-                            .filter(facet => facet.name.toLowerCase().startsWith('location'))
-                            .map(facet => (renderSingleFacet(facet)))
-                    ) : ""
-                }
-            </Grid>
-        );
-    };
-
-    const renderViewTabs = () => (
-        <div>
-            <Tabs
-                value={currentViewIndex}
-                onChange={changeTab}
-                indicatorColor="primary"
-                textColor="primary"
-                variant="scrollable"
-                scrollButtons="auto"
-                aria-label="metadata view tabs"
-                className={classes.tabsPanel}
-            >
-                {views.map((view, index) => (
-                    <Tab label={view.title} {...a11yProps(index)} />
-                ))}
-            </Tabs>
-            {views.map((view, index) => (
-                <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
-                    <MetadataViewTableContainer
-                        columns={appendCustomColumns(view)}
-                        view={view.name}
-                        filters={filters}
-                        locationContext={locationContext}
-                        selected={selected}
-                        toggleRow={toggleRow}
-                        hasInactiveFilters={filterCandidates.length > 0}
-                        collections={collections}
-                        textFiltersObject={textFiltersObject}
-                        setTextFiltersObject={setTextFiltersObject}
-                    />
-                </TabPanel>
-            ))}
-        </div>
-    );
 
     const getPathSegments = () => {
         const segments = ((locationContext && getPathFromIri(locationContext)) || '').split('/');
@@ -269,6 +156,18 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
     const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
+
+    const getPrefilteringRedirectionLink = () => {
+        if (!selected) {
+            return "";
+        }
+        const metadataURL = window.location.host + getMetadataViewsPath();
+        const prefilteringQueryString = queryString.stringify({
+            view: currentView.name,
+            [currentViewIdColumn.name.toLowerCase()]: selected.label
+        });
+        return metadataURL + "?" + prefilteringQueryString;
+    };
 
     return (
         <BreadcrumbsContext.Provider value={{
@@ -296,24 +195,44 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
-                <Grid item className={`${classes.centralPanel} ${!selected && classes.centralPanelFullWidth}`}>
+                <Grid item className={`${classes.centralPanel} ${isClosedPanel && classes.centralPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.facets}>
-                            <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
-                                {views.map(view => renderFacets(view))}
-                                {renderFacetConfirmButtons}
-                            </Grid>
+                            <MetadataViewFacets
+                                views={views}
+                                filters={filters}
+                                facetsEx={facetsEx}
+                                clearFilterCandidates={clearFilterCandidates}
+                                filterCandidates={filterCandidates}
+                                updateFilterCandidates={updateFilterCandidates}
+                                handleClearFilter={handleClearFilter}
+                                applyFilters={applyFilters}
+                            />
                         </Grid>
                         <Grid item className={classes.metadataViewTabs}>
-                            {renderViewTabs()}
+                            <MetadataViewTabs
+                                currentViewIndex={currentViewIndex}
+                                idColumn={currentViewIdColumn}
+                                changeTab={changeTab}
+                                views={views}
+                                filters={filters}
+                                locationContext={locationContext}
+                                selected={selected}
+                                toggleRow={toggleRow}
+                                hasInactiveFilters={filterCandidates.length > 0}
+                                collections={collections}
+                                textFiltersObject={textFiltersObject}
+                                setTextFiltersObject={setTextFiltersObject}
+                            />
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item className={classes.sidePanel} hidden={!selected}>
+                <Grid item className={classes.sidePanel} hidden={isClosedPanel}>
                     <MetadataViewInformationDrawer
-                        forceExpand
+                        handleCloseCard={() => setIsClosedPanel(true)}
                         entity={selected}
                         viewIcon=<Assignment />
+                        textFilterLink={getPrefilteringRedirectionLink(selected)}
                     />
                 </Grid>
             </Grid>

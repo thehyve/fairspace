@@ -5,17 +5,21 @@ import {
     FormControl,
     FormControlLabel,
     FormGroup
-} from "@material-ui/core";
-import {Clear, Search} from "@material-ui/icons";
-import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
-import InputAdornment from "@material-ui/core/InputAdornment";
-import TextField from "@material-ui/core/TextField";
-import IconButton from "@material-ui/core/IconButton";
-import Typography from "@material-ui/core/Typography";
-import Tooltip from "@material-ui/core/Tooltip";
-import Switch from "@material-ui/core/Switch";
-import Grid from "@material-ui/core/Grid";
+} from "@mui/material";
+
+// react-window https://react-window.vercel.app/#/examples/
+import {FixedSizeList as List} from 'react-window';
+
+import {Clear, Search} from "@mui/icons-material";
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import Switch from "@mui/material/Switch";
+import Grid from "@mui/material/Grid";
 import type {MetadataViewFacetProperties, Option} from "../MetadataViewFacetFactory";
 import Iri from "../../../common/components/Iri";
 import useStateWithSessionStorage from "../../../common/hooks/UseSessionStorage";
@@ -63,9 +67,10 @@ const SelectMultiple = (props: SelectProperties) => {
         onChange(selected);
     };
 
-    const renderCheckboxListElement = (option) => (
+    const renderCheckboxListElement = (option, style) => (
         <FormControlLabel
             key={option.value}
+            style={style}
             control={(
                 <Checkbox
                     checked={!!state[option.value]}
@@ -86,6 +91,8 @@ const SelectMultiple = (props: SelectProperties) => {
         />
     );
 
+    const renderCheckboxListElementWindowed = ({index, style}) => renderCheckboxListElement(filteredOptions[index], style);
+
     const renderCheckboxList = () => {
         if (showAccessFilter) {
             return filteredOptions.map(option => (
@@ -99,6 +106,22 @@ const SelectMultiple = (props: SelectProperties) => {
                 </Grid>
             ));
         }
+
+        if (filteredOptions.leng > 20) {
+            // Large lists dramatically decrease browser performance, MUI generates many thousands of dom nodes
+            // Solution is windowed rendering. For really small lists the fixed height of 150 is not suitable,
+            // therefor only windowed rendering large lists
+            return (
+                <List
+                    height={150}
+                    itemCount={filteredOptions.length}
+                    itemSize={35}
+                >
+                    {renderCheckboxListElementWindowed}
+                </List>
+            );
+        }
+
         return filteredOptions.map(option => renderCheckboxListElement(option));
     };
 
@@ -192,6 +215,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                                 onClick={() => setTextFilterValue("")}
                                 disabled={!textFilterValue}
                                 style={{order: 1}}
+                                size="medium"
                             >
                                 <Clear color="disabled" fontSize="small" />
                             </IconButton>

@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {TextField, withStyles} from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
+import {TextField} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import SearchIcon from '@mui/icons-material/Search';
 
-import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
 import styles from './SearchBar.styles';
 
 const SearchBar = ({
@@ -58,6 +59,7 @@ const SearchBar = ({
                                 className={classes.searchIcon}
                                 title="Apply filter"
                                 color="primary"
+                                size="medium"
                             >
                                 <SearchIcon />
                             </IconButton>

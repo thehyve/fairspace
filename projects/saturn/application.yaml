@@ -42,6 +42,8 @@ auth:
   clientId: workspace-client
   enableBasicAuth: true
   superAdminUser: organisation-admin
+  defaultUserRoles:
+    - canViewPublicMetadata
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
@@ -50,6 +52,7 @@ services:
   cbioportal: https://www.cbioportal.org
   "test username": http://google.com?q=${username}
 features:
+  - ExtraStorage
 viewDatabase:
   enabled: true
   url: jdbc:postgresql://localhost:9432/fairspace

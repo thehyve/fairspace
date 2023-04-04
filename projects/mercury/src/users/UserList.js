@@ -8,17 +8,17 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import IconButton from "@material-ui/core/IconButton";
-import {HighlightOffSharp} from "@material-ui/icons";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogActions from "@material-ui/core/DialogActions";
-import Checkbox from "@material-ui/core/Checkbox";
-import TableContainer from "@material-ui/core/TableContainer";
+import IconButton from "@mui/material/IconButton";
+import {HighlightOffSharp} from "@mui/icons-material";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Checkbox from "@mui/material/Checkbox";
+import TableContainer from "@mui/material/TableContainer";
 import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
 import type {User} from "./UsersAPI";
@@ -115,10 +115,7 @@ const UserList = (props: UserListProps) => {
                 >
                     Add
                 </Button>
-                <Button
-                    onClick={() => setShowAddUserDialog(false)}
-                    color="default"
-                >
+                <Button onClick={() => setShowAddUserDialog(false)}>
                     Cancel
                 </Button>
             </DialogActions>
@@ -198,7 +195,7 @@ const UserList = (props: UserListProps) => {
                                         agreeButtonText="Remove user"
                                         dangerous
                                     >
-                                        <IconButton disabled={!canManage}>
+                                        <IconButton disabled={!canManage} size="medium">
                                             <HighlightOffSharp />
                                         </IconButton>
                                     </ConfirmationButton>

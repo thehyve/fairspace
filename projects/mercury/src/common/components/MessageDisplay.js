@@ -1,6 +1,6 @@
 import React from 'react';
-import Typography from "@material-ui/core/Typography";
-import {ErrorOutline, InfoOutlined} from '@material-ui/icons';
+import Typography from "@mui/material/Typography";
+import {ErrorOutline, InfoOutlined} from '@mui/icons-material';
 
 const MessageDisplay = ({
     message, isError = true, withIcon = true,

@@ -1,20 +1,25 @@
 package nl.fairspace.pluto.auth.filters;
 
-import nl.fairspace.pluto.auth.*;
-import nl.fairspace.pluto.auth.model.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.http.*;
-import java.util.*;
-import java.util.stream.*;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doReturn;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AuthorizedCheckAuthenticationFilterTest {
 
     AuthorizedCheckAuthenticationFilter filter;
@@ -25,15 +30,15 @@ public class AuthorizedCheckAuthenticationFilterTest {
     @Mock
     HttpServletRequest request;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         filter = new AuthorizedCheckAuthenticationFilter(requiredAuthority);
         claims = new HashMap<>();
-        token = new OAuthAuthenticationToken("access", "refresh", claims);
+        token = new OAuthAuthenticationToken("access", "refresh", "id", claims);
     }
 
     @Test
-    void testHappyFlow() {
+    public void testHappyFlow() {
         claims.put(AuthConstants.AUTHORITIES_CLAIM, List.of("test", "other", requiredAuthority));
         doReturn(token).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
 
@@ -41,14 +46,14 @@ public class AuthorizedCheckAuthenticationFilterTest {
     }
 
     @Test
-    void testNotAuthorizedWithoutToken() {
+    public void testNotAuthorizedWithoutToken() {
         doReturn(null).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
 
         assertFalse(filter.isAuthorized(request));
     }
 
     @Test
-    void testMultipleValidAuthorities() {
+    public void testMultipleValidAuthorities() {
         doReturn(token).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
 
         String[] authorities = new String[] {"some-authority", "another", "test"};
@@ -67,7 +72,7 @@ public class AuthorizedCheckAuthenticationFilterTest {
     }
 
     @Test
-    void testNotAuthorizedWithoutCorrectAuthority() {
+    public void testNotAuthorizedWithoutCorrectAuthority() {
         doReturn(token).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
         assertFalse(filter.isAuthorized(request));
     }

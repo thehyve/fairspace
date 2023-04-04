@@ -1,0 +1,141 @@
+@prefix fs: <https://fairspace.nl/ontology#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix curie: <https://institut-curie.org/ontology#> .
+@prefix icdo3t: <https://bioportal.bioontology.org/ontologies/ICD-O-3-T/> .
+@prefix icdo3m: <https://bioportal.bioontology.org/ontologies/ICD-O-3-M/> .
+@prefix gender: <http://hl7.org/fhir/administrative-gender#> .
+@prefix ncbitaxon: <https://bioportal.bioontology.org/ontologies/NCBITAXON/> .
+@prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
+@prefix workspaceType: <https://institut-curie.org/workspace-type#> .
+@prefix availabilityForResearch: <https://institut-curie.org/availabilityForResearch#> .
+@prefix consentAnswer: <https://institut-curie.org/consentAnswer#> .
+@prefix tumorGradeValue: <https://institut-curie.org/tumorGradeValue#> .
+@prefix tnmT: <https://institut-curie.org/TNM-T#> .
+@prefix tnmN: <https://institut-curie.org/TNM-N#> .
+@prefix tnmM: <https://institut-curie.org/TNM-M#> .
+@prefix osiris: <https://institut-curie.org/osiris#> .
+
+fs:File rdfs:label "File" .
+fs:Directory rdfs:label "Directory" .
+fs:Collection rdfs:label "Collection" .
+fs:Workspace rdfs:label "Workspace" .
+
+workspaceType:personal a curie:WorkspaceType ;
+  rdfs:label "Personal" .
+workspaceType:researchProject a curie:WorkspaceType ;
+  rdfs:label "Research project" .
+workspaceType:clinicalTrial a curie:WorkspaceType ;
+  rdfs:label "Clinical trial" .
+workspaceType:team a curie:WorkspaceType ;
+  rdfs:label "Team" .
+
+gender:male a curie:Gender ;
+  rdfs:label "Male" .
+gender:female a curie:Gender ;
+  rdfs:label "Female" .
+gender:undifferentiated a curie:Gender ;
+  rdfs:label "Undifferentiated" .
+
+availabilityForResearch:yes a curie:AvailabilityForResearch ;
+  rdfs:label "Yes" .
+availabilityForResearch:yesAfterPatientInformation a curie:AvailabilityForResearch ;
+  rdfs:label "Yes after patient information" .
+availabilityForResearch:no a curie:AvailabilityForResearch ;
+  rdfs:label "No" .
+
+consentAnswer:yes a curie:ConsentAnswer ;
+  rdfs:label "Yes" .
+consentAnswer:no a curie:ConsentAnswer ;
+  rdfs:label "No" .
+consentAnswer:noInformation a curie:ConsentAnswer ;
+  rdfs:label "No information" .
+
+icdo3t:C00 a curie:Topography ;
+  rdfs:label "LIP" .
+icdo3t:C00.0 a curie:Topography ;
+  rdfs:label "External upper lip" .
+icdo3t:C00.1 a curie:Topography ;
+  rdfs:label "External lower lip" .
+icdo3t:C42 a curie:Topography ;
+  rdfs:label "HEMATOPOIETIC AND RETICULOENDOTHELIAL SYSTEMS" .
+icdo3t:C22.0 a curie:Topography ;
+  rdfs:label "Liver" .
+icdo3t:C34.9 a curie:Topography ;
+  rdfs:label "Lung, NOS" .
+icdo3m:8740\/0 a curie:Morphology ;
+  rdfs:label "Junctional nevus, NOS" .
+icdo3m:8740\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma in junctional nevus" .
+icdo3m:8741\/2 a curie:Morphology ;
+  rdfs:label "Precancerous melanosis, NOS" .
+icdo3m:8741\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma in precancerous melanosis" .
+icdo3m:8742\/2 a curie:Morphology ;
+  rdfs:label "Lentigo maligna" .
+icdo3m:8742\/3 a curie:Morphology ;
+  rdfs:label "Lentigo maligna melanoma" .
+icdo3m:8743\/3 a curie:Morphology ;
+  rdfs:label "Superficial spreading melanoma" .
+icdo3m:9423\/3 a curie:Morphology ;
+  rdfs:label "Polar spongioblastoma" .
+icdo3m:9766\/1 a curie:Morphology ;
+  rdfs:label "Angiocentric immunoproliferative lesion" .
+icdo3m:9767\/1 a curie:Morphology ;
+  rdfs:label "Angioimmunoblastic lymphadenopathy (AIC)" .
+icdo3m:9768\/1 a curie:Morphology ;
+  rdfs:label "T-gamma lymphoproliferative disease" .
+icdo3m:9769\/1 a curie:Morphology ;
+  rdfs:label "Immunoglobulin deposition disease" .
+icdo3m:9800\/3 a curie:Morphology ;
+  rdfs:label "Leukemia, NOS" .
+evs:C12434 a curie:SampleNature ;
+  rdfs:label "Blood" .
+evs:C13356 a curie:SampleNature ;
+  rdfs:label "Plasma" .
+evs:C17021 a curie:SampleNature ;
+  rdfs:label "Protein" .
+evs:C812 a curie:SampleNature ;
+  rdfs:label "RNA" .
+evs:C449 a curie:SampleNature ;
+  rdfs:label "DNA" .
+evs:C12954 a curie:SampleNature ;
+  rdfs:label "Peripheral Blood Mononuclear Cell" .
+evs:C20313 a curie:SampleNature ;
+  rdfs:label "Tumor Cell Line" .
+evs:C70717 a curie:SampleNature ;
+  rdfs:label "Frozen Specimen" .
+evs:C19597 a curie:SampleNature ;
+  rdfs:label "Paraffin Embedded Tissue (FFPE)" .
+evs:C13283 a curie:SampleNature ;
+  rdfs:label "Urine" .
+ncbitaxon:9606 a curie:Species ;
+  rdfs:label "Homo sapiens" .
+ncbitaxon:10090 a curie:Species ;
+  rdfs:label "Mus musculus" .
+ncbitaxon:10116 a curie:Species ;
+  rdfs:label "Rattus norvegicus" .
+ncbitaxon:7215 a curie:Species ;
+  rdfs:label "Drosophila" .
+ncbitaxon:10847 a curie:Species ;
+  rdfs:label "Enterobacteria phage phiX174" .
+ncbitaxon:9790 a curie:Species ;
+  rdfs:label "Equus burchellii" .
+ncbitaxon:9796 a curie:Species ;
+  rdfs:label "Equus caballus" .
+ncbitaxon:9685 a curie:Species ;
+  rdfs:label "Felis catus" .
+ncbitaxon:28756 a curie:Species ;
+  rdfs:label "Fundulidae" .
+ncbitaxon:9031 a curie:Species ;
+  rdfs:label "Gallus gallus" .
+osiris:C37-2 a curie:AnalysisType ;
+  rdfs:label "Imaging" .
+osiris:O6-12 a curie:AnalysisType ;
+  rdfs:label "RNA-seq" .
+osiris:O6-13 a curie:AnalysisType ;
+  rdfs:label "RPPA" .
+osiris:O6-14 a curie:AnalysisType ;
+  rdfs:label "Whole genome bisulfite sequencing" .
+osiris:O6-15 a curie:AnalysisType ;
+  rdfs:label "Whole genome sequencing" .
+

@@ -1,8 +1,9 @@
-package io.fairspace.saturn.webdav;
+package io.fairspace.saturn.webdav.blobstore;
 
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,5 +27,9 @@ public interface BlobStore {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    default boolean delete(String id) throws IOException {
+        throw new RuntimeException("Cannot delete blob from read-only blob store");
     }
 }

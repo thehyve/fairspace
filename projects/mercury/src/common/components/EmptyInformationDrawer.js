@@ -1,6 +1,6 @@
 import React from 'react';
-import {Grid} from '@material-ui/core';
-import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
+import {Grid} from '@mui/material';
+import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
 import MessageDisplay from './MessageDisplay';
 
 const EmptyInformationDrawer = (props) => {

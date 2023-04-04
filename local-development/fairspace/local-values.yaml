@@ -14,7 +14,8 @@ fairspace:
     domain: fairspace.local
     tls:
       enabled: false
-  features: []
+  features:
+    - ExtraStorage
   services:
     JupyterHub: http://jupyterhub.local/user/${username}/lab
 
@@ -25,6 +26,9 @@ saturn:
     image: saturn-local
     tag: latest
     pullPolicy: Never
+  persistence:
+    extra-file-storage:
+      size: 5Gi
 
 # Specific settings for Pluto subchart
 pluto:

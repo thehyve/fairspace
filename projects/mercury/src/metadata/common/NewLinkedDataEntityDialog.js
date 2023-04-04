@@ -8,7 +8,7 @@ import {
     DialogContent,
     DialogTitle,
     Typography
-} from "@material-ui/core";
+} from "@mui/material";
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUtils";
 import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
@@ -131,7 +131,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                 fullWidth
                 maxWidth="md"
             >
-                <DialogTitle disableTypography id="form-dialog-title">
+                <DialogTitle id="form-dialog-title">
                     <Typography variant="h5">{typeLabel}</Typography>
                     <Typography variant="subtitle1">{typeDescription}</Typography>
                 </DialogTitle>
@@ -151,11 +151,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                         {`Create ${typeLabel}`}
                         {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
                     </Button>
-                    <Button
-                        onClick={handleCloseDialog}
-                        color="default"
-                        disabled={isUpdating}
-                    >
+                    <Button onClick={handleCloseDialog} disabled={isUpdating}>
                         Cancel
                     </Button>
                 </DialogActions>

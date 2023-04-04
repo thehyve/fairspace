@@ -19,7 +19,7 @@ public class AuthorizationFailedHandler {
     public static final String STATIC_PATH = "/static/";
 
     public void handleFailedAuthorization(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        log.info("Authentication failed for request {}", request.getRequestURI());
+        log.trace("Authentication failed for request {}", request.getRequestURI());
 
         if (shouldRedirect(request)) {
             request.getSession().setAttribute(AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE, request.getRequestURI());

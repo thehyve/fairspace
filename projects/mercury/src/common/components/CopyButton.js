@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {Tooltip} from "@material-ui/core";
-import AssignmentOutlined from '@material-ui/icons/AssignmentOutlined';
-import AssignmentTurnedInOutlined from '@material-ui/icons/AssignmentTurnedInOutlined';
+import {Tooltip} from "@mui/material";
+import ContentCopy from "mdi-material-ui/ContentCopy";
+import {CheckOutlined} from "@mui/icons-material";
 import useIsMounted from "react-is-mounted-hook";
 
 const DEFAULT_TIMEOUT = 1000;
@@ -41,14 +41,16 @@ const CopyButton = ({
                 <span>
                     {justCopied ? (
                         <span data-testid="copied">
-                            <AssignmentTurnedInOutlined
+                            <CheckOutlined
                                 color="action"
+                                fontSize="small"
                             />
                         </span>
                     ) : (
                         <span data-testid="uncopied">
-                            <AssignmentOutlined
+                            <ContentCopy
                                 color="action"
+                                fontSize="small"
                             />
                         </span>
                     )}

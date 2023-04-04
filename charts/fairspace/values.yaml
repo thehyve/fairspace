@@ -53,6 +53,8 @@ saturn:
   # loglevel: debug
   auth:
     enableBasicAuth: true
+    defaultUserRoles:
+      - canViewPublicMetadata
   persistence:
     files:
       ## A manually managed Persistent Volume and Claim
@@ -72,6 +74,7 @@ saturn:
       size: 50Gi
     audit:
       size: 5Gi
+    extra-file-storage:
   image:
     image: eu.gcr.io/fairspace-207108/saturn
     tag: RELEASEVERSION

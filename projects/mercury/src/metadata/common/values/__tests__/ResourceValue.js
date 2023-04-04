@@ -1,8 +1,13 @@
 import React from 'react';
-import {shallow} from "enzyme";
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
 import ResourceValue from "../ResourceValue";
 import IriValueContainer from "../IriValueContainer";
+
+// Enzyme is obsolete, the Adapter allows running our old tests.
+// For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
+configure({adapter: new Adapter()});
 
 describe('ResourceValue', () => {
     it('should prepend the namespace uri to the specified value', () => {

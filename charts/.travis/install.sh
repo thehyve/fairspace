@@ -9,6 +9,8 @@ if [[ $SHOULD_RELEASE ]]; then
   echo "Adding helm repositories ..."
   source "$BUILD_SCRIPTS_DIR/helm/add_repos.sh"
 
-  source "$BUILD_SCRIPTS_DIR/k8s/ics_kubectl.sh"
+  if [[ $SHOULD_DEPLOY = "true" ]]; then
+    source "$BUILD_SCRIPTS_DIR/k8s/ics_kubectl.sh"
+  fi
 
 fi

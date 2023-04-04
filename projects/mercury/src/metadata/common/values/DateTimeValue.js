@@ -1,5 +1,5 @@
 import React from 'react';
-import {DateTimePicker} from "@material-ui/pickers";
+import {DateTimePicker} from '@mui/x-date-pickers/DateTimePicker';
 import {DATE_FORMAT} from '../../../constants';
 
 class DateTimeValue extends React.Component {
@@ -17,11 +17,11 @@ class DateTimeValue extends React.Component {
 
     handleChange = (date) => {
         this.props.onChange({value: date});
-    }
+    };
 
     updateState = () => {
         this.setState({value: this.props.entry.value});
-    }
+    };
 
     render() {
         const {entry, property, currentValues, ...otherProps} = this.props;

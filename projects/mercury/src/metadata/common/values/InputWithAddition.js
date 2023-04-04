@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
-import {Grid, IconButton} from "@material-ui/core";
-import Add from '@material-ui/icons/Add';
+import {Grid, IconButton} from "@mui/material";
+import Add from '@mui/icons-material/Add';
 
 import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LoadingInlay from "../../../common/components/LoadingInlay";
@@ -38,6 +38,7 @@ const InputWithAddition = ({
                     aria-label="Add"
                     title="Add a new"
                     onClick={() => setAdding(true)}
+                    size="medium"
                 >
                     <Add />
                 </IconButton>

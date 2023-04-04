@@ -9,8 +9,8 @@ import {
     TableHead,
     TableRow,
     Typography
-} from "@material-ui/core";
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+} from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default ({entityErrors, otherErrors}) => {
     const hasOtherErrors = otherErrors && otherErrors.length > 0;

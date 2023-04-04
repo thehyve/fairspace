@@ -765,6 +765,27 @@ curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=undelete" "${FAIRS
 ----
 ====
 
+===== Delete directory content
+
+|===
+2+| ``POST /api/webdav/{path}`` +
+    ``action=delete_all_in_directory``
+
+2+| Delete directory content
+2+| _Request data_:
+| ``action``
+| ``delete_all_in_directory``
+|===
+
+.Example delete all in directory (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -i -H "Authorization: ${AUTH_HEADER}" -X POST -F "action=delete_all_in_directory" "${FAIRSPACE_URL}/api/webdav/${path}"
+----
+====
+
 ===== Revert to a file version
 
 |===
@@ -2332,7 +2353,7 @@ Requires:
 
 * yarn
 * docker
-* Java 15
+* Java 17
 
 To run the development version, checkout this repository,
 navigate to ``projects/mercury`` and run
@@ -2480,7 +2501,7 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.25
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.26
 ----
 
 ===== Deploy Keycloak
@@ -2566,7 +2587,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.25 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.26 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2703,7 +2724,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.25.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.26.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
@@ -3014,6 +3035,10 @@ directory listings and file properties handling, adding, moving, replacing and d
 There are two types of storages that Saturn connects to: primary for storing RDF triples and file blobs,
 and secondary for efficient data retrieval.
 
+There is also a possibility to configure an extra file storage for Saturn,
+separate from the primary one to keep e.g. search result exports created by users,
+so they could be mounted in the JupyterHub environment for further analysis.
+
 ==== Primary data storage
 
 RDF database (link:https://jena.apache.org/documentation/tdb2[Apache Jena TDB2]) stores:
@@ -3039,6 +3064,21 @@ that makes it possible to (incrementally) backup full state of workspaces and me
 To improve the performance of metadata views, especially for counts and pagination, a simple relational database
 (PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
 which enables recreation of the database at any point of time.
+
+==== Extra file storage
+
+Similar to the primary file storage, the extra storage is a virtual file system
+that stores directory structure and basic file information in the RDF database.
+Unlike the primary one, the additional storage cannot be annotated with metadata from the defined model.
+Files themselves are stored in an extra storage as blobs. This storage however is NOT append-only.
+File blobs will be removed on deletion.
+
+There is a basic, file-level access control over the storage - each user has "modify" access only to the files added by that user.
+Users cannot overwrite, read or even list each others files. This includes users with admin role.
+
+To configure the extra storage to allow storage of metadata search results and to include the "Export to analysis" button in the user interface,
+add `ExtraStorage` feature to the configured features list.
+This will enable `/api/extra-storage` webdav endpoint with default `analysis-export` root directory created to store exported files.
 
 === Deployment architecture
 

@@ -1,7 +1,7 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from "prop-types";
-import {withStyles} from '@material-ui/core/styles';
-import Link from "@material-ui/core/Link";
+import withStyles from '@mui/styles/withStyles';
+import Link from "@mui/material/Link";
 import styles from './Layout.styles';
 import Footer from './Footer';
 import TopBar from "./TopBar";

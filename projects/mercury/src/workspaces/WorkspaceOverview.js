@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 
 import PropTypes from 'prop-types';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import {Widgets} from '@material-ui/icons';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import {Widgets} from '@mui/icons-material';
 import WorkspaceInfo from './WorkspaceInfo';
 import UserList from "../users/UserList";
 import WorkspaceContext from "./WorkspaceContext";
