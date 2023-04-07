@@ -107,7 +107,7 @@ const SelectMultiple = (props: SelectProperties) => {
             ));
         }
 
-        if (filteredOptions.leng > 20) {
+        if (filteredOptions.length > 20) {
             // Large lists dramatically decrease browser performance, MUI generates many thousands of dom nodes
             // Solution is windowed rendering. For really small lists the fixed height of 150 is not suitable,
             // therefor only windowed rendering large lists
