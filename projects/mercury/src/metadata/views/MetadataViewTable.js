@@ -3,6 +3,7 @@ import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '
 import makeStyles from '@mui/styles/makeStyles';
 import {Link as RouterLink} from "react-router-dom";
 import qs from 'qs';
+import useDeepCompareEffect from "use-deep-compare-effect";
 import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
 import {TextualValueTypes} from "./MetadataViewAPI";
 import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
@@ -176,7 +177,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         );
     };
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         initializeCheckboxes();
     }, [data, initializeCheckboxes]);
 

@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
 import {Button, Grid, Typography} from '@mui/material';
@@ -154,8 +154,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return result.reverse();
     };
 
-    const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
-    const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
+    const areFacetFiltersNonEmpty = useMemo(
+        () => (filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field))),
+        [filters, facetsEx]
+    );
+    const areTextFiltersNonEmpty = useMemo(
+        () => (textFiltersObject && Object.keys(textFiltersObject).length > 0),
+        [textFiltersObject]
+    );
 
     const getPrefilteringRedirectionLink = () => {
         if (!selected) {
@@ -175,14 +181,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {(areFacetFiltersNonEmpty() || areTextFiltersNonEmpty()) && (
+            {(areFacetFiltersNonEmpty || areTextFiltersNonEmpty) && (
                 <Grid container justifyContent="space-between" direction="row-reverse">
                     <Grid item xs={2} className={classes.clearAllButtonContainer}>
                         <Button className={classes.clearAllButton} startIcon={<Close />} onClick={handleClearAllFilters}>
                             Clear all filters
                         </Button>
                     </Grid>
-                    {areFacetFiltersNonEmpty() && (
+                    {areFacetFiltersNonEmpty && (
                         <Grid item container xs alignItems="center" spacing={1} className={classes.activeFilters}>
                             <Grid item>
                                 <Typography variant="overline" component="span" color="textSecondary">Active filters:</Typography>

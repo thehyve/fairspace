@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import useDeepCompareEffect from "use-deep-compare-effect";
 import Grid from "@mui/material/Grid";
 import Input from "@mui/material/Input";
 import Slider from "@mui/material/Slider";
@@ -17,7 +18,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const [dynamicSliderValue, setDynamicSliderValue] = useState([minValue, maxValue]);
     const [validationError, setValidationError] = useState(null);
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         if (activeFilterValues.length > 0) {
             setValue(activeFilterValues);
             setDynamicSliderValue(activeFilterValues);

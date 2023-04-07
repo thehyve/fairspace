@@ -9,7 +9,7 @@ import {
 
 // react-window https://react-window.vercel.app/#/examples/
 import {FixedSizeList as List} from 'react-window';
-
+import useDeepCompareEffect from "use-deep-compare-effect";
 import {Clear, Search} from "@mui/icons-material";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -44,7 +44,7 @@ const SelectMultiple = (props: SelectProperties) => {
     const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
     const filteredOptions = options.filter(readAccessFilter).filter(textFilter);
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         setState(defaultOptions);
     }, [activeFilterValues]);
 
