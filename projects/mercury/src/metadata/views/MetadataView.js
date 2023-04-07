@@ -183,7 +183,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         </Button>
                     </Grid>
                     {areFacetFiltersNonEmpty() && (
-                        <Grid item container xs alignItems="center" spacing={1}>
+                        <Grid item container xs alignItems="center" spacing={1} className={classes.activeFilters}>
                             <Grid item>
                                 <Typography variant="overline" component="span" color="textSecondary">Active filters:</Typography>
                             </Grid>
@@ -195,9 +195,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
-                <Grid item className={`${classes.centralPanel} ${isClosedPanel && classes.centralPanelFullWidth}`}>
+                <Grid item className={`${classes.overallPanel} ${isClosedPanel && classes.overallPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
-                        <Grid item className={classes.facets}>
+                        <Grid item className={classes.leftPanel}>
                             <MetadataViewFacets
                                 views={views}
                                 filters={filters}
@@ -209,7 +209,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 applyFilters={applyFilters}
                             />
                         </Grid>
-                        <Grid item className={classes.metadataViewTabs}>
+                        <Grid item className={classes.centralPanel}>
                             <MetadataViewTabs
                                 currentViewIndex={currentViewIndex}
                                 idColumn={currentViewIdColumn}
@@ -227,7 +227,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item className={classes.sidePanel} hidden={isClosedPanel}>
+                <Grid item className={classes.rightPanel} hidden={isClosedPanel}>
                     <MetadataViewInformationDrawer
                         handleCloseCard={() => setIsClosedPanel(true)}
                         entity={selected}

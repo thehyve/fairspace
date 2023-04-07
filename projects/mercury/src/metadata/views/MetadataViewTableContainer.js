@@ -81,7 +81,7 @@ const styles = () => ({
     },
     tableSettings: {
         position: 'relative',
-        marginTop: -50,
+        marginTop: -40,
         marginRight: 10,
         float: 'right',
         maxWidth: 50
