@@ -28,7 +28,7 @@ const styles = theme => ({
         width: '100%',
     },
     facetsContainer: {
-        maxHeight: 'calc(100vh - 210px)',
+        maxHeight: 'calc(100vh - 212px)',
         overflowY: 'auto',
         paddingTop: 8
     },

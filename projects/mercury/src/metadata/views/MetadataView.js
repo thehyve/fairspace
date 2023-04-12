@@ -129,14 +129,21 @@ export const MetadataView = (props: MetadataViewProperties) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterCandidates]);
 
-    const collectionsFacet = !locationContext && collections && {
-        name: 'location',
-        title: "Collection",
-        type: 'Term',
-        values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
-    };
+    const collectionsFacet = useMemo(
+        () => (
+            !locationContext && collections && {
+                name: 'location',
+                title: "Collection",
+                type: 'Term',
+                values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
+            }),
+        [locationContext, collections]
+    );
 
-    const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
+    const facetsEx = useMemo(
+        () => (collectionsFacet ? [...facets, collectionsFacet] : facets),
+        [collectionsFacet, facets]
+    );
 
     const getPathSegments = () => {
         const segments = ((locationContext && getPathFromIri(locationContext)) || '').split('/');
