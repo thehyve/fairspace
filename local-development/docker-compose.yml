@@ -41,7 +41,6 @@ services:
       - fairspace-keycloak-db-network
     volumes:
       - ./keycloak/setup-realm.sh:/opt/jboss/startup-scripts/setup-realm.sh
-      # - ./keycloak/realm-template.json:/tmp/realm-template.json
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
     restart: unless-stopped
     logging:
