@@ -2383,11 +2383,7 @@ At first run, you need to configure the service account in Keycloak.
 ** Click `Clients` in the left menu -> Select 'workspace-client'
 ** Choose tab `Service Account Roles`
 ** Click `Assign Role`
-** Filter by clients -> Select `realm-management  view-users` from the available roles, click `Asign role`.
-* Load initial users:
-** Still within the fairspace realm, click `Realm settings` in the left menu
-** In the top right corner, click `Action`, then click `Partial import`
-** Click `Browse` and select `local-development/keycloak/keycloak-add-user.json` -> Click `Upload`
+** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Asign role`.
 
 Now everything should be ready to start using Fairspace:
 
