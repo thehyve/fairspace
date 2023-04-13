@@ -21,7 +21,10 @@ You can also follow the instructions in the [section on Kubernetes and Helm](htt
 
 Please check the [deploy.sh](fairspace/deploy.sh) script.
 It assumes Helm 3 to be available in `~/bin/helm3/helm` and
-Keycloak to be running at http://keycloak.local.
+Keycloak to be running at http://keycloak.local. You can check if
+this is the case by typing `which helm` in your console. If the path to Helm 3
+is not `~/bin/helm3/helm`, please change the value of `helm_cmd` on line 4 in 
+local-development/fairspace/deploy.sh to the correct path.
 
 The ingress node will listen to http://fairspace.local, so make sure to
 - add `$(minikube ip) fairspace.local` to `/etc/hosts`:

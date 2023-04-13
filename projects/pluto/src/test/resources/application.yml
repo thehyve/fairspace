@@ -9,7 +9,7 @@ security:
     clientSecret: web_app
     scope: openid
     token-url: http://localhost:8531/certs
-    auth-url: http://localhost:8531/auth
+    auth-url: http://localhost:8531
     jwk-key-set-url: http://localhost:8531/certs
     logout-url: https://test.logout.url/%s
     redirect-after-logout-url: https://test.redirect.after.logout.url
