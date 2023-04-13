@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import useDeepCompareEffect from "use-deep-compare-effect";
 import Grid from "@mui/material/Grid";
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
@@ -25,7 +26,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     const minDate = getRangeLimit(minDateOption);
     const maxDate = getRangeLimit(maxDateOption, true);
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         if (activeFilterValues.length > 0) {
             setValue(activeFilterValues);
         } else {

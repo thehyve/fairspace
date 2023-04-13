@@ -1,7 +1,6 @@
 import React from 'react';
 import withStyles from '@mui/styles/withStyles';
 import {Button, Grid} from '@mui/material';
-import {alpha} from '@mui/material/styles';
 import {ofBooleanValueType, ofRangeValueType} from "./metadataViewUtils";
 import Facet from './MetadataViewFacetFactory';
 import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
@@ -20,29 +19,37 @@ type MetadataViewFacetsProperties = {
 
 const styles = theme => ({
     confirmFiltersButtonBlock: {
-        bottom: 0,
-        marginTop: 8,
-        marginLeft: 4,
-        width: 253
-    },
-    confirmFiltersButtonBlockActive: {
-        position: 'sticky',
-        backgroundColor: alpha(theme.palette.common.white, 0.8)
+        top: 0,
+        marginBottom: 10,
+        marginLeft: 0,
+        width: 265
     },
     confirmFiltersButton: {
-        width: '100%'
+        width: '100%',
+    },
+    facetsContainer: {
+        maxHeight: 'calc(100vh - 212px)',
+        overflowY: 'auto',
+        paddingTop: 8
+    },
+    facetGroup: {
+        marginBottom: 10,
+        marginLeft: 0
+    },
+    facetGroupHeader: {
+        textAlign: 'left',
+        marginBottom: 1,
+        marginTop: 0,
+        fontSize: 13,
+        color: theme.palette.primary.light,
+        textTransform: 'uppercase'
     },
     facet: {
         borderColor: theme.palette.primary.light,
-        borderWidth: 1.5,
-        borderRadius: 6
-    },
-    facetHeaders: {
-        textAlign: 'left',
-        marginTop: 6,
-        fontSize: 13,
-        color: theme.palette.primary.light,
-        marginLeft: 4
+        borderWidth: 1.8,
+        borderRadius: 6,
+        marginLeft: 8,
+        marginTop: 6
     }
 });
 
@@ -84,8 +91,8 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
     const renderFacets = (view: MetadataViewOptions) => {
         const viewFacets = facetsEx.filter(facet => (facet.name.toLowerCase().startsWith(view.name.toLowerCase())));
         return viewFacets.length > 0 && (
-            <Grid key={view.name} container item direction="column" justifyContent="flex-start" spacing={1}>
-                <div className={classes.facetHeaders} style={{textTransform: 'uppercase'}}>{view.title}</div>
+            <Grid key={view.name} className={classes.facetGroup} container item direction="column" justifyContent="flex-start">
+                <div className={classes.facetGroupHeader}>{view.title}</div>
                 {
                     viewFacets.map(facet => renderSingleFacet(facet, filters, filterCandidates, updateFilterCandidates, handleClearFilter))
                 }
@@ -104,8 +111,8 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
     const renderFacetConfirmButtons = () => (
         <Grid
             container
-            spacing={1}
-            className={`${classes.confirmFiltersButtonBlock} ${filterCandidates.length > 0 && classes.confirmFiltersButtonBlockActive}`}
+            spacing={0.5}
+            className={`${classes.confirmFiltersButtonBlock}`}
         >
             <Grid item xs={4}>
                 <Button
@@ -133,8 +140,10 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
 
     return (
         <Grid container item direction="column" justifyContent="flex-start" spacing={1}>
-            {views.map(view => renderFacets(view))}
             {renderFacetConfirmButtons()}
+            <Grid className={classes.facetsContainer}>
+                {views.map(view => renderFacets(view))}
+            </Grid>
         </Grid>
     );
 };
