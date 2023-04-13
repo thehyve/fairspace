@@ -75,7 +75,7 @@
     "express-session": "^1.17.1",
     "flow-bin": "^0.117.0",
     "history": "^5.0.0",
-    "keycloak-connect": "^10.0.1",
+    "keycloak-connect": "^21.0.1",
     "node-fetch": "^2.6.1",
     "nodemon": "^2.0.2",
     "wait-on": "^3.3.0"
