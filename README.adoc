@@ -284,7 +284,7 @@ def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
         'Content-type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json'
     }
-    response = requests.post(f'{keycloak_url}/auth/realms/{realm}/protocol/openid-connect/token',
+    response = requests.post(f'{keycloak_url}/realms/{realm}/protocol/openid-connect/token',
                              data=params,
                              headers=headers)
     if not response.ok:
@@ -313,7 +313,7 @@ fetch_access_token() {
     --data-urlencode "username=${KEYCLOAK_USERNAME}" \
     --data-urlencode "password=${KEYCLOAK_PASSWORD}" \
     -d 'grant_type=password' \
-    "${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
+    "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
 }
 ACCESS_TOKEN=$(fetch_access_token)
 ----
@@ -2383,11 +2383,7 @@ At first run, you need to configure the service account in Keycloak.
 ** Click `Clients` in the left menu -> Select 'workspace-client'
 ** Choose tab `Service Account Roles`
 ** Click `Assign Role`
-** Filter by clients -> Select `realm-management  view-users` from the available roles, click `Asign role`.
-* Load initial users:
-** Still within the fairspace realm, click `Realm settings` in the left menu
-** In the top right corner, click `Action`, then click `Partial import`
-** Click `Browse` and select `local-development/keycloak/keycloak-add-user.json` -> Click `Upload`
+** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Asign role`.
 
 Now everything should be ready to start using Fairspace:
 
@@ -2707,10 +2703,10 @@ jupyterhub:
       FairspaceOAuthenticator:
         client_id: fairspace-example-private
         client_secret: # Copy the client secret from Keycloak
-        authorize_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/auth
-        token_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/token
-        userdata_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/userinfo
-        logout_redirect_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
+        authorize_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/auth
+        token_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/token
+        userdata_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/userinfo
+        logout_redirect_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
     image:
       pullPolicy: Always
   singleuser:

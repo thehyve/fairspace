@@ -2,7 +2,7 @@ version: '3'
 
 services:
   fairspace-keycloak-postgres:
-    image: postgres:11-alpine
+    image: postgres:13-alpine
     container_name: fairspace-keycloak-database
     environment:
       POSTGRES_DB: keycloak
@@ -28,11 +28,12 @@ services:
       KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:?Please configure KEYCLOAK_HOSTNAME.}
       KEYCLOAK_ADMIN: keycloak
       KEYCLOAK_ADMIN_PASSWORD: keycloak
-      KC_STORAGE_AREA_CLIENT: ${WORKSPACE_CLIENT_ID:?Please configure WORKSPACE_CLIENT_ID}
       PROXY_ADDRESS_FORWARDING: 'true'
       WORKSPACE_URL: ${WORKSPACE_URL:?Please configure WORKSPACE_URL.}
       WORKSPACE_DEBUG_URL: ${WORKSPACE_DEBUG_URL:?Please configure WORKSPACE_DEBUG_URL.}
-      KC_HEALTH_ENABLED: true
+      WORKSPACE_CLIENT_ID: ${WORKSPACE_CLIENT_ID:?Please configure WORKSPACE_CLIENT_ID}
+      KC_HEALTH_ENABLED: 'true'
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:?Please configure KEYCLOAK_REALM}
     ports:
       - ${KEYCLOAK_PORT:-5100}:8080
     depends_on:
@@ -40,8 +41,7 @@ services:
     networks:
       - fairspace-keycloak-db-network
     volumes:
-      - ./keycloak/setup-realm.sh:/opt/jboss/startup-scripts/setup-realm.sh
-      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+      - ./keycloak/realm-template.json:/opt/keycloak/data/import/realm-template.json
     restart: unless-stopped
     logging:
       driver: ${DOCKER_LOGGING_DRIVER:-journald}
