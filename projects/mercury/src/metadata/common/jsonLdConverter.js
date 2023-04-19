@@ -7,13 +7,12 @@ import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../commo
 /**
  * Generates an entry to describe a single value for a property
  * @param entry
- * @param allMetadata
  * @returns {{id: *, label, value: *}}
  */
-const generateValueEntry = (entry, allMetadata) => ({
+const generateValueEntry = (entry) => ({
     id: entry['@id'],
     value: entry['@value'],
-    label: entry['@id'] && getLabel(allMetadata.find(element => element['@id'] === entry['@id']))
+    label: entry['@id'] && getLabel(entry)
 });
 
 /**
@@ -33,44 +32,62 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = [], voca
         return propertyShape && isRdfList(propertyShape);
     };
 
-    propertyShapes.forEach(shape => {
-        const path = getFirstPredicateId(shape, constants.SHACL_PATH);
-        if (path.startsWith('_')) {
-            const predicate = getFirstPredicateId(vocabulary.find(e => e['@id'] === path), constants.SHACL_INVERS_PATH);
-            valuesByPredicate[path] = allMetadata.filter(item => Object.prototype.hasOwnProperty.call(item, predicate)
-                && item[predicate].find(v => v['@id'] === iri) !== undefined)
-                .map(item => generateValueEntry(item, allMetadata));
+    const getValuesFirstPredicateId = (predicate) => {
+        const relevantItems = allMetadata.filter(item => Object.prototype.hasOwnProperty.call(item, predicate)
+            && item[predicate].find(v => v['@id'] === iri) !== undefined);
+
+        const newItems = [];
+        for (let i = 0; i < relevantItems.length; i++) {
+            const newItem = generateValueEntry(relevantItems[i], allMetadata);
+            newItems.push(newItem);
+        }
+
+        return newItems;
+    };
+
+    const processFirstPredicateId = (predicateUri: String) => {
+        const predicate = getFirstPredicateId(vocabulary.find(e => e['@id'] === predicateUri), constants.SHACL_INVERS_PATH);
+        valuesByPredicate[predicateUri] = getValuesFirstPredicateId(predicate);
+    };
+
+    const processValues = (predicateUri: String) => {
+        // Ensure that we have a list of values for the predicate
+        if (!Array.isArray(metadata[predicateUri])) {
+            return;
+        }
+
+        let values;
+
+        if (predicateUri === '@type') {
+            // Treat @type as special case, as it does not have the correct
+            // format (with @id or @value)
+            values = metadata[predicateUri].map(t => ({id: t}));
+        } else if (expectsRdfList(predicateUri)) {
+            // RDF lists in JSON LD are arrays in a container with key '@list'
+            // We want to use just the arrays. If there are multiple lists
+            // they are concatenated
+            // Please note that entries are not sorted as rdf:lists are meant to be ordered
+            values = flattenShallow(metadata[predicateUri].map(
+                entry => (entry['@list'] ? entry['@list'] : [entry])
+            )).map(entry => generateValueEntry(entry, allMetadata));
         } else {
-            const predicateUri = path;
+            // Convert json-ld values into our internal format and
+            // sort the values
+            values = metadata[predicateUri]
+                .map(entry => generateValueEntry(entry, allMetadata))
+                .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+        }
 
-            // Ensure that we have a list of values for the predicate
-            if (!Array.isArray(metadata[predicateUri])) {
-                return;
-            }
+        valuesByPredicate[predicateUri] = values;
+    };
 
-            let values;
+    propertyShapes.forEach(shape => {
+        const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
 
-            if (predicateUri === '@type') {
-                // Treat @type as special case, as it does not have the correct
-                // format (with @id or @value)
-                values = metadata[predicateUri].map(t => ({id: t}));
-            } else if (expectsRdfList(predicateUri)) {
-                // RDF lists in JSON LD are arrays in a container with key '@list'
-                // We want to use just the arrays. If there are multiple lists
-                // they are concatenated
-                // Please note that entries are not sorted as rdf:lists are meant to be ordered
-                values = flattenShallow(metadata[predicateUri].map(
-                    entry => (entry['@list'] ? entry['@list'] : [entry])
-                )).map(entry => generateValueEntry(entry, allMetadata));
-            } else {
-                // Convert json-ld values into our internal format and
-                // sort the values
-                values = metadata[predicateUri]
-                    .map(entry => generateValueEntry(entry, allMetadata))
-                    .sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
-            }
-
-            valuesByPredicate[predicateUri] = values;
+        if (predicateUri.startsWith('_')) {
+            processFirstPredicateId(predicateUri);
+        } else {
+            processValues(predicateUri);
         }
     });
 
