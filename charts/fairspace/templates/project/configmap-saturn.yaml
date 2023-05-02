@@ -23,6 +23,10 @@ data:
       clientId: {{ .Values.external.keycloak.clientId }}
       enableBasicAuth: {{ .Values.saturn.auth.enableBasicAuth }}
       superAdminUser: {{ .Values.external.keycloak.superAdminUser | default (printf "organisation-admin-%s" .Values.external.keycloak.realm ) }}
+{{ if .Values.saturn.auth.defaultUserRoles }}
+      defaultUserRoles:
+{{ toYaml .Values.saturn.auth.defaultUserRoles | indent 8 }}
+{{ end }}
     webDAV:
       blobStorePath: "/data/saturn/files/blobs"
     viewDatabase:
