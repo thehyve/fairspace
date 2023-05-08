@@ -1,7 +1,7 @@
 import * as constants from "../../constants";
 import {getFirstPredicateId} from "./jsonLdUtils";
 import {determineShapeForProperty, isRdfList} from "./vocabularyUtils";
-import {getLabel} from "./metadataUtils";
+import {getLabel, getLabelStrict} from "./metadataUtils";
 import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 /**
@@ -9,11 +9,24 @@ import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../commo
  * @param entry
  * @returns {{id: *, label, value: *}}
  */
-const generateValueEntry = (entry) => ({
-    id: entry['@id'],
-    value: entry['@value'],
-    label: entry['@id'] && getLabel(entry)
-});
+const generateValueEntry = (entry, allMetadata) => {
+    let label = "";
+
+    if (entry['@id']) {
+        label = getLabelStrict(entry);
+
+        if (label === "") {
+            const elementFromAll = allMetadata.find(element => element['@id'] === entry['@id']);
+            label = getLabel(elementFromAll);
+        }
+    }
+
+    return {
+        id: entry['@id'],
+        value: entry['@value'],
+        label
+    };
+};
 
 /**
  * Converts a JSON-LD structure into a list of values per predicate
