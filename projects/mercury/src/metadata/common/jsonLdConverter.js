@@ -16,7 +16,7 @@ const generateValueEntry = (entry, allMetadata) => {
         label = getLabelStrict(entry);
 
         if (label === "") {
-            const elementFromAll = allMetadata.find(element => element['@id'] === entry['@id']);
+            const elementFromAll = allMetadata[entry['@id']];
             label = getLabel(elementFromAll);
         }
     }
@@ -35,7 +35,7 @@ const generateValueEntry = (entry, allMetadata) => {
  * @param allMetadata All known metadata to be processed. Is used to retrieve labels for associated entities
  * @returns {Array}
  */
-export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = [], vocabulary) => {
+export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = {}, vocabulary) => {
     const iri = metadata['@id'];
     const valuesByPredicate = {};
 
@@ -46,7 +46,9 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = [], voca
     };
 
     const getValuesFirstPredicateId = (predicate) => {
-        const relevantItems = allMetadata.filter(item => Object.prototype.hasOwnProperty.call(item, predicate)
+        // const relevantItems = allMetadata[iri][predicate] ?? [];
+
+        const relevantItems = Object.values(allMetadata).filter(item => Object.prototype.hasOwnProperty.call(item, predicate)
             && item[predicate].find(v => v['@id'] === iri) !== undefined);
 
         const newItems = [];
@@ -163,6 +165,12 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
  * @returns {*|{}}
  */
 export const getJsonLdForSubject = (expandedMetadata, subject) => {
+    // when expandedMetadata is a dictionary
+    if (expandedMetadata.constructor === Object) {
+        return expandedMetadata[subject];
+    }
+
+    // when expandedMetadata is a list
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
         console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
         return {};
@@ -171,18 +179,36 @@ export const getJsonLdForSubject = (expandedMetadata, subject) => {
     return expandedMetadata.find(item => item['@id'] === subject) || {};
 };
 
-/**
- * Replaces all occurrences of rdf:type with @type
- * @param expandedMetadata
- * @returns {*}
- */
-export const normalizeTypes = (expandedMetadata) => expandedMetadata.map(e => {
-    if (!e['@type'] && e[constants.RDF_TYPE]) {
-        const {[constants.RDF_TYPE]: types, ...rest} = e;
+const normalizeType = (entry) => {
+    if (!entry['@type'] && entry[constants.RDF_TYPE]) {
+        const {[constants.RDF_TYPE]: types, ...rest} = entry;
         return {
             '@type': types.map(t => t['@id']),
             ...rest
         };
     }
-    return e;
-});
+    return entry;
+};
+
+/**
+ * Returns metadata in a dictionary. For the right metadata panel a lot of data is
+ * retrieved by subject id. Loading a study with over 10.000 samples took a few seconds,
+ * with the dictionary implementation normalizing metadata is reduced to 10s of milliseconds.
+ * @returns
+ */
+export const normalizeTypesBySubjectId = (expandedMetadata) => {
+    const normalizedTypes = {};
+
+    expandedMetadata.forEach(e => {
+        normalizedTypes[e['@id']] = normalizeType(e);
+    });
+
+    return normalizedTypes;
+};
+
+/**
+ * Replaces all occurrences of rdf:type with @type
+ * @param expandedMetadata
+ * @returns {*}
+ */
+export const normalizeTypes = (expandedMetadata) => expandedMetadata.map(e => normalizeType(e));
