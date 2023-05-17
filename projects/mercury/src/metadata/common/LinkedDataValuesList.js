@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Divider, Grid, IconButton, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Add, Clear} from '@mui/icons-material';
+import {FixedSizeList as List} from 'react-window';
 
 import {LABEL_URI, STRING_URI} from '../../constants';
 import styles from './LinkedDataValuesTable.styles';
@@ -113,6 +114,69 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
     const isDeleteButtonEnabled = () => property.isEditable && canEdit;
     const isAddButtonEnabled = canEdit && !maxValuesReached && AddComponent;
 
+    const renderValue = (entry, index) => rowDecorator(entry, (
+        <Grid
+            container
+            spacing={1}
+            alignItems="center"
+            onMouseEnter={() => setHoveredIndex(index)}
+            onFocus={() => setHoveredIndex(index)}
+            onBlur={() => setHoveredIndex(null)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            onDoubleClick={() => onOpen(entry)}
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+        >
+            <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
+                <div style={{overflow: "hidden", textOverflow: "ellipsis", width: "20rem"}}>
+                    {
+                        columnDefinition.id === LABEL_URI
+                            ? <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>
+                            : <Typography noWrap>{columnDefinition.getValue(entry, index)}</Typography>
+                    }
+                </div>
+                {showRowDividers && <Divider />}
+            </Grid>
+            {
+                property.isEditable && isDeleteButtonEnabled(entry) && (
+                    <Grid item xs={2}>
+                        <IconButton
+                            data-testid="delete-btn"
+                            title="Delete"
+                            onClick={() => {
+                                onDelete(index);
+                                incrementSerialNumber();
+                            }}
+                            style={{opacity: hoveredIndex === index ? 1 : 0}}
+                            aria-label="Delete"
+                            size="medium"
+                        >
+                            <Clear />
+                        </IconButton>
+                    </Grid>
+                )
+            }
+        </Grid>
+    ));
+
+    const renderValueWindowed = ({index, style}) => (<div style={style}>{renderValue(values[index], index)}</div>);
+
+    const renderValues = () => {
+        if (values.length > 20) {
+            return (
+                <List
+                    height={300}
+                    itemCount={values.length}
+                    itemSize={30}
+                >
+                    {renderValueWindowed}
+                </List>
+            );
+        }
+
+        return values.map((entry, idx) => renderValue(entry, idx));
+    };
+
     return (
         <>
             {showHeader ? (
@@ -122,49 +186,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                     </Grid>
                 </Grid>
             ) : undefined}
-            {values.map((entry, idx) => rowDecorator(entry, (
-                <Grid
-                    container
-                    spacing={1}
-                    alignItems="center"
-                    onMouseEnter={() => setHoveredIndex(idx)}
-                    onFocus={() => setHoveredIndex(idx)}
-                    onBlur={() => setHoveredIndex(null)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                    onDoubleClick={() => onOpen(entry)}
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={idx}
-                >
-                    <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
-                        {
-                            columnDefinition.id === LABEL_URI
-                                ? <Typography variant="h6">{columnDefinition.getValue(entry, idx)}</Typography>
-                                : columnDefinition.getValue(entry, idx)
-                        }
-                        {showRowDividers && <Divider />}
-                    </Grid>
-                    {
-                        property.isEditable && isDeleteButtonEnabled(entry) && (
-                            <Grid item xs={2}>
-                                <IconButton
-                                    data-testid="delete-btn"
-                                    title="Delete"
-                                    onClick={() => {
-                                        onDelete(idx);
-                                        incrementSerialNumber();
-                                    }}
-                                    style={{opacity: hoveredIndex === idx ? 1 : 0}}
-                                    aria-label="Delete"
-                                    size="medium"
-                                >
-                                    <Clear />
-                                </IconButton>
-                            </Grid>
-                        )
-                    }
-                </Grid>
-            )))}
-
+            {renderValues()}
             {isAddButtonEnabled && (
                 (property.maxValuesCount === 1)
                     ? (

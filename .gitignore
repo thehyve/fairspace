@@ -336,3 +336,7 @@ gradle-app.setting
 **/build/
 
 # End of https://www.gitignore.io/api/osx,vim,java,cmake,emacs,gradle,kotlin,eclipse,netbeans,intellij,visualstudiocode
+
+# config files, at this moment only needed for VSCode jest plugin
+projects/mercury/jest.json
+projects/mercury/jsconfig.json
