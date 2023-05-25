@@ -2,7 +2,7 @@ import {expand} from 'jsonld';
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../../common/utils/httpUtils';
 
-import {normalizeTypes} from "./jsonLdConverter";
+import {normalizeTypes, normalizeTypesBySubjectId} from "./jsonLdConverter";
 import {flattenShallow} from "../../common/utils/genericUtils";
 
 const requestOptions = {
@@ -37,6 +37,24 @@ class LinkedDataAPI {
             .then(extractJsonData)
             .then(expand)
             .then(normalizeTypes)
+            .catch(handleHttpError("Failure when retrieving metadata"));
+    }
+
+    /**
+     * Retrieves the same data as 'get', not returned as list but as dictionary, with
+     * subject id as key. For certain scenarios this increases performance with a factor ~100
+     */
+    getDict(params = {}) {
+        if (Object.prototype.hasOwnProperty.call(params, 'subject') && !params.subject) {
+            return Promise.reject(new Error('Please provide a valid subject.'));
+        }
+
+        const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
+
+        return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
+            .then(extractJsonData)
+            .then(expand)
+            .then(normalizeTypesBySubjectId)
             .catch(handleHttpError("Failure when retrieving metadata"));
     }
 

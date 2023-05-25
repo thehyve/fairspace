@@ -2,25 +2,22 @@ const CENTRAL_PANEL_WIDTH = '70%';
 const RIGHT_PANEL_WIDTH = '30%';
 
 const styles = theme => ({
-    facets: {
-        marginTop: 10,
+    leftPanel: {
+        marginTop: 8,
         paddingBottom: 10,
-        minWidth: 280,
-        maxHeight: 'calc(100vh - 210px)',
-        overflowY: 'auto'
+        minWidth: 282
     },
-    centralPanel: {
+    overallPanel: {
         width: CENTRAL_PANEL_WIDTH,
         overflowX: 'auto'
     },
-    centralPanelFullWidth: {
+    overallPanelFullWidth: {
         width: '100%'
     },
-    sidePanel: {
+    rightPanel: {
         width: RIGHT_PANEL_WIDTH
     },
-    metadataViewTabs: {
-        marginTop: 10,
+    centralPanel: {
         overflowX: 'auto',
         width: '100%',
         overflowY: 'hidden',
@@ -31,6 +28,9 @@ const styles = theme => ({
     },
     clearAllButton: {
         color: theme.palette.error.main
+    },
+    activeFilters: {
+        marginBottom: 10
     }
 });
 

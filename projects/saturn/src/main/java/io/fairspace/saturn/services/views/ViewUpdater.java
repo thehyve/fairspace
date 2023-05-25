@@ -76,8 +76,7 @@ public class ViewUpdater implements AutoCloseable {
 
     public Object getValue(ViewsConfig.View.Column column, Node node) throws SQLException {
         return switch (column.type) {
-            case Boolean -> node.getLiteralValue();
-            case Number -> node.getLiteralValue();
+            case Boolean, Number -> node.getLiteralValue();
             case Date -> {
                 try {
                     if (node.getLiteralDatatypeURI().equals(XSD.dateTime.getURI())) {
@@ -114,14 +113,11 @@ public class ViewUpdater implements AutoCloseable {
         if (protectedResources.contains(type)) {
             // set collection name
             var rootLocation = CONFIG.publicUrl + "/api/webdav" + "/";
-            if (!subject.getURI().startsWith(rootLocation)) {
-                log.error("Unexpected protected resource identifier: {}", subject.getURI());
-                log.error("Protected resource identifier should start with {}", rootLocation);
-                throw new IllegalStateException("Unexpected resource identifier: " + subject.getURI());
+            if (subject.getURI().startsWith(rootLocation)) {
+                var location = subject.getURI().substring(rootLocation.length());
+                var collection = URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
+                row.put("collection", collection);
             }
-            var location = subject.getURI().substring(rootLocation.length());
-            var collection = URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
-            row.put("collection", collection);
         }
     }
 

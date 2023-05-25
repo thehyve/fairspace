@@ -61,6 +61,17 @@ export function getLabel(entity, shortenExternalUris = false) {
 }
 
 /**
+ * Returns the entity label, returns empty string if no label is present.
+ *
+ * This is different than 'getLabel' which will return the entity iri if no label is found.
+ * @returns string
+ */
+export function getLabelStrict(entity) {
+    return getFirstPredicateValue(entity, consts.LABEL_URI)
+        || "";
+}
+
+/**
  * Looks up a label for the given entity in the provided metadata
  * @param id
  * @param allMetadata

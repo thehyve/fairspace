@@ -9,7 +9,7 @@ import {
 
 // react-window https://react-window.vercel.app/#/examples/
 import {FixedSizeList as List} from 'react-window';
-
+import useDeepCompareEffect from "use-deep-compare-effect";
 import {Clear, Search} from "@mui/icons-material";
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -44,7 +44,7 @@ const SelectMultiple = (props: SelectProperties) => {
     const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
     const filteredOptions = options.filter(readAccessFilter).filter(textFilter);
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         setState(defaultOptions);
     }, [activeFilterValues]);
 
@@ -107,7 +107,7 @@ const SelectMultiple = (props: SelectProperties) => {
             ));
         }
 
-        if (filteredOptions.leng > 20) {
+        if (filteredOptions.length > 20) {
             // Large lists dramatically decrease browser performance, MUI generates many thousands of dom nodes
             // Solution is windowed rendering. For really small lists the fixed height of 150 is not suitable,
             // therefor only windowed rendering large lists

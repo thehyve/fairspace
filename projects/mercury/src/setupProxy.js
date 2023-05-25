@@ -21,7 +21,7 @@ module.exports = (app) => {
             store
         },
         {
-            authServerUrl: 'http://localhost:5100/auth',
+            authServerUrl: 'http://localhost:5100/',
             realm: 'fairspace',
             clientId: 'workspace-client',
             secret: '**********'

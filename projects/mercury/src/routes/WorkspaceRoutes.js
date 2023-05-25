@@ -21,6 +21,9 @@ const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
 );
 
+// wrapping MetadataView in memo to prevent it from re-rendering
+const MetadataViewMemo = React.memo(MetadataView);
+
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
 
@@ -72,7 +75,7 @@ const WorkspaceRoutes = () => {
                 render={() => (
                     <BreadcrumbsContext.Provider value={{segments: []}}>
                         <LinkedDataMetadataProvider>
-                            <MetadataView />
+                            <MetadataViewMemo />
                         </LinkedDataMetadataProvider>
                     </BreadcrumbsContext.Provider>
                 )}

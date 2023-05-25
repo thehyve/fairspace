@@ -1,4 +1,4 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import _ from 'lodash';
 import {useHistory} from "react-router-dom";
 import {Button, Grid, Typography} from '@mui/material';
@@ -129,14 +129,21 @@ export const MetadataView = (props: MetadataViewProperties) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterCandidates]);
 
-    const collectionsFacet = !locationContext && collections && {
-        name: 'location',
-        title: "Collection",
-        type: 'Term',
-        values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
-    };
+    const collectionsFacet = useMemo(
+        () => (
+            !locationContext && collections && {
+                name: 'location',
+                title: "Collection",
+                type: 'Term',
+                values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
+            }),
+        [locationContext, collections]
+    );
 
-    const facetsEx = collectionsFacet ? [...facets, collectionsFacet] : facets;
+    const facetsEx = useMemo(
+        () => (collectionsFacet ? [...facets, collectionsFacet] : facets),
+        [collectionsFacet, facets]
+    );
 
     const getPathSegments = () => {
         const segments = ((locationContext && getPathFromIri(locationContext)) || '').split('/');
@@ -154,8 +161,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
         return result.reverse();
     };
 
-    const areFacetFiltersNonEmpty = () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field));
-    const areTextFiltersNonEmpty = () => textFiltersObject && Object.keys(textFiltersObject).length > 0;
+    const areFacetFiltersNonEmpty = useMemo(
+        () => (filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field))),
+        [filters, facetsEx]
+    );
+    const areTextFiltersNonEmpty = useMemo(
+        () => (textFiltersObject && Object.keys(textFiltersObject).length > 0),
+        [textFiltersObject]
+    );
 
     const getPrefilteringRedirectionLink = () => {
         if (!selected) {
@@ -175,15 +188,15 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {(areFacetFiltersNonEmpty() || areTextFiltersNonEmpty()) && (
+            {(areFacetFiltersNonEmpty || areTextFiltersNonEmpty) && (
                 <Grid container justifyContent="space-between" direction="row-reverse">
                     <Grid item xs={2} className={classes.clearAllButtonContainer}>
                         <Button className={classes.clearAllButton} startIcon={<Close />} onClick={handleClearAllFilters}>
                             Clear all filters
                         </Button>
                     </Grid>
-                    {areFacetFiltersNonEmpty() && (
-                        <Grid item container xs alignItems="center" spacing={1}>
+                    {areFacetFiltersNonEmpty && (
+                        <Grid item container xs alignItems="center" spacing={1} className={classes.activeFilters}>
                             <Grid item>
                                 <Typography variant="overline" component="span" color="textSecondary">Active filters:</Typography>
                             </Grid>
@@ -195,9 +208,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
-                <Grid item className={`${classes.centralPanel} ${isClosedPanel && classes.centralPanelFullWidth}`}>
+                <Grid item className={`${classes.overallPanel} ${isClosedPanel && classes.overallPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
-                        <Grid item className={classes.facets}>
+                        <Grid item className={classes.leftPanel}>
                             <MetadataViewFacets
                                 views={views}
                                 filters={filters}
@@ -209,7 +222,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 applyFilters={applyFilters}
                             />
                         </Grid>
-                        <Grid item className={classes.metadataViewTabs}>
+                        <Grid item className={classes.centralPanel}>
                             <MetadataViewTabs
                                 currentViewIndex={currentViewIndex}
                                 idColumn={currentViewIdColumn}
@@ -227,7 +240,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid item className={classes.sidePanel} hidden={isClosedPanel}>
+                <Grid item className={classes.rightPanel} hidden={isClosedPanel}>
                     <MetadataViewInformationDrawer
                         handleCloseCard={() => setIsClosedPanel(true)}
                         entity={selected}

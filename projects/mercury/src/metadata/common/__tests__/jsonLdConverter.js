@@ -54,16 +54,16 @@ describe('jsonLdConverter', () => {
                     ]
                 };
 
-                const allMetadata = [
-                    {
+                const allMetadata = {
+                    'http://a': {
                         '@id': 'http://a',
                         [constants.LABEL_URI]: [{'@value': 'ZZZ'}]
                     },
-                    {
+                    'http://b': {
                         '@id': 'http://b',
                         [constants.LABEL_URI]: [{'@value': 'AAA'}]
                     }
-                ];
+                };
 
                 const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
@@ -155,16 +155,16 @@ describe('jsonLdConverter', () => {
                 ]
             };
 
-            const allMetadata = [
-                {
+            const allMetadata = {
+                'http://a': {
                     '@id': 'http://a',
                     [constants.LABEL_URI]: [{'@value': 'AAA'}]
                 },
-                {
+                'http://b': {
                     '@id': 'http://b',
                     [constants.LABEL_URI]: [{'@value': 'BBB'}]
                 }
-            ];
+            };
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 

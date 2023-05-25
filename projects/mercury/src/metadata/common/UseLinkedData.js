@@ -28,7 +28,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
 
             return fetchLinkedDataForSubject(subject)
                 .then(ld => {
-                    if (ld && ld.length > 0) {
+                    if (ld && Object.keys(ld).length > 0) {
                         const linkedDataItem = getJsonLdForSubject(ld, subject);
                         setTypeInfo(getTypeInfo(linkedDataItem, shapes));
 

@@ -32,6 +32,50 @@
   "quickLoginCheckMilliSeconds": 1000,
   "maxDeltaTimeSeconds": 43200,
   "failureFactor": 30,
+  "users": [
+    {
+      "username": "organisation-admin",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "hashedSaltedValue": "t8bblTme2yyu5bFA5Qqp88+7usvDYrPDh0tEsnZCz91KKvGDJEIJncKMOgX/Mivfbh58+8S1z7ElpeEc7HMacQ==",
+          "salt": "KU8BscCubkHEYPOn22JmKA==",
+          "hashIterations": 100000,
+          "algorithm": "pbkdf2-sha256"
+        }
+      ],
+      "realmRoles": []
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "hashedSaltedValue": "SEsidzlXSJ2kNzyfePmOBikIWp8l+isHgkPpQi0V/50DxaffSZw/MoVXBUoLH+Cl2wypdTMbzmSv1pHp42Kuig==",
+          "salt": "62iHKU0CRl5iD1xv5xzPJw==",
+          "hashIterations": 100000,
+          "algorithm": "pbkdf2-sha256"
+        }
+      ],
+      "realmRoles": []
+    },
+    {
+      "username": "user2",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "hashedSaltedValue": "77ZMmTVT5GnxDuanovvqCHfiGSu+wfjZRz6J19oSHSWWD3G7l0BKUKHyUn1tlVSGdqNNq/euqpzsqpcDOyRoZQ==",
+          "salt": "idhZxv/6LbvEaGoHxmrbPQ==",
+          "hashIterations": 100000,
+          "algorithm": "pbkdf2-sha256"
+        }
+      ],
+      "realmRoles": []
+    }
+  ],
   "roles": {
     "realm": [
       {
@@ -993,13 +1037,13 @@
       "id": "62255d6f-5519-4765-8e13-37c6bb8ac30b",
       "clientId": "security-admin-console",
       "name": "${client_security-admin-console}",
-      "baseUrl": "/auth/admin/ci/console/index.html",
+      "baseUrl": "/admin/ci/console/index.html",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "/auth/admin/ci/console/*"
+        "/admin/ci/console/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -1129,7 +1173,7 @@
       "id": "24e598a2-6bf6-4986-a7a2-dc158a3cb110",
       "clientId": "account",
       "name": "${client_account}",
-      "baseUrl": "/auth/realms/ci/account",
+      "baseUrl": "/realms/ci/account",
       "surrogateAuthRequired": false,
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
@@ -1139,7 +1183,7 @@
         "manage-account"
       ],
       "redirectUris": [
-        "/auth/realms/ci/account/*"
+        "/realms/ci/account/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -1964,5 +2008,5 @@
     "_browser_header.contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
     "waitIncrementSeconds": "60"
   },
-  "keycloakVersion": "3.4.3.Final"
+  "keycloakVersion": "20.0.3"
 }

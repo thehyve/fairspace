@@ -284,7 +284,7 @@ def fetch_access_token(keycloak_url: str = os.environ.get('KEYCLOAK_URL'),
         'Content-type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json'
     }
-    response = requests.post(f'{keycloak_url}/auth/realms/{realm}/protocol/openid-connect/token',
+    response = requests.post(f'{keycloak_url}/realms/{realm}/protocol/openid-connect/token',
                              data=params,
                              headers=headers)
     if not response.ok:
@@ -313,7 +313,7 @@ fetch_access_token() {
     --data-urlencode "username=${KEYCLOAK_USERNAME}" \
     --data-urlencode "password=${KEYCLOAK_PASSWORD}" \
     -d 'grant_type=password' \
-    "${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
+    "${KEYCLOAK_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/token" | jq -r '.access_token'
 }
 ACCESS_TOKEN=$(fetch_access_token)
 ----
@@ -2355,19 +2355,19 @@ Requires:
 * docker
 * Java 17
 
+On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
+Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
+[source, shell]
+----
+DOCKER_LOGGING_DRIVER=json-file
+----
+
 To run the development version, checkout this repository,
 navigate to ``projects/mercury`` and run
 
 [source, shell]
 ----
 yarn dev
-----
-
-On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
-Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
-[source, shell]
-----
-DOCKER_LOGGING_DRIVER=json-file
 ----
 
 This will start a Keycloak instance for authentication at port ``5100``,
@@ -2378,17 +2378,16 @@ At first run, you need to configure the service account in Keycloak.
 
 * Navigate to link:http://localhost:5100[http://localhost:5100]
 * Login with credentials ``keycloak``, ``keycloak``
+* In the top-left drop down menu, select the fairspace realm
 * Grant the ``view-users`` role to the client service account:
-** In the realm, select `Clients` -> Select client
+** Click `Clients` in the left menu -> Select 'workspace-client'
 ** Choose tab `Service Account Roles`
-** Select `realm-management` from the `Client Roles` dropdown
-** Select `view-users` from the available roles, click `Add selected`.
-+
-image:docs/images/screenshots/Keycloak service account roles.png[Keycloak service account roles, role="th", align="center"]
+** Click `Assign Role`
+** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Asign role`.
 
 Now everything should be ready to start using Fairspace:
 
-* Navigate to link:http://localhost:3000[http://localhost:3000] to open the application.
+* Navigate to link:http://localhost:3000/dev[http://localhost:3000/dev] to open the application.
 * Login with one of the following credentials:
 +
 [cols="1, 1"]
@@ -2501,7 +2500,7 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.26
+~/bin/helm/helm pull fairspace/fairspace --version 0.7.27
 ----
 
 ===== Deploy Keycloak
@@ -2587,7 +2586,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.26 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.27 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2704,10 +2703,10 @@ jupyterhub:
       FairspaceOAuthenticator:
         client_id: fairspace-example-private
         client_secret: # Copy the client secret from Keycloak
-        authorize_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/auth
-        token_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/token
-        userdata_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/userinfo
-        logout_redirect_url: https://keycloak.example.com/auth/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
+        authorize_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/auth
+        token_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/token
+        userdata_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/userinfo
+        logout_redirect_url: https://keycloak.example.com/realms/fairspace/protocol/openid-connect/logout?redirect_uri=https://jupyterhub.example.com
     image:
       pullPolicy: Always
   singleuser:
@@ -2724,7 +2723,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.26.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-0.7.27.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.

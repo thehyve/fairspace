@@ -56,7 +56,7 @@ const LinkedDataProperty = (
                     ? (
                         <GenericTooltip interactive leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
                             <FormLabel component="legend">
-                                {label}
+                                {label} {values.length > 1 && "(" + values.length + ")"}
                             </FormLabel>
                         </GenericTooltip>
                     ) : null
