@@ -2,7 +2,7 @@ version: '3'
 
 services:
   fairspace-keycloak-postgres:
-    image: postgres:13-alpine
+    image: postgres:15-alpine
     container_name: fairspace-keycloak-database
     environment:
       POSTGRES_DB: keycloak
@@ -48,12 +48,12 @@ services:
       options:
         labels: application
         tag: fairspace-keycloak
-    command: 
-      - start-dev 
-      - --import-realm 
+    command:
+      - start-dev
+      - --import-realm
 
   fairspace-postgres:
-    image: postgres:13-alpine
+    image: postgres:15-alpine
     container_name: fairspace-postgresql
     environment:
       POSTGRES_DB: fairspace
