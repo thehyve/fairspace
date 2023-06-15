@@ -1,0 +1,5 @@
+// @ts-nocheck
+const mockClipboard = {
+  writeText: jest.fn()
+};
+global.navigator.clipboard = mockClipboard;
