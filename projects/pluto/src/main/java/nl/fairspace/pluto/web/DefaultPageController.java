@@ -1,12 +1,12 @@
 package nl.fairspace.pluto.web;
 
-import org.springframework.boot.web.servlet.error.*;
-import org.springframework.http.*;
-import org.springframework.stereotype.*;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * Serves index page instead of error page when a static resource is not found.

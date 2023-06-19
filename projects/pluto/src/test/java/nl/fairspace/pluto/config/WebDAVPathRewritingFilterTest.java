@@ -1,19 +1,19 @@
 package nl.fairspace.pluto.config;
 
-import nl.fairspace.pluto.config.dto.*;
-import org.junit.*;
-import org.mockito.*;
-import org.springframework.cloud.netflix.zuul.filters.*;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.cloud.gateway.config.GatewayProperties;
 
-import java.io.*;
+import java.io.StringWriter;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 
 public class WebDAVPathRewritingFilterTest {
     @Mock
-    ZuulProperties zuulProperties;
+    GatewayProperties gatewayProperties;
 
-    private final WebDAVPathRewritingFilter filter = new WebDAVPathRewritingFilter(null, zuulProperties);
+    private final WebDAVPathRewritingFilter filter = new WebDAVPathRewritingFilter(null, gatewayProperties);
 
     @Test
     public void transformWebdavResponse() throws Exception {

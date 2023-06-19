@@ -5,9 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import java.util.Set;
-
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor

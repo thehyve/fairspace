@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -91,7 +91,7 @@ public class CorsIntegrationTests {
 		headers.set("access-control-request-method", "PROPFIND");
 
 		HttpEntity<Object> request = new HttpEntity<>(headers);
-		ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + "/zuul/thehyve", HttpMethod.OPTIONS, request, String.class);
+		ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + "/thehyve", HttpMethod.OPTIONS, request, String.class);
 
 		// Expect no restrictions on origin, headers and methods and that credentials are allowed
 		assertEquals(200, response.getStatusCodeValue());

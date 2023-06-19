@@ -1,58 +1,58 @@
 package nl.fairspace.pluto.config;
 
-import com.netflix.zuul.*;
-import com.netflix.zuul.context.*;
-import com.netflix.zuul.exception.*;
-import lombok.extern.slf4j.*;
-import nl.fairspace.pluto.config.dto.*;
-import org.springframework.cloud.netflix.zuul.filters.*;
-import org.springframework.http.*;
-import org.w3c.dom.*;
-import org.xml.sax.*;
+import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
+import org.reactivestreams.Publisher;
+import org.springframework.cloud.gateway.config.GatewayProperties;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.PooledDataBuffer;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebExchange;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import javax.xml.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import javax.xml.xpath.*;
-
-import java.io.*;
-import java.net.*;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.*;
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static nl.fairspace.pluto.config.ExtendedHttpMethod.PROPFIND;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
-import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
-public class WebDAVPathRewritingFilter extends ZuulFilter {
+public class WebDAVPathRewritingFilter implements GlobalFilter, Ordered {
     private final PlutoConfig plutoConfig;
-    private final ZuulProperties zuulProperties;
+    private final GatewayProperties gatewayProperties;
 
-    public WebDAVPathRewritingFilter(PlutoConfig plutoConfig, ZuulProperties zuulProperties) {
+    public WebDAVPathRewritingFilter(PlutoConfig plutoConfig, GatewayProperties gatewayProperties) {
         this.plutoConfig = plutoConfig;
-        this.zuulProperties = zuulProperties;
+        this.gatewayProperties = gatewayProperties;
     }
 
-    @Override
-    public String filterType() {
-        return POST_TYPE;
-    }
-
-    @Override
-    public int filterOrder() {
-        return SEND_RESPONSE_FILTER_ORDER - 10;
-    }
-
-    @Override
-    public boolean shouldFilter() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        return ctx.getRequest().getMethod().equalsIgnoreCase(PROPFIND.name()) &&
-                ctx.getRequest().getRequestURI().startsWith("/api/storages/") &&
-                valueOf(ctx.getResponseStatusCode()).is2xxSuccessful();
+    private boolean shouldFilter(ServerWebExchange exchange) {
+        return exchange.getRequest().getMethod() != null && exchange.getRequest().getMethod().matches(PROPFIND.name()) &&
+                exchange.getRequest().getURI().getPath().matches("^/api/storages/.*/webdav.*") &&
+                exchange.getResponse().getStatusCode() != null && exchange.getResponse().getStatusCode().is2xxSuccessful();
     }
 
     /**
@@ -93,47 +93,61 @@ public class WebDAVPathRewritingFilter extends ZuulFilter {
     }
 
     @Override
-    public Object run() throws ZuulException {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        // /api/storages/$storage/webdav/
-        var parts = ctx.getRequest().getRequestURI().split("/");
-        if (parts.length < 5 || ! "webdav".equals(parts[4])) {
-            throw new ZuulException("Not a Webdav endpoint", HttpStatus.METHOD_NOT_ALLOWED.value(), "Method not allowed.");
-        }
-        var storageName = parts[3];
-        var storage = plutoConfig.getStorages().get(storageName);
-        if (storage == null) {
-            throw new ZuulException("Missing storage configuration", HttpStatus.BAD_GATEWAY.value(), "Missing storage configuration");
-        }
-        String routePrefix = "/api/storages/%s/webdav".formatted(storageName);
-        var storageRoot = "%s://%s:%s%s".formatted(
-                ctx.getRequest().getScheme(),
-                ctx.getRequest().getServerName(),
-                ctx.getRequest().getServerPort(),
-                routePrefix
-        );
-        var route = zuulProperties.getRoutes().values().stream()
-                .filter(r -> r.getPath().startsWith(routePrefix))
-                .findFirst().orElseThrow(() -> new ZuulException("Invalid Webdav route", HttpStatus.NOT_FOUND.value(), "No such route configured"));
-        ctx.setDebugRouting(true);
-        String remotePrefix;
-        try {
-            remotePrefix = new URL(route.getUrl()).getPath();
-        } catch (MalformedURLException e) {
-            log.error("Invalid route url: {}", route.getUrl(), e);
-            throw new ZuulException(e, HttpStatus.BAD_GATEWAY.value(), "Invalid route url");
-        }
-        var writer = new StringWriter();
-        try {
-            transform(ctx.getResponseDataStream(), remotePrefix, routePrefix, storage.getRootDirectoryIri(), storageRoot, writer);
-        } catch (Exception e) {
-            log.error("Error translating webdav response", e);
-            throw new ZuulException(e, HttpStatus.BAD_GATEWAY.value(), "Error translating webdav response");
-        }
-        var content = writer.toString();
-        ctx.setResponseBody(content);
-        ctx.setOriginContentLength(Long.valueOf(content.getBytes(StandardCharsets.UTF_8).length));
-        ctx.setResponseDataStream(null);
-        return null;
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        var responseMutated = new ServerHttpResponseDecorator(exchange.getResponse()) {
+            @Override
+            public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
+                if (shouldFilter(exchange)) {
+                    return join(body).flatMap(db -> {
+                        var uri = exchange.getRequest().getURI();
+                        // /api/storages/$storage/webdav/
+                        var parts = uri.getPath().split("/");
+                        if (parts.length < 5 || !"webdav".equals(parts[4])) {
+                            return Mono.error(new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED, "Not a Webdav endpoint."));
+                        }
+                        var storageName = parts[3];
+                        var storage = plutoConfig.getStorages().get(storageName);
+                        if (storage == null) {
+                            return Mono.error(new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Missing storage configuration"));
+                        }
+
+                        String routePrefix = "/api/storages/%s/webdav".formatted(storageName);
+                        var storageRoot = "%s://%s:%s%s".formatted(uri.getScheme(), uri.getHost(), uri.getPort(), routePrefix);
+                        var route = gatewayProperties.getRoutes().stream()
+                                .filter(r -> r.getPredicates().stream().anyMatch(
+                                        predicateDefinition -> Objects.equals(predicateDefinition.getName(), "Path")
+                                                && predicateDefinition.getArgs().values().stream().anyMatch(v -> v.startsWith(routePrefix))))
+                                .findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No such webdav route configured"));
+                        String remotePrefix = route.getUri().getPath();
+                        var writer = new StringWriter();
+                        try {
+                            transform(db.asInputStream(), remotePrefix, routePrefix, storage.getRootDirectoryIri(), storageRoot, writer);
+                        } catch (Exception e) {
+                            log.error("Error translating webdav response", e);
+                            return Mono.error(new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Error translating webdav response"));
+                        }
+                        var newContent = writer.toString();
+                        exchange.getResponse().getHeaders().setContentLength(newContent.length());
+                        return getDelegate().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(newContent.getBytes(StandardCharsets.UTF_8))));
+                    });
+                } else {
+                    return getDelegate().writeWith(body);
+                }
+            }
+        };
+        return chain.filter(exchange.mutate().response(responseMutated).build());
+    }
+
+    private Mono<? extends DataBuffer> join(Publisher<? extends DataBuffer> dataBuffers) {
+        return Flux.from(dataBuffers)
+                .collectList()
+                .filter((list) -> !list.isEmpty())
+                .map((list) -> list.get(0).factory().join(list))
+                .doOnDiscard(PooledDataBuffer.class, DataBufferUtils::release);
+    }
+
+    @Override
+    public int getOrder() {
+        return -2;
     }
 }

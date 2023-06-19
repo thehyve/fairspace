@@ -14,15 +14,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.contract.wiremock.WireMockConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -32,20 +28,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -166,14 +152,14 @@ public class OAuth2ValidationTests {
 
 	@Test
 	public void accessAnonymousEndpoints() {
-		for(String path: Arrays.asList("/login", "/actuator/health")) {
+		for(String path: Arrays.asList("/actuator/health", "/login", "/logout")) {
 			HttpEntity<Object> request = new HttpEntity<>(null);
 			ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + path, HttpMethod.GET, request, String.class);
 			assertTrue("Anonymous call to " + path + " does not result in success status", response.getStatusCodeValue() < 400);
 		}
 	}
 
-    private ResponseEntity<String> getWithKey(JWT jwt) {
+	private ResponseEntity<String> getWithKey(JWT jwt) {
         return getWithKey(jwt, new HttpHeaders(), "/echo-token");
     }
 

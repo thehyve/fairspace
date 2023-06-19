@@ -1,15 +1,17 @@
 package nl.fairspace.pluto.auth.filters;
 
-import lombok.extern.slf4j.*;
-import nl.fairspace.pluto.auth.*;
-import nl.fairspace.pluto.auth.model.*;
+import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-import java.util.*;
+import java.util.Map;
 
-import static nl.fairspace.pluto.auth.AuthConstants.*;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
 /**
  * This filter extracts the token from a provided HTTP Authorization header.
@@ -19,44 +21,19 @@ import static nl.fairspace.pluto.auth.AuthConstants.*;
  * {@link AuthConstants#AUTHORIZATION_REQUEST_ATTRIBUTE}
  */
 @Slf4j
-public class HeaderAuthenticationFilter implements Filter {
+public class HeaderAuthenticationFilter implements GatewayFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BEARER_PREFIX = "Bearer ";
-    private JwtTokenValidator jwtTokenValidator;
+    private final JwtTokenValidator jwtTokenValidator;
 
     public HeaderAuthenticationFilter(JwtTokenValidator jwtTokenValidator) {
         this.jwtTokenValidator = jwtTokenValidator;
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    private OAuthAuthenticationToken retrieveHeaderAuthorization(ServerWebExchange exchange) {
+        log.debug("Check authentication header for " + exchange.getRequest().getURI().getPath());
 
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // If the authorization is already set, skip this filter
-        if(request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // Otherwise, check if the authorization can be found in the header
-        OAuthAuthenticationToken authenticationToken = retrieveHeaderAuthorization((HttpServletRequest) request, (HttpServletResponse) response);
-
-        log.trace("Retrieved authentication token from request: {}", authenticationToken);
-
-        if(authenticationToken != null) {
-            request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
-        }
-
-        chain.doFilter(request, response);
-    }
-
-    private OAuthAuthenticationToken retrieveHeaderAuthorization(HttpServletRequest request, HttpServletResponse response) {
-        log.trace("Check authentication header for " + request.getPathInfo());
-
-        String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String authorizationHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
 
         if(authorizationHeader == null) {
             log.trace("No Authorization header provided");
@@ -83,7 +60,22 @@ public class HeaderAuthenticationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // If the authorization is already set, skip this filter
+        if(exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
+            return chain.filter(exchange);
+        }
 
+        // Otherwise, check if the authorization can be found in the header
+        OAuthAuthenticationToken authenticationToken = retrieveHeaderAuthorization(exchange);
+
+        log.trace("Retrieved authentication token from request: {}", authenticationToken);
+
+        if(authenticationToken != null) {
+            exchange.getAttributes().put(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
+        }
+
+        return chain.filter(exchange);
     }
+
 }

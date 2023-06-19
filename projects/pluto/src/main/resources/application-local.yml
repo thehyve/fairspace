@@ -16,34 +16,32 @@ pluto:
        search-url: http://localhost:8090/api/search/files
        root-directory-iri: http://localhost:8080/api/webdav
 
-zuul:
-  routes:
-    # Please note that the order of the routes is relevant:
-    # The saturn route must be defined before ui, because of the
-    # paths they listen to
-    storage-test-webdav:
-      path: /api/storages/test/webdav/**
-      url: ${pluto.storages.test.url}
-    storage-test-search:
-      path: /api/storages/test/search/files/**
-      url: ${pluto.storages.test.search-url}
-    saturn:
-      path: /api/**
-      url: http://localhost:8090/api/
-
-  include-debug-header: true
-
-security:
-  oidc:
-  #required-authority: user-ws
-  #clientId: ws-pluto
-  #clientSecret: 00000000-0000-0000-0000-000000000000
-  #refresh-token-jwk-algorithm: HS256
-
 spring:
-  zipkin:
-    base-url: http://localhost:9411/
-    enabled: false
-  web:
-    resources:
-      static-locations: classpath:static,file:../mercury/build
+  cloud:
+    gateway:
+      routes:
+      - id: storage-test-webdav
+        uri: ${pluto.storages.test.url}
+        predicates:
+        - Path=/api/storages/test/webdav/**
+        filters:
+        - RewritePath=/api/storages/test/webdav/(?<segment>.*), /api/webdav/$\{segment}
+      - id: storage-test-search
+        uri: ${pluto.storages.test.search-url}
+        predicates:
+        - Path=/api/storages/test/search/files
+        filters:
+        - RewritePath=/api/storages/test/search/files, /api/search/files
+      - id: saturn-post-request-size
+        uri: http://localhost:8090/api/
+        predicates:
+        - Method=POST
+        - Path=/api/**
+        filters:
+        - name: RequestSize
+          args:
+            maxSize: ${pluto.max-file-size}
+      - id: saturn
+        uri: http://localhost:8090/
+        predicates:
+        - Path=/api/**

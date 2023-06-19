@@ -1,18 +1,20 @@
 package nl.fairspace.pluto.config;
 
 import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.io.ByteArrayInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,21 +23,19 @@ public class WebDAVHostRoutingFilterTest {
     @Autowired
     private WebDAVHostRoutingFilter filter;
 
-
     @Test
     public void buildHttpRequest() {
         var entity = new InputStreamEntity(new ByteArrayInputStream(new byte[1]));
 
-        var map = new LinkedMultiValueMap<String, String> () {{
-            set("key", "value");
-        }};
+        MockServerHttpRequest request = MockServerHttpRequest.method("PROPFIND", "http://example.com")
+                .header("key", "value")
+                .body(entity.toString());
+        ServerWebExchange exchange = MockServerWebExchange.from(request);
+        exchange.getAttributes().put("key", "value");
+        GatewayFilterChain filterChain = mock(GatewayFilterChain.class);
 
-        var req = filter.buildHttpRequest("PROPFIND", "http://example.com", entity, map, map, new MockHttpServletRequest());
-
-        assertTrue(req instanceof BasicHttpEntityEnclosingRequest);
-        assertSame(entity, ((BasicHttpEntityEnclosingRequest)req).getEntity());
-        assertEquals("value", req.getFirstHeader("key").getValue());
-        assertEquals("http://example.com?key=value", req.getRequestLine().getUri());
-        assertEquals("PROPFIND", req.getRequestLine().getMethod());
+        filter.filter(exchange, filterChain);
+        assertEquals("value",  exchange.getRequest().getHeaders().get("key").get(0));
+        assertEquals("PROPFIND", exchange.getRequest().getMethod().toString());
     }
 }

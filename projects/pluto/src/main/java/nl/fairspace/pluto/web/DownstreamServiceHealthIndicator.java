@@ -2,21 +2,24 @@ package nl.fairspace.pluto.web;
 
 import nl.fairspace.pluto.config.dto.PlutoConfig;
 import nl.fairspace.pluto.web.dto.DownstreamServiceHealthStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.Objects;
 
 @Component("downstreamServiceCheck")
 public class DownstreamServiceHealthIndicator implements HealthIndicator {
 
-    @Autowired
-    PlutoConfig plutoConfig;
+    final PlutoConfig plutoConfig;
 
     RestTemplate restTemplate = new RestTemplate();
+
+    public DownstreamServiceHealthIndicator(PlutoConfig plutoConfig) {
+        this.plutoConfig = plutoConfig;
+    }
 
     @Override
     public Health health() {

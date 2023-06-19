@@ -1,26 +1,19 @@
 package nl.fairspace.pluto.config;
 
-import nl.fairspace.pluto.config.dto.*;
-import org.springframework.cloud.commons.httpclient.ApacheHttpClientConnectionManagerFactory;
-import org.springframework.cloud.commons.httpclient.ApacheHttpClientFactory;
-import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
+import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RoutingConfiguration {
     @Bean
-    public WebDAVHostRoutingFilter webDAVHostRoutingFilter(ProxyRequestHelper helper,
-                                                           ZuulProperties zuulProperties,
-                                                           ApacheHttpClientConnectionManagerFactory connectionManagerFactory,
-                                                           ApacheHttpClientFactory httpClientFactory) {
-        return new WebDAVHostRoutingFilter(helper, zuulProperties,
-                connectionManagerFactory, httpClientFactory);
+    public WebDAVHostRoutingFilter webDAVHostRoutingFilter() {
+        return new WebDAVHostRoutingFilter();
     }
 
     @Bean
-    public WebDAVPathRewritingFilter webDAVPathRewritingFilter(PlutoConfig plutoConfig, ZuulProperties zuulProperties) {
-        return new WebDAVPathRewritingFilter(plutoConfig, zuulProperties);
+    public WebDAVPathRewritingFilter webDAVPathRewritingFilter(PlutoConfig plutoConfig, GatewayProperties gatewayProperties) {
+        return new WebDAVPathRewritingFilter(plutoConfig, gatewayProperties);
     }
 }

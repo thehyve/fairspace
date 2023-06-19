@@ -8,7 +8,7 @@ security:
     clientId: web_app
     clientSecret: web_app
     scope: openid
-    token-url: http://localhost:8531/certs
+    token-url: http://localhost:8531/token
     auth-url: http://localhost:8531
     jwk-key-set-url: http://localhost:8531/certs
     logout-url: https://test.logout.url/%s
@@ -18,21 +18,30 @@ security:
     permitAll:
     - /actuator/health
     - /login
+    - /logout
     needsAuthorization:
     - /thehyve
     - /echo-token
 
-zuul:
-  routes:
-    hyve:
-      path: /thehyve/**
-      url: https://thehyve.nl/
-      strip-prefix: true
-    echo:
-      path: /echo-token/**
-      url: http://localhost:8531/echo-token
-      strip-prefix: true
-    noauthz:
-      path: /noauthz/**
-      url: https://thehyve.nl/
-      strip-prefix: true
+
+spring:
+  main:
+    web-application-type: reactive
+  cloud:
+    gateway:
+      routes:
+      - id: hyve
+        uri: https://thehyve.nl/
+        predicates:
+        - Path=/thehyve/**
+      - id: echo
+        uri: http://localhost:8531/echo-token
+        predicates:
+        - Path=/echo-token/**
+      - id: noauthz
+        uri: https://thehyve.nl/
+        predicates:
+        - Path=/noauthz/**
+      default-filters:
+      # Add following Filter Response header in order to remove duplicates CORS value for a Http Header
+      - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Headers

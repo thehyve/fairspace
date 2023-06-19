@@ -1,21 +1,30 @@
 package nl.fairspace.pluto.auth.filters;
 
-import com.nimbusds.oauth2.sdk.*;
-import nl.fairspace.pluto.auth.*;
-import nl.fairspace.pluto.auth.model.*;
-import org.junit.*;
-import org.junit.runner.*;
-import org.mockito.*;
-import org.mockito.junit.*;
+import com.nimbusds.oauth2.sdk.ParseException;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebSession;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import static nl.fairspace.pluto.auth.AuthConstants.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.doReturn;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SessionAuthenticationFilterTest {
@@ -29,16 +38,7 @@ public class SessionAuthenticationFilterTest {
     private OAuthFlow oAuthFlow;
 
     @Mock
-    HttpServletRequest request;
-
-    @Mock
-    HttpServletResponse response;
-
-    @Mock
-    FilterChain filterChain;
-
-    @Mock
-    HttpSession session;
+    GatewayFilterChain filterChain;
 
     Map<String,Object> claims;
     OAuthAuthenticationToken token = new OAuthAuthenticationToken("test-token", "refresh-token", "id-token");
@@ -46,85 +46,104 @@ public class SessionAuthenticationFilterTest {
     OAuthAuthenticationToken refreshedToken = new OAuthAuthenticationToken("refreshed-test-token", "refreshed-refresh-token", "refreshed-id-token");
     OAuthAuthenticationToken tokenWithoutRefreshToken = new OAuthAuthenticationToken("test-token", (String) null, "id-token");
 
+    ServerWebExchange exchange;
+
     @Before
     public void setUp() {
         filter = new SessionAuthenticationFilter(accessTokenValidator, oAuthFlow);
-
         claims = new HashMap<>();
         claims.put("authorities", Collections.singletonList("test"));
-
         tokenWithClaims = token.toBuilder().claimsSet(claims).build();
+        exchange = MockServerWebExchange.builder(MockServerHttpRequest.get("/")).build();
     }
 
     @Test
-    public void testHappyFlow() throws IOException, ServletException {
-
-        doReturn(session).when(request).getSession();
-        doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+    public void testHappyFlow() {
+        WebSession session = this.exchange.getSession().block(Duration.ofMillis(500));
+        assertNotNull(session);
+        session.getAttributes().put(AUTHORIZATION_SESSION_ATTRIBUTE, token);
         doReturn(claims).when(accessTokenValidator).parseAndValidate("test-token");
-        filter.doFilter(request, response, filterChain);
+        filter.filter(exchange, filterChain);
 
-        verify(request).setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, tokenWithClaims);
-        verify(filterChain).doFilter(request, response);
+        assertEquals(tokenWithClaims, exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE));
     }
 
     @Test
-    public void testTokenAlreadyExists() throws IOException, ServletException {
-        doReturn(new OAuthAuthenticationToken("token", "refresh-token", "id-token")).when(request).getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
-        filter.doFilter(request, response, filterChain);
+    public void testTokenAlreadyExists() {
+        OAuthAuthenticationToken token = new OAuthAuthenticationToken("token", "refresh", "id-token");
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        exchange = MockServerWebExchange.from(request);
+        exchange.getAttributes().put(
+                AUTHORIZATION_REQUEST_ATTRIBUTE,
+                token
+        );
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
+        int originalAttributesSize = exchange.getAttributes().size();
+
+        filter.filter(exchange, filterChain);
+
+        assertEquals(token, exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 
     @Test
-    public void testNoTokenInSession() throws IOException, ServletException {
-        doReturn(session).when(request).getSession();
-        filter.doFilter(request, response, filterChain);
+    public void testNoTokenInSession() {
+        WebSession session = this.exchange.getSession().block(Duration.ofMillis(500));
+        assertNotNull(session);
+        int originalAttributesSize = exchange.getAttributes().size();
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
+        filter.filter(exchange, filterChain);
+
+        assertNull(exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 
-
     @Test
-    public void testInvalidRefreshToken() throws IOException, ServletException {
-        doReturn(session).when(request).getSession();
-        doReturn(tokenWithoutRefreshToken).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+    public void testInvalidRefreshToken() {
+        WebSession session = this.exchange.getSession().block(Duration.ofMillis(500));
+        assertNotNull(session);
+        session.getAttributes().put(AUTHORIZATION_SESSION_ATTRIBUTE, tokenWithoutRefreshToken);
         doReturn(null).when(accessTokenValidator).parseAndValidate("test-token");
-        filter.doFilter(request, response, filterChain);
+        int originalAttributesSize = exchange.getAttributes().size();
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
+        filter.filter(exchange, filterChain);
+
+        assertNull(exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 
     @Test
-    public void testValidRefreshToken() throws IOException, ServletException, ParseException {
-        doReturn(session).when(request).getSession();
-        doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+    public void testValidRefreshToken() throws IOException, ParseException {
+        WebSession session = this.exchange.getSession().block(Duration.ofMillis(500));
+        assertNotNull(session);
+        session.getAttributes().put(AUTHORIZATION_SESSION_ATTRIBUTE, token);
         doReturn(null).when(accessTokenValidator).parseAndValidate("test-token");
         doReturn(claims).when(accessTokenValidator).parseAndValidate("refreshed-test-token");
         doReturn(refreshedToken).when(oAuthFlow).refreshToken(token);
+        int originalAttributesSize = exchange.getAttributes().size();
 
-        filter.doFilter(request, response, filterChain);
+        filter.filter(exchange, filterChain);
 
         OAuthAuthenticationToken finalToken = refreshedToken.toBuilder().claimsSet(claims).build();
-        verify(session).setAttribute(AUTHORIZATION_SESSION_ATTRIBUTE, finalToken);
-        verify(request).setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, finalToken);
-        verify(filterChain).doFilter(request, response);
+
+        assertEquals(finalToken, exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize + 1, exchange.getAttributes().size());
+        assertEquals(finalToken, exchange.getSession().block(Duration.ofMillis(500)).getAttributes().get(AUTHORIZATION_SESSION_ATTRIBUTE));
     }
 
     @Test
-    public void testRefreshingFailed() throws IOException, ServletException, ParseException {
-        doReturn(session).when(request).getSession();
-        doReturn(token).when(session).getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+    public void testRefreshingFailed() throws IOException, ParseException {
+        WebSession session = this.exchange.getSession().block(Duration.ofMillis(500));
+        assertNotNull(session);
+        session.getAttributes().put(AUTHORIZATION_SESSION_ATTRIBUTE, token);
         doReturn(null).when(accessTokenValidator).parseAndValidate("test-token");
         doReturn(refreshedToken).when(oAuthFlow).refreshToken(token);
         doReturn(null).when(accessTokenValidator).parseAndValidate("refreshed-test-token");
+        int originalAttributesSize = exchange.getAttributes().size();
 
-        filter.doFilter(request, response, filterChain);
+        filter.filter(exchange, filterChain);
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
+        assertNull(exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 }

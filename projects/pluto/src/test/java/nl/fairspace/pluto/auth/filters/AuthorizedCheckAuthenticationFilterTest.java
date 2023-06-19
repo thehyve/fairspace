@@ -5,56 +5,54 @@ import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doReturn;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AuthorizedCheckAuthenticationFilterTest {
 
     AuthorizedCheckAuthenticationFilter filter;
-    private String requiredAuthority = "login";
+    private final String requiredAuthority = "login";
     private OAuthAuthenticationToken token;
     private Map<String, Object> claims;
-
-    @Mock
-    HttpServletRequest request;
+    ServerWebExchange exchange;
 
     @Before
     public void setUp() {
         filter = new AuthorizedCheckAuthenticationFilter(requiredAuthority);
         claims = new HashMap<>();
         token = new OAuthAuthenticationToken("access", "refresh", "id", claims);
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        exchange = MockServerWebExchange.from(request);
     }
 
     @Test
     public void testHappyFlow() {
         claims.put(AuthConstants.AUTHORITIES_CLAIM, List.of("test", "other", requiredAuthority));
-        doReturn(token).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
+        exchange.getAttributes().put(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE, token);
 
-        assertTrue(filter.isAuthorized(request));
+        assertTrue(filter.isAuthorized(exchange));
     }
 
     @Test
     public void testNotAuthorizedWithoutToken() {
-        doReturn(null).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
-
-        assertFalse(filter.isAuthorized(request));
+        assertNull(exchange.getAttributes().get(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertFalse(filter.isAuthorized(exchange));
     }
 
     @Test
     public void testMultipleValidAuthorities() {
-        doReturn(token).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
+        exchange.getAttributes().put(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE, token);
 
         String[] authorities = new String[] {"some-authority", "another", "test"};
         filter = new AuthorizedCheckAuthenticationFilter(authorities);
@@ -63,17 +61,17 @@ public class AuthorizedCheckAuthenticationFilterTest {
         Stream.of(authorities)
                 .forEach(authority -> {
                     claims.put(AuthConstants.AUTHORITIES_CLAIM, Collections.singletonList(authority));
-                    assertTrue(filter.isAuthorized(request));
+                    assertTrue(filter.isAuthorized(exchange));
                 });
 
         // The user is not authorized with another authority
         claims.put(AuthConstants.AUTHORITIES_CLAIM, Collections.singletonList("non-authorized"));
-        assertFalse(filter.isAuthorized(request));
+        assertFalse(filter.isAuthorized(exchange));
     }
 
     @Test
     public void testNotAuthorizedWithoutCorrectAuthority() {
-        doReturn(token).when(request).getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE);
-        assertFalse(filter.isAuthorized(request));
+        exchange.getAttributes().put(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE, token);
+        assertFalse(filter.isAuthorized(exchange));
     }
 }

@@ -13,12 +13,11 @@ import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.auth.config.OidcConfig;
-import nl.fairspace.pluto.auth.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,18 +26,18 @@ import java.util.Map;
 @Component
 @Slf4j
 public class OAuthFlow {
-    @Autowired
-    OidcConfig configuration;
+    final OidcConfig configuration;
 
-    @Autowired
-    JwtTokenValidator accessTokenValidator;
+    final JwtTokenValidator accessTokenValidator;
 
-    @Autowired
-    HttpServletRequest request;
+    public OAuthFlow(OidcConfig configuration, JwtTokenValidator accessTokenValidator) {
+        this.configuration = configuration;
+        this.accessTokenValidator = accessTokenValidator;
+    }
 
-    public URI getLoginUri(State state) throws URISyntaxException {
+    public URI getLoginUri(ServerHttpRequest request, State state) throws URISyntaxException {
         // The client callback URI, typically pre-registered with the server
-        URI callback = getAuthorizeUri();
+        URI callback = getAuthorizeUri(request);
 
         // Build the request
         return new AuthorizationRequest.Builder(
@@ -50,8 +49,8 @@ public class OAuthFlow {
                 .build().toURI();
     }
 
-    public OAuthAuthenticationToken retrieveToken(String code) throws URISyntaxException, IOException, ParseException {
-        return retrieveToken(new AuthorizationCodeGrant(new AuthorizationCode(code), getAuthorizeUri()), getClientAuthentication());
+    public OAuthAuthenticationToken retrieveToken(String code, ServerHttpRequest request) throws IOException, ParseException, URISyntaxException {
+        return retrieveToken(new AuthorizationCodeGrant(new AuthorizationCode(code), getAuthorizeUri(request)), getClientAuthentication());
     }
 
     public OAuthAuthenticationToken retrieveTokenBasicAuth(String username, String password) throws IOException, ParseException {
@@ -125,21 +124,19 @@ public class OAuthFlow {
         return null;
     }
 
-    private URI getAuthorizeUri() throws URISyntaxException {
-        return new URI(getBaseUrl() + "/authorize");
+    private URI getAuthorizeUri(ServerHttpRequest request) throws URISyntaxException {
+        return new URI(getBaseUrl(request) + "/authorize");
     }
 
-    private String getBaseUrl() {
-        String host = request.getHeader("X-Forwarded-Host");
+    private String getBaseUrl(ServerHttpRequest request) {
+        String host = request.getHeaders().getFirst("X-Forwarded-Host");
         if (host == null) {
-            host = request.getHeader(HttpHeaders.HOST);
+            host = request.getHeaders().getFirst(HttpHeaders.HOST);
         }
-
-        String scheme = request.getHeader("X-Forwarded-Proto");
+        String scheme = request.getHeaders().getFirst("X-Forwarded-Proto");
         if (scheme == null) {
-            scheme = request.getScheme();
+            scheme = request.getURI().getScheme();
         }
-
         return String.format("%s://%s", scheme, host);
     }
 

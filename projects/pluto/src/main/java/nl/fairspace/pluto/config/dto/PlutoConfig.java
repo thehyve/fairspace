@@ -1,12 +1,15 @@
 package nl.fairspace.pluto.config.dto;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import javax.validation.constraints.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @ConfigurationProperties(prefix = "pluto")
 @Configuration

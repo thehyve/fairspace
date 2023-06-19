@@ -167,11 +167,10 @@ pluto:
   terminationGracePeriodSeconds: 10
   keycloak:
     redirectAfterLogoutUrl:
-  # Zuul timeouts when connecting to upstream services
-  socketTimeoutMillis: 600000  # 10 minutes
+  # Gateway timeouts when connecting to upstream services
+  responseTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
   maxFileSize: 1GB    # max total size of file(s) that can be uploaded
-  maxRequestSize: 1GB  # max total size of the request (should be > maxFileSize)
   backends:
     storageRoutes:
 

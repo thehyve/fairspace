@@ -1,12 +1,12 @@
 package nl.fairspace.pluto.auth.filters;
 
-import lombok.extern.slf4j.*;
-import nl.fairspace.pluto.auth.*;
-import nl.fairspace.pluto.auth.model.*;
+import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.http.*;
 import java.util.Arrays;
-import java.util.stream.*;
+import java.util.stream.Stream;
 
 /**
  * This filter will mark every request that has a valid JWT token and that has a certain authority (if specified) as authenticated
@@ -33,10 +33,10 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
     }
 
     @Override
-    protected boolean isAuthorized(HttpServletRequest request) {
+    protected boolean isAuthorized(ServerWebExchange exchange) {
         // If not specified otherwise, specific authorization is needed,
         // check for that in the authorities list
-        OAuthAuthenticationToken authentication = getAuthentication(request);
+        OAuthAuthenticationToken authentication = getAuthentication(exchange);
         if (authentication == null) {
             log.trace("No token provided");
             return false;
@@ -50,7 +50,11 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
                 .anyMatch(authority -> authentication.getAuthorities().contains(authority));
 
         if (!hasAuthority) {
-            log.trace("JWT does not contain a required authority ({}) for request {}", String.join(",", validAuthorities), request.getRequestURI());
+            log.trace(
+                    "JWT does not contain a required authority ({}) for request {}",
+                    String.join(",", validAuthorities),
+                    exchange.getRequest().getURI()
+            );
         }
 
         return hasAuthority;

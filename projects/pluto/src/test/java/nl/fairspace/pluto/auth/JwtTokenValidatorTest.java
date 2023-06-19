@@ -1,20 +1,24 @@
 package nl.fairspace.pluto.auth;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.proc.*;
-import com.nimbusds.jwt.*;
-import com.nimbusds.jwt.proc.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.proc.BadJOSEException;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.proc.JWTProcessor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.text.*;
-import java.util.*;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class JwtTokenValidatorTest {

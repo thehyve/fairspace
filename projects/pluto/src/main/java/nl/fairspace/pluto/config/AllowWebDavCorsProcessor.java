@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD;
 
 /**
  * This class overrides the {@link DefaultCorsProcessor} implementation in
@@ -27,10 +27,10 @@ import static org.springframework.http.HttpHeaders.*;
  * the methods specified in the configuration.
  */
 @Slf4j
-public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {
+public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO check if needed
     @Override
     protected boolean handleInternal(ServerHttpRequest request, ServerHttpResponse response, CorsConfiguration config, boolean preFlightRequest) throws IOException {
-        log.trace("Handle cors request for {} {}", request.getMethodValue(), request.getURI());
+        log.trace("Handle cors request for {} {}", request.getMethod(), request.getURI());
 
         String requestOrigin = request.getHeaders().getOrigin();
         String allowOrigin = checkOrigin(config, requestOrigin);
@@ -106,7 +106,7 @@ public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {
 
     @Nullable
     private ExtendedHttpMethod getMethodToUse(ServerHttpRequest request, boolean isPreFlight) {
-        return ExtendedHttpMethod.valueOf((isPreFlight ? request.getHeaders().getFirst(ACCESS_CONTROL_REQUEST_METHOD) : request.getMethodValue()));
+        return ExtendedHttpMethod.valueOf((isPreFlight ? request.getHeaders().getFirst(ACCESS_CONTROL_REQUEST_METHOD) : request.getMethod().name()));
     }
 
 }

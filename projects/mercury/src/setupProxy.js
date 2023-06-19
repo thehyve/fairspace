@@ -41,11 +41,6 @@ module.exports = (app) => {
         onProxyReq: addToken
     }));
 
-    app.use(createProxyMiddleware('/zuul', {
-        target: 'http://localhost:8080/',
-        onProxyReq: addToken
-    }));
-
     app.use(createProxyMiddleware('/actuator/health', {
         target: 'http://localhost:8080/'
     }));
