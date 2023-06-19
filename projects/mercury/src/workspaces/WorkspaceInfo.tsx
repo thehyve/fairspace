@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext } from "react";
 import { Paper } from "@mui/material";
 import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";

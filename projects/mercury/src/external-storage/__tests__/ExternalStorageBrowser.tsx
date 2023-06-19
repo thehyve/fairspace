@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 /* eslint-disable react/jsx-props-no-spreading */
 import React from "react";
 import { cleanup, render, screen } from "@testing-library/react";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import * as queryString from "query-string";

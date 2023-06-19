@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import withStyles from "@mui/styles/withStyles";
 import Tabs from "@mui/material/Tabs";

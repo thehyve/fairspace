@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useState } from "react";
 import PropTypes from "prop-types";
 import withStyles from "@mui/styles/withStyles";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import { Divider, Grid, IconButton, Typography } from "@mui/material";
 import withStyles from "@mui/styles/withStyles";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import PropTypes from "prop-types";
 import CircularProgress from "@mui/material/CircularProgress";

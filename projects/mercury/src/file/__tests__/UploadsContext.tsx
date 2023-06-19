@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { configure, confiure, mount } from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";

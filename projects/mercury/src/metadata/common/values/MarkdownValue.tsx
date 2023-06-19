@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import BaseInputValue from "./BaseInputValue";

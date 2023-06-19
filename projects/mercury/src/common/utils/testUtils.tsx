@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { mount } from "enzyme"; // eslint-disable-line import/no-extraneous-dependencies
 

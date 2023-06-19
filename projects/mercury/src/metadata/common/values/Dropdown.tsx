@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Autocomplete, ListItemText, TextField } from "@mui/material";

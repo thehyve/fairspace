@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import WorkspaceLayout from "../layout/WorkspaceLayout";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import { render, screen } from "@testing-library/react";
 import { LinkedDataParentMock } from "../__mocks__/LinkedDataParent.mock";
 import { COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS } from "../../../constants";

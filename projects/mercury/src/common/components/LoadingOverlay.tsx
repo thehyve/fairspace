@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import Dialog from "@mui/material/Dialog";
 import LoadingInlay from "./LoadingInlay";

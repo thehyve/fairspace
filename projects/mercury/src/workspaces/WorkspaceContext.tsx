@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import type { Workspace } from "./WorkspacesAPI";
 import WorkspacesAPI from "./WorkspacesAPI";

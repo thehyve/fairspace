@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import _ from "lodash";
 import { useHistory } from "react-router-dom";

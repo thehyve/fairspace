@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { Grid } from "@mui/material";
 import { Widgets } from "@mui/icons-material";

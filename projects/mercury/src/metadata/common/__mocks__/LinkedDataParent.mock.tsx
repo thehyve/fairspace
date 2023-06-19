@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useEffect } from "react";
 import { useLinkedDataNoContext } from "../UseLinkedData";
 import { MemoryRouter, useHistory } from "react-router-dom";

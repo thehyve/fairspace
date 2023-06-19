@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";

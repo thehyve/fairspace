@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { ReferringValue } from "../ReferringValue";
 import LinkedDataLink from "../../LinkedDataLink";

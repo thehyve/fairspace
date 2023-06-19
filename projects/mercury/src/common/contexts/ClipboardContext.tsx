@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import { COPY, CUT } from "../../constants";
 const ClipboardContext = React.createContext({

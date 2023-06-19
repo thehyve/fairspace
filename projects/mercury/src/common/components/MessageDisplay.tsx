@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import Typography from "@mui/material/Typography";
 import { ErrorOutline, InfoOutlined } from "@mui/icons-material";

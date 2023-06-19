@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import Dropdown from "./Dropdown";
 import { getLabel, valuesContainsValueOrId } from "../metadataUtils";

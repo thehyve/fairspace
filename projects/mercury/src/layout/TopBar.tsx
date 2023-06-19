@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { withRouter } from "react-router-dom";
 import { AppBar, Toolbar, Typography } from "@mui/material";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { getUsers } from "./UsersAPI";
 import useAsync from "../common/hooks/UseAsync";

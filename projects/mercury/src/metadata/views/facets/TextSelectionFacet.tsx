@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { Checkbox, FormControl, FormControlLabel, FormGroup } from "@mui/material";

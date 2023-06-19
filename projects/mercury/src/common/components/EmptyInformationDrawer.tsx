@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { Grid } from "@mui/material";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";

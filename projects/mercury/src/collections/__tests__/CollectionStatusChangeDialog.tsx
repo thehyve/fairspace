@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import CollectionStatusChangeDialog from "../CollectionStatusChangeDialog";

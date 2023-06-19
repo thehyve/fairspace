@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { IconButton, Menu, MenuItem } from "@mui/material";

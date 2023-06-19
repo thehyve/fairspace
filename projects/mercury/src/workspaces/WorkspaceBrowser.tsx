@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useState } from "react";
 import Button from "@mui/material/Button";
 import { useHistory, withRouter } from "react-router-dom";

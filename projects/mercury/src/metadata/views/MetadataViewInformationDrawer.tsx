@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { Card, CardContent, CardHeader, IconButton } from "@mui/material";
 import { withRouter } from "react-router-dom";

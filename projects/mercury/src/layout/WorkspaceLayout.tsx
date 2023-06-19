@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext } from "react";
 import { VocabularyProvider } from "../metadata/vocabulary/VocabularyContext";
 import { CollectionsProvider } from "../collections/CollectionsContext";

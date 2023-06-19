@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { Paper } from "@mui/material";
 import useNamespacedIri from "../../common/hooks/UseNamespacedIri";

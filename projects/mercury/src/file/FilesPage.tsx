@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import { withRouter } from "react-router-dom";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import useIsMounted from "react-is-mounted-hook";
 import FileNameDialog from "./FileNameDialog";

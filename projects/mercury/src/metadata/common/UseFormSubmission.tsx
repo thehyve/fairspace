@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useState } from "react";
 import useIsMounted from "react-is-mounted-hook";
 import { getNamespacedIri, partitionErrors } from "./metadataUtils";

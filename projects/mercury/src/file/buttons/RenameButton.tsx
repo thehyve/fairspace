@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import useIsMounted from "react-is-mounted-hook";

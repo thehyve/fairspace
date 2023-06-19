@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { Chip, Grid, Typography } from "@mui/material";
 import type { MetadataViewFacet, MetadataViewFilter } from "./MetadataViewAPI";

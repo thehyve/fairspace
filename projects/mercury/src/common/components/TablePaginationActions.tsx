@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import IconButton from "@mui/material/IconButton";
 import { KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage } from "@mui/icons-material";

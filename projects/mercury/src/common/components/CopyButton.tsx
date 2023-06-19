@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import { Tooltip } from "@mui/material";
 import ContentCopy from "mdi-material-ui/ContentCopy";

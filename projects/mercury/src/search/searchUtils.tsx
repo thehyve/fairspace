@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import queryString from "query-string";
 import React from "react";
 import { handleAuthError } from "../common/utils/httpUtils";

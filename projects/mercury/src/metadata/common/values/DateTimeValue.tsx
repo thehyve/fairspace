@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { DATE_FORMAT } from "../../../constants";

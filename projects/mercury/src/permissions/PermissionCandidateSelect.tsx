@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import Dropdown from "../metadata/common/values/Dropdown";
 import { getDisplayName } from "../users/userUtils";

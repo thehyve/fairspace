@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import { configure, mount } from "enzyme";
 import React from "react";
 // eslint-disable-next-line jest/no-mocks-import

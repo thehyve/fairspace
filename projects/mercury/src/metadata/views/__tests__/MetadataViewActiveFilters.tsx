@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import { configure, shallow } from "enzyme";
 import React from "react";
 import Chip from "@mui/material/Chip";

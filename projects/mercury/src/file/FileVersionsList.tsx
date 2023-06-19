@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import { Column, InfiniteLoader, Table } from "react-virtualized";
 import { IconButton } from "@mui/material";

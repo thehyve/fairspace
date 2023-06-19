@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useEffect } from "react";
 import { renderHook } from "@testing-library/react-hooks";
 import { act } from "react-test-renderer";

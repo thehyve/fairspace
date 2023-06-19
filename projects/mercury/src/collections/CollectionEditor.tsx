@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext } from "react";
 import { withRouter, useHistory } from "react-router-dom";
 import Dialog from "@mui/material/Dialog";

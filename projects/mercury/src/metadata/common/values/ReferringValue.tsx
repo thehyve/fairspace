@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import Switch from "@mui/material/Switch";

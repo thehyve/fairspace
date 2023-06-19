@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { withRouter } from "react-router-dom";
 import { useDropzone } from "react-dropzone";

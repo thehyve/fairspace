@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, Collapse, IconButton } from "@mui/material";
 import classnames from "classnames";

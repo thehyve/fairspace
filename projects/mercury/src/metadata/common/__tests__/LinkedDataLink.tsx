@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React from "react";
 import { configure, mount } from "enzyme";

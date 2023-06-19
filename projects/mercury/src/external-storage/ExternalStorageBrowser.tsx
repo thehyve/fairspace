@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import withStyles from "@mui/styles/withStyles";

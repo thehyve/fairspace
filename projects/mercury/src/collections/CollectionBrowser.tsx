@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
 import Button from "@mui/material/Button";

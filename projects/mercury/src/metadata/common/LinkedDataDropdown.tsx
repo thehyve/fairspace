@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useRef } from "react";
 import { PropTypes } from "prop-types";
 import { valuesContainsValueOrId } from "./metadataUtils";

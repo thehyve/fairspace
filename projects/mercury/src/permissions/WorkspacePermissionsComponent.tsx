@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useState } from "react";
 import { IconButton } from "@mui/material";
 import withStyles from "@mui/styles/withStyles";

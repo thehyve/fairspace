@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import { Button, Dialog, DialogTitle, DialogActions, DialogContent, FormControl, FormControlLabel, ListItemText, Radio, RadioGroup } from "@mui/material";
 import withStyles from "@mui/styles/withStyles";

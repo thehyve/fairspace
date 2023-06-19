@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useState } from "react";
 import useDeepCompareEffect from "use-deep-compare-effect";
 import Grid from "@mui/material/Grid";

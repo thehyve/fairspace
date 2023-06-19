@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import * as PropTypes from "prop-types";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useCallback, useEffect } from "react";
 import { Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import makeStyles from "@mui/styles/makeStyles";

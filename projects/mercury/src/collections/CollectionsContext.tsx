@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useContext, useState } from "react";
 import type { AccessLevel, AccessMode, Collection, CollectionProperties, Status } from "./CollectionAPI";
 import CollectionAPI from "./CollectionAPI";

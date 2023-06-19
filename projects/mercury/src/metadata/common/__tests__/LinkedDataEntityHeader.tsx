@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 /* eslint-disable jest/expect-expect */
 import React from "react";
 import { configure, mount } from "enzyme";

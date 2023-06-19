@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useCallback, useContext } from "react";
 // Utils
 import { getFirstPredicateValue } from "./common/jsonLdUtils";

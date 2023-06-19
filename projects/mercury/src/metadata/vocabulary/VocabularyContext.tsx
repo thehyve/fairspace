@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import VocabularyAPI from "../common/VocabularyAPI";
 import useAsync from "../../common/hooks/UseAsync";

@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from "react";
 import useDeepCompareEffect from "use-deep-compare-effect";

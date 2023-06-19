@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import useInterval from "../common/hooks/UseInterval";
 import { getServerStatus, getSessionStatus, SERVER_STATUS_DOWN, SERVER_STATUS_UP } from "./StatusAPI";

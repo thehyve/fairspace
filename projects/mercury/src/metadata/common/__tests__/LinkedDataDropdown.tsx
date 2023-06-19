@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import { shallow } from "enzyme";
 import { LinkedDataDropdown } from "../LinkedDataDropdown";

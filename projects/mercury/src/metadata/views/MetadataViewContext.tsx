@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React from "react";
 import type { MetadataViewFilter } from "./MetadataViewAPI";
 import MetadataViewAPI from "./MetadataViewAPI";

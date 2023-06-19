@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import axios from "axios";
 import React from "react";
 import { extractJsonData, handleHttpError } from "../utils/httpUtils";

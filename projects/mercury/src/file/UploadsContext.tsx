@@ -1,5 +1,4 @@
 // @ts-nocheck
-// @ts-nocheck
 import React, { useEffect, useState } from "react";
 import { LocalFileAPI } from "./FileAPI";
 import ErrorDialog from "../common/components/ErrorDialog";
