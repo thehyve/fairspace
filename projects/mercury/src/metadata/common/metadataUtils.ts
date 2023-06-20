@@ -1,20 +1,16 @@
-import _ from 'lodash';
-
+// @ts-nocheck
+import _ from "lodash";
 import * as consts from "../../constants";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import {determineShapeForTypes} from './vocabularyUtils';
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import { getFirstPredicateId, getFirstPredicateValue } from "./jsonLdUtils";
+import { determineShapeForTypes } from "./vocabularyUtils";
+import { isNonEmptyValue } from "../../common/utils/genericUtils";
 
 /**
  * Returns the local part of the given uri
  * @param uri
  * @returns {string}
  */
-export const getLocalPart = uri => (
-    uri.includes('#')
-        ? uri.substring(uri.lastIndexOf('#') + 1)
-        : uri.substring(uri.lastIndexOf('/') + 1)
-);
+export const getLocalPart = uri => uri.includes('#') ? uri.substring(uri.lastIndexOf('#') + 1) : uri.substring(uri.lastIndexOf('/') + 1);
 
 /**
  *
@@ -25,22 +21,23 @@ export const getLocalPart = uri => (
  * @returns {*}
  */
 export function linkLabel(uri, shortenExternalUris = false) {
-    try {
-        const supportedLocalInfixes = ['/iri/', '/collections/'];
-        const url = new URL(uri);
+  try {
+    const supportedLocalInfixes = ['/iri/', '/collections/'];
+    const url = new URL(uri);
 
-        // Local uris are treated separately, as we know its
-        // structure
-        if (url.hostname === window.location.hostname) {
-            const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
-            if (foundInfix) {
-                return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
-            }
-        }
-        // eslint-disable-next-line no-empty
-    } catch (e) {}
+    // Local uris are treated separately, as we know its
+    // structure
+    if (url.hostname === window.location.hostname) {
+      const foundInfix = supportedLocalInfixes.find(infix => url.pathname.startsWith(infix));
 
-    return shortenExternalUris ? getLocalPart(uri) : uri;
+      if (foundInfix) {
+        return `${url.pathname.substring(foundInfix.length)}${url.search}${url.hash}`;
+      }
+    } // eslint-disable-next-line no-empty
+
+  } catch (e) {}
+
+  return shortenExternalUris ? getLocalPart(uri) : uri;
 }
 
 /**
@@ -55,9 +52,7 @@ export function linkLabel(uri, shortenExternalUris = false) {
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
-    return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || getFirstPredicateValue(entity, consts.SHACL_NAME)
-        || (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris));
+  return getFirstPredicateValue(entity, consts.LABEL_URI) || getFirstPredicateValue(entity, consts.SHACL_NAME) || entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris);
 }
 
 /**
@@ -67,8 +62,7 @@ export function getLabel(entity, shortenExternalUris = false) {
  * @returns string
  */
 export function getLabelStrict(entity) {
-    return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || "";
+  return getFirstPredicateValue(entity, consts.LABEL_URI) || "";
 }
 
 /**
@@ -78,8 +72,8 @@ export function getLabelStrict(entity) {
  * @returns {string}
  */
 export const lookupLabel = (id, allMetadata) => {
-    const entry = allMetadata.find(element => element['@id'] === id);
-    return getLabel(entry);
+  const entry = allMetadata.find(element => element['@id'] === id);
+  return getLabel(entry);
 };
 
 /**
@@ -88,24 +82,21 @@ export const lookupLabel = (id, allMetadata) => {
  * @returns {string}
  */
 export function relativeLink(link) {
-    const withoutSchema = link.toString().substring(link.toString().indexOf('//') + 2);
-    return withoutSchema.substring(withoutSchema.indexOf('/'));
+  const withoutSchema = link.toString().substring(link.toString().indexOf('//') + 2);
+  return withoutSchema.substring(withoutSchema.indexOf('/'));
 }
-
 export function generateUuid() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
-        // eslint-disable-next-line
-        c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
+  return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, // eslint-disable-next-line
+  c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
 }
-
 export function isValidLinkedDataIdentifier(uri) {
-    try {
-        // eslint-disable-next-line no-new
-        new URL(uri);
-        return true;
-    } catch (e) {
-        return false;
-    }
+  try {
+    // eslint-disable-next-line no-new
+    new URL(uri);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
@@ -114,37 +105,40 @@ export function isValidLinkedDataIdentifier(uri) {
  * @param {string} domain property domain
  */
 export const shouldPropertyBeHidden = (key, domain) => {
-    const isCollection = domain === consts.COLLECTION_URI;
-    const isFile = domain === consts.FILE_URI;
-    const isDirectory = domain === consts.DIRECTORY_URI;
-    const isManaged = isCollection || isFile || isDirectory;
+  const isCollection = domain === consts.COLLECTION_URI;
+  const isFile = domain === consts.FILE_URI;
+  const isDirectory = domain === consts.DIRECTORY_URI;
+  const isManaged = isCollection || isFile || isDirectory;
 
-    switch (key) {
-        case '@type':
-        case consts.TYPE_URI:
-        case consts.FILE_PATH_URI:
-        case consts.CAN_LIST_URI:
-        case consts.CAN_READ_URI:
-        case consts.CAN_WRITE_URI:
-        case consts.CAN_MANAGE_URI:
-        case consts.CAN_ADD_SHARED_METADATA_URI:
-        case consts.CAN_VIEW_PUBLIC_METADATA_URI:
-        case consts.CAN_VIEW_PUBLIC_DATA_URI:
-        case consts.CAN_QUERY_METADATA_URI:
-        case consts.IS_ADMIN:
-        case consts.IS_SUPERADMIN:
-        case consts.IS_MEMBER_OF_URI:
-        case consts.IS_MANAGER_OF_URI:
-            return true;
-        case consts.LABEL_URI:
-            return isManaged;
-        case consts.DATE_DELETED_URI:
-        case consts.DELETED_BY_URI:
-        case consts.COMMENT_URI:
-            return isCollection;
-        default:
-            return false;
-    }
+  switch (key) {
+    case '@type':
+    case consts.TYPE_URI:
+    case consts.FILE_PATH_URI:
+    case consts.CAN_LIST_URI:
+    case consts.CAN_READ_URI:
+    case consts.CAN_WRITE_URI:
+    case consts.CAN_MANAGE_URI:
+    case consts.CAN_ADD_SHARED_METADATA_URI:
+    case consts.CAN_VIEW_PUBLIC_METADATA_URI:
+    case consts.CAN_VIEW_PUBLIC_DATA_URI:
+    case consts.CAN_QUERY_METADATA_URI:
+    case consts.IS_ADMIN:
+    case consts.IS_SUPERADMIN:
+    case consts.IS_MEMBER_OF_URI:
+    case consts.IS_MANAGER_OF_URI:
+      return true;
+
+    case consts.LABEL_URI:
+      return isManaged;
+
+    case consts.DATE_DELETED_URI:
+    case consts.DELETED_BY_URI:
+    case consts.COMMENT_URI:
+      return isCollection;
+
+    default:
+      return false;
+  }
 };
 
 /**
@@ -152,9 +146,9 @@ export const shouldPropertyBeHidden = (key, domain) => {
  * @param {Object[]} properties the list of properties
  */
 export const propertiesToShow = (properties = []) => {
-    const domainKey = properties.find(property => property.key === '@type');
-    const domainValue = domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
-    return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
+  const domainKey = properties.find(property => property.key === '@type');
+  const domainValue = domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
+  return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
 /**
@@ -164,20 +158,19 @@ export const propertiesToShow = (properties = []) => {
  * @returns {{label: string, description: string}} object containing the type label and description
  */
 export const getTypeInfo = (linkedDataItem, vocabulary) => {
-    const types = (linkedDataItem && linkedDataItem['@type']);
+  const types = linkedDataItem && linkedDataItem['@type'];
 
-    if (!types) {
-        return {};
-    }
+  if (!types) {
+    return {};
+  }
 
-    const shape = determineShapeForTypes(vocabulary, types);
-
-    return {
-        typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'],
-        label: getFirstPredicateValue(shape, consts.SHACL_NAME),
-        description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION),
-        comment: getFirstPredicateValue(shape, consts.COMMENT_URI)
-    };
+  const shape = determineShapeForTypes(vocabulary, types);
+  return {
+    typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'],
+    label: getFirstPredicateValue(shape, consts.SHACL_NAME),
+    description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION),
+    comment: getFirstPredicateValue(shape, consts.COMMENT_URI)
+  };
 };
 
 /**
@@ -200,7 +193,7 @@ export const createIri = (id, infix) => `http://${window.location.hostname}/${in
  * @returns {string}
  * @see createIri
  */
-export const createMetadataIri = (id) => createIri(id, 'iri');
+export const createMetadataIri = id => createIri(id, 'iri');
 
 /**
  * Creates a new vocabulary IRI within this workspace
@@ -209,7 +202,7 @@ export const createMetadataIri = (id) => createIri(id, 'iri');
  * @returns {string}
  * @see createIri
  */
-export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
+export const createVocabularyIri = id => createIri(id, 'vocabulary');
 
 /**
  * Generates a compatible workspace IRI from the given iri.
@@ -222,14 +215,14 @@ export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
  * @param iri
  * @returns {string}
  */
-export const url2iri = (iri) => {
-    try {
-        const url = new URL(iri);
-        return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
-    } catch (e) {
-        console.warn("Invalid uri given to convert to iri", iri);
-        return iri;
-    }
+export const url2iri = iri => {
+  try {
+    const url = new URL(iri);
+    return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
+  } catch (e) {
+    console.warn("Invalid uri given to convert to iri", iri);
+    return iri;
+  }
 };
 
 /**
@@ -239,16 +232,12 @@ export const url2iri = (iri) => {
  * @returns {string|*}
  */
 export const getNamespacedIri = (iri, namespaces) => {
-    if (!iri) return '';
-
-    // eslint-disable-next-line no-param-reassign
-    iri = decodeURI(iri);
-
-    if (!namespaces) return iri;
-
-    const namespace = namespaces.find(n => iri.startsWith(n.namespace));
-
-    return namespace ? iri.replace(namespace.namespace, namespace.prefix + ':') : iri;
+  if (!iri) return '';
+  // eslint-disable-next-line no-param-reassign
+  iri = decodeURI(iri);
+  if (!namespaces) return iri;
+  const namespace = namespaces.find(n => iri.startsWith(n.namespace));
+  return namespace ? iri.replace(namespace.namespace, namespace.prefix + ':') : iri;
 };
 
 /**
@@ -256,8 +245,12 @@ export const getNamespacedIri = (iri, namespaces) => {
  * @returns {Object}
  */
 export const partitionErrors = (errors, subject) => {
-    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
-    return {entityErrors, otherErrors};
+  const [entityErrors, otherErrors] = _.partition(errors, e => e.subject === subject);
+
+  return {
+    entityErrors,
+    otherErrors
+  };
 };
 
 /**
@@ -267,11 +260,11 @@ export const partitionErrors = (errors, subject) => {
  * @param {string} id
  */
 export const valuesContainsValueOrId = (values, value, id) => {
-    if (!Array.isArray(values) || values.length === 0 || (!value && !id)) {
-        return false;
-    }
+  if (!Array.isArray(values) || values.length === 0 || !value && !id) {
+    return false;
+  }
 
-    return values.some(v => (v.id && v.id === id) || (v.value && v.value === value));
+  return values.some(v => v.id && v.id === id || v.value && v.value === value);
 };
 
 /**

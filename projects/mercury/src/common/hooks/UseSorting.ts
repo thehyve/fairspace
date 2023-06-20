@@ -1,6 +1,6 @@
-import {useState} from "react";
-
-import {compareBy, stableSort} from "../utils/genericUtils";
+// @ts-nocheck
+import { useState } from "react";
+import { compareBy, stableSort } from "../utils/genericUtils";
 
 /**
  * Custom hook to perform sorting
@@ -15,26 +15,25 @@ import {compareBy, stableSort} from "../utils/genericUtils";
  * @see {compareBy}
  */
 const useSorting = (items, columns, initialOrderBy) => {
-    const [orderAscending, setOrderAscending] = useState(true);
-    const [orderBy, setOrderBy] = useState(initialOrderBy);
+  const [orderAscending, setOrderAscending] = useState(true);
+  const [orderBy, setOrderBy] = useState(initialOrderBy);
+  const orderedItems = stableSort(items, compareBy(columns[orderBy].valueExtractor), orderAscending);
 
-    const orderedItems = stableSort(items, compareBy(columns[orderBy].valueExtractor), orderAscending);
-    const toggleSort = column => {
-        if (orderBy === column) {
-            setOrderAscending(!orderAscending);
-        } else {
-            setOrderAscending(true);
-            setOrderBy(column);
-        }
-    };
+  const toggleSort = column => {
+    if (orderBy === column) {
+      setOrderAscending(!orderAscending);
+    } else {
+      setOrderAscending(true);
+      setOrderBy(column);
+    }
+  };
 
-    return {
-        orderAscending,
-        orderBy,
-        toggleSort,
-
-        orderedItems
-    };
+  return {
+    orderAscending,
+    orderBy,
+    toggleSort,
+    orderedItems
+  };
 };
 
 export default useSorting;

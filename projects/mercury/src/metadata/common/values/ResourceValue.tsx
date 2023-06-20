@@ -1,41 +1,35 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
+// @ts-nocheck
+import React from "react";
+import PropTypes from "prop-types";
 import IriValueContainer from "./IriValueContainer";
 
 class ResourceValue extends React.Component {
-    state = {
-        namespace: undefined
-    };
+  state = {
+    namespace: undefined
+  };
+  handleLocalPartChange = value => this.props.onChange({
+    id: this.state.namespace ? this.state.namespace.value + value : value
+  });
+  handleNamespaceChange = namespace => this.setState({
+    namespace
+  });
 
-    handleLocalPartChange = (value) => this.props.onChange({
-        id: this.state.namespace ? this.state.namespace.value + value : value
-    });
+  render() {
+    const {
+      entry,
+      onChange,
+      ...otherProps
+    } = this.props;
+    return <IriValueContainer namespace={this.state.namespace} localPart={entry.id || ''} onLocalPartChange={this.handleLocalPartChange} onNamespaceChange={this.handleNamespaceChange} {...otherProps} />;
+  }
 
-    handleNamespaceChange = namespace => this.setState({namespace});
-
-    render() {
-        const {entry, onChange, ...otherProps} = this.props;
-
-        return (
-            <IriValueContainer
-                namespace={this.state.namespace}
-                localPart={entry.id || ''}
-                onLocalPartChange={this.handleLocalPartChange}
-                onNamespaceChange={this.handleNamespaceChange}
-                {...otherProps}
-            />
-        );
-    }
 }
 
 ResourceValue.propTypes = {
-    entry: PropTypes.object,
-    onChange: PropTypes.func
+  entry: PropTypes.object,
+  onChange: PropTypes.func
 };
-
 ResourceValue.defaultProps = {
-    entry: {},
+  entry: {}
 };
-
 export default ResourceValue;

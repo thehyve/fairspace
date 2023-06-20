@@ -1,4 +1,5 @@
+// @ts-nocheck
 export default function logout() {
-    sessionStorage.clear();
-    window.location.href = '/logout';
+  sessionStorage.clear();
+  window.location.href = '/logout';
 }

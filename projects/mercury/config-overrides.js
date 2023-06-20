@@ -11,7 +11,8 @@ module.exports = function override(config, env) {
         stream: false,
         crypto: false,
         util: false,
-        path: false
+        path: false,
+        buffer: false
     };
     return config;
 }

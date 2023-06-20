@@ -1,8 +1,8 @@
+// @ts-nocheck
 export const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
 export const CUT = 'CUT';
 export const COPY = 'COPY';
 export const PATH_SEPARATOR = '/';
-
 // UI
 export const LEFT_MENU_EXPANSION_DELAY = 500;
 export const MAIN_CONTENT_WIDTH = '65%';
@@ -13,7 +13,6 @@ export const METADATA_PATH = '/metadata';
 export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';
 export const TOOLTIP_ENTER_DELAY = 350;
 export const DATE_FORMAT = 'dd-MM-yyyy';
-
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
 export const XMLSCHEMA_NS = 'http://www.w3.org/2001/XMLSchema#';
@@ -22,15 +21,12 @@ export const RDFS_NS = 'http://www.w3.org/2000/01/rdf-schema#';
 export const FAIRSPACE_NS = 'https://fairspace.nl/ontology#';
 export const DASH_NS = 'http://datashapes.org/dash#';
 export const RDF_TYPE = RDF_NS + 'type';
-
 // URIs
 export const TYPE_URI = RDF_NS + 'type';
 export const LABEL_URI = RDFS_NS + 'label';
 export const COMMENT_URI = RDFS_NS + 'comment';
 export const SUBCLASS_URI = RDFS_NS + 'subClassOf';
-
 export const RDFS_CLASS = RDFS_NS + 'Class';
-
 export const SHACL_NAME = SHACL_NS + 'name';
 export const SHACL_DESCRIPTION = SHACL_NS + 'description';
 export const SHACL_PATH = SHACL_NS + 'path';
@@ -51,10 +47,8 @@ export const SHACL_PREFIX = SHACL_NS + 'prefix';
 export const SHACL_NAMESPACE = SHACL_NS + 'namespace';
 export const SHACL_PREFIX_DECLARATION = SHACL_NS + 'PrefixDeclaration';
 export const SHACL_NODE_SHAPE = SHACL_NS + 'NodeShape';
-
 export const DASH_LIST_SHAPE = DASH_NS + 'ListShape';
 export const DASH_SINGLE_LINE = DASH_NS + 'singleLine';
-
 export const STRING_URI = XMLSCHEMA_NS + 'string';
 export const BOOLEAN_URI = XMLSCHEMA_NS + 'boolean';
 export const DATETIME_URI = XMLSCHEMA_NS + 'dateTime';
@@ -64,7 +58,6 @@ export const INTEGER_URI = XMLSCHEMA_NS + 'integer';
 export const LONG_URI = XMLSCHEMA_NS + 'long';
 export const DECIMAL_URI = XMLSCHEMA_NS + 'decimal';
 export const MARKDOWN_URI = FAIRSPACE_NS + 'markdown';
-
 export const MACHINE_ONLY_URI = FAIRSPACE_NS + 'machineOnly';
 export const USER_URI = FAIRSPACE_NS + 'User';
 export const COLLECTION_URI = FAIRSPACE_NS + 'Collection';
@@ -100,5 +93,4 @@ export const IS_ADMIN = FAIRSPACE_NS + 'isAdmin';
 export const IS_SUPERADMIN = FAIRSPACE_NS + 'isSuperadmin';
 export const IS_MEMBER_OF_URI = FAIRSPACE_NS + 'isMemberOf';
 export const IS_MANAGER_OF_URI = FAIRSPACE_NS + 'isManagerOf';
-
 export const NIL_URI = FAIRSPACE_NS + 'nil';

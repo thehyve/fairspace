@@ -1,23 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+// @ts-nocheck
+import React from "react";
+import PropTypes from "prop-types";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 const confirmationDialog = ({
-    title = 'Confirmation',
-    content = '',
-    agreeButtonText = 'Submit',
-    disagreeButtonText = 'Cancel',
-    dangerous = false,
-    open = false,
-    onAgree = () => {},
-    onDisagree = () => {},
-}) => (
-    <Dialog
-        open={open}
-        onClose={onDisagree}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-    >
+  title = 'Confirmation',
+  content = '',
+  agreeButtonText = 'Submit',
+  disagreeButtonText = 'Cancel',
+  dangerous = false,
+  open = false,
+  onAgree = () => {},
+  onDisagree = () => {}
+}) => <Dialog open={open} onClose={onDisagree} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
         <DialogTitle id="alert-dialog-title">
             {title}
         </DialogTitle>
@@ -27,28 +22,22 @@ const confirmationDialog = ({
             </DialogContentText>
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={onAgree}
-                color={dangerous ? 'secondary' : 'primary'}
-                autoFocus={!dangerous}
-            >
+            <Button onClick={onAgree} color={dangerous ? 'secondary' : 'primary'} autoFocus={!dangerous}>
                 {agreeButtonText}
             </Button>
             <Button onClick={onDisagree}>
                 {disagreeButtonText}
             </Button>
         </DialogActions>
-    </Dialog>
-);
+    </Dialog>;
 
 confirmationDialog.propTypes = {
-    open: PropTypes.bool,
-    title: PropTypes.string,
-    content: PropTypes.any,
-    agreeButtonText: PropTypes.string,
-    disagreeButtonText: PropTypes.string,
-    onAgree: PropTypes.func,
-    onDisagree: PropTypes.func,
+  open: PropTypes.bool,
+  title: PropTypes.string,
+  content: PropTypes.any,
+  agreeButtonText: PropTypes.string,
+  disagreeButtonText: PropTypes.string,
+  onAgree: PropTypes.func,
+  onDisagree: PropTypes.func
 };
-
 export default confirmationDialog;

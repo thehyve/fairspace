@@ -1,13 +1,14 @@
-import React from 'react';
-
+// @ts-nocheck
+import React from "react";
 import BaseInputValue from "./BaseInputValue";
 
 function StringValue(props) {
-    return <BaseInputValue {...props} type="text" />;
+  return <BaseInputValue {...props} type="text" />;
 }
 
 StringValue.defaultProps = {
-    entry: {value: ''}
+  entry: {
+    value: ''
+  }
 };
-
 export default StringValue;
