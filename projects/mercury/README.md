@@ -1,46 +1,87 @@
-# Getting Started with Create React App
+# Mercury
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This application contains the user interface to list, manage and
+explore collections and metadata in Fairspace.
 
-## Available Scripts
+For a detailed description of the application, see the [Fairspace documentation](../../README.adoc).
 
-In the project directory, you can run:
+## Development
 
-### `npm start`
+When starting development in Mercury,
+please read about the [project structure](Structure.md) first.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Running the app in development mode
 
-### `npm test`
+Prerequisites:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- [nodejs and npm](https://www.npmjs.com/get-npm)
+- [yarn](https://yarnpkg.com/lang/en/)
+- docker
+- Java 17
 
-### `npm run build`
+The Mercury frontend app needs a backend to communicate with. For convenience, there are a few scripts to use for local development:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- `yarn localdevelopment` starts Keycloak at port `5100`.
+- `yarn saturn` starts the backend at port `8090`.
+- `yarn pluto` starts a proxy server that also serves the frontend at port `8080`.
+- `yarn start` starts the frontend and exposes it at port `3000`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+To start all these components at once, run:
+```bash
+yarn dev
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+This will start:
+- Keycloak (http://localhost:5100)
+- PostgreSQL (port `9432`)
+- Saturn (JDK 17 required, port `8090`)
+- Pluto (proxy, including Mercury frontend, http://localhost:8080)
+- Mercury frontend in development mode (http://localhost:3000)
+- a [backend proxy](src/setupProxy.js) for Mercury
 
-### `npm run eject`
+The backend and frontend application will be available at http://localhost:8080/
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+A reloading version of the frontend application is available at http://localhost:3000.
+Sometimes it is needed to navigate to http://localhost:3000/dev to login due to an issue in the backend proxy.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Keycloak has preconfigured user accounts `user`, `user2`, `organisation-admin`, `datasteward`, `external-user`, `coordinator` and `coordinator2` with password `fairspace123`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+In Keycloak, one setting needs to be configured manually: the permissions of the client service account. Follow the [local development instructions](https://docs.fairway.app/#_local_development) to configure these.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
+### Libraries
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- The UI uses many components from [Material UI](https://material-ui.com/).
+- [axios](https://github.com/axios/axios) is used for http requests.
+- [webdav](https://github.com/perry-mitchell/webdav-client) is used for connecting to WebDAV servers.
+- [jsonld](https://github.com/digitalbazaar/jsonld.js) is used for unpacking JSON-LD responses.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Testing
+
+The project has extended the eslint configuration by React. At the moment it is not enforced and therefore it is recommended to use a plugin for eslint in your favorite IDE. The rules are in the .eslintrc.json file.
+
+You can also run eslint manually by doing:
+```bash
+yarn lint
+```
+
+Some types have been added using [flow]. To run the flow type checker:
+```bash
+yarn flow
+```
+
+[Jest] is the main testing framework and runner for unit tests.
+It is encouraged to use the [React Testing Library] for testing React components.
+However, some tests still use [Enzyme].
+
+To run the test scripts:
+```bash
+yarn test
+```
+
+
+[flow]: https://flow.org/en/docs/lang/
+[Jest]: https://jestjs.io/docs/en/getting-started
+[Enzyme]: https://airbnb.io/enzyme/
+[React Testing Library]: https://github.com/testing-library/react-testing-library
