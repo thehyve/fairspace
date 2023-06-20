@@ -1,8 +1,8 @@
 // @ts-nocheck
 /* eslint-disable no-unused-vars */
-import axios, { CancelTokenSource } from "axios";
-import { extractJsonData, handleHttpError } from "../../common/utils/httpUtils";
-import type { AccessLevel } from "../../collections/CollectionAPI";
+import axios, {CancelTokenSource} from "axios";
+import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
+import type {AccessLevel} from "../../collections/CollectionAPI";
 export type ValueType = "Identifier" | "Text" | "Number" | "Date" | "Term" | "Set" | "TermSet" | "Boolean";
 export const TextualValueTypes: ValueType[] = ['Identifier', 'Text', 'Set'];
 export type MetadataViewFilter = {
@@ -65,45 +65,43 @@ type MetadataViewDataRequest = MetadataViewCountRequest & {
 };
 const metadataViewUrl = "/api/views/";
 const defaultRequestOptions = {
-  headers: {
-    Accept: 'application/json'
-  }
+    headers: {
+        Accept: 'application/json'
+    }
 };
 
 class MetadataViewAPI {
-  getViews(): Promise<MetadataViews> {
-    return axios.get(metadataViewUrl, defaultRequestOptions).then(extractJsonData).catch(handleHttpError("Failure when retrieving metadata views."));
-  }
+    getViews(): Promise<MetadataViews> {
+        return axios.get(metadataViewUrl, defaultRequestOptions).then(extractJsonData).catch(handleHttpError("Failure when retrieving metadata views."));
+    }
 
-  getFacets(): Promise<MetadataFacets> {
-    return axios.get(`${metadataViewUrl}facets`, defaultRequestOptions).then(extractJsonData).catch(handleHttpError("Failure when retrieving metadata facets."));
-  }
+    getFacets(): Promise<MetadataFacets> {
+        return axios.get(`${metadataViewUrl}facets`, defaultRequestOptions).then(extractJsonData).catch(handleHttpError("Failure when retrieving metadata facets."));
+    }
 
-  getViewData(cancelToken: CancelTokenSource, viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
-    const viewRequest: MetadataViewDataRequest = {
-      view: viewName,
-      filters,
-      page: page + 1,
-      // API endpoint expects 1-base page number
-      size,
-      includeJoinedViews: true
-    };
-    const requestOptions = cancelToken ? { ...defaultRequestOptions,
-      cancelToken: cancelToken.token
-    } : defaultRequestOptions;
-    return axios.post(metadataViewUrl, viewRequest, requestOptions).then(extractJsonData).catch(handleHttpError("Error while fetching view data."));
-  }
+    getViewData(cancelToken: CancelTokenSource, viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
+        const viewRequest: MetadataViewDataRequest = {
+            view: viewName,
+            filters,
+            page: page + 1,
+            // API endpoint expects 1-base page number
+            size,
+            includeJoinedViews: true
+        };
+        const requestOptions = cancelToken ? {...defaultRequestOptions,
+            cancelToken: cancelToken.token} : defaultRequestOptions;
+        return axios.post(metadataViewUrl, viewRequest, requestOptions).then(extractJsonData).catch(handleHttpError("Error while fetching view data."));
+    }
 
-  getCount(cancelToken: CancelTokenSource, viewName: string, filters: MetadataViewFilter[] = []): Promise<MetadataViewDataCount> {
-    const viewRequest: MetadataViewCountRequest = {
-      view: viewName,
-      filters
-    };
-    const requestOptions = cancelToken ? { ...defaultRequestOptions,
-      cancelToken: cancelToken.token
-    } : defaultRequestOptions;
-    return axios.post(`${metadataViewUrl}count`, viewRequest, requestOptions).then(extractJsonData).catch(handleHttpError("Error while fetching view count."));
-  }
+    getCount(cancelToken: CancelTokenSource, viewName: string, filters: MetadataViewFilter[] = []): Promise<MetadataViewDataCount> {
+        const viewRequest: MetadataViewCountRequest = {
+            view: viewName,
+            filters
+        };
+        const requestOptions = cancelToken ? {...defaultRequestOptions,
+            cancelToken: cancelToken.token} : defaultRequestOptions;
+        return axios.post(`${metadataViewUrl}count`, viewRequest, requestOptions).then(extractJsonData).catch(handleHttpError("Error while fetching view count."));
+    }
 
 }
 

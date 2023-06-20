@@ -1,5 +1,5 @@
 // @ts-nocheck
 import useNamespacedIri from "../hooks/UseNamespacedIri";
 export default (({
-  iri
+    iri
 }) => useNamespacedIri(iri));

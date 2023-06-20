@@ -5,12 +5,12 @@ import Typography from "@mui/material/Typography";
 import styles from "./Footer.styles";
 
 const Footer = ({
-  classes,
-  content
+    classes,
+    content
 }) => <footer className={classes.root}>
-        <Typography variant="body2" className={classes.text}>
-            {content}
-        </Typography>
-    </footer>;
+    <Typography variant="body2" className={classes.text}>
+        {content}
+    </Typography>
+</footer>;
 
 export default withStyles(styles)(Footer);

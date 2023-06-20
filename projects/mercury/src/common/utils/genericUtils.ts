@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { isValid } from "date-fns";
-import { enGB } from "date-fns/locale";
+import {isValid} from "date-fns";
+import {enGB} from "date-fns/locale";
 //* *********************************
 //* ARRAYS
 //* *********************************
@@ -23,9 +23,9 @@ export const flattenShallow = array => [].concat(...array);
  * @returns {*[]}
  */
 export const joinWithSeparator = (items = [], separator) => items.reduce((prev, curr) => {
-  if (!prev || prev.length === 0) return [curr];
-  if (separator) return [...prev, separator, curr];
-  return [...prev, curr];
+    if (!prev || prev.length === 0) return [curr];
+    if (separator) return [...prev, separator, curr];
+    return [...prev, curr];
 }, []);
 
 /**
@@ -42,9 +42,9 @@ export const first = array => array && array.length ? array[0] : undefined;
  * @returns Map with property as a group key and list of objects in the group as a value
  */
 export const groupBy = (array, key) => array.reduce((objectsMap, obj) => {
-  const value = obj[key];
-  objectsMap[value] = (objectsMap[value] || []).concat(obj);
-  return objectsMap;
+    const value = obj[key];
+    objectsMap[value] = (objectsMap[value] || []).concat(obj);
+    return objectsMap;
 }, {});
 //* *********************************
 //* COMPARISION
@@ -57,40 +57,40 @@ export const groupBy = (array, key) => array.reduce((objectsMap, obj) => {
  * @param {*} y
  */
 export function comparePrimitives(x, y) {
-  if (typeof x === "undefined" || typeof y === "undefined") {
-    if (typeof x === "undefined" && typeof y === "undefined") {
-      return 0;
+    if (typeof x === "undefined" || typeof y === "undefined") {
+        if (typeof x === "undefined" && typeof y === "undefined") {
+            return 0;
+        }
+
+        if (typeof x === "undefined") {
+            return -1;
+        }
+
+        return 1;
     }
 
-    if (typeof x === "undefined") {
-      return -1;
+    if (typeof x === 'string' && typeof y === 'string') {
+        return x.localeCompare(y, undefined, {
+            sensitivity: 'base'
+        });
     }
 
-    return 1;
-  }
+    if (x < y) {
+        return -1;
+    }
 
-  if (typeof x === 'string' && typeof y === 'string') {
-    return x.localeCompare(y, undefined, {
-      sensitivity: 'base'
-    });
-  }
+    if (x > y) {
+        return 1;
+    }
 
-  if (x < y) {
-    return -1;
-  }
-
-  if (x > y) {
-    return 1;
-  }
-
-  return 0;
+    return 0;
 }
 export function compareBy(valueExtractor, ascending = true) {
-  const transform = typeof valueExtractor === 'function' ? valueExtractor : x => x[valueExtractor];
-  return (x, y) => (ascending ? 1 : -1) * comparePrimitives(transform(x), transform(y));
+    const transform = typeof valueExtractor === 'function' ? valueExtractor : x => x[valueExtractor];
+    return (x, y) => (ascending ? 1 : -1) * comparePrimitives(transform(x), transform(y));
 }
 export function comparing(...comparators) {
-  return comparators.reduce((c1, c2) => (x, y) => c1(x, y) || c2(x, y));
+    return comparators.reduce((c1, c2) => (x, y) => c1(x, y) || c2(x, y));
 }
 
 /**
@@ -112,19 +112,19 @@ export const isEmptyObject = obj => !obj || Object.keys(obj).length === 0;
 let defaultLocale;
 
 try {
-  defaultLocale = new Intl.Locale('en-GB');
+    defaultLocale = new Intl.Locale('en-GB');
 } catch (e) {
-  defaultLocale = enGB;
+    defaultLocale = enGB;
 }
 
 const dateFormatter = new Intl.DateTimeFormat(defaultLocale, {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric'
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
 });
 const timeFormatter = new Intl.DateTimeFormat(defaultLocale, {
-  hour: 'numeric',
-  minute: 'numeric'
+    hour: 'numeric',
+    minute: 'numeric'
 });
 
 /**
@@ -134,13 +134,13 @@ const timeFormatter = new Intl.DateTimeFormat(defaultLocale, {
  * @return {string} the formatted date
  */
 export const formatDate = value => {
-  const date = new Date(value);
+    const date = new Date(value);
 
-  if (!value || !isValid(date)) {
-    return value;
-  }
+    if (!value || !isValid(date)) {
+        return value;
+    }
 
-  return dateFormatter.format(date);
+    return dateFormatter.format(date);
 };
 
 /**
@@ -150,15 +150,15 @@ export const formatDate = value => {
  * @return {string} the formatted date
  */
 export const formatDateTime = value => {
-  const date = new Date(value);
+    const date = new Date(value);
 
-  if (!value || !isValid(date)) {
-    return value;
-  }
+    if (!value || !isValid(date)) {
+        return value;
+    }
 
-  const today = new Date();
-  const isToday = today.toDateString() === date.toDateString();
-  return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
+    const today = new Date();
+    const isToday = today.toDateString() === date.toDateString();
+    return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
 
 /**

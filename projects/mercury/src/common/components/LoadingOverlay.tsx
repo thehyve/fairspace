@@ -4,15 +4,15 @@ import Dialog from "@mui/material/Dialog";
 import LoadingInlay from "./LoadingInlay";
 
 const LoadingOverlay = ({
-  loading
+    loading
 }) => <Dialog open={loading || false} PaperProps={{
-  style: {
-    backgroundColor: 'transparent',
-    boxShadow: 'none',
-    overflow: 'hidden'
-  }
+    style: {
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        overflow: 'hidden'
+    }
 }}>
-        <LoadingInlay />
-    </Dialog>;
+    <LoadingInlay />
+</Dialog>;
 
 export default LoadingOverlay;

@@ -1,26 +1,26 @@
 // @ts-nocheck
-import React, { useEffect } from "react";
-import { useLinkedDataNoContext } from "../UseLinkedData";
-import { MemoryRouter, useHistory } from "react-router-dom";
+import React, {useEffect} from "react";
+import {useLinkedDataNoContext} from "../UseLinkedData";
+import {MemoryRouter, useHistory} from "react-router-dom";
 
 const WrapperWithPushToHistory = ({
-  children
+    children
 }) => {
-  const history = useHistory();
-  useEffect(() => history.push(), [history]);
-  return children;
+    const history = useHistory();
+    useEffect(() => history.push(), [history]);
+    return children;
 };
 
 const LinkedDataParentMock = props => {
-  const {
-    iri,
-    context
-  } = props;
-  context.result = useLinkedDataNoContext(iri, context);
-  return <MemoryRouter>
-            <WrapperWithPushToHistory>
-            </WrapperWithPushToHistory>
-        </MemoryRouter>;
+    const {
+        iri,
+        context
+    } = props;
+    context.result = useLinkedDataNoContext(iri, context);
+    return <MemoryRouter>
+        <WrapperWithPushToHistory>
+        </WrapperWithPushToHistory>
+    </MemoryRouter>;
 };
 
-export { LinkedDataParentMock };
+export {LinkedDataParentMock};

@@ -1,8 +1,6 @@
 // @ts-nocheck
 const {createProxyMiddleware} = require('http-proxy-middleware');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const Keycloak = require('keycloak-connect');
-// eslint-disable-next-line import/no-extraneous-dependencies
 const session = require('express-session');
 
 module.exports = (app) => {

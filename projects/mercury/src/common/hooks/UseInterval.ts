@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useRef } from "react";
+import {useEffect, useRef} from "react";
 
 /**
  * A hook to set up an interval and clear it after the component unmounts
@@ -7,22 +7,22 @@ import { useEffect, useRef } from "react";
  * @param delay      delay between callbacks
  */
 const useInterval = (callback, delay) => {
-  const callbackRef = useRef();
-  useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
-  useEffect(() => {
-    const doCallback = () => {
-      callbackRef.current();
-    };
+    const callbackRef = useRef();
+    useEffect(() => {
+        callbackRef.current = callback;
+    }, [callback]);
+    useEffect(() => {
+        const doCallback = () => {
+            callbackRef.current();
+        };
 
-    if (delay !== null) {
-      const id = setInterval(doCallback, delay);
-      return () => clearInterval(id);
-    }
+        if (delay !== null) {
+            const id = setInterval(doCallback, delay);
+            return () => clearInterval(id);
+        }
 
-    return () => {};
-  }, [delay]);
+        return () => {};
+    }, [delay]);
 };
 
 export default useInterval;

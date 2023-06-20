@@ -8,7 +8,7 @@
  * @returns {*}
  */
 export const getFirstPredicateProperty = (metadataEntry: any, predicate: string, property: string, defaultValue: any): any => // eslint-disable-next-line implicit-arrow-linebreak
-metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue;
+    metadataEntry && metadataEntry[predicate] && metadataEntry[predicate][0] ? metadataEntry[predicate][0][property] : defaultValue;
 export const getFirstPredicateValue = (metadataEntry: any, predicate: string, defaultValue: any): any => getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
 export const getFirstPredicateId = (metadataEntry: any, predicate: string, defaultValue: any): any => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
 export const getFirstPredicateList = (metadataEntry: any, predicate: string, defaultValue: any): any => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
@@ -23,10 +23,10 @@ export const getFirstPredicateList = (metadataEntry: any, predicate: string, def
  * @returns {{}}
  */
 export const normalizeJsonLdResource = (jsonLd: any): any => Object.getOwnPropertyNames(jsonLd || {}).reduce((res: any, key: string) => {
-  const values = jsonLd[key];
-  res[key] = Array.isArray(values) ? values.map((v: any) => {
-    if (Object.prototype.hasOwnProperty.call(v, '@value')) return v['@value'];
-    return v['@id'] || v;
-  }) : values;
-  return res;
+    const values = jsonLd[key];
+    res[key] = Array.isArray(values) ? values.map((v: any) => {
+        if (Object.prototype.hasOwnProperty.call(v, '@value')) return v['@value'];
+        return v['@id'] || v;
+    }) : values;
+    return res;
 }, {});

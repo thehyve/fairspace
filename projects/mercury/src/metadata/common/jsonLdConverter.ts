@@ -1,9 +1,9 @@
 // @ts-nocheck
 import * as constants from "../../constants";
-import { getFirstPredicateId } from "./jsonLdUtils";
-import { determineShapeForProperty, isRdfList } from "./vocabularyUtils";
-import { getLabel, getLabelStrict } from "./metadataUtils";
-import { compareBy, comparing, flattenShallow, isNonEmptyValue } from "../../common/utils/genericUtils";
+import {getFirstPredicateId} from "./jsonLdUtils";
+import {determineShapeForProperty, isRdfList} from "./vocabularyUtils";
+import {getLabel, getLabelStrict} from "./metadataUtils";
+import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../common/utils/genericUtils";
 
 /**
  * Generates an entry to describe a single value for a property
@@ -11,22 +11,22 @@ import { compareBy, comparing, flattenShallow, isNonEmptyValue } from "../../com
  * @returns {{id: *, label, value: *}}
  */
 const generateValueEntry = (entry, allMetadata) => {
-  let label = "";
+    let label = "";
 
-  if (entry['@id']) {
-    label = getLabelStrict(entry);
+    if (entry['@id']) {
+        label = getLabelStrict(entry);
 
-    if (label === "") {
-      const elementFromAll = allMetadata[entry['@id']];
-      label = getLabel(elementFromAll);
+        if (label === "") {
+            const elementFromAll = allMetadata[entry['@id']];
+            label = getLabel(elementFromAll);
+        }
     }
-  }
 
-  return {
-    id: entry['@id'],
-    value: entry['@value'],
-    label
-  };
+    return {
+        id: entry['@id'],
+        value: entry['@value'],
+        label
+    };
 };
 
 /**
@@ -37,71 +37,71 @@ const generateValueEntry = (entry, allMetadata) => {
  * @returns {Array}
  */
 export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = {}, vocabulary) => {
-  const iri = metadata['@id'];
-  const valuesByPredicate = {};
+    const iri = metadata['@id'];
+    const valuesByPredicate = {};
 
-  const expectsRdfList = predicateUri => {
-    const propertyShape = propertyShapes.find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
-    return propertyShape && isRdfList(propertyShape);
-  };
+    const expectsRdfList = predicateUri => {
+        const propertyShape = propertyShapes.find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
+        return propertyShape && isRdfList(propertyShape);
+    };
 
-  const getValuesFirstPredicateId = predicate => {
+    const getValuesFirstPredicateId = predicate => {
     // const relevantItems = allMetadata[iri][predicate] ?? [];
-    const relevantItems = Object.values(allMetadata).filter(item => Object.prototype.hasOwnProperty.call(item, predicate) && item[predicate].find(v => v['@id'] === iri) !== undefined);
-    const newItems = [];
+        const relevantItems = Object.values(allMetadata).filter(item => Object.prototype.hasOwnProperty.call(item, predicate) && item[predicate].find(v => v['@id'] === iri) !== undefined);
+        const newItems = [];
 
-    for (let i = 0; i < relevantItems.length; i++) {
-      const newItem = generateValueEntry(relevantItems[i], allMetadata);
-      newItems.push(newItem);
-    }
+        for (let i = 0; i < relevantItems.length; i++) {
+            const newItem = generateValueEntry(relevantItems[i], allMetadata);
+            newItems.push(newItem);
+        }
 
-    return newItems;
-  };
+        return newItems;
+    };
 
-  const processFirstPredicateId = (predicateUri: String) => {
-    const predicate = getFirstPredicateId(vocabulary.find(e => e['@id'] === predicateUri), constants.SHACL_INVERS_PATH);
-    valuesByPredicate[predicateUri] = getValuesFirstPredicateId(predicate);
-  };
+    const processFirstPredicateId = (predicateUri: string) => {
+        const predicate = getFirstPredicateId(vocabulary.find(e => e['@id'] === predicateUri), constants.SHACL_INVERS_PATH);
+        valuesByPredicate[predicateUri] = getValuesFirstPredicateId(predicate);
+    };
 
-  const processValues = (predicateUri: String) => {
+    const processValues = (predicateUri: string) => {
     // Ensure that we have a list of values for the predicate
-    if (!Array.isArray(metadata[predicateUri])) {
-      return;
-    }
+        if (!Array.isArray(metadata[predicateUri])) {
+            return;
+        }
 
-    let values;
+        let values;
 
-    if (predicateUri === '@type') {
-      // Treat @type as special case, as it does not have the correct
-      // format (with @id or @value)
-      values = metadata[predicateUri].map(t => ({
-        id: t
-      }));
-    } else if (expectsRdfList(predicateUri)) {
-      // RDF lists in JSON LD are arrays in a container with key '@list'
-      // We want to use just the arrays. If there are multiple lists
-      // they are concatenated
-      // Please note that entries are not sorted as rdf:lists are meant to be ordered
-      values = flattenShallow(metadata[predicateUri].map(entry => entry['@list'] ? entry['@list'] : [entry])).map(entry => generateValueEntry(entry, allMetadata));
-    } else {
-      // Convert json-ld values into our internal format and
-      // sort the values
-      values = metadata[predicateUri].map(entry => generateValueEntry(entry, allMetadata)).sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
-    }
+        if (predicateUri === '@type') {
+            // Treat @type as special case, as it does not have the correct
+            // format (with @id or @value)
+            values = metadata[predicateUri].map(t => ({
+                id: t
+            }));
+        } else if (expectsRdfList(predicateUri)) {
+            // RDF lists in JSON LD are arrays in a container with key '@list'
+            // We want to use just the arrays. If there are multiple lists
+            // they are concatenated
+            // Please note that entries are not sorted as rdf:lists are meant to be ordered
+            values = flattenShallow(metadata[predicateUri].map(entry => entry['@list'] ? entry['@list'] : [entry])).map(entry => generateValueEntry(entry, allMetadata));
+        } else {
+            // Convert json-ld values into our internal format and
+            // sort the values
+            values = metadata[predicateUri].map(entry => generateValueEntry(entry, allMetadata)).sort(comparing(compareBy('label'), compareBy('id'), compareBy('value')));
+        }
 
-    valuesByPredicate[predicateUri] = values;
-  };
+        valuesByPredicate[predicateUri] = values;
+    };
 
-  propertyShapes.forEach(shape => {
-    const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
+    propertyShapes.forEach(shape => {
+        const predicateUri = getFirstPredicateId(shape, constants.SHACL_PATH);
 
-    if (predicateUri.startsWith('_')) {
-      processFirstPredicateId(predicateUri);
-    } else {
-      processValues(predicateUri);
-    }
-  });
-  return valuesByPredicate;
+        if (predicateUri.startsWith('_')) {
+            processFirstPredicateId(predicateUri);
+        } else {
+            processValues(predicateUri);
+        }
+    });
+    return valuesByPredicate;
 };
 
 /**
@@ -113,27 +113,27 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = {}, voca
  * @returns {*}
  */
 const jsonLdWrapper = (values, shape) => {
-  if (isRdfList(shape)) {
-    return {
-      '@list': values.map(({
+    if (isRdfList(shape)) {
+        return {
+            '@list': values.map(({
+                id,
+                value
+            }) => ({
+                '@id': id,
+                '@value': value
+            }))
+        };
+    }
+
+    const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
+    return values.map(({
         id,
         value
-      }) => ({
+    }) => ({
         '@id': id,
-        '@value': value
-      }))
-    };
-  }
-
-  const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
-  return values.map(({
-    id,
-    value
-  }) => ({
-    '@id': id,
-    '@value': value,
-    "@type": dataType
-  }));
+        '@value': value,
+        "@type": dataType
+    }));
 };
 
 /**
@@ -145,29 +145,29 @@ const jsonLdWrapper = (values, shape) => {
  * @returns {*}
  */
 export const toJsonLd = (subject, predicate, values, vocabulary) => {
-  if (!subject || !predicate || !values) {
-    return null;
-  }
+    if (!subject || !predicate || !values) {
+        return null;
+    }
 
-  const validValues = values.filter(({
-    id,
-    value
-  }) => isNonEmptyValue(value) || !!id);
+    const validValues = values.filter(({
+        id,
+        value
+    }) => isNonEmptyValue(value) || !!id);
 
-  // Return special nil value if no values or if all values are empty or invalid (non-truthy except zero or false)
-  if (validValues.length === 0) {
+    // Return special nil value if no values or if all values are empty or invalid (non-truthy except zero or false)
+    if (validValues.length === 0) {
+        return {
+            '@id': subject,
+            [predicate]: {
+                '@id': constants.NIL_URI
+            }
+        };
+    }
+
     return {
-      '@id': subject,
-      [predicate]: {
-        '@id': constants.NIL_URI
-      }
+        '@id': subject,
+        [predicate]: jsonLdWrapper(validValues, determineShapeForProperty(vocabulary, predicate))
     };
-  }
-
-  return {
-    '@id': subject,
-    [predicate]: jsonLdWrapper(validValues, determineShapeForProperty(vocabulary, predicate))
-  };
 };
 
 /**
@@ -177,33 +177,33 @@ export const toJsonLd = (subject, predicate, values, vocabulary) => {
  * @returns {*|{}}
  */
 export const getJsonLdForSubject = (expandedMetadata, subject) => {
-  // when expandedMetadata is a dictionary
-  if (expandedMetadata.constructor === Object) {
-    return expandedMetadata[subject];
-  }
+    // when expandedMetadata is a dictionary
+    if (expandedMetadata.constructor === Object) {
+        return expandedMetadata[subject];
+    }
 
-  // when expandedMetadata is a list
-  if (!Array.isArray(expandedMetadata) || !subject && expandedMetadata.length !== 1) {
-    console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
-    return {};
-  }
+    // when expandedMetadata is a list
+    if (!Array.isArray(expandedMetadata) || !subject && expandedMetadata.length !== 1) {
+        console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
+        return {};
+    }
 
-  return expandedMetadata.find(item => item['@id'] === subject) || {};
+    return expandedMetadata.find(item => item['@id'] === subject) || {};
 };
 
 const normalizeType = entry => {
-  if (!entry['@type'] && entry[constants.RDF_TYPE]) {
-    const {
-      [constants.RDF_TYPE]: types,
-      ...rest
-    } = entry;
-    return {
-      '@type': types.map(t => t['@id']),
-      ...rest
-    };
-  }
+    if (!entry['@type'] && entry[constants.RDF_TYPE]) {
+        const {
+            [constants.RDF_TYPE]: types,
+            ...rest
+        } = entry;
+        return {
+            '@type': types.map(t => t['@id']),
+            ...rest
+        };
+    }
 
-  return entry;
+    return entry;
 };
 
 /**
@@ -213,11 +213,11 @@ const normalizeType = entry => {
  * @returns
  */
 export const normalizeTypesBySubjectId = expandedMetadata => {
-  const normalizedTypes = {};
-  expandedMetadata.forEach(e => {
-    normalizedTypes[e['@id']] = normalizeType(e);
-  });
-  return normalizedTypes;
+    const normalizedTypes = {};
+    expandedMetadata.forEach(e => {
+        normalizedTypes[e['@id']] = normalizeType(e);
+    });
+    return normalizedTypes;
 };
 
 /**

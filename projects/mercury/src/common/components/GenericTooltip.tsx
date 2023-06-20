@@ -4,14 +4,13 @@ import React from "react";
 import withStyles from "@mui/styles/withStyles";
 
 const styles = theme => ({
-  tooltip: { ...theme.typography.caption,
-    maxWidth: 'none',
-    color: 'white'
-  }
+    tooltip: {...theme.typography.caption,
+        maxWidth: 'none',
+        color: 'white'}
 });
 
 export default withStyles(styles)(({
-  classes,
-  children,
-  ...otherProps
+    classes,
+    children,
+    ...otherProps
 }) => <Tooltip classes={classes} {...otherProps}>{children}</Tooltip>);

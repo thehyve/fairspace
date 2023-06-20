@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from "react";
+import React, {useState} from "react";
 import MetadataViewAPI from "./MetadataViewAPI";
 
 /**
@@ -8,34 +8,34 @@ import MetadataViewAPI from "./MetadataViewAPI";
  */
 const MetadataViewFacetsContext = React.createContext({});
 export const MetadataViewFacetsProvider = ({
-  children,
-  metadataViewApi = MetadataViewAPI
+    children,
+    metadataViewApi = MetadataViewAPI
 }) => {
-  const [data, setData] = useState({});
-  const [facetsLoading, setFacetsLoading] = useState(true);
-  const [facetsError, setFacetsError] = useState();
-  const [requested, setRequested] = useState(false);
+    const [data, setData] = useState({});
+    const [facetsLoading, setFacetsLoading] = useState(true);
+    const [facetsError, setFacetsError] = useState();
+    const [requested, setRequested] = useState(false);
 
-  const initialLoad = () => {
-    if (!requested) {
-      setRequested(true);
-      metadataViewApi.getFacets().then(d => {
-        setData(d);
-        setFacetsError(undefined);
-      }).catch(e => {
-        setFacetsError(e || true);
-        console.error(e || new Error('Unknown error while fetching facets.'));
-      }).finally(() => setFacetsLoading(false));
-    }
-  };
+    const initialLoad = () => {
+        if (!requested) {
+            setRequested(true);
+            metadataViewApi.getFacets().then(d => {
+                setData(d);
+                setFacetsError(undefined);
+            }).catch(e => {
+                setFacetsError(e || true);
+                console.error(e || new Error('Unknown error while fetching facets.'));
+            }).finally(() => setFacetsLoading(false));
+        }
+    };
 
-  return <MetadataViewFacetsContext.Provider value={{
-    facets: data && data.facets,
-    facetsError,
-    facetsLoading,
-    initialLoad
-  }}>
-            {children}
-        </MetadataViewFacetsContext.Provider>;
+    return <MetadataViewFacetsContext.Provider value={{
+        facets: data && data.facets,
+        facetsError,
+        facetsLoading,
+        initialLoad
+    }}>
+        {children}
+    </MetadataViewFacetsContext.Provider>;
 };
 export default MetadataViewFacetsContext;

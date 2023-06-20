@@ -6,9 +6,8 @@
 import "@testing-library/jest-dom";
 import "@testing-library/jest-dom/extend-expect";
 
-/* eslint-disable import/no-extraneous-dependencies */
-import { configure } from "enzyme";
+import {configure} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 configure({
-  adapter: new Adapter()
+    adapter: new Adapter()
 });
