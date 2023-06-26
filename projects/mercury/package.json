@@ -37,7 +37,7 @@
     "escape-string-regexp": "^5.0.0",
     "filesize": "^8.0.7",
     "http-proxy-middleware": "^2.0.4",
-    "jsonld": "^5.2.0",
+    "jsonld": "8.2.0",
     "lodash": "^4.17.21",
     "mdi-material-ui": "^7.2.0",
     "notistack": "^2.0.3",
@@ -87,7 +87,7 @@
     "not op_mini all"
   ],
   "engines": {
-    "node": ">=16.19.0"
+    "node": ">=18.16.0"
   },
   "jest": {
     "moduleNameMapper": {
@@ -95,6 +95,7 @@
     },
     "transformIgnorePatterns": [
       "\\.pnp\\.[^\\/]+$"
-    ]
+    ],
+    "setupFilesAfterEnv": ["./jest-setup.js"]
   }
 }
