@@ -19,6 +19,7 @@ import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -68,7 +69,7 @@ public class UserServiceTest {
                     return keycloakUser;
                 })
                 .collect(Collectors.toList());
-        when(usersResource.list()).thenReturn(keycloakUsers);
+        when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
 
         userService = new UserService(ConfigLoader.CONFIG.auth, tx, usersResource);
         workspaceService = new WorkspaceService(tx, userService);
@@ -90,7 +91,7 @@ public class UserServiceTest {
         // Change Keycloak info, triggering a database write
         // when the user cache is refreshed
         keycloakUsers.get(0).setLastName("Updated");
-        when(usersResource.list()).thenReturn(keycloakUsers);
+        when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
     }
 
     /**
