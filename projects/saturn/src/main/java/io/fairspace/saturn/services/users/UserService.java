@@ -81,7 +81,8 @@ public class UserService {
     }
 
     private Map<Node, User> fetchUsers() {
-        var keycloakUsers = usersResource.list();
+        var userCount = usersResource.count(); // TODO [FNS-126] implement proper pagination based on client request parameters
+        var keycloakUsers = usersResource.list(0, userCount);
         var updated = new HashSet<User>();
         var users = transactions.calculateRead(model -> {
             var dao = new DAO(model);
