@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: {{ .Release.Name }}-postgres-database
-          image: postgres:13-alpine
+          image: postgres:15-alpine
           volumeMounts:
             - name: postgres
               mountPath: /var/lib/postgresql/data

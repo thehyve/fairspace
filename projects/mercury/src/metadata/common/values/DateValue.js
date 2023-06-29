@@ -1,5 +1,8 @@
 import React from 'react';
-import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {DatePicker} from "@mui/x-date-pickers/DatePicker";
+import {TextField} from "@mui/material";
 import {format} from 'date-fns';
 
 import {DATE_FORMAT} from '../../../constants';
@@ -28,18 +31,16 @@ class DateValue extends React.Component {
     };
 
     render() {
-        const {entry, property, currentValues, ...otherProps} = this.props;
-
         return (
-            <DatePicker
-                showTodayButton
-                openTo="year"
-                format={DATE_FORMAT}
-                views={["year", "month", "date"]}
-                {...otherProps}
-                value={this.state.value}
-                onChange={this.handleChange}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                    format={DATE_FORMAT}
+                    invalidDateMessage="Invalid date format"
+                    value={this.state.value}
+                    onChange={this.handleChange}
+                    renderInput={(params) => <TextField {...params} />}
+                />
+            </LocalizationProvider>
         );
     }
 }

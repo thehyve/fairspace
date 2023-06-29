@@ -80,7 +80,7 @@ saturn:
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   initContainer:
-    image: alpine:3.9
+    image: alpine:3.18
     pullPolicy: IfNotPresent
   resources:
     limits:
