@@ -11,15 +11,33 @@ const styles = theme => ({
         zIndex: theme.zIndex.drawer + 1
     },
     title: {
-        flexGrow: 1
+        flexGrow: 1,
+        marginLeft: 20,
+        width: 150
     }
 });
 
 const TopBar = ({classes, title, children}) => (
     <AppBar className={classes.root} position="sticky">
         <Toolbar>
-            <Typography variant="h6" color="inherit" noWrap className={classes.title}>
-                {title}
+            <img src="/public/images/logo_white.png" alt="Fairspace" height="60" />
+            <Typography
+                className={classes.title}
+                variant="h6"
+                noWrap
+                component="a"
+                href="/"
+                sx={{
+                    mr: 2,
+                    display: {xs: 'none', md: 'flex'},
+                    fontFamily: ['monospace'],
+                    fontWeight: 700,
+                    letterSpacing: '.3rem',
+                    color: 'inherit',
+                    textDecoration: 'none',
+                }}
+            >
+                {title} {process.env.NODE_ENV === 'development' ? "### LOCAL DEVELOPMENT ### " : ""}
             </Typography>
             {children}
             <UserMenu />

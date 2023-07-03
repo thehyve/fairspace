@@ -15,8 +15,9 @@ import withStyles from '@mui/styles/withStyles';
 
 import {ErrorOutline} from '@mui/icons-material';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
+import UserContext from "../users/UserContext";
+import versionInfo from '../common/VersionInfo';
 import {getDisplayName} from "../users/userUtils";
 
 const styles = {
@@ -28,6 +29,8 @@ const styles = {
     },
     avatar: {
         margin: 10,
+        width: 28,
+        height: 28,
     },
     logout: {
         width: 50
@@ -104,6 +107,9 @@ const UserMenu = ({classes}) => {
                                             <ExitToAppIcon />
                                         </ListItemIcon>
                                         <ListItemText primary="Logout" />
+                                    </MenuItem>
+                                    <MenuItem>
+                                        {versionInfo.name} {versionInfo.version}
                                     </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>

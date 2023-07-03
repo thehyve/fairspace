@@ -20,7 +20,7 @@ const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
 
     const workspace: Workspace = currentWorkspace() && workspaces.find(w => w.iri === currentWorkspace());
-    const title = (workspace && workspace.code) || '';
+    const title = (workspace && workspace.code) || 'fairspace';
 
     return (
         <StatusProvider>

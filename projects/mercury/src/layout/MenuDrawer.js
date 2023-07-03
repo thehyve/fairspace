@@ -12,7 +12,7 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose),
+            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose)
         }}
     >
         <div className={classes.toolbar}>
@@ -26,6 +26,9 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
             onMouseLeave={onMouseLeave}
         >
             {renderMenu()}
+        </div>
+        <div className={classes.customerLogo}>
+            <img src="/public/images/fns_logo.png" alt="fns" height="60" />
         </div>
     </Drawer>
 );
