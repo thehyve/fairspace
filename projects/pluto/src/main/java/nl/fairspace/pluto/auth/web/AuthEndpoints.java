@@ -1,9 +1,7 @@
 package nl.fairspace.pluto.auth.web;
 
-import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.id.State;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.AuthConstants;
 import nl.fairspace.pluto.auth.OAuthFlow;
 import nl.fairspace.pluto.auth.config.OidcConfig;
 import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
@@ -17,7 +15,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import static nl.fairspace.pluto.auth.AuthConstants.*;
@@ -53,7 +50,10 @@ public class AuthEndpoints {
            try {
                location = oAuthFlow.getLoginUri(exchange.getRequest(), state).toString();
            } catch (URISyntaxException e) {
-               throw new RuntimeException(e); // todo fix
+               log.error("Error parsing login URI: " + e.getMessage());
+               return ResponseEntity
+                       .status(HttpStatus.FORBIDDEN)
+                       .body("Error parsing login URI.");
            }
 
            return ResponseEntity
@@ -65,13 +65,19 @@ public class AuthEndpoints {
 
     @GetMapping("/logout")
     public Mono<ResponseEntity<Void>> logout(ServerWebExchange exchange) {
-        return exchange.getSession().doOnSuccess(session -> {
-                    // Invalidate current session
-                    session.getAttributes().remove(AUTHORIZATION_SESSION_ATTRIBUTE);
-                }).map(WebSession::invalidate).then(Mono.just(ResponseEntity
-                        .status(HttpStatus.SEE_OTHER)
-                        .header("Location", getAuthProviderLogoutUrl(exchange.getAttribute(AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE)))
-                        .build()));
+        return exchange.getSession().map(session -> {
+            OAuthAuthenticationToken authenticationToken = (OAuthAuthenticationToken)session.getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+            String location = getAuthProviderLogoutUrl(authenticationToken);
+
+            // Invalidate current session
+            session.getAttributes().remove(AUTHORIZATION_SESSION_ATTRIBUTE);
+            session.invalidate();
+
+            return ResponseEntity
+                    .status(HttpStatus.SEE_OTHER)
+                    .header("Location", location)
+                    .build();
+        });
     }
 
     @GetMapping("/authorize")
@@ -90,13 +96,11 @@ public class AuthEndpoints {
             OAuthAuthenticationToken token = null;
             try {
                 token = oAuthFlow.retrieveToken(code, exchange.getRequest());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            } // TODO fix error handling
-            catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                log.error("Error retrieving token from the auth provider: " + e.getMessage());
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("Error retrieving token from the auth provider.");
             }
 
             if (token == null) {
