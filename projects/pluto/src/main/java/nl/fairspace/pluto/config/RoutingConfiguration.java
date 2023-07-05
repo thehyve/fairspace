@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RoutingConfiguration {
+
     @Bean
     public WebDAVHostRoutingFilter webDAVHostRoutingFilter() {
         return new WebDAVHostRoutingFilter();

@@ -95,13 +95,12 @@ public class OAuth2ValidationTests {
 	}
 
 	@Test
-	public void applicationRedirectsWhenHtmlIsAccepted() throws Exception {
+	public void applicationReturnsOkWhenHtmlIsAccepted() throws Exception {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Accept", "text/html");
 		ResponseEntity<String> response = getWithKey(new JWTBuilder().build(), headers);
 
-		assertEquals(302, response.getStatusCodeValue());
-		assertTrue(response.getHeaders().get("Location").get(0).endsWith("/login"));
+		assertEquals(200, response.getStatusCodeValue());
 	}
 
 	@Test
@@ -110,8 +109,7 @@ public class OAuth2ValidationTests {
 		headers.set("Accept", "text/html, application/json");
 		ResponseEntity<String> response = getWithKey(new JWTBuilder().build(), headers);
 
-		assertEquals(302, response.getStatusCodeValue());
-		assertTrue(response.getHeaders().get("Location").get(0).endsWith("/login"));
+		assertEquals(200, response.getStatusCodeValue());
 	}
 
 	@Test

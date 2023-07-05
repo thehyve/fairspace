@@ -4,6 +4,7 @@ pluto:
     backend-url: ${KEYCLOAK_BACKEND_URL:${pluto.oauth2.base-url}}
     realm: fairspace
   max-file-size: 2GB
+  staticHtmlLocation:
 server:
   error:
     whitelabel:
@@ -19,14 +20,12 @@ spring:
   sleuth:
     sampler:
       probability: 1.0
+  webflux:
+    static-path-pattern: "/**"
   web:
     resources:
-      static-locations: classpath:static,file:/opt/mercury
+      static-locations: classpath:static,${pluto.static-html-location:""}
   cloud:
-    discovery:
-      client:
-        composite-indicator:
-          enabled: false
     gateway:
       globalcors:
         add-to-simple-url-handler-mapping: true

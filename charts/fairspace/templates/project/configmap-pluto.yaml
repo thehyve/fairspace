@@ -13,6 +13,7 @@ data:
 {{ if .Values.pluto.externalDomains }}{{ toYaml .Values.pluto.externalDomains | indent 8 }}{{ end }}
       downstreamServiceHealthUrl: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}/api/health/
       max-file-size: {{ .Values.pluto.maxFileSize }}
+      staticHtmlLocation: /opt/mercury
       oauth2:
         base-url: {{ .Values.external.keycloak.baseUrl }}
         realm: {{ .Values.external.keycloak.realm }}
@@ -42,14 +43,8 @@ data:
         clientSecret: '{{ .Values.external.keycloak.clientSecret }}'
 
     spring:
-      main:
-        web-application-type: reactive
-      webflux.static-path-pattern: "/**"
-      resources.static-locations: "file:/opt/mercury"
       cloud:
         gateway:
-          globalcors:
-            add-to-simple-url-handler-mapping: true
           routes:
 {{ if .Values.pluto.backends.storageRoutes }}
 {{ toYaml .Values.pluto.backends.storageRoutes | indent 8 }}
@@ -62,7 +57,7 @@ data:
             filters:
             - name: RequestSize
               args:
-              maxSize: ${pluto.max-file-size}
+                maxSize: ${pluto.max-file-size}
           - id: saturn
             uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
             predicates:

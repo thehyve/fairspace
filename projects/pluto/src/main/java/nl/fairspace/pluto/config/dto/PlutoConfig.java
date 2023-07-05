@@ -30,5 +30,6 @@ public class PlutoConfig {
     private List<String> domains = Collections.emptyList();
     private Map<String, Storage> storages = new LinkedHashMap<>();
     private String downstreamServiceHealthUrl;
+    private String staticHtmlLocation;
 }
 
