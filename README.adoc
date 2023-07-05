@@ -3004,9 +3004,8 @@ Pluto keeps track of user sessions, handles the OIDC authentication flow (author
 JWT tokens (validation, refreshing) and redirects to back-end applications.
 
 Pluto is a link:https://spring.io/projects/spring-boot[Java Spring Boot] application,
-using link:https://github.com/Netflix/zuul[Netflix Zuul] as an embedded reverse proxy
-and link:https://bitbucket.org/connect2id/nimbus-jose-jwt[Nimbus JOSE + JWT library] to connect to Keycloak,
-follow the authentication flow and to handle JWT tokens.
+using link:https://github.com/spring-cloud/spring-cloud-gateway[Spring Cloud Gateway] to route APIs
+and, together with link:https://bitbucket.org/connect2id/nimbus-jose-jwt[Nimbus JOSE + JWT library], to connect to Keycloak, follow the authentication flow, handle web sessions and JWT tokens.
 
 === Saturn
 

@@ -19,10 +19,6 @@ security:
     - /actuator/health
     - /login
     - /logout
-    needsAuthorization:
-    - /thehyve
-    - /echo-token
-
 
 spring:
   main:

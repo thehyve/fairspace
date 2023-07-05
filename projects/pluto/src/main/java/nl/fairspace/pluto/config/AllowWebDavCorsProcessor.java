@@ -27,7 +27,7 @@ import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD
  * the methods specified in the configuration.
  */
 @Slf4j
-public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO check if needed
+public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO remove if not needed
     @Override
     protected boolean handleInternal(ServerHttpRequest request, ServerHttpResponse response, CorsConfiguration config, boolean preFlightRequest) throws IOException {
         log.trace("Handle cors request for {} {}", request.getMethod(), request.getURI());

@@ -24,7 +24,7 @@ spring:
     static-path-pattern: "/**"
   web:
     resources:
-      static-locations: classpath:static,${pluto.static-html-location:""}
+      static-locations: classpath:static,${pluto.staticHtmlLocation}
   cloud:
     gateway:
       globalcors:
@@ -62,9 +62,7 @@ security:
 
   # Specify urls for security configuration.
   # URLs with permitAll do not require any authentication
-  # URLs with needAuthentication are allowed to be accessed by any user. They are needed
-  #      to show an error message if the user is not allowed to access the workspace
-  # URLs with needAuthorization need an authorized user.
+  # All other URLs need an authorized user.
   urls:
     permitAll:
     - /actuator/health
@@ -75,5 +73,3 @@ security:
     - /logout
     - /authorize
     - /favicon.ico
-    needsAuthorization:
-    - /*

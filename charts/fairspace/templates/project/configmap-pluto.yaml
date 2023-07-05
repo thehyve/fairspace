@@ -43,6 +43,9 @@ data:
         clientSecret: '{{ .Values.external.keycloak.clientSecret }}'
 
     spring:
+      web:
+        resources:
+          static-locations: classpath:static,file:/opt/mercury
       cloud:
         gateway:
           routes:
@@ -57,7 +60,7 @@ data:
             filters:
             - name: RequestSize
               args:
-                maxSize: ${pluto.max-file-size}
+                maxSize: {{ .Values.pluto.maxFileSize }}
           - id: saturn
             uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
             predicates:

@@ -19,7 +19,6 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -37,12 +36,10 @@ import static nl.fairspace.pluto.auth.AuthorizationFailedHandler.X_REQUESTED_WIT
 public class WebClientHtmlRequestFilter implements OrderedWebFilter {
 
     private final AppSecurityUrlConfig urlConfig;
-    private final PlutoConfig plutoConfig;
     private Resource indexFile;
 
     public WebClientHtmlRequestFilter(AppSecurityUrlConfig urlConfig, PlutoConfig plutoConfig) {
         this.urlConfig = urlConfig;
-        this.plutoConfig = plutoConfig;
         String staticHtmlLocation = plutoConfig.getStaticHtmlLocation();
         if (staticHtmlLocation != null && !staticHtmlLocation.trim().isEmpty()) {
             indexFile = new FileSystemResource(Paths.get(staticHtmlLocation, "index.html"));
@@ -51,11 +48,11 @@ public class WebClientHtmlRequestFilter implements OrderedWebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        if (shouldRedirect(exchange.getRequest())) {
+        if (shouldFilter(exchange.getRequest())) {
             ServerHttpResponse response = exchange.getResponse();
             response.getHeaders().put(HttpHeaders.CONTENT_TYPE, Collections.singletonList((MediaType.TEXT_HTML_VALUE)));
             String newResponseBody = "";
-            if (indexFile != null) {
+            if (indexFile != null && indexFile.exists()) {
                 try {
                     newResponseBody = indexFile.getContentAsString(StandardCharsets.UTF_8);
                 } catch (Exception e) {
@@ -70,7 +67,7 @@ public class WebClientHtmlRequestFilter implements OrderedWebFilter {
         return chain.filter(exchange);
     }
 
-    private boolean shouldRedirect(ServerHttpRequest request) {
+    private boolean shouldFilter(ServerHttpRequest request) {
         String acceptHeader = request.getHeaders().getFirst(HttpHeaders.ACCEPT);
         return HttpMethod.GET.matches(request.getMethod().name()) && acceptHeader != null &&
                 acceptHeader.contains("text/html") &&

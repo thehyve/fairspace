@@ -83,23 +83,4 @@ public class CorsIntegrationTests {
 		assertEquals("PROPFIND", response.getHeaders().get("Access-Control-Allow-Methods").get(0));
 	}
 
-	@Test
-	public void corsHeadersForZuulServletRequest() throws Exception {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set("Origin", "http://fake-origin");
-		headers.set("access-control-request-headers", "depth");
-		headers.set("access-control-request-method", "PROPFIND");
-
-		HttpEntity<Object> request = new HttpEntity<>(headers);
-		ResponseEntity<String> response = restTemplate.exchange("http://localhost:" + port + "/thehyve", HttpMethod.OPTIONS, request, String.class);
-
-		// Expect no restrictions on origin, headers and methods and that credentials are allowed
-		assertEquals(200, response.getStatusCodeValue());
-		assertEquals("true", response.getHeaders().get("Access-Control-Allow-Credentials").get(0));
-		assertEquals("http://fake-origin", response.getHeaders().get("Access-Control-Allow-Origin").get(0));
-		assertEquals("depth", response.getHeaders().get("Access-Control-Allow-Headers").get(0));
-		assertEquals("PROPFIND", response.getHeaders().get("Access-Control-Allow-Methods").get(0));
-	}
-
-
 }
