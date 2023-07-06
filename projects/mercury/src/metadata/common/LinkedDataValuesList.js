@@ -128,7 +128,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
             key={index}
         >
             <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
-                <div style={{overflow: "hidden", textOverflow: "ellipsis", width: "20rem"}}>
+                <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
                     {
                         columnDefinition.id === LABEL_URI
                             ? <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>
