@@ -1,6 +1,6 @@
 import React from 'react';
 import {withRouter} from "react-router-dom";
-import {AppBar, Toolbar, Typography} from "@mui/material";
+import {AppBar, Toolbar} from "@mui/material";
 
 import withStyles from '@mui/styles/withStyles';
 
@@ -17,28 +17,13 @@ const styles = theme => ({
     }
 });
 
-const TopBar = ({classes, title, children}) => (
+const TopBar = ({classes, children}) => (
     <AppBar className={classes.root} position="sticky">
         <Toolbar>
-            <img src="/public/images/logo_white.png" alt="Fairspace" height="60" />
-            <Typography
-                className={classes.title}
-                variant="h6"
-                noWrap
-                component="a"
-                href="/"
-                sx={{
-                    mr: 2,
-                    display: {xs: 'none', md: 'flex'},
-                    fontFamily: ['monospace'],
-                    fontWeight: 700,
-                    letterSpacing: '.3rem',
-                    color: 'inherit',
-                    textDecoration: 'none',
-                }}
-            >
-                {title} {process.env.NODE_ENV === 'development' ? "### LOCAL DEVELOPMENT ### " : ""}
-            </Typography>
+            <div className={classes.title}>
+                <img src="/public/images/logo_white.png" alt="Fairspace" height="60" />
+                <img style={{marginLeft: 20}} src="/public/images/text_white.png" alt="Fairspace" height="50" />
+            </div>
             {children}
             <UserMenu />
         </Toolbar>
