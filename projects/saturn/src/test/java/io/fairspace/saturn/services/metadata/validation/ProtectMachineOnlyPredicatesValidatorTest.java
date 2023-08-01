@@ -13,8 +13,7 @@ import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProtectMachineOnlyPredicatesValidatorTest {
@@ -44,7 +43,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         S2, P2, S1);
 
         validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, violationHandler);
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test
@@ -71,7 +70,7 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     @Test
     public void testHasMachineOnlyPredicatesOnEmptyModel() {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
 }
