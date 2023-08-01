@@ -1,54 +1,33 @@
 package nl.fairspace.pluto.config;
 
 import nl.fairspace.pluto.config.dto.PlutoConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
-public class CorsConfiguration {
-    @Autowired
+public class CorsConfiguration extends org.springframework.web.cors.CorsConfiguration {
+
     PlutoConfig plutoConfig;
 
+    public CorsConfiguration(PlutoConfig plutoConfig) {
+        this.plutoConfig = plutoConfig;
+    }
+
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    CorsWebFilter corsWebFilter() {
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
 
-        plutoConfig.getDomains().forEach(corsConfiguration::addAllowedOrigin);
+        corsConfiguration.setAllowedOrigins(plutoConfig.getDomains());
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
-    }
 
-    @Bean
-    CorsFilter corsFilter() {
-        CorsFilter corsFilter = new CorsFilter(corsConfigurationSource());
-        corsFilter.setCorsProcessor(new AllowWebDavCorsProcessor());
-        return corsFilter;
-    }
-
-    /**
-     * This registration bean makes sure that the corsFilter is added as the first filter
-     * This is needed, because in certain cases another corsFilter (with default settings) is added to
-     * the filter chain. This seems to be happing when bypassing the spring servlet (on the /zuul/* endpoints).
-     * This filter effectively intercepts the preflight requests and responds properly.
-     *
-     * @return
-     */
-    @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
-        FilterRegistrationBean<CorsFilter> registrationBean = new FilterRegistrationBean<>(corsFilter());
-        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-        return registrationBean;
+        return new CorsWebFilter(source);
     }
 }
 

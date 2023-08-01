@@ -37,7 +37,6 @@ pluto:
     image: pluto-local
     tag: latest
     pullPolicy: Never
-  socketTimeoutMillis: 600000  # 10 minutes
+  responseTimeoutMillis: 600000  # 10 minutes
   connectTimeoutMillis: 2000
   maxFileSize: 1GB
-  maxRequestSize: 1GB

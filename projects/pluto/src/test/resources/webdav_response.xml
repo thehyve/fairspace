@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
-<d:multistatus xmlns:d="DAV:" xmlns:cal="urn:ietf:params:xml:ns:caldav" xmlns:card="urn:ietf:params:xml:ns:carddav"
-               xmlns:cs="http://calendarserver.org/ns/" xmlns:ns1="https://fairspace.nl/ontology#">
+<d:multistatus xmlns:d="DAV:"
+               xmlns:ns1="https://fairspace.nl/ontology#">
     <d:response>
         <d:href>/api/webdav/</d:href>
         <d:propstat>

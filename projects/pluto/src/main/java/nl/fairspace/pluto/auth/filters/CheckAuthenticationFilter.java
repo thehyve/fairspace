@@ -1,55 +1,34 @@
 package nl.fairspace.pluto.auth.filters;
 
-import lombok.extern.slf4j.*;
-import nl.fairspace.pluto.auth.*;
-import nl.fairspace.pluto.auth.model.*;
+import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-
-import static nl.fairspace.pluto.auth.AuthConstants.*;
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
 /**
  * Base filter class that will mark a request as authorized if a certain condition holds. The condition
- * is to be implemented by subclasses in the {@link CheckAuthenticationFilter#isAuthorized(HttpServletRequest)} method
+ * is to be implemented by subclasses in the {@link CheckAuthenticationFilter#isAuthorized(ServerWebExchange)} method
  *
  * It will add an attribute called {@link AuthConstants#AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE}
  * to the current request, set to true
  */
 @Slf4j
-public abstract class CheckAuthenticationFilter implements Filter {
-    @Override
-    public void init(FilterConfig filterConfig) {
+public abstract class CheckAuthenticationFilter implements GatewayFilter {
 
+    protected abstract boolean isAuthorized(ServerWebExchange exchange);
+
+    protected boolean hasAuthentication(ServerWebExchange exchange) {
+        return getAuthentication(exchange) != null;
     }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if(Boolean.TRUE.equals(request.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-
-        if(isAuthorized(httpServletRequest)) {
-            // Save authorization check result
-            request.setAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE, Boolean.TRUE);
-        }
-
-        chain.doFilter(request, response);
-    }
-
-    protected abstract boolean isAuthorized(HttpServletRequest request);
-
-    protected boolean hasAuthentication(HttpServletRequest request) {
-        return getAuthentication(request) != null;
-    }
-
-    protected OAuthAuthenticationToken getAuthentication(HttpServletRequest request) {
-        Object attribute = request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
+    protected OAuthAuthenticationToken getAuthentication(ServerWebExchange exchange) {
+        Object attribute = exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
 
         if (attribute instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) attribute;
@@ -59,7 +38,15 @@ public abstract class CheckAuthenticationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        if (Boolean.TRUE.equals(exchange.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
+            return chain.filter(exchange);
+        }
 
+        if (isAuthorized(exchange)) {
+            // Save authorization check result
+            exchange.getAttributes().put(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE, Boolean.TRUE);
+        }
+        return chain.filter(exchange.mutate().build());
     }
 }

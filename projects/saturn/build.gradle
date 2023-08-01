@@ -2,15 +2,15 @@ buildscript {
     ext {
         jena_version = '4.3.2'
         milton_version = '3.0.1.269'
-        mockitoVersion = '3.12.0'
+        mockitoVersion = '5.3.1'
         jacksonVersion = '2.14.2' // check what version is used by Jena
-        postgresqlVersion = '42.3.3'
+        postgresqlVersion = '42.6.0'
     }
 }
 
 plugins {
     id 'java'
-    id "io.freefair.lombok" version "6.1.0"
+    id "io.freefair.lombok" version "8.0.1"
     id 'application'
     id 'jacoco'
 //    id  'com.github.spotbugs' version '1.6.10'
@@ -97,6 +97,13 @@ jacocoTestReport {
 dependencyCheck {
     failBuildOnCVSS=9
     suppressionFile='suppressions.xml'
+}
+
+test {
+    // From JVM 16 there are stricter rules on JDK internal access
+    // They also blocks usage of testing library mocking environment variables,
+    // That is why this additional arg for tests is needed
+    jvmArgs = ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
 }
 
 // Plugin disabled for Java 13 - not compatible

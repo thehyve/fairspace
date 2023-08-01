@@ -3,9 +3,9 @@ package nl.fairspace.pluto.web;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.config.dto.PlutoConfig;
 import nl.fairspace.pluto.web.dto.StorageInfo;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +34,7 @@ public class StoragesResource {
                         storage.getName(),
                         storage.getLabel(),
                         String.format("/api/storages/%s/webdav", storage.getName()),
-                        StringUtils.isEmpty(storage.getSearchUrl()) ? null : String.format("/api/storages/%s/search", storage.getName()),
+                        StringUtils.hasText(storage.getSearchUrl()) ? String.format("/api/storages/%s/search", storage.getName()) : null,
                         storage.getRootDirectoryIri()
                 ))
                 .collect(Collectors.toList());

@@ -1,25 +1,24 @@
 package nl.fairspace.pluto.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.*;
-import nl.fairspace.pluto.auth.model.*;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
 
 @Slf4j
-public class SessionAuthenticationFilter implements Filter {
+public class SessionAuthenticationFilter implements GatewayFilter {
     private JwtTokenValidator jwtTokenValidator;
     private OAuthFlow oAuthFlow;
 
@@ -28,32 +27,11 @@ public class SessionAuthenticationFilter implements Filter {
         this.oAuthFlow = oAuthFlow;
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // If the authorization is already set, skip this filter
-        if(request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        OAuthAuthenticationToken authenticationToken = retrieveSessionAuthentication((HttpServletRequest) request, (HttpServletResponse) response);
-        if(authenticationToken != null) {
-            request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
-        }
-
-        chain.doFilter(request, response);
-    }
-
-    private OAuthAuthenticationToken retrieveSessionAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        log.trace("Handle authentication for " + request.getRequestURI());
+    private OAuthAuthenticationToken retrieveSessionAuthentication(ServerWebExchange exchange, WebSession session) {
+        log.trace("Handle authentication for " + exchange.getRequest().getURI().getPath());
 
         // Get token from session
-        OAuthAuthenticationToken token = getTokenFromSession(request);
+        OAuthAuthenticationToken token = getTokenFromSession(session);
 
         // Nothing in session
         if(token == null) {
@@ -90,7 +68,7 @@ public class SessionAuthenticationFilter implements Filter {
                     if(refreshedTokenClaims != null) {
                         log.trace("The access token has been refreshed. Storing the new access token in session.");
                         OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
-                        storeTokenInSession(tokenWithClaims, request);
+                        storeTokenInSession(tokenWithClaims, session);
                         return tokenWithClaims;
                     } else {
                         log.warn("The access token has been refreshed, but the returned token seems to be invalid.");
@@ -112,9 +90,9 @@ public class SessionAuthenticationFilter implements Filter {
         return null;
     }
 
-    private OAuthAuthenticationToken getTokenFromSession(HttpServletRequest request) {
-        log.trace("Retrieving oAuth token from session with id {}", request.getSession().getId());
-        Object authenticationToken = request.getSession().getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+    private OAuthAuthenticationToken getTokenFromSession(WebSession session) {
+        log.trace("Retrieving oAuth token from session with id {}", session.getId());
+        Object authenticationToken = session.getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
 
         if(authenticationToken instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) authenticationToken;
@@ -123,12 +101,24 @@ public class SessionAuthenticationFilter implements Filter {
         }
     }
 
-    private void storeTokenInSession(OAuthAuthenticationToken token, HttpServletRequest request) {
-        request.getSession().setAttribute(AUTHORIZATION_SESSION_ATTRIBUTE, token);
+    private void storeTokenInSession(OAuthAuthenticationToken token, WebSession session) {
+        session.getAttributes().put(AUTHORIZATION_SESSION_ATTRIBUTE, token);
+        session.save();
     }
 
     @Override
-    public void destroy() {
-
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // If the authorization is already set, skip this filter
+        if(exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
+            return chain.filter(exchange);
+        }
+        Optional<WebSession> session = exchange.getSession().blockOptional(Duration.ofMillis(500));
+        if (session.isPresent()) {
+            OAuthAuthenticationToken authenticationToken = retrieveSessionAuthentication(exchange, session.get());
+            if (authenticationToken != null) {
+                exchange.getAttributes().put(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
+            }
+        }
+        return chain.filter(exchange);
     }
 }

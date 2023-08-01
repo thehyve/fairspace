@@ -2,79 +2,77 @@ package nl.fairspace.pluto.auth.config;
 
 import nl.fairspace.pluto.auth.AuthorizationFailedHandler;
 import nl.fairspace.pluto.auth.JwtTokenValidator;
-import nl.fairspace.pluto.auth.filters.*;
 import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.filters.*;
 import nl.fairspace.pluto.config.dto.AppSecurityUrlConfig;
 import nl.fairspace.pluto.config.dto.OidcConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+
+import java.util.Arrays;
 
 @Configuration
 @Profile("!noAuth")
 @ComponentScan("nl.fairspace.pluto.auth")
 public class AuthFilterConfiguration {
-    @Autowired
-    private OidcConfiguration oidcConfiguration;
+    private final OidcConfiguration oidcConfiguration;
 
-    @Autowired
-    private AppSecurityUrlConfig urlConfig;
+    private final AppSecurityUrlConfig urlConfig;
 
-    @Autowired
-    private OAuthFlow oAuthFlow;
+    private final OAuthFlow oAuthFlow;
 
+    final
+    JwtTokenValidator jwtTokenValidator;
+
+    public AuthFilterConfiguration(OidcConfiguration oidcConfiguration, AppSecurityUrlConfig urlConfig, OAuthFlow oAuthFlow, JwtTokenValidator jwtTokenValidator) {
+        this.oidcConfiguration = oidcConfiguration;
+        this.urlConfig = urlConfig;
+        this.oAuthFlow = oAuthFlow;
+        this.jwtTokenValidator = jwtTokenValidator;
+    }
     @Bean
-    @Autowired
-    public FilterRegistrationBean<SessionAuthenticationFilter> sessionAuthenticationFilter(JwtTokenValidator jwtTokenValidator, OAuthFlow oAuthFlow) {
-        FilterRegistrationBean<SessionAuthenticationFilter> registration = new FilterRegistrationBean<>();
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 100);
-        registration.setFilter(new SessionAuthenticationFilter(jwtTokenValidator, oAuthFlow));
-        return registration;
+    @Order(Ordered.HIGHEST_PRECEDENCE + 100)
+    public GlobalFilter sessionAuthenticationFilter() {
+        return (exchange, chain) -> new SessionAuthenticationFilter(jwtTokenValidator, oAuthFlow).filter(exchange, chain);
     }
 
     @Bean
-    public FilterRegistrationBean<UsernamePasswordAuthenticationFilter> usernamePasswordAuthenticationFilter() {
-        FilterRegistrationBean<UsernamePasswordAuthenticationFilter> registration = new FilterRegistrationBean<>();
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 101);
-        registration.setFilter(new UsernamePasswordAuthenticationFilter(oAuthFlow));
-        return registration;
+    @Order(Ordered.HIGHEST_PRECEDENCE + 101)
+    public GlobalFilter usernamePasswordAuthenticationFilter() {
+        return (exchange, chain) -> new UsernamePasswordAuthenticationFilter(oAuthFlow).filter(exchange, chain);
     }
 
     @Bean
-    @Autowired
-    public FilterRegistrationBean<HeaderAuthenticationFilter> bearerAuthenticationFilter(JwtTokenValidator jwtTokenValidator) {
-        FilterRegistrationBean<HeaderAuthenticationFilter> registration = new FilterRegistrationBean<>();
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 102);
-        registration.setFilter(new HeaderAuthenticationFilter(jwtTokenValidator));
-        return registration;
+    @Order(Ordered.HIGHEST_PRECEDENCE + 102)
+    public GlobalFilter bearerAuthenticationFilter() {
+        return (exchange, chain) -> new HeaderAuthenticationFilter(jwtTokenValidator).filter(exchange, chain);
     }
 
     @Bean
-    public FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> authorizedCheckAuthenticationFilter() {
-        FilterRegistrationBean<AuthorizedCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
-        filterRegBean.setFilter(new AuthorizedCheckAuthenticationFilter(oidcConfiguration.getRequiredAuthority()));
-        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 203);
-        return filterRegBean;
+    @Order(Ordered.HIGHEST_PRECEDENCE + 203)
+    public GlobalFilter authorizedCheckAuthenticationFilter() {
+        return (exchange, chain) -> new AuthorizedCheckAuthenticationFilter(oidcConfiguration.getRequiredAuthority()).filter(exchange, chain);
     }
 
     @Bean
-    public FilterRegistrationBean<AnonymousCheckAuthenticationFilter> anonymousCheckAuthenticationFilter() {
-        FilterRegistrationBean<AnonymousCheckAuthenticationFilter> filterRegBean = new FilterRegistrationBean<>();
-        filterRegBean.setFilter(new AnonymousCheckAuthenticationFilter());
-        filterRegBean.addUrlPatterns(urlConfig.getPermitAll());
-        filterRegBean.setOrder(Ordered.HIGHEST_PRECEDENCE + 204);
-        return filterRegBean;
+    @Order(Ordered.HIGHEST_PRECEDENCE + 204)
+    public GlobalFilter anonymousCheckAuthenticationFilter() {
+        return (exchange, chain) -> {
+            if (Arrays.stream(urlConfig.getPermitAll()).anyMatch(s -> s.equals(exchange.getRequest().getPath().toString()))) {
+                return new AnonymousCheckAuthenticationFilter().filter(exchange, chain);
+            }
+            return chain.filter(exchange);
+        };
     }
 
     @Bean
-    public FilterRegistrationBean<HandleFailedAuthenticationFilter> handleFailedAuthenticationFilter() {
-        FilterRegistrationBean<HandleFailedAuthenticationFilter> registration = new FilterRegistrationBean<>();
-        registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 300);
-        registration.setFilter(new HandleFailedAuthenticationFilter(new AuthorizationFailedHandler()));
-        return registration;
+    @Order(Ordered.HIGHEST_PRECEDENCE + 300)
+    public GlobalFilter handleFailedAuthenticationFilter() {
+        return (exchange, chain) -> new HandleFailedAuthenticationFilter(new AuthorizationFailedHandler()).filter(exchange, chain);
     }
 }
