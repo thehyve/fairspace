@@ -2,7 +2,8 @@ FROM openjdk:17
 
 ADD build/distributions/*.tar /opt/
 
-RUN apk update && apk add findutils
+RUN set -eux; \
+	microdnf install findutils
 
 EXPOSE 8090
 
