@@ -36,6 +36,16 @@ spring:
       httpclient:
         connect-timeout: 2000
         response-timeout: 600s
+      x-forwarded:
+        port-enabled: false
+        host-enabled: false
+        proto-enabled: false
+        prefix-enabled: false
+        port-append: false
+        host-append: false
+        proto-append: false
+        prefix-append: false
+        enabled: false
 
 management:
   endpoint:
