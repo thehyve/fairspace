@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {withRouter} from "react-router-dom";
 import {useDropzone} from "react-dropzone";
@@ -109,38 +108,39 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
 
-    function initializeDropzone() {
+    function InitializeDropzone() {
         return useDropzone({
-        noClick: true,
-        noKeyboard: true,
-        multiple: true,
-        useFsAccessApi: false,
-        onDropAccepted: (droppedFiles) => {
-            const newUpload = {
-                id: generateUuid(),
-                files: droppedFiles,
-                destinationPath: openedPath,
-            };
-            const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
-            const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
+            noClick: true,
+            noKeyboard: true,
+            multiple: true,
+            useFsAccessApi: false,
+            onDropAccepted: (droppedFiles) => {
+                const newUpload = {
+                    id: generateUuid(),
+                    files: droppedFiles,
+                    destinationPath: openedPath,
+                };
+                const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
+                const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
 
-            if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
-                setOverwriteFileCandidateNames(newOverwriteFileCandidates);
-                setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
-                if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
-                    setShowCannotOverwriteWarning(true);
-                    return;
+                if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
+                    setOverwriteFileCandidateNames(newOverwriteFileCandidates);
+                    setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
+                    if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
+                        setShowCannotOverwriteWarning(true);
+                        return;
+                    }
+                    setCurrentUpload(newUpload);
+                    setShowOverwriteConfirmation(true);
+                } else {
+                    startUpload(newUpload).then(refreshFiles);
                 }
-                setCurrentUpload(newUpload);
-                setShowOverwriteConfirmation(true);
-            } else {
-                startUpload(newUpload).then(refreshFiles);
             }
-        }
-    })};
+        });
+    }
 
-    const fileDropzoneProperties = initializeDropzone();
-    const folderDropzoneProperties = initializeDropzone();
+    const fileDropzoneProperties = InitializeDropzone();
+    const folderDropzoneProperties = InitializeDropzone();
 
     // Deselect all files on history changes
     useEffect(() => {
@@ -182,7 +182,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     }
 
     const uploadFolder = () => {
-        folderDropzoneProperties.open()
+        folderDropzoneProperties.open();
     };
 
     const uploadFile = () => {
@@ -286,8 +286,8 @@ export const FileBrowser = (props: FileBrowserProperties) => {
                 {...fileDropzoneProperties.getRootProps()}
                 className={`${classes.dropzone} ${fileDropzoneProperties.isDragActive && classes.activeStyle} ${fileDropzoneProperties.isDragAccept && classes.acceptStyle} ${fileDropzoneProperties.isDragReject && classes.rejectStyle}`}
             >
-                <input {...fileDropzoneProperties.getInputProps({ webkitdirectory: undefined })} />
-                <input {...folderDropzoneProperties.getInputProps({ webkitdirectory: "" })} />
+                <input {...fileDropzoneProperties.getInputProps({webkitdirectory: undefined})} />
+                <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ""})} />
                 <FileList
                     selectionEnabled={openedCollection.canRead}
                     files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
