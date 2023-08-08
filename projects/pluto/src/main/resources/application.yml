@@ -33,9 +33,16 @@ spring:
       default-filters:
       - RemoveRequestHeader=Pragma X-Frame-Options X-Content-Type-Options X-XSS-Protection X-Permitted-Cross-Domain-Policies Origin
         # Including the ORIGIN header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
+      - name: Retry
+        args:
+          methods: GET,PUT,POST,DELETE
+          exceptions:
+            - reactor.netty.http.client.PrematureCloseException
       httpclient:
         connect-timeout: 2000
         response-timeout: 600s
+        pool:
+          max-idle-time: 20s
       x-forwarded:
         port-enabled: false
         host-enabled: false
