@@ -104,6 +104,7 @@ public class UserService {
 
                             for (var role : config.defaultUserRoles) {
                                 switch (role) {
+                                    case "admin" -> user.setAdmin(true);
                                     case "canViewPublicMetadata" -> user.setCanViewPublicMetadata(true);
                                     case "canViewPublicData" -> user.setCanViewPublicData(true);
                                     case "canAddSharedMetadata" -> user.setCanAddSharedMetadata(true);
