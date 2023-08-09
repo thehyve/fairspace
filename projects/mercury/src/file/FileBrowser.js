@@ -108,36 +108,34 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
 
-    function InitializeDropzone() {
-        return useDropzone({
-            noClick: true,
-            noKeyboard: true,
-            multiple: true,
-            useFsAccessApi: false,
-            onDropAccepted: (droppedFiles) => {
-                const newUpload = {
-                    id: generateUuid(),
-                    files: droppedFiles,
-                    destinationPath: openedPath,
-                };
-                const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
-                const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
+    const InitializeDropzone = () => useDropzone({
+        noClick: true,
+        noKeyboard: true,
+        multiple: true,
+        useFsAccessApi: false,
+        onDropAccepted: (droppedFiles) => {
+            const newUpload = {
+                id: generateUuid(),
+                files: droppedFiles,
+                destinationPath: openedPath,
+            };
+            const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
+            const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
 
-                if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
-                    setOverwriteFileCandidateNames(newOverwriteFileCandidates);
-                    setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
-                    if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
-                        setShowCannotOverwriteWarning(true);
-                        return;
-                    }
-                    setCurrentUpload(newUpload);
-                    setShowOverwriteConfirmation(true);
-                } else {
-                    startUpload(newUpload).then(refreshFiles);
+            if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
+                setOverwriteFileCandidateNames(newOverwriteFileCandidates);
+                setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
+                if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
+                    setShowCannotOverwriteWarning(true);
+                    return;
                 }
+                setCurrentUpload(newUpload);
+                setShowOverwriteConfirmation(true);
+            } else {
+                startUpload(newUpload).then(refreshFiles);
             }
-        });
-    }
+        }
+    });
 
     const fileDropzoneProperties = InitializeDropzone();
     const folderDropzoneProperties = InitializeDropzone();
@@ -286,6 +284,8 @@ export const FileBrowser = (props: FileBrowserProperties) => {
                 {...fileDropzoneProperties.getRootProps()}
                 className={`${classes.dropzone} ${fileDropzoneProperties.isDragActive && classes.activeStyle} ${fileDropzoneProperties.isDragAccept && classes.acceptStyle} ${fileDropzoneProperties.isDragReject && classes.rejectStyle}`}
             >
+                {/* Since dropzone doesn't support a native folder picker we need to create an input element for both folders and files
+                https://github.com/react-dropzone/react-dropzone/discussions/1157 */}
                 <input {...fileDropzoneProperties.getInputProps({webkitdirectory: undefined})} />
                 <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ""})} />
                 <FileList
