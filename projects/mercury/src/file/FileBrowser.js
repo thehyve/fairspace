@@ -108,7 +108,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
 
-    const InitializeDropzone = () => useDropzone({
+    const useFairspaceDropzone = () => useDropzone({
         noClick: true,
         noKeyboard: true,
         multiple: true,
@@ -137,8 +137,8 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         }
     });
 
-    const fileDropzoneProperties = InitializeDropzone();
-    const folderDropzoneProperties = InitializeDropzone();
+    const fileDropzoneProperties = useFairspaceDropzone();
+    const folderDropzoneProperties = useFairspaceDropzone();
 
     // Deselect all files on history changes
     useEffect(() => {
