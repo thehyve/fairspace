@@ -25,7 +25,7 @@ spec:
       containers:
         - name: {{ .Release.Name }}-postgres-database
           image: postgres:15-alpine
-          args: ["postgres", "-c", "checkpoint_timeout=43200"]
+          args: ["-c", "checkpoint_timeout=43200"]
           volumeMounts:
             - name: postgres
               mountPath: /var/lib/postgresql/data
