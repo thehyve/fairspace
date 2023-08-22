@@ -64,6 +64,7 @@ services:
     volumes:
       - fairspace-postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
+    command: ["postgres", "-c", "checkpoint_timeout=43200"]
     logging:
       driver: ${DOCKER_LOGGING_DRIVER:-journald}
       options:
