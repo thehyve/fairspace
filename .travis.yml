@@ -91,7 +91,8 @@ jobs:
       - source charts/.travis/install.sh
       script:
       - travis_wait ci/helm/deploy.sh $DEPLOY_TARGET -f projects/saturn/views.yaml
-    - if: branch = documentation and type != pull_request
+    - if: branch = release and type != pull_request
+      name: Update documentation page
       install:
         - docs/.travis/install.sh
       script:
