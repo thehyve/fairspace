@@ -1,77 +1,92 @@
 package nl.fairspace.pluto.auth;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.http.*;
-import java.io.*;
+import java.time.Duration;
 
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class AuthorizationFailedHandlerTest {
     AuthorizationFailedHandler authorizationFailedHandler;
 
-    @Mock
-    HttpServletRequest request ;
+    ServerWebExchange exchange;
 
-    @Mock
-    HttpServletResponse response;
 
-    @Mock
-    HttpSession session;
-
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         authorizationFailedHandler = new AuthorizationFailedHandler();
     }
 
     @Test
-    void testRedirect() throws IOException {
-        when(request.getSession()).thenReturn(session);
-        when(request.getHeader("Accept")).thenReturn("text/html");
-        authorizationFailedHandler.handleFailedAuthorization(request, response);
-        verify(response).sendRedirect("/login");
+    public void testRedirect() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("Accept", "text/html")
+                .build();
+        exchange = MockServerWebExchange.from(request);
+        authorizationFailedHandler.handleFailedAuthorization(exchange);
+        assertEquals(HttpStatusCode.valueOf(302), exchange.getResponse().getStatusCode());
+        assertEquals("http://localhost/login", exchange.getResponse().getHeaders().get(HttpHeaders.LOCATION).get(0));
     }
 
     @Test
-    void testRedirectForHtmlAndJson() throws IOException {
-        when(request.getSession()).thenReturn(session);
-        when(request.getHeader("Accept")).thenReturn("text/html, application/json, other-types");
-        authorizationFailedHandler.handleFailedAuthorization(request, response);
-        verify(response).sendRedirect("/login");
+    public void testRedirectForHtmlAndJson() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("Accept", "text/html, application/json, other-types")
+                .build();
+        exchange = MockServerWebExchange.from(request);
+        authorizationFailedHandler.handleFailedAuthorization(exchange);
+        assertEquals(HttpStatusCode.valueOf(302), exchange.getResponse().getStatusCode());
+        assertEquals("http://localhost/login", exchange.getResponse().getHeaders().get(HttpHeaders.LOCATION).get(0));
     }
 
     @Test
-    void testStorageOfCurrentRequestUri() throws IOException {
-        when(request.getSession()).thenReturn(session);
-        when(request.getHeader("Accept")).thenReturn("text/html");
-        when(request.getRequestURI()).thenReturn("http://request-uri");
-        authorizationFailedHandler.handleFailedAuthorization(request, response);
-        verify(session).setAttribute(AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE, "http://request-uri");
-    }
-
-
-    @Test
-    void test401ForJsonRequests() throws IOException {
-        when(request.getHeader("Accept")).thenReturn("application/json");
-        authorizationFailedHandler.handleFailedAuthorization(request, response);
-        verify(response).sendError(401);
+    public void testStorageOfCurrentRequestUri() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://request-uri")
+                .header("Accept", "text/html")
+                .build();
+        exchange = MockServerWebExchange.from(request);
+        authorizationFailedHandler.handleFailedAuthorization(exchange);
+        assertEquals(
+                "http://request-uri",
+                exchange.getSession().block(Duration.ofMillis(500)).getAttribute(AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE)
+        );
     }
 
     @Test
-    void test401ForXHRRequests() throws IOException {
-        doReturn("text/html").when(request).getHeader("Accept");
-        doReturn("XMLHttpRequest").when(request).getHeader("X-Requested-With");
-        authorizationFailedHandler.handleFailedAuthorization(request, response);
-        verify(response).sendError(401);
+    public void test401ForJsonRequests() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("Accept", "application/json")
+                .build();
+        exchange = MockServerWebExchange.from(request);
+        authorizationFailedHandler.handleFailedAuthorization(exchange);
+        assertEquals(HttpStatusCode.valueOf(401), exchange.getResponse().getStatusCode());
     }
 
     @Test
-    void test401WithoutHeaders() throws IOException {
-        authorizationFailedHandler.handleFailedAuthorization(request, response);
-        verify(response).sendError(401);
+    public void test401ForXHRRequests() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("Accept", "X-Requested-With")
+                .build();
+        exchange = MockServerWebExchange.from(request);
+        authorizationFailedHandler.handleFailedAuthorization(exchange);
+        assertEquals(HttpStatusCode.valueOf(401), exchange.getResponse().getStatusCode());
+    }
+
+    @Test
+    public void test401WithoutHeaders() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        assertEquals(0, request.getHeaders().size());
+        exchange = MockServerWebExchange.from(request);
+        authorizationFailedHandler.handleFailedAuthorization(exchange);
+        assertEquals(HttpStatusCode.valueOf(401), exchange.getResponse().getStatusCode());
     }
 }

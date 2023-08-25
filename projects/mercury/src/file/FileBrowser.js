@@ -107,19 +107,12 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
-    const [isFolderUpload, setIsFolderUpload] = useState();
 
-    const {
-        getRootProps,
-        getInputProps,
-        isDragActive,
-        isDragAccept,
-        isDragReject,
-        open
-    } = useDropzone({
+    const useFairspaceDropzone = () => useDropzone({
         noClick: true,
         noKeyboard: true,
         multiple: true,
+        useFsAccessApi: false,
         onDropAccepted: (droppedFiles) => {
             const newUpload = {
                 id: generateUuid(),
@@ -144,6 +137,9 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         }
     });
 
+    const fileDropzoneProperties = useFairspaceDropzone();
+    const folderDropzoneProperties = useFairspaceDropzone();
+
     // Deselect all files on history changes
     useEffect(() => {
         const historyListener = history.listen(() => {
@@ -155,13 +151,6 @@ export const FileBrowser = (props: FileBrowserProperties) => {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [history]);
-
-    // A hook to make sure that isFolderUpload state is changed before opening the upload dialog
-    useEffect(() => {
-        if (isFolderUpload !== undefined) {
-            open();
-        }
-    }, [isFolderUpload, open]);
 
     const isParentCollectionDeleted = openedCollection.dateDeleted != null;
     const parentCollectionDeletedRef = useRef(isParentCollectionDeleted);
@@ -191,19 +180,11 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     }
 
     const uploadFolder = () => {
-        if (isFolderUpload) {
-            open();
-        } else {
-            setIsFolderUpload(true);
-        }
+        folderDropzoneProperties.open();
     };
 
     const uploadFile = () => {
-        if (!isFolderUpload) {
-            open();
-        } else {
-            setIsFolderUpload(false);
-        }
+        fileDropzoneProperties.open();
     };
 
     // A highlighting of a path means only this path would be selected/checked
@@ -300,10 +281,13 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     return (
         <div data-testid="files-view" className={classes.container}>
             <div
-                {...getRootProps()}
-                className={`${classes.dropzone} ${isDragActive && classes.activeStyle} ${isDragAccept && classes.acceptStyle} ${isDragReject && classes.rejectStyle}`}
+                {...fileDropzoneProperties.getRootProps()}
+                className={`${classes.dropzone} ${fileDropzoneProperties.isDragActive && classes.activeStyle} ${fileDropzoneProperties.isDragAccept && classes.acceptStyle} ${fileDropzoneProperties.isDragReject && classes.rejectStyle}`}
             >
-                <input {...getInputProps()} {...(isFolderUpload && {webkitdirectory: ""})} />
+                {/* Since dropzone doesn't support a native folder picker we need to create an input element for both folders and files
+                https://github.com/react-dropzone/react-dropzone/discussions/1157 */}
+                <input {...fileDropzoneProperties.getInputProps({webkitdirectory: undefined})} />
+                <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ""})} />
                 <FileList
                     selectionEnabled={openedCollection.canRead}
                     files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}

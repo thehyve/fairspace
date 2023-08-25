@@ -40,10 +40,6 @@ class FileAPI {
         this.remoteURL = remoteURL;
     }
 
-    uploadClient() {
-        return createClient('/zuul' + this.remoteURL);
-    }
-
     client() {
         return createClient(this.remoteURL);
     }
@@ -169,7 +165,7 @@ class FileAPI {
             onUploadProgress,
             data: formData
         };
-        return this.uploadClient()
+        return this.client()
             .customRequest(destinationPath, requestOptions)
             .catch(e => {
                 if (e && e.response) {

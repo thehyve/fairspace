@@ -12,6 +12,8 @@ data:
         - {{ template "fairspace.url" . }}
 {{ if .Values.pluto.externalDomains }}{{ toYaml .Values.pluto.externalDomains | indent 8 }}{{ end }}
       downstreamServiceHealthUrl: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}/api/health/
+      max-file-size: {{ .Values.pluto.maxFileSize }}
+      staticHtmlLocation: /opt/mercury
       oauth2:
         base-url: {{ .Values.external.keycloak.baseUrl }}
         realm: {{ .Values.external.keycloak.realm }}
@@ -41,25 +43,31 @@ data:
         clientSecret: '{{ .Values.external.keycloak.clientSecret }}'
 
     spring:
-      zipkin:
-        enabled: {{ .Values.tracing.enabled }}
-        base-url: {{ .Values.tracing.baseUrl }}
-      servlet:
-        multipart:
-          max-file-size: {{ .Values.pluto.maxFileSize }}
-          max-request-size: {{ .Values.pluto.maxRequestSize }}
-
-    zuul:
-      retryable: false
-      host:
-        connect-timeout-millis: {{ .Values.pluto.connectTimeoutMillis }}
-        socket-timeout-millis: {{ .Values.pluto.socketTimeoutMillis }}
-      routes:
+      web:
+        resources:
+          static-locations: classpath:static,file:/opt/mercury
+      cloud:
+        gateway:
+          routes:
 {{ if .Values.pluto.backends.storageRoutes }}
 {{ toYaml .Values.pluto.backends.storageRoutes | indent 8 }}
 {{ end }}
-        saturn:
-          path: /api/**
-          url: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
-          strip-prefix: false
-      add-proxy-headers: false
+          - id: saturn-post-request-size
+            uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090/api/" }}
+            predicates:
+            - Method=POST
+            - Path=/api/**
+            filters:
+            - name: RequestSize
+              args:
+                maxSize: {{ .Values.pluto.maxFileSize }}
+          - id: saturn
+            uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
+            predicates:
+            - Path=/api/**
+          default-filters:
+            - RemoveRequestHeader=Pragma X-Frame-Options X-Content-Type-Options X-XSS-Protection X-Permitted-Cross-Domain-Policies Origin
+            # Including the ORIGIN header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
+          httpclient:
+            connect-timeout: {{ .Values.pluto.connectTimeoutMillis }}
+            response-timeout: {{ .Values.pluto.responseTimeoutMillis }}

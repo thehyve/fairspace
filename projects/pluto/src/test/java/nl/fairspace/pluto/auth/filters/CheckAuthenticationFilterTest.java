@@ -1,75 +1,71 @@
 package nl.fairspace.pluto.auth.filters;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE;
+import static org.junit.Assert.assertEquals;
 
-import static nl.fairspace.pluto.auth.AuthConstants.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class CheckAuthenticationFilterTest {
     CheckAuthenticationFilter filter;
 
-    @Mock
-    HttpServletRequest request;
+    ServerWebExchange exchange;
 
     @Mock
-    HttpServletResponse response;
-
-    @Mock
-    FilterChain filterChain;
+    GatewayFilterChain filterChain;
 
     private boolean isAuthorized = true;
 
-    @BeforeEach
-    void setUp() {
+    @Before
+    public void setUp() {
         filter = new CheckAuthenticationFilter() {
             @Override
-            protected boolean isAuthorized(HttpServletRequest request) {
+            protected boolean isAuthorized(ServerWebExchange exchange) {
                 return isAuthorized;
             }
         };
-
         isAuthorized = true;
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        exchange = MockServerWebExchange.from(request);
     }
 
     @Test
-    void testFilterStoresAuthorizationResult() throws IOException, ServletException {
-        filter.doFilter(request, response, filterChain);
+    public void testFilterStoresAuthorizationResult() {
+        int originalAttributesSize = exchange.getAttributes().size();
+        filter.filter(exchange, filterChain);
 
-        verify(request).setAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE, Boolean.TRUE);
-        verify(filterChain).doFilter(request, response);
+        assertEquals(Boolean.TRUE, exchange.getAttributes().get(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize+1, exchange.getAttributes().size());
     }
 
     @Test
-    void testFilterStopsOnFailedAuthentication() throws IOException, ServletException {
+    public void testFilterStopsOnFailedAuthentication() {
+        int originalAttributesSize = exchange.getAttributes().size();
         isAuthorized = false;
-        filter.doFilter(request, response, filterChain);
+        filter.filter(exchange, filterChain);
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 
     @Test
-    void testFilterSkipsOnExistingResult() throws IOException, ServletException {
-        doReturn(Boolean.TRUE).when(request).getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE);
+    public void testFilterSkipsOnExistingResult() {
+        exchange.getAttributes().put(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE, Boolean.TRUE);
         filter = new CheckAuthenticationFilter() {
             @Override
-            protected boolean isAuthorized(HttpServletRequest request) {
+            protected boolean isAuthorized(ServerWebExchange exchange) {
                 throw new RuntimeException("this method should not be called");
             }
         };
 
-        filter.doFilter(request, response, filterChain);
-
-        verify(request, times(0)).setAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE, Boolean.TRUE);
-        verify(filterChain).doFilter(request, response);
+        filter.filter(exchange, filterChain);
+        assertEquals(Boolean.TRUE, exchange.getAttributes().get(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE));
     }
 }

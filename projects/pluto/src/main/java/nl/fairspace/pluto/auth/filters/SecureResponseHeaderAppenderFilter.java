@@ -1,10 +1,10 @@
 package nl.fairspace.pluto.auth.filters;
 
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 /**
  * This filter adds secure headers to the response in order to increase the security of the application.
@@ -16,29 +16,21 @@ import java.io.IOException;
  * Headers already included by default: "Strict-Transport-Security"
  */
 @Component
-public class SecureResponseHeaderAppenderFilter implements Filter {
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
+public class SecureResponseHeaderAppenderFilter implements GlobalFilter {
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-                         FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-        httpServletResponse.setHeader("X-Frame-Options", "DENY");
-        httpServletResponse.setHeader("X-Content-Type-Options", "nosniff");
-        httpServletResponse.setHeader("X-XSS-Protection", "0");
-        httpServletResponse.setHeader("X-Permitted-Cross-Domain-Policies", "none");
-        httpServletResponse.setHeader(
-                "Content-Security-Policy",
-                "default-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' 'unsafe-inline' https://*"
-        );
-        chain.doFilter(request, response);
-    }
-
-    @Override
-    public void destroy() {
-
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        return chain.filter(exchange)
+                .then(Mono.fromRunnable(() -> {
+                    var headers = exchange.getResponse().getHeaders();
+                    headers.add("X-Frame-Options", "DENY");
+                    headers.add("X-Content-Type-Options", "nosniff");
+                    headers.add("X-XSS-Protection", "0");
+                    headers.add("X-Permitted-Cross-Domain-Policies", "none");
+                    headers.add(
+                            "Content-Security-Policy",
+                            "default-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' 'unsafe-inline' https://*"
+                    );
+                }));
     }
 }

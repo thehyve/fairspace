@@ -1,10 +1,10 @@
 package nl.fairspace.pluto.auth;
 
-import nl.fairspace.pluto.auth.model.*;
-import org.apache.commons.lang3.*;
-import org.junit.jupiter.api.*;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.apache.commons.lang3.SerializationUtils;
+import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.HashMap;
 
 public class OAuthAuthenticationTokenTest {
     @Test

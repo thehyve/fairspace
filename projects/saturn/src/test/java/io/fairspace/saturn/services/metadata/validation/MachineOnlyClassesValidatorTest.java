@@ -45,7 +45,7 @@ public class MachineOnlyClassesValidatorTest {
         var model = modelOf(regularInstance, RDF.type, regularClass);
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test
@@ -62,6 +62,6 @@ public class MachineOnlyClassesValidatorTest {
         var model = modelOf(regularInstance, RDF.type, regularClass);
         validator.validate(model, EMPTY_MODEL, model, EMPTY_MODEL, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 }

@@ -1,14 +1,20 @@
 package nl.fairspace.pluto.auth;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.jwk.source.*;
-import com.nimbusds.jose.proc.*;
-import com.nimbusds.jwt.*;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.KeySourceException;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.jwk.source.RemoteJWKSet;
+import com.nimbusds.jose.proc.JWSKeySelector;
+import com.nimbusds.jose.proc.JWSVerificationKeySelector;
+import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.*;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 
-import java.net.*;
-import java.util.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.Map;
 
 @Slf4j
 public class JwtTokenValidator {

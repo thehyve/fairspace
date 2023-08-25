@@ -1,13 +1,14 @@
 package nl.fairspace.pluto.auth.filters;
 
-import lombok.extern.slf4j.*;
-import nl.fairspace.pluto.auth.*;
+import lombok.extern.slf4j.Slf4j;
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.AuthorizationFailedHandler;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-
-import static nl.fairspace.pluto.auth.AuthConstants.*;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE;
 
 /**
  * This filter will check whether any other filter has marked the request as authorized. If not, a handler is called
@@ -17,30 +18,21 @@ import static nl.fairspace.pluto.auth.AuthConstants.*;
  * set to true
  */
 @Slf4j
-public class HandleFailedAuthenticationFilter implements Filter {
-    private AuthorizationFailedHandler failedHandler;
+public class HandleFailedAuthenticationFilter implements GatewayFilter {
+    private final AuthorizationFailedHandler failedHandler;
 
     public HandleFailedAuthenticationFilter(AuthorizationFailedHandler failedHandler) {
         this.failedHandler = failedHandler;
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if(!Boolean.TRUE.equals(request.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
-            failedHandler.handleFailedAuthorization((HttpServletRequest) request, (HttpServletResponse) response);
-            return;
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        if(!Boolean.TRUE.equals(exchange.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
+            var mutatedExchange = failedHandler.handleFailedAuthorization(exchange);
+            return mutatedExchange.getResponse().setComplete();
         }
 
-        chain.doFilter(request, response);
+        return chain.filter(exchange);
     }
 
-    @Override
-    public void destroy() {
-
-    }
 }

@@ -2,6 +2,9 @@ FROM openjdk:17
 
 ADD build/distributions/*.tar /opt/
 
+RUN set -eux; \
+	microdnf install findutils
+
 EXPOSE 8090
 
 WORKDIR "/opt/config"

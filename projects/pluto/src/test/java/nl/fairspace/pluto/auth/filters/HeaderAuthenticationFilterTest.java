@@ -1,22 +1,27 @@
 package nl.fairspace.pluto.auth.filters;
 
-import nl.fairspace.pluto.auth.model.*;
-import nl.fairspace.pluto.auth.*;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.*;
-import org.mockito.*;
-import org.mockito.junit.jupiter.*;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
+import org.springframework.web.server.ServerWebExchange;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import java.io.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import static nl.fairspace.pluto.auth.AuthConstants.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doReturn;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class HeaderAuthenticationFilterTest {
 
     private HeaderAuthenticationFilter filter;
@@ -25,56 +30,64 @@ public class HeaderAuthenticationFilterTest {
     private JwtTokenValidator tokenValidator;
 
     @Mock
-    HttpServletRequest request;
-
-    @Mock
-    HttpServletResponse response;
-
-    @Mock
-    FilterChain filterChain;
+    GatewayFilterChain filterChain;
 
     Map<String,Object> claims;
 
-    @BeforeEach
-    void setUp() {
+    ServerWebExchange exchange;
+
+    @Before
+    public void setUp() {
         filter = new HeaderAuthenticationFilter(tokenValidator);
         claims = new HashMap<>();
         claims.put("authorities", Collections.singletonList("test"));
     }
 
     @Test
-    void testHappyFlow() throws IOException, ServletException {
-        doReturn("Bearer test-token").when(request).getHeader("Authorization");
+    public void testHappyFlow() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("Authorization", "Bearer test-token")
+                .build();
+        exchange = MockServerWebExchange.from(request);
+
         doReturn(claims).when(tokenValidator).parseAndValidate("test-token");
-        filter.doFilter(request, response, filterChain);
+        filter.filter(exchange, filterChain);
 
-        verifyResponseClaims(response, claims);
-        verify(filterChain).doFilter(request, response);
+        assertEquals(
+                claims,
+                ((OAuthAuthenticationToken) exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE)).getClaimsSet()
+        );
     }
 
     @Test
-    void testTokenAlreadyExists() throws IOException, ServletException {
-        doReturn(new OAuthAuthenticationToken("token", "refresh", "id")).when(request).getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
-        filter.doFilter(request, response, filterChain);
+    public void testTokenAlreadyExists() {
+        OAuthAuthenticationToken token = new OAuthAuthenticationToken("token", "refresh", "id");
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        exchange = MockServerWebExchange.from(request);
+        exchange.getAttributes().put(
+                AUTHORIZATION_REQUEST_ATTRIBUTE,
+                token
+        );
+        int originalAttributesSize = exchange.getAttributes().size();
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
+        filter.filter(exchange, filterChain);
+
+        assertEquals(token, exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 
     @Test
-    void testInvalidToken() throws IOException, ServletException {
-        doReturn("Bearer test-token").when(request).getHeader("Authorization");
+    public void testInvalidToken() {
+        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost")
+                .header("Authorization", "Bearer test-token")
+                .build();
+        exchange = MockServerWebExchange.from(request);
         doReturn(null).when(tokenValidator).parseAndValidate("test-token");
-        filter.doFilter(request, response, filterChain);
+        int originalAttributesSize = exchange.getAttributes().size();
 
-        verify(request, times(0)).setAttribute(any(), any());
-        verify(filterChain).doFilter(request, response);
-    }
+        filter.filter(exchange, filterChain);
 
-    private void verifyResponseClaims(HttpServletResponse response, Map<String, Object> claims) {
-        verify(request).setAttribute(eq(AUTHORIZATION_REQUEST_ATTRIBUTE), argThat(argument -> {
-            OAuthAuthenticationToken token = (OAuthAuthenticationToken) argument;
-            return token.getClaimsSet().equals(claims);
-        }));
+        assertNull(exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE));
+        assertEquals(originalAttributesSize, exchange.getAttributes().size());
     }
 }

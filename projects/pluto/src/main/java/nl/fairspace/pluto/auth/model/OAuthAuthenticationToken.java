@@ -1,12 +1,15 @@
 package nl.fairspace.pluto.auth.model;
 
 import lombok.*;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toSet;
 
 @Getter
 @EqualsAndHashCode

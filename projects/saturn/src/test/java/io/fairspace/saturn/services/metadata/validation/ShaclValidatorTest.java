@@ -49,7 +49,7 @@ public class ShaclValidatorTest {
     @Test
     public void validateNoChanges() {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ShaclValidatorTest {
         var model = modelOf(resource1, RDFS.label, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class ShaclValidatorTest {
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
 
         before = modelOf(resource2, RDF.type, FOAF.Person);
 
@@ -163,7 +163,7 @@ public class ShaclValidatorTest {
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test
@@ -186,7 +186,7 @@ public class ShaclValidatorTest {
 
         validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, violationHandler);
 
-        verifyZeroInteractions(violationHandler);
+        verifyNoInteractions(violationHandler);
     }
 
     @Test

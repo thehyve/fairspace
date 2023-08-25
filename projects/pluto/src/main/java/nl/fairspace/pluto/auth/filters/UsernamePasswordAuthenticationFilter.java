@@ -1,22 +1,29 @@
 package nl.fairspace.pluto.auth.filters;
 
 import com.nimbusds.oauth2.sdk.ParseException;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebSession;
+import reactor.core.publisher.Mono;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
+import java.util.Optional;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
 
 @Slf4j
-public class UsernamePasswordAuthenticationFilter implements Filter {
+public class UsernamePasswordAuthenticationFilter implements GatewayFilter {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     public static final String BASIC_PREFIX = "Basic ";
     private final OAuthFlow oAuthFlow;
@@ -25,40 +32,10 @@ public class UsernamePasswordAuthenticationFilter implements Filter {
         this.oAuthFlow = oAuthFlow;
     }
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
+    private OAuthAuthenticationToken retrieveHeaderAuthorization(ServerWebExchange exchange) throws ParseException, IOException, URISyntaxException {
+        log.debug("Check authentication header for " + exchange.getRequest().getURI().getPath());
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // If the authorization is already set, skip this filter
-        if (request.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // Otherwise, check if the authorization can be found in the header
-        OAuthAuthenticationToken authenticationToken;
-        try {
-            authenticationToken = retrieveHeaderAuthorization((HttpServletRequest) request);
-        } catch (ParseException | URISyntaxException e) {
-            log.error("Error retrieving authentication token", e);
-            throw new IOException(e);
-        }
-
-        log.trace("Retrieved authentication token from request: {}", authenticationToken);
-
-        if (authenticationToken != null) {
-            request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
-        }
-
-        chain.doFilter(request, response);
-    }
-
-    private OAuthAuthenticationToken retrieveHeaderAuthorization(HttpServletRequest request) throws ParseException, IOException, URISyntaxException {
-        log.debug("Check authentication header for " + request.getPathInfo());
-
-        var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String authorizationHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
 
         if (authorizationHeader == null) {
             log.debug("No Authorization header provided");
@@ -72,12 +49,10 @@ public class UsernamePasswordAuthenticationFilter implements Filter {
 
         var auth = authorizationHeader.substring(BASIC_PREFIX.length());
 
-        var token = fetchToken(auth);
-        request.getSession().setAttribute(AUTHORIZATION_SESSION_ATTRIBUTE, token);
-        return token;
+        return fetchToken(auth);
     }
 
-    private OAuthAuthenticationToken fetchToken(String auth) throws ParseException, IOException, URISyntaxException {
+    private OAuthAuthenticationToken fetchToken(String auth) throws ParseException, IOException {
         var decoded = new String(Base64.getDecoder().decode(auth), StandardCharsets.UTF_8);
         var usernamePassword = decoded.split(":");
         if (usernamePassword.length != 2) {
@@ -88,6 +63,30 @@ public class UsernamePasswordAuthenticationFilter implements Filter {
     }
 
     @Override
-    public void destroy() {
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        if (exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
+            return chain.filter(exchange);
+        }
+
+        // Otherwise, check if the authorization can be found in the header
+        OAuthAuthenticationToken authenticationToken;
+        try {
+            authenticationToken = retrieveHeaderAuthorization(exchange);
+        } catch (ParseException | URISyntaxException | IOException e) {
+            log.error("Error retrieving authentication token", e);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
+
+        log.trace("Retrieved authentication token from request: {}", authenticationToken);
+
+        if (authenticationToken != null) {
+            exchange.getAttributes().put(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
+            Optional<WebSession> session = exchange.getSession().blockOptional(Duration.ofMillis(500));
+            if (session.isPresent()) {
+                session.get().getAttributes().put(AUTHORIZATION_SESSION_ATTRIBUTE, authenticationToken);
+                session.get().save();
+            }
+        }
+       return chain.filter(exchange);
     }
 }

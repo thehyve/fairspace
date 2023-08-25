@@ -3,33 +3,56 @@ pluto:
     base-url: http://localhost:5100
     backend-url: ${KEYCLOAK_BACKEND_URL:${pluto.oauth2.base-url}}
     realm: fairspace
+  max-file-size: 2GB
+  staticHtmlLocation:
 server:
   error:
     whitelabel:
       enabled: false
   max-http-header-size: 65535
 
+
 spring:
   application:
     name: Pluto
+  main:
+    web-application-type: reactive
   sleuth:
     sampler:
       probability: 1.0
-  zipkin:
-    base-url: http://jaeger-collector.jaeger:9411/
-    enabled: false
-  servlet:
-    multipart:
-      max-file-size: 1GB
-      max-request-size: 1GB
+  webflux:
+    static-path-pattern: "/**"
   web:
     resources:
-      static-locations: classpath:static,file:/opt/mercury
+      static-locations: classpath:static,${pluto.staticHtmlLocation}
   cloud:
-    discovery:
-      client:
-        composite-indicator:
-          enabled: false
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+      routes:
+      default-filters:
+      - RemoveRequestHeader=Pragma X-Frame-Options X-Content-Type-Options X-XSS-Protection X-Permitted-Cross-Domain-Policies Origin
+        # Including the ORIGIN header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
+      - name: Retry
+        args:
+          methods: GET,PUT,POST,DELETE
+          exceptions:
+            - reactor.netty.http.client.PrematureCloseException
+      httpclient:
+        connect-timeout: 2000
+        response-timeout: 600s
+        pool:
+          max-idle-time: 20s
+      x-forwarded:
+        port-enabled: false
+        host-enabled: false
+        proto-enabled: false
+        prefix-enabled: false
+        port-append: false
+        host-append: false
+        proto-append: false
+        prefix-append: false
+        enabled: false
 
 management:
   endpoint:
@@ -49,16 +72,14 @@ security:
     logout-url: ${pluto.oauth2.base-url}/realms/${pluto.oauth2.realm}/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s
     token-url: ${pluto.oauth2.backend-url}/realms/${pluto.oauth2.realm}/protocol/openid-connect/token
     jwk-key-set-url: ${pluto.oauth2.backend-url}/realms/${pluto.oauth2.realm}/protocol/openid-connect/certs
-    redirect-after-logout-url: http://localhost:8080
+    redirect-after-logout-url: ${pluto.oauth2.base-url}
     clientId: workspace-client
     clientSecret: ${KEYCLOAK_CLIENT_SECRET}
     scope: openid
 
   # Specify urls for security configuration.
   # URLs with permitAll do not require any authentication
-  # URLs with needAuthentication are allowed to be accessed by any user. They are needed
-  #      to show an error message if the user is not allowed to access the workspace
-  # URLs with needAuthorization need an authorized user.
+  # All other URLs need an authorized user.
   urls:
     permitAll:
     - /actuator/health
@@ -69,33 +90,3 @@ security:
     - /logout
     - /authorize
     - /favicon.ico
-    needsAuthorization:
-    - /*
-
-zuul:
-  retryable: false
-  routes: {}
-    # Please note that the order of the routes is relevant
-    # The specific routes for will be configured when deploying
-    # the application
-  ignored-patterns:
-  - /actuator/**
-  - /api/storages/
-  - /api/status
-  - /api/config
-  - /login
-  - /logout
-  - /authorize
-  - /error
-  ignored-headers:
-  - Pragma
-  - X-Frame-Options
-  - X-Content-Type-Options
-  - X-XSS-Protection
-  - X-Permitted-Cross-Domain-Policies
-  - Origin  # Including the header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
-  set-content-length: true
-  host:
-    socket-timeout-millis: 600000  # 10 minutes
-    connect-timeout-millis: 2000
-  ignored-services: '*'
