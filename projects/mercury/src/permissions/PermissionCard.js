@@ -225,6 +225,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         <ListItemText
             primary={camelCaseToWords(collection.accessMode)}
             secondary={descriptionForAccessMode(collection.accessMode)}
+            style={{whiteSpace: "normal"}}
         />
     );
     const showMultipleAccessModes = () => (
@@ -241,6 +242,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                         <ListItemText
                             primary={camelCaseToWords(mode)}
                             secondary={descriptionForAccessMode(mode)}
+                            style={{whiteSpace: "normal"}}
                         />
                     </MenuItem>
                 ))}
@@ -249,6 +251,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     .map(unavailableMode => (
                         <MenuItem key={unavailableMode} value={unavailableMode} disabled>
                             <ListItemText
+                                style={{whiteSpace: "normal"}}
                                 primary={camelCaseToWords(unavailableMode)}
                                 secondary={descriptionForAccessMode(unavailableMode)}
                             />
@@ -351,7 +354,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    <div>
+                    <div style={{overflowX: "auto"}}>
                         <List>
                             <ListItem disableGutters>
                                 {renderAccessMode()}
