@@ -4,7 +4,7 @@
 source "$BUILD_SCRIPTS_DIR/helm/install_helm.sh"
 
 if [[ $SHOULD_RELEASE ]]; then
-  "$BUILD_SCRIPTS_DIR/login-provider.sh"
+  source "$BUILD_SCRIPTS_DIR/login-provider.sh"
 
   echo "Adding helm repositories ..."
   source "$BUILD_SCRIPTS_DIR/helm/add_repos.sh"
