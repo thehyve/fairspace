@@ -3,7 +3,7 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.services.views.Table.*;
-import lombok.*;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.tuple.*;
 

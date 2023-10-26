@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.vocabulary.FS;
-import lombok.*;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.*;
 import org.apache.jena.query.*;

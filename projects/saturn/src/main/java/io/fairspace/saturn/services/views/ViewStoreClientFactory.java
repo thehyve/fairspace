@@ -6,7 +6,8 @@ import com.zaxxer.hikari.*;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.vocabulary.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.*;
 
 import javax.sql.*;
