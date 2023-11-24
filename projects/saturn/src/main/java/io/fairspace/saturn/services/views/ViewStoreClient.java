@@ -40,6 +40,8 @@ public class ViewStoreClient implements AutoCloseable {
             query.setFloat(index, ((Number) value).floatValue());
         } else if (value instanceof Instant) {
             query.setTimestamp(index, Timestamp.from((Instant) value));
+        } else if (value instanceof LocalDate) {
+            query.setTimestamp(index, Timestamp.valueOf(((LocalDate) value).atStartOfDay()));
         } else if (value instanceof Collection) {
             throw new IllegalArgumentException("Unexpected value of collection type.");
         } else {
