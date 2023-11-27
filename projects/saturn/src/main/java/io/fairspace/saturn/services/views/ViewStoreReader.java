@@ -31,6 +31,7 @@ public class ViewStoreReader implements AutoCloseable {
     final Config.Search searchConfig;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
+    final int MAX_JOIN_ITEMS = 50;
 
     public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory) throws SQLException {
         this.searchConfig = searchConfig;
@@ -389,11 +390,6 @@ public class ViewStoreReader implements AutoCloseable {
                         .filter(column -> !valueSetProperties.contains(column)))
                 .collect(Collectors.toList());
 
-        // Limit related items by 50, it is only for visualisation and becomes problematic
-        // with thousands of related items.
-        // It will have impact on the column filters, items outside of the limit can't be found.
-        // In these cases the user should make a more narrow selection using facets before using
-        // column filters.
         var query = connection.prepareStatement(
                 "select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) +
                         " from " + joinedTable.name + " j " +
@@ -401,7 +397,7 @@ public class ViewStoreReader implements AutoCloseable {
                         "   select * from " + joinTable.name + " jt " +
                         "   where jt." + idColumn(joinView.view).name + " = j.id" +
                         "   and jt." + idColumn(view).name + " = ? )" +
-                        "limit 50"
+                        "limit " + String.valueOf(MAX_JOIN_ITEMS)
         );
         query.setString(1, id);
         var result = query.executeQuery();
