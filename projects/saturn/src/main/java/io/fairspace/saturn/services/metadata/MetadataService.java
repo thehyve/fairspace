@@ -72,7 +72,9 @@ public class MetadataService {
                     .forEach(property -> m.listStatements(null, property, resource)
                             .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
                             .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted))
-                            .forEachRemaining(stmt -> {
+                            .toList()
+                            .subList(0, 21)
+                            .forEach(stmt -> {
                                 model.add(stmt);
                                 if (withValueProperties) {
                                     addImportantProperties(stmt.getSubject(), model);

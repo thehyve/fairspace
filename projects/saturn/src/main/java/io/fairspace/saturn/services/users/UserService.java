@@ -37,7 +37,7 @@ public class UserService {
     private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
 
     public UserService(Config.Auth config, Transactions transactions, UsersResource usersResource) {
-        this.config = config;
+                this.config = config;
         this.transactions = transactions;
         this.usersResource = usersResource;
         usersCache = CacheBuilder.newBuilder()
@@ -81,7 +81,7 @@ public class UserService {
     }
 
     private Map<Node, User> fetchUsers() {
-        var userCount = usersResource.count(); // TODO [FNS-126] implement proper pagination based on client request parameters
+        var userCount = usersResource.count();
         var keycloakUsers = usersResource.list(0, userCount);
         var updated = new HashSet<User>();
         var users = transactions.calculateRead(model -> {

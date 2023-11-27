@@ -364,7 +364,7 @@ public class ViewStoreReader implements AutoCloseable {
             }
             log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
             return rows;
-        } finally {
+                } finally {
             for (var q : valueSetQueries.values()) {
                 q.close();
             }
@@ -388,13 +388,20 @@ public class ViewStoreReader implements AutoCloseable {
                 joinView.include.stream()
                         .filter(column -> !valueSetProperties.contains(column)))
                 .collect(Collectors.toList());
+
+        // Limit related items by 50, it is only for visualisation and becomes problematic
+        // with thousands of related items.
+        // It will have impact on the column filters, items outside of the limit can't be found.
+        // In these cases the user should make a more narrow selection using facets before using
+        // column filters.
         var query = connection.prepareStatement(
                 "select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) +
                         " from " + joinedTable.name + " j " +
                         " where exists (" +
                         "   select * from " + joinTable.name + " jt " +
                         "   where jt." + idColumn(joinView.view).name + " = j.id" +
-                        "   and jt." + idColumn(view).name + " = ? )"
+                        "   and jt." + idColumn(view).name + " = ? )" +
+                        "limit 50"
         );
         query.setString(1, id);
         var result = query.executeQuery();
