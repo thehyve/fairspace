@@ -37,7 +37,7 @@ public class UserService {
     private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
 
     public UserService(Config.Auth config, Transactions transactions, UsersResource usersResource) {
-                this.config = config;
+        this.config = config;
         this.transactions = transactions;
         this.usersResource = usersResource;
         usersCache = CacheBuilder.newBuilder()

@@ -364,7 +364,7 @@ public class ViewStoreReader implements AutoCloseable {
             }
             log.debug("Processing rows + querying value sets took {} ms", new Date().getTime() - mid);
             return rows;
-                } finally {
+        } finally {
             for (var q : valueSetQueries.values()) {
                 q.close();
             }
