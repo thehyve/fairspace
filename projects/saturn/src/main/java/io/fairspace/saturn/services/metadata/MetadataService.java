@@ -9,6 +9,7 @@ import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.shacl.vocabulary.SHACLM;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import java.time.Instant;
@@ -49,18 +50,18 @@ public class MetadataService {
      * @return
      */
     public Model get(String subject, boolean withValueProperties) {
-        var model = createDefaultModel();
+        var returnValues = createDefaultModel();
 
-        transactions.executeRead(m -> {
-            var resource = m.createResource(subject);
+        transactions.executeRead(fairspaceData -> {
+            var resource = fairspaceData.createResource(subject);
             if (!permissions.canReadMetadata(resource)) {
                 throw new AccessDeniedException(subject);
             }
 
             resource.listProperties().forEachRemaining(stmt -> {
-                model.add(stmt);
+                returnValues.add(stmt);
                 if (withValueProperties && stmt.getObject().isURIResource()) {
-                    addImportantProperties(stmt.getResource(), model);
+                    addImportantProperties(stmt.getResource(), returnValues);
                 }
             });
 
@@ -69,19 +70,30 @@ public class MetadataService {
                     .map(ps -> ps.getProperty(SHACLM.path).getResource().getPropertyResourceValue(SHACLM.inversePath))
                     .filter(Objects::nonNull)
                     .map(p -> p.as(Property.class))
-                    .forEach(property -> m.listStatements(null, property, resource)
-                            .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
-                            .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted))
-                            .toList()
-                            .subList(0, 21)
-                            .forEach(stmt -> {
-                                model.add(stmt);
-                                if (withValueProperties) {
-                                    addImportantProperties(stmt.getSubject(), model);
-                                }
-                            }));
+                    .forEach(property -> addStatements(fairspaceData, returnValues, property, resource, withValueProperties));
         });
-        return model;
+        return returnValues;
+    }
+
+    private void addStatements(Model fairspaceData, Model returnValues, Property property, Resource resource, boolean withValueProperties) {
+        ExtendedIterator<Statement> statements = fairspaceData.listStatements(null, property, resource)
+            .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
+            .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted));
+
+        int numberOfStatementsAdded = 0;
+
+        while(statements.hasNext()) {
+            Statement stmt = (Statement)statements.next();
+
+            returnValues.add(stmt);
+            if (withValueProperties) {
+                addImportantProperties(stmt.getSubject(), returnValues);
+            }
+
+            if(numberOfStatementsAdded++ == 20){
+                break;
+            }
+        }
     }
 
     private void addImportantProperties(Resource s, Model dest) {
