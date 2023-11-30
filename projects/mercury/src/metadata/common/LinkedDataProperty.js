@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import {FormControl, FormGroup, FormHelperText, FormLabel} from '@mui/material';
 import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
 import LinkedDataRelationTable from "./LinkedDataRelationTable";
-import {LABEL_URI, TOOLTIP_ENTER_DELAY} from "../../constants";
+import {LABEL_URI, MAX_LIST_LENGTH, TOOLTIP_ENTER_DELAY} from "../../constants";
 import GenericTooltip from "../../common/components/GenericTooltip";
 import Iri from "../../common/components/Iri";
 import LinkedDataContext from "../LinkedDataContext";
@@ -33,6 +33,8 @@ const LinkedDataProperty = (
         || property.allowedValues
     );
 
+    const getCount = () => "(" + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + "+" : values.length) + ")";
+
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
     const disableEditing = !formEditable || !property.isEditable || disallowEditingOfExistingValues;
@@ -56,7 +58,7 @@ const LinkedDataProperty = (
                     ? (
                         <GenericTooltip interactive leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
                             <FormLabel component="legend">
-                                {label} {values.length > 1 && "(" + values.length + ")"}
+                                {label} {values.length > 1 && getCount()}
                             </FormLabel>
                         </GenericTooltip>
                     ) : null

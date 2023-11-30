@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
-import {Divider, Grid, IconButton, Typography} from '@mui/material';
+import {Divider, Grid, IconButton, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Add, Clear} from '@mui/icons-material';
 import {FixedSizeList as List} from 'react-window';
 
-import {LABEL_URI, STRING_URI} from '../../constants';
+import {LABEL_URI, MAX_LIST_LENGTH, STRING_URI} from '../../constants';
 import styles from './LinkedDataValuesTable.styles';
 import StringValue from './values/StringValue';
 
@@ -114,6 +114,29 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
     const isDeleteButtonEnabled = () => property.isEditable && canEdit;
     const isAddButtonEnabled = canEdit && !maxValuesReached && AddComponent;
 
+    const renderListItem = (entry, index) => rowDecorator(entry, (
+        <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
+            <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                {
+                    columnDefinition.id === LABEL_URI
+                        ? <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>
+                        : <Typography noWrap>{columnDefinition.getValue(entry, index)}</Typography>
+                }
+            </div>
+            {showRowDividers && <Divider />}
+        </Grid>
+    ));
+
+    const renderListLimitMessage = (entry) => rowDecorator(entry, (
+        <Grid item className={classes.values}>
+            <div>
+                <Tooltip title={"If a view tab is defined for '" + property.label + "', you can find all available values there."}>
+                    <Typography fontStyle="italic" noWrap>... display limit ({MAX_LIST_LENGTH}) reached ...</Typography>
+                </Tooltip>
+            </div>
+        </Grid>
+    ));
+
     const renderValue = (entry, index) => rowDecorator(entry, (
         <Grid
             container
@@ -127,16 +150,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
             // eslint-disable-next-line react/no-array-index-key
             key={index}
         >
-            <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
-                <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
-                    {
-                        columnDefinition.id === LABEL_URI
-                            ? <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>
-                            : <Typography noWrap>{columnDefinition.getValue(entry, index)}</Typography>
-                    }
-                </div>
-                {showRowDividers && <Divider />}
-            </Grid>
+            {index === MAX_LIST_LENGTH ? renderListLimitMessage(entry) : renderListItem(entry, index)}
             {
                 property.isEditable && isDeleteButtonEnabled(entry) && (
                     <Grid item xs={2}>

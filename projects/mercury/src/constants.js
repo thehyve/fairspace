@@ -14,6 +14,10 @@ export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';
 export const TOOLTIP_ENTER_DELAY = 350;
 export const DATE_FORMAT = 'dd-MM-yyyy';
 
+// The maximum number of items in a list in the right panel, for performance reasons.
+// If you change this, also change it in 'MetadataService.java'
+export const MAX_LIST_LENGTH = 100;
+
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';
 export const XMLSCHEMA_NS = 'http://www.w3.org/2001/XMLSchema#';

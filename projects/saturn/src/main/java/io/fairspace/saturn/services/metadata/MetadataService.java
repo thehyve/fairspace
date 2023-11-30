@@ -31,6 +31,10 @@ public class MetadataService {
     private final MetadataRequestValidator validator;
     private final MetadataPermissions permissions;
 
+    // The maximum number of items in a list in the right panel, for performance reasons.
+    // If you change this, also change it in 'constants.js'
+    private final int MAX_LIST_LENGTH = 100;
+
     public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator, MetadataPermissions permissions) {
         this.transactions = transactions;
         this.vocabulary = vocabulary;
@@ -90,7 +94,7 @@ public class MetadataService {
                 addImportantProperties(stmt.getSubject(), returnValues);
             }
 
-            if(numberOfStatementsAdded++ == 20){
+            if(numberOfStatementsAdded++ == MAX_LIST_LENGTH){
                 break;
             }
         }
