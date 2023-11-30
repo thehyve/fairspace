@@ -130,7 +130,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
     const renderListLimitMessage = (entry) => rowDecorator(entry, (
         <Grid item className={classes.values}>
             <div>
-                <Tooltip title={"If a view tab is defined for '" + property.label + "' you can retrieve all available values there."}>
+                <Tooltip title={"If a view tab is defined for '" + property.label + "', you can find all available values there."}>
                     <Typography fontStyle="italic" noWrap>... display limit ({MAX_LIST_LENGTH}) reached ...</Typography>
                 </Tooltip>
             </div>
