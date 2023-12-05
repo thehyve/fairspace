@@ -146,14 +146,15 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <div>
             {minValue !== null && maxValue !== null ? (
-                <Grid container spacing={2} alignItems="center" className={classes.numericalContent}>
-                    <Grid item xs={3}>
-                        {renderInput(value[0], handleMinValueInputChange, minValue)}
-                    </Grid>
-                    <Grid item xs={6}>
+                <Grid container alignItems="center" className={classes.numericalContent}>
+                    <Grid item xs={12} style={{marginLeft: 8, marginRight: 8}}>
                         {renderSlider()}
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={5}>
+                        {renderInput(value[0], handleMinValueInputChange, minValue)}
+                    </Grid>
+                    <Grid item xs={2} />
+                    <Grid item xs={5}>
                         {renderInput(value[1], handleMaxValueInputChange, maxValue)}
                     </Grid>
                 </Grid>
