@@ -13,9 +13,7 @@ export const handleAuthError = (status) => {
     switch (status) {
         case 401:
             sessionStorage.clear();
-            ErrorDialog.showError('Your session has expired. Please log in again.',
-                null,
-                () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
+            window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
             break;
         case 403:
             ErrorDialog.showError('You have no access to this resource. Ask your administrator to grant you access.',

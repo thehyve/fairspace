@@ -2405,8 +2405,8 @@ Now everything should be ready to start using Fairspace:
 
 Requires:
 
-* Helm >= 3.5.x
-* kubectl >= 1.17.x
+* Helm >= 3.13.x
+* kubectl >= 1.27.x
 
 You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Helm].
 Helm charts for Fairspace are published to the public helm repository at
@@ -2423,7 +2423,7 @@ We provide a number of charts for various components that can be used in combina
 
 ===== Download and install helm and gcloud
 
-* Download ``helm 3.6.0`` from https://github.com/helm/helm/releases/tag/v3.6.0
+* Download ``helm 3.13.1`` from https://github.com/helm/helm/releases/tag/v3.13.1
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
 [source, shell]
@@ -2431,7 +2431,7 @@ We provide a number of charts for various components that can be used in combina
 ~/bin/helm/helm version
 ----
 
-* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.6.x install version > 1.18.x).
+* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.13.x install version > 1.27.x).
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
@@ -2473,7 +2473,7 @@ kubectl get ns
 # Add the fairspace repo for reading
 ~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
 # (Optional) Add the fairspace repo via the GCS plugin for writing
-~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.3.11
+~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.4.2
 gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ~/bin/helm/helm repo add fairspace-gcs gs://fairspace-helm
@@ -2496,7 +2496,7 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace-keycloak chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace-keycloak
 # Fetch the fairspace-keycloak chart
-~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.6.4
+~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.7.0
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
@@ -2513,7 +2513,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace Keycloak chart:
 [source, shell]
 ----
-~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.6.4 --namespace keycloak-new \
+~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.7.0 --namespace keycloak-new \
 -f /path/to/fairspace-keycloak-values.yaml
 ----
 You can pass values files with ``-f``.

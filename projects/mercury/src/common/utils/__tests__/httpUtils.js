@@ -4,10 +4,13 @@ import ErrorDialog from "../../components/ErrorDialog";
 describe('Http Utils', () => {
     describe('handleHttpError', () => {
         it('Should show an error on 401', () => {
-            Object.defineProperty(window.location, 'assign', jest.fn());
-            ErrorDialog.showError = jest.fn();
-            handleHttpError("Default error")({response: {status: 401}});
-            expect(ErrorDialog.showError).toHaveBeenCalledWith("Your session has expired. Please log in again.", null, expect.anything());
+            delete window.location;
+            window.location = {assign: jest.fn()};
+            handleHttpError("")({response: {status: 401}});
+            expect(window.location.assign).toHaveBeenCalledTimes(1);
+            expect(window.location.assign).toHaveBeenCalledWith(
+                "/login?redirectUrl=undefined",
+            );
         });
 
         it('Should show an error on 403', () => {
