@@ -51,6 +51,10 @@ spec:
           volumeMounts:
             - name: config-volume-pluto
               mountPath: /opt/config
+{{- if .Values.extraCerts }}
+            - name: extra-certs
+              mountPath: /opt
+{{- end }}
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
@@ -98,6 +102,10 @@ spec:
             - name: extra-file-storage
               mountPath: /data/saturn/extra-files
 {{- end }}
+{{- if .Values.extraCerts }}
+            - name: extra-certs
+              mountPath: /opt
+{{- end }}
           livenessProbe:
             httpGet:
               path:  /liveness
@@ -122,6 +130,11 @@ spec:
       - name: config-volume-pluto
         configMap:
           name: {{ .Release.Name }}-pluto
+{{- if .Values.extraCerts }}
+      - name: extra-certs
+        secret:
+          secretName: {{ .Release.Name }}-extra-certs
+{{- end }}
   volumeClaimTemplates:
   - metadata:
       name: postgres
