@@ -32,7 +32,7 @@ module.exports = (app) => {
     keycloak.redirectToLogin = (request) => !(request.baseUrl.startsWith('/api/'));
 
     app.use(keycloak.middleware({logout: '/logout'}));
-    app.use('/dev', keycloak.protect());
+    app.use('/', keycloak.protect());
 
     const addToken = (proxyReq, req) => req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
