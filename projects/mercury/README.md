@@ -27,6 +27,11 @@ The Mercury frontend app needs a backend to communicate with. For convenience, t
 - `yarn pluto` starts a proxy server that also serves the frontend at port `8080`.
 - `yarn start` starts the frontend and exposes it at port `3000`.
 
+For the first run, execute:
+```bash
+yarn build
+``` 
+
 To start all these components at once, run:  
 ```bash
 yarn dev
