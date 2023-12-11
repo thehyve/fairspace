@@ -1,3 +1,4 @@
+// Use of proxy middleware for local development, assumption is it only listens to port 3000 (confirm reference?)
 const {createProxyMiddleware} = require('http-proxy-middleware');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const Keycloak = require('keycloak-connect');
@@ -32,7 +33,9 @@ module.exports = (app) => {
     keycloak.redirectToLogin = (request) => !(request.baseUrl.startsWith('/api/'));
 
     app.use(keycloak.middleware({logout: '/logout'}));
-    app.use('/', keycloak.protect());
+
+    // The next statement enables debugging and setting breakpoints in Intellij and VSCode. Not fully understand it but don't remove :)
+    app.use('/dev', keycloak.protect());
 
     const addToken = (proxyReq, req) => req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
