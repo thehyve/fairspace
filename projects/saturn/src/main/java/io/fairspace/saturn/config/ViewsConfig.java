@@ -88,7 +88,7 @@ public class ViewsConfig {
             @NotNull public ColumnType type;
             @NotBlank public String source;
             // displayIndex determines the order of columns on the view page.
-            @NotNull public Integer displayIndex = 999;
+            @NotNull public Integer displayIndex = Integer.MAX_VALUE;
             public String rdfType;
             public int priority;
         }
@@ -100,7 +100,7 @@ public class ViewsConfig {
             @JsonSetter(nulls = Nulls.AS_EMPTY)
             public List<String> include;
             // displayIndex determines the order of columns on the view page, for joinView it is the column displaying the related entity
-            public Integer displayIndex = 999;
+            public Integer displayIndex = Integer.MAX_VALUE;
         }
     }
 }

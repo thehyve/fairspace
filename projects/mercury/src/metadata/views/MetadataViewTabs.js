@@ -53,15 +53,7 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                 accessColumn
             ];
         }
-        return view.columns.sort((a, b) => {
-            if (a.displayIndex > b.displayIndex) {
-                return 1;
-            }
-            if (a.displayIndex < b.displayIndex) {
-                return -1;
-            }
-            return 0;
-        });
+        return view.columns.sort((a, b) => a.displayIndex - b.displayIndex);
     };
 
     return (
