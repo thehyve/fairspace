@@ -175,9 +175,9 @@ public class ViewService {
         return viewsConfig.views.stream()
                 .map(v -> {
                     var columns = new ArrayList<ColumnDTO>();
-                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier));
+                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, 0));
                     for (var c : v.columns) {
-                        columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type));
+                        columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
                     for (var j : v.join) {
                         var joinView = viewsConfig.views.stream().filter(view -> view.name.equalsIgnoreCase(j.view)).findFirst().orElse(null);
@@ -185,13 +185,13 @@ public class ViewService {
                             continue;
                         }
                         if (j.include.contains("id")) {
-                            columns.add(new ColumnDTO(joinView.name, joinView.title, ColumnType.Identifier));
+                            columns.add(new ColumnDTO(joinView.name, joinView.title, ColumnType.Identifier, j.displayIndex));
                         }
                         for (var c : joinView.columns) {
                             if (!j.include.contains(c.name)) {
                                 continue;
                             }
-                            columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type));
+                            columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, c.displayIndex));
                         }
                     }
                     return new ViewDTO(v.name, v.title, columns);
