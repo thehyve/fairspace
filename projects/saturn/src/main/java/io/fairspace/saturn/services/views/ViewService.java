@@ -175,7 +175,11 @@ public class ViewService {
         return viewsConfig.views.stream()
                 .map(v -> {
                     var columns = new ArrayList<ColumnDTO>();
-                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, 0));
+
+                    // The entity labal is the first column displayed, if you want a column before this label, assign a negative displayIndex value in views.yaml
+                    int entityLabelIndex = 0;
+
+                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, entityLabelIndex));
                     for (var c : v.columns) {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
