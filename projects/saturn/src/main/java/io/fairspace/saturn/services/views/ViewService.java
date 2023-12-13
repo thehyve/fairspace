@@ -191,7 +191,7 @@ public class ViewService {
                             if (!j.include.contains(c.name)) {
                                 continue;
                             }
-                            columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, c.displayIndex));
+                            columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
                         }
                     }
                     return new ViewDTO(v.name, v.title, columns);
