@@ -27,7 +27,6 @@ import java.sql.*;
 import java.util.stream.*;
 
 import static io.fairspace.saturn.TestUtils.*;
-import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -116,5 +115,21 @@ public class ViewServiceTest {
                 .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Boolean)
                 .toList();
         Assert.assertEquals(1, boolFacets.size());
+    }
+
+    @Test
+    public void testDisplayIndex_IsSet() {
+        var views = viewService.getViews();
+        var columns = views.get(1).getColumns().stream().toList();
+        var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Morphology")).collect(Collectors.toList()).get(0);
+        Assert.assertEquals(Integer.valueOf(1), selectedColumn.getDisplayIndex());
+    }
+
+    @Test
+    public void testDisplayIndex_IsNotSet() {
+        var views = viewService.getViews();
+        var columns = views.get(1).getColumns().stream().toList();
+        var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Laterality")).collect(Collectors.toList()).get(0);
+        Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), selectedColumn.getDisplayIndex());
     }
 }

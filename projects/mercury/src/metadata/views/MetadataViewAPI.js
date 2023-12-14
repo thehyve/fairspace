@@ -32,6 +32,7 @@ export type MetadataViewFacet = {
 };
 
 export type MetadataViewColumn = {
+    displayIndex: number;
     name: string;
     title: string;
     type: ValueType;

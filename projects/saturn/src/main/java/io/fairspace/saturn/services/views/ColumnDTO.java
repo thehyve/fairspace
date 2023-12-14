@@ -8,4 +8,5 @@ public class ColumnDTO {
     String name;
     String title;
     ViewsConfig.ColumnType type;
+    Integer displayIndex;
 }
