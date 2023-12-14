@@ -130,6 +130,6 @@ public class ViewServiceTest {
         var views = viewService.getViews();
         var columns = views.get(1).getColumns().stream().toList();
         var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Laterality")).collect(Collectors.toList()).get(0);
-        Assert.assertEquals(Integer.valueOf(999), selectedColumn.getDisplayIndex());
+        Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), selectedColumn.getDisplayIndex());
     }
 }
