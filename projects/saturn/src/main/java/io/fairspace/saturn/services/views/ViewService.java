@@ -177,9 +177,9 @@ public class ViewService {
                     var columns = new ArrayList<ColumnDTO>();
 
                     // The entity labal is the first column displayed, if you want a column before this label, assign a negative displayIndex value in views.yaml
-                    int entityLabelIndex = 0;
+                    final int ENTITY_LABEL_INDEX = 0;
 
-                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, entityLabelIndex));
+                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, ENTITY_LABEL_INDEX));
                     for (var c : v.columns) {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
