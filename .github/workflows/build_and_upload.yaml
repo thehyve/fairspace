@@ -2,12 +2,9 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
 # deploy workflow is dependent on this one, if you change the name, also change it in deploy.yaml
-name: Build&Upload Fairspace images
+name: Build & Upload Fairspace images
 
 on: [push]
-
-env:
-  REGISTRY: eu.gcr.io/fairspace-207108
 
 jobs:
   build-saturn:
@@ -24,15 +21,12 @@ jobs:
 
       - name: Get version
         run: |
-          echo "-----github.actor------"
-          echo "${{ github.actor }}"
-          echo "-----secrets.GITHUB_TOKEN------"
-          echo "${{ secrets.GITHUB_TOKEN }}"
-          echo "-----GITHUB_HEAD_REF------"
-          echo "${GITHUB_HEAD_REF}"
-          echo "------GITHUB_REF#refs/heads/-----"
-          echo "${GITHUB_REF#refs/heads/}"
-          echo "-----------"
+          echo "----env.REGISTRY------"
+          echo "${{ env.REGISTRY }}"
+          echo "----secrets.DOCKER_USERNAME------"
+          echo "${{ secrets.DOCKER_USERNAME }}"
+          echo "----secrets.DOCKER_PASSWORD------"
+          echo "${{ secrets.DOCKER_PASSWORD }}"
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
