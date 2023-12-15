@@ -21,8 +21,8 @@ jobs:
 
       - name: Get version
         run: |
-          echo "----env.DOCKER_REGISTRY------"
-          echo "${{ env.DOCKER_REGISTRY }}"
+          echo "----vars.DOCKER_REGISTRY------"
+          echo "${{ vars.DOCKER_REGISTRY }}"
           echo "----secrets.DOCKER_USERNAME------"
           echo "${{ secrets.DOCKER_USERNAME }}"
           echo "----------"
