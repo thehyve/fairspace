@@ -24,13 +24,17 @@ jobs:
 
       - name: Get version
         run: |
-          echo "-----------"
-          echo "${{ env.VERSION }}"
-          echo "${{ github.actor }}"
-          echo "${{ secrets.GITHUB_TOKEN }}"
-          echo "-----------"
+          echo "-----env.VERSION------"
+          echo "${ env.VERSION }"
+          echo "-----github.actor------"
+          echo "${ github.actor }"
+          echo "-----secrets.GITHUB_TOKEN------"
+          echo "${ secrets.GITHUB_TOKEN }"
+          echo "-----GITHUB_HEAD_REF------"
           echo "${GITHUB_HEAD_REF}"
+          echo "------GITHUB_REF#refs/heads/-----"
           echo "${GITHUB_REF#refs/heads/}}"
+          echo "-----------"
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
