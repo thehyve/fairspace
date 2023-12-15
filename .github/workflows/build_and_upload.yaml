@@ -24,8 +24,6 @@ jobs:
 
       - name: Get version
         run: |
-          echo "-----env.VERSION------"
-          echo "${ env.VERSION }"
           echo "-----github.actor------"
           echo "${ github.actor }"
           echo "-----secrets.GITHUB_TOKEN------"
