@@ -21,11 +21,11 @@ jobs:
 
       - name: Get version
         run: |
-          echo "----env.REGISTRY------"
-          echo "${{ env.REGISTRY }}"
+          echo "----env.DOCKER_REGISTRY------"
+          echo "${{ env.DOCKER_REGISTRY }}"
           echo "----secrets.DOCKER_USERNAME------"
           echo "${{ secrets.DOCKER_USERNAME }}"
-          echo "----secrets.DOCKER_PASSWORD------"
+          echo "----------"
           echo "${{ secrets.DOCKER_PASSWORD }}"
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
