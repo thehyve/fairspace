@@ -29,9 +29,9 @@ jobs:
           echo "-----secrets.GITHUB_TOKEN------"
           echo "${{ secrets.GITHUB_TOKEN }}"
           echo "-----GITHUB_HEAD_REF------"
-          echo "${{GITHUB_HEAD_REF}}"
+          echo "${GITHUB_HEAD_REF}"
           echo "------GITHUB_REF#refs/heads/-----"
-          echo "${{GITHUB_REF#refs/heads/}}"
+          echo "${GITHUB_REF#refs/heads/}"
           echo "-----------"
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
