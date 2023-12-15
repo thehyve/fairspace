@@ -1,0 +1,175 @@
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+# deploy workflow is dependent on this one, if you change the name, also change it in deploy.yaml
+name: Build Fairspace images
+
+on: [push]
+
+env:
+  REGISTRY: eu.gcr.io/fairspace-207108
+
+jobs:
+  build-saturn:
+    runs-on: ubuntu-latest
+    permissions:
+#      TODO: check if we need them or others
+      contents: read
+      id-token: write
+      packages: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Get version
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "branch: $BRANCH"
+          VER=$(cat ./VERSION)
+          if [ $BRANCH == "dev" ]
+          then
+            VER=$VER-$BRANCH
+          fi
+          echo "VERSION=$VER" >> $GITHUB_ENV
+          echo "version: $VER"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./projects/saturn/gradlew
+
+      - name: Build with Gradle
+        run: ./projects/saturn/gradlew build -p ./projects/saturn/
+
+#      - name: Log in to the Container registry
+#        uses: docker/login-action@v3
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: Extract metadata (tags, labels) for Docker
+#        id: meta
+#        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+#        with:
+#          images: ghcr.io/${{ github.repository }}/saturn
+#
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+#        with:
+#          context: ./projects/saturn/
+#          push: true
+#          tags: ghcr.io/${{ github.repository }}/saturn:${{ env.VERSION }}
+#          labels: ${{ steps.meta.outputs.labels }}
+
+#  build-mercury:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set Node.js 18.x
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: 18.x
+#      - name: Get version
+#        run: |
+#          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+#          echo "branch: $BRANCH"
+#          VER=$(cat ./VERSION)
+#          if [ $BRANCH == "dev" ]
+#          then
+#            VER=$VER-$BRANCH
+#          fi
+#          echo "VERSION=$VER" >> $GITHUB_ENV
+#          echo "version: $VER"
+#      - name: Set deployment version
+#        run: |
+#          sed -i "s/0.0.0-RELEASEVERSION/${{ env.VERSION }}/g" projects/mercury/package.json
+#
+#      - name: Run install
+#        uses: borales/actions-yarn@v4
+#        with:
+#          cmd: install # will run `yarn install`
+#          dir: ./projects/mercury/
+#      - name: Build production bundle
+#        uses: borales/actions-yarn@v4
+#        with:
+#          cmd: build # will run `yarn build'
+#          dir: ./projects/mercury/
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: mercury-build
+#          path: ./projects/mercury/build/
+#      # todo: enable tests
+#      # - name: Test the app
+#      #   uses: borales/actions-yarn@v4
+#      #   with:
+#      #     cmd: test # will run `yarn test`
+#      #     dir: ./projects/mercury/
+
+#  build-pluto:
+#    needs: build-mercury
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: read
+#      id-token: write
+#      packages: write
+#
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set variables
+#        run: |
+#          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+#          echo "branch: $BRANCH"
+#          VER=$(cat ./VERSION)
+#          if [ $BRANCH == "dev" ]
+#          then
+#            VER=$VER-$BRANCH
+#          fi
+#
+#          echo "VERSION=$VER" >> $GITHUB_ENV
+#          echo "version: $VER"
+#
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '17'
+#          distribution: 'temurin'
+#      - name: Change wrapper permissions
+#        run: chmod +x ./projects/pluto/gradlew
+#      - name: Build with Gradle
+#        run: ./projects/pluto/gradlew build -p ./projects/pluto/
+#
+#        # mercury frontend will be hosted in the same pod as pluto
+#      - uses: actions/download-artifact@v3
+#        with:
+#          name: mercury-build
+#          path: ./projects/pluto/build/mercury
+#
+#      - name: Log in to the Container registry
+#        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+#        with:
+#          registry: ${{ env.REGISTRY }}
+#          username: ${{ github.actor }}
+#          password: ${{ secrets.GITHUB_TOKEN }}
+#
+#      - name: Extract metadata (tags, labels) for Docker
+#        id: meta
+#        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+#        with:
+#          images: ghcr.io/${{ github.repository }}/pluto
+#
+#      # todo: copy mercury build artifact to pluto build folder (see pluto docker file for location)
+#      - name: Build and push Docker image
+#        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+#        with:
+#          context: ./projects/pluto/
+#          push: ${{ github.event_name != 'pull_request' }}
+#          tags: ghcr.io/${{ github.repository }}/pluto:${{ env.VERSION }}
+#          labels: ${{ steps.meta.outputs.labels }}
