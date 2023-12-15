@@ -24,6 +24,13 @@ jobs:
 
       - name: Get version
         run: |
+          echo "-----------"
+          echo "${{ env.VERSION }}"
+          echo "${{ github.actor }}"
+          echo "${{ secrets.GITHUB_TOKEN }}"
+          echo "-----------"
+          echo "${GITHUB_HEAD_REF}"
+          echo "${GITHUB_REF#refs/heads/}}"
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
