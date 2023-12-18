@@ -1,0 +1,95 @@
+# This workflow is triggered on any PR's changes
+
+name: PR - Build Fairspace
+
+#TODO: remove  '-x test'
+
+on:
+  pull_request:
+
+jobs:
+  build-saturn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: ./projects/saturn/gradlew build -p ./projects/saturn/ -x test
+
+  build-pluto:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: ./projects/pluto/gradlew build -p ./projects/pluto/ -x test
+
+#  build-mercury:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set Node.js 18.x
+#        uses: actions/setup-node@v3
+#        with:
+#          node-version: 18.x
+#      - name: Get version
+#        run: |
+#          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+#          echo "branch: $BRANCH"
+#          VER=$(cat ./VERSION)
+#          if [ $BRANCH == "dev" ]
+#          then
+#            VER=$VER-$BRANCH
+#          fi
+#          echo "VERSION=$VER" >> $GITHUB_ENV
+#          echo "version: $VER"
+#      - name: Set deployment version
+#        run: |
+#          sed -i "s/0.0.0-RELEASEVERSION/${{ env.VERSION }}/g" projects/mercury/package.json
+#
+#      - name: Run install
+#        uses: borales/actions-yarn@v4
+#        with:
+#          cmd: install # will run `yarn install`
+#          dir: ./projects/mercury/
+#      - name: Build production bundle
+#        uses: borales/actions-yarn@v4
+#        with:
+#          cmd: build # will run `yarn build'
+#          dir: ./projects/mercury/
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: mercury-build
+#          path: ./projects/mercury/build/
+#      # todo: enable tests
+#      # - name: Test the app
+#      #   uses: borales/actions-yarn@v4
+#      #   with:
+#      #     cmd: test # will run `yarn test`
+#      #     dir: ./projects/mercury/
