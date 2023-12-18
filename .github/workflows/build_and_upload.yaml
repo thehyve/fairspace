@@ -7,9 +7,6 @@ name: Build & Upload Fairspace images
 env:
   DOCKER_REGISTRY: ghcr.io
   DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
-  GITHUB_EVENT: ${{ github.event_name }}
-  GITHUB_EVENT_PR: ${{ github.event.pull_request }}
-  QU: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.event.pull_request) }}
 
 on: [push, pull_request]
 
@@ -18,14 +15,37 @@ jobs:
 #    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.event.pull_request)
     runs-on: ubuntu-latest
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+
+
       - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Initialization
         run: |
-          echo ${{ env.QU }}
-          echo ${{ env.GITHUB_EVENT }}
-          echo ${{ env.GITHUB_EVENT_PR }}
           # VERSION
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
