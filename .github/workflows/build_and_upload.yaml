@@ -37,7 +37,7 @@ jobs:
           echo "version: $VER"     
           
           # GET DATE AND TIME FOR VERSIONING
-          run: echo "DATE=$(date + '%Y%m%d%H%M%S')" >> $GITHUB_ENV
+          run: echo "DATE=$(date '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
           echo "Current date for versioning: $DATE"     
           
           # DO BUILD IMAGES AND PUBLISH?
