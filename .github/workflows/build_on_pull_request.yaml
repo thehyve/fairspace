@@ -45,7 +45,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./projects/pluto/gradlew build -p ./projects/pluto/ -x test
+        run: ./projects/pluto/gradlew build -p ./projects/pluto/
 
 
   build-mercury:
@@ -76,8 +76,8 @@ jobs:
           cmd: build # will run `yarn build`
           dir: ./projects/mercury/
 
-#      - name: Run FE tests
-#        uses: borales/actions-yarn@v4
-#        with:
-#          cmd: test # will run `yarn test`
-#          dir: ./projects/mercury/
+      - name: Run FE tests
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: test # will run `yarn test`
+          dir: ./projects/mercury/
