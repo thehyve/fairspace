@@ -52,10 +52,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-saturn
     steps:
-      - name Check things
-      - run: |
+      - name: Check things
+        run: |
           pwd
-          ls -a
+          ls -R
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
