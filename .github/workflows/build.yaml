@@ -5,7 +5,7 @@ name: Just Build Fairspace
 on:
   pull_request:
 #    types:
-#      - synchronize
+#      - synchronize1
 #    branches:
 #      - "infra/FAIRSPC-23_github_actions_CI"
 
