@@ -1,19 +1,19 @@
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+# This workflow is triggered on such PR's changes as created, new change committed
 
-# deploy workflow is supposed to be dependent on this one, if you change the name, also change it in deploy.yaml
-name: Build & Upload Fairspace images
+name: Just Build Fairspace
 
-env:
-  DOCKER_REGISTRY: ghcr.io
-  DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/infra/FAIRSPC-23_github_actions_CI' }}
-
-on: [push]
+on:
+  push:
+    branches:
+      - "infra/FAIRSPC-23_github_actions_CI"
+  pull_request:
+    branches:
+      - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
   build-saturn:
-    if: github.ref == 'refs/heads/infra/FAIRSPC-23_github_actions_CI'
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/infra/FAIRSPC-23_github_actions_CI'
     steps:
       - name: Dump GitHub context
         env:
@@ -23,26 +23,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Initialization
+      - name: Log details
         run: |
-          # VERSION
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
-          VER=$(cat ./VERSION)
-          if [ $BRANCH == "dev" ]
-          then
-            VER=$VER-$BRANCH
-          fi
-          echo "VERSION=$VER" >> $GITHUB_ENV
-          echo "version: $VER"     
-          
-          # GET DATE AND TIME FOR VERSIONING
-          DATE=$(date "+%Y%m%d%H%M%S")
-          echo "DATE=$DATE" >> $GITHUB_ENV
-          echo "Current date for versioning: $DATE"     
-          
-          # DO BUILD IMAGES AND PUBLISH?
-          echo "Do build and publish Docker images: ${{ env.DO_BUILD_IMAGES_AND_PUBLISH }}"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -52,30 +36,6 @@ jobs:
 
       - name: Build with Gradle
         run: ./projects/saturn/gradlew build -p ./projects/saturn/ -x test
-
-      - name: Log in to the Container registry
-#        if: env.DO_BUILD_IMAGES_AND_PUBLISH == true
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-#        if: env.DO_BUILD_IMAGES_AND_PUBLISH == true
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn
-
-      - name: Build and push Docker image
-#        if: env.DO_BUILD_IMAGES_AND_PUBLISH == true
-        uses: docker/build-push-action@v5
-        with:
-          context: ./projects/saturn/
-          push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:SNAPSHOT-${{ env.VERSION }}-${{ env.DATE }}
-          labels: ${{ steps.meta.outputs.labels }}
 
 #  build-mercury:
 #    runs-on: ubuntu-latest
