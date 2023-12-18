@@ -25,7 +25,7 @@ jobs:
 
       - name: Get version
         run: |
-          ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
+          echo ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
