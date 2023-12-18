@@ -8,7 +8,8 @@ env:
   DOCKER_REGISTRY: ghcr.io
   DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
 
-on: [pull_request]
+on:
+  pull_request
 #    types: [edited]
 #    branches: ['dev']
 
