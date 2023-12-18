@@ -7,12 +7,13 @@ name: Build & Upload Fairspace images
 env:
   DOCKER_REGISTRY: ghcr.io
   DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
+  GITHUB_EVENT: ${{ github.event_name }}
 
 on: [push, pull_request]
 
 jobs:
   build-saturn:
-    if: ${{ github.event_name == 'pull_request'}}
+#    if: ${{ github.event_name == 'pull_request'}}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -20,6 +21,7 @@ jobs:
 
       - name: Initialization
         run: |
+          echo ${{ env.GITHUB_EVENT }}
           # VERSION
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
