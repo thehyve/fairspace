@@ -49,7 +49,7 @@ jobs:
         run: ./projects/saturn/gradlew build -p ./projects/saturn/ -x test
 
       - name: Log in to the Container registry
-        if: ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
+        if: env.DO_BUILD_IMAGE_AND_PUBLISH == true
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
@@ -57,19 +57,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
-        if: ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
+        if: env.DO_BUILD_IMAGE_AND_PUBLISH == true
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn
 
       - name: Build and push Docker image
-        if: ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
+        if: env.DO_BUILD_IMAGE_AND_PUBLISH == true
         uses: docker/build-push-action@v5
         with:
           context: ./projects/saturn/
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:${{ env.VERSION }}
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:SNAPSHOT-${{ env.VERSION }}-
           labels: ${{ steps.meta.outputs.labels }}
 
 #  build-mercury:
