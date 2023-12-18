@@ -6,19 +6,13 @@ name: Build & Upload Fairspace images
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
+  DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref != 'refs/heads/dev' }}
 
 on: [push]
 
 jobs:
   build-saturn:
     runs-on: ubuntu-latest
-    permissions:
-#      TODO: check if we need them or others
-      contents: read
-      id-token: write
-      packages: write
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -74,7 +68,7 @@ jobs:
         with:
           context: ./projects/saturn/
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:SNAPSHOT-${{ env.VERSION }}-
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:SNAPSHOT-${{ env.VERSION }}-${{ env.$DATE }}
           labels: ${{ steps.meta.outputs.labels }}
 
 #  build-mercury:
