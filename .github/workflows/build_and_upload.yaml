@@ -24,6 +24,7 @@ jobs:
 
       - name: Get version
         run: |
+          echo ${{ github.event_name }}
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
