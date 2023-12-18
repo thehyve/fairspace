@@ -6,6 +6,7 @@ name: Build & Upload Fairspace images
 
 env:
   DOCKER_REGISTRY: ghcr.io
+  DO_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
 
 on: [push]
 
@@ -24,7 +25,7 @@ jobs:
 
       - name: Get version
         run: |
-          echo ${{ github.event_name }}
+          echo ${{ env.DO_PUBLISH }}
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
@@ -47,6 +48,14 @@ jobs:
       - name: Build with Gradle
         run: ./projects/saturn/gradlew build -p ./projects/saturn/ -x test
 
+  build_and_publish_docker_image:
+    runs-on: ubuntu-latest
+    needs: build-saturn
+    steps:
+      - name Check things
+      - run: |
+          pwd
+          ls -a
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
