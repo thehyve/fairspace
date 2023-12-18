@@ -8,7 +8,10 @@ env:
   DOCKER_REGISTRY: ghcr.io
   DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/infra/FAIRSPC-23_github_actions_CI' }}
 
-on: [push]
+on:
+  push:
+    branches:
+      - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
   build-saturn:

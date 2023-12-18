@@ -3,17 +3,15 @@
 name: Just Build Fairspace
 
 on:
-  push:
-    branches:
-      - "infra/FAIRSPC-23_github_actions_CI"
   pull_request:
-    branches:
-      - "infra/FAIRSPC-23_github_actions_CI"
+#    types:
+#      - synchronize
+#    branches:
+#      - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
   build-saturn:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/infra/FAIRSPC-23_github_actions_CI'
     steps:
       - name: Dump GitHub context
         env:
