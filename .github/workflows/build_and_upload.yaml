@@ -6,7 +6,7 @@ name: Build & Upload Fairspace images
 
 env:
   DOCKER_REGISTRY: ghcr.io
-  DO_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
+  DO_BUILD_IMAGE_AND_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
 
 on: [push]
 
@@ -25,7 +25,6 @@ jobs:
 
       - name: Get version
         run: |
-          echo ${{ env.DO_PUBLISH }}
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
           VER=$(cat ./VERSION)
@@ -48,34 +47,29 @@ jobs:
       - name: Build with Gradle
         run: ./projects/saturn/gradlew build -p ./projects/saturn/ -x test
 
-  build_and_publish_docker_image:
-    runs-on: ubuntu-latest
-    needs: build-saturn
-    steps:
-      - name: Check things
-        run: |
-          pwd
-          ls -R
       - name: Log in to the Container registry
+        if: ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
         uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Extract metadata (tags, labels) for Docker
-#        id: meta
-#        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-#        with:
-#          images: ghcr.io/${{ github.repository }}/saturn
-#
-#      - name: Build and push Docker image
-#        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-#        with:
-#          context: ./projects/saturn/
-#          push: true
-#          tags: ghcr.io/${{ github.repository }}/saturn:${{ env.VERSION }}
-#          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        if: ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn
+
+      - name: Build and push Docker image
+        if: ${{ env.DO_BUILD_IMAGE_AND_PUBLISH }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./projects/saturn/
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:${{ env.VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
 
 #  build-mercury:
 #    runs-on: ubuntu-latest
