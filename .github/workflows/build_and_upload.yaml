@@ -8,12 +8,13 @@ env:
   DOCKER_REGISTRY: ghcr.io
   DO_BUILD_IMAGES_AND_PUBLISH: ${{ github.ref == 'refs/heads/dev' }}
   GITHUB_EVENT: ${{ github.event_name }}
+  GITHUB_EVENT_PR: ${{ github.event.pull_request }}
 
 on: [push, pull_request]
 
 jobs:
   build-saturn:
-#    if: ${{ github.event_name == 'pull_request'}}
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.event.pull_request)
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -22,6 +23,7 @@ jobs:
       - name: Initialization
         run: |
           echo ${{ env.GITHUB_EVENT }}
+          echo ${{ env.GITHUB_EVENT_PR }}
           # VERSION
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "branch: $BRANCH"
