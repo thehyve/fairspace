@@ -68,7 +68,7 @@ jobs:
         with:
           context: ./projects/saturn/
           push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:SNAPSHOT-${{ env.VERSION }}-${{ env.$DATE }}
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:SNAPSHOT-${{ env.VERSION }}-${{ env.DATE }}
           labels: ${{ steps.meta.outputs.labels }}
 
 #  build-mercury:
