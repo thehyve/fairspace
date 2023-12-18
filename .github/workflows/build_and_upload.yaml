@@ -12,7 +12,7 @@ on: [push, pull_request]
 
 jobs:
   build-saturn:
-    if: env.DO_BUILD_IMAGES_AND_PUBLISH == false
+    if: ${{ env.DO_BUILD_IMAGES_AND_PUBLISH == false }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
