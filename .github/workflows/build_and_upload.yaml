@@ -15,7 +15,6 @@ on:
 
 jobs:
   build-saturn:
-    if: github.ref == 'refs/heads/infra/FAIRSPC-23_github_actions_CI'
     runs-on: ubuntu-latest
     steps:
       - name: Dump GitHub context
