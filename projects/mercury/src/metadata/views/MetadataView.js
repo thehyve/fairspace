@@ -63,7 +63,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
-    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier'); // first column of id type
+    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier' && c.name === currentView.name);
 
     const changeTab = useCallback((event, tabIndex) => {
         setIsClosedPanel(true);
