@@ -42,7 +42,7 @@ jobs:
         name: Log details
         run: |
           # VERSION
-          BRANCH=${{needs.generate-version.outputs.output1}}
+          BRANCH=${{needs.generate-version.outputs.snapshot_version}}
           echo "$BRANCH"
 #          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
 #          echo "Triggered on branch: $BRANCH"
