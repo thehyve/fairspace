@@ -7,7 +7,6 @@ name: Build & Upload Fairspace Docker images
 env:
   DOCKER_REGISTRY: ghcr.io
 
-#TODO: remove  '-x test'
 #TODO: look for travis and create tickets
 
 on:
@@ -16,7 +15,8 @@ on:
       - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
-  generate-version: # to have one common unique version for all built artifacts per build cycle
+  # A job to generate one shared unique version tag per build cycle for all built artifacts
+  generate-version:
     runs-on: ubuntu-latest
     outputs:
       output1: ${{ steps.version.outputs.snapshot_version }}
@@ -42,7 +42,7 @@ jobs:
           echo "Docker tag to be attached to images: $SNAPSHOT_VERSION"
           
 
-  build-saturn:
+  build-saturn-service:
     runs-on: ubuntu-latest
     needs: generate-version
     steps:
@@ -56,33 +56,16 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./projects/saturn/gradlew build -p ./projects/saturn/ -x test
+        run: ./projects/saturn/gradlew build -p ./projects/saturn/
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
+      - name: Upload generated artifacts for further processing
+        uses: actions/upload-artifact@v4
         with:
-          registry: ${{ env.DOCKER_REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn
-
-      - name: Build and push Docker image
-        env:
-          SNAPSHOT_VERSION: ${{needs.generate-version.outputs.output1}}
-        uses: docker/build-push-action@v5
-        with:
-          context: ./projects/saturn/
-          push: true
-          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:${{needs.generate-version.outputs.output1}}
-          labels: ${{ steps.meta.outputs.labels }}
+          name: saturn-build
+          path: ./projects/saturn/build/distributions/*.tar
 
 
-  build-mercury:
+  build-mercury-fe-bundle:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -109,19 +92,20 @@ jobs:
           cmd: build # will run `yarn build`
           dir: ./projects/mercury/
 
-      - name: Upload generated artifacts for further # to be used building an image which includes artifacts of both Pluto and Mercury
+      # to be used building an image which includes artifacts of both Pluto and Mercury
+      - name: Upload generated artifacts for further processing
         uses: actions/upload-artifact@v4
         with:
           name: mercury-build
           path: ./projects/mercury/build/
 
-#      - name: Run Mercury tests
-#        uses: borales/actions-yarn@v4
-#        with:
-#          cmd: test # will run `yarn test`
-#          dir: ./projects/mercury/
+      - name: Run Mercury tests
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: test # will run `yarn test`
+          dir: ./projects/mercury/
 
-  build-pluto:
+  build-pluto-service:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -134,17 +118,18 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Gradle
-        run: ./projects/pluto/gradlew build -p ./projects/pluto/ -x test
+        run: ./projects/pluto/gradlew build -p ./projects/pluto/
 
-      - name: Upload generated artifacts for further # to be used building an image which includes artifacts of both Pluto and Mercury
+      # to be used building an image which includes artifacts of both Pluto and Mercury
+      - name: Upload generated artifacts for further processing
         uses: actions/upload-artifact@v4
         with:
           name: pluto-build
           path: ./projects/pluto/build/distributions/*.tar
 
-
-  build-docker-image-with-pluto-and-mercury:
-    needs: [generate-version, build-mercury, build-pluto]
+  # Pluto .tar file and Mercury bundle run together in one docker container
+  build-and-upload-docker-image-with-pluto-and-mercury:
+    needs: [generate-version, build-mercury-fe-bundle, build-pluto-service]
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository # To get Pluto Dockerfile
@@ -163,15 +148,15 @@ jobs:
           path: ./projects/pluto/build/distributions/
 
       - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v5
         with:
           images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/pluto
 
@@ -181,4 +166,41 @@ jobs:
           context: ./projects/pluto/
           push: true
           tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/pluto:${{needs.generate-version.outputs.output1}}
+          labels: ${{ steps.meta.outputs.labels }}
+
+
+  build-and-upload-docker-image-for-saturn:
+    needs: [generate-version, build-saturn-service]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository # To get Saturn Dockerfile
+        uses: actions/checkout@v4
+
+      - name: Download Saturn artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: saturn-build
+          path: ./projects/saturn/build/distributions/
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn
+
+      - name: Build and push Docker image
+        env:
+          SNAPSHOT_VERSION: ${{needs.generate-version.outputs.output1}}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./projects/saturn/
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn:${{needs.generate-version.outputs.output1}}
           labels: ${{ steps.meta.outputs.labels }}
