@@ -11,6 +11,9 @@ jobs:
     outputs:
       output1: ${{ steps.version.outputs.snapshot_version }}
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - id: version
         name: Generating version tag for artifacts
         run: |
