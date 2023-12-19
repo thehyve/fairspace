@@ -44,7 +44,6 @@ jobs:
 
   build-saturn-service:
     runs-on: ubuntu-latest
-    needs: generate-version
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
