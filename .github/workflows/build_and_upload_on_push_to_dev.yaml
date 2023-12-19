@@ -1,18 +1,20 @@
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+# Deployment workflow is supposed to be dependent on this one.
 
-# deploy workflow is supposed to be dependent on this one, if you change the name, also change it in deploy.yaml
+# 1. At the workflow start four jobs are triggered in parallel (generate version, building all services)
+# 2. A job to build Docker image with Saturn service is triggered once version generated and Saturn artifacts
+#       are built and uploaded
+# 3. A job to build Docker image with Pluto service and Mercury bundle is triggered once version generated and
+#       Pluto/Mercury artifacts are built and uploaded
+
 name: Build & Upload Fairspace Docker images
 
 env:
   DOCKER_REGISTRY: ghcr.io
 
-#TODO: look for travis and create tickets
-
 on:
   push:
     branches:
-      - "infra/FAIRSPC-23_github_actions_CI"
+      - "dev"
 
 jobs:
   # A job to generate one shared unique version tag per build cycle for all built artifacts
