@@ -6,10 +6,31 @@ on:
   pull_request:
 
 jobs:
-  build-saturn:
+  generate-version: # to have one common unique version for all built artifacts
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.log.outputs.snapshot_version }}
+      output1: ${{ steps.version.outputs.snapshot_version }}
+    steps:
+      - id: version
+        name: Generating version tag for artifacts
+        run: |
+          # EXTRACT VERSION
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Building images from the branch: $BRANCH"
+          VER=$(cat ./VERSION)
+          echo "Building images for version: $VER"     
+
+          # GET DATE AND TIME FOR VERSIONING 
+          DATE=$(date "+%Y%m%d%H%M%S")
+
+          # DOCKER TAG TO BE ATTACHED (SHARED WITHIN OUTPUT):
+          SNAPSHOT_VERSION=SNAPSHOT-$VER-$DATE
+          echo "snapshot_version=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Docker tag to be attached to images: $SNAPSHOT_VERSION"
+
+  build-saturn:
+    runs-on: ubuntu-latest
+    needs: generate-version
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -18,24 +39,8 @@ jobs:
         name: Log details
         run: |
           # VERSION
-          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          echo "branch: $BRANCH"
-          VER=$(cat ./VERSION)
-          if [ $BRANCH == "dev" ]
-          then
-            VER=$VER-$BRANCH
-          fi
-          echo "VERSION=$VER" >> $GITHUB_ENV
-          echo "version: $VER"     
-
-          # GET DATE AND TIME FOR VERSIONING
-          DATE=$(date "+%Y%m%d%H%M%S")
-          echo "DATE=$DATE" >> $GITHUB_ENV
-          echo "Current date for versioning: $DATE"     
-
-          # DOCKER TAG TO BE ATTACHED (SHARED WITHIN OUTPUT):
-          echo "snapshot_version=SNAPSHOT-$VER-$DATE" >> "$GITHUB_OUTPUT"
-          echo "Docker tag to be attached to images: SNAPSHOT-$VER-$DATE"
+          BRANCH=${{needs.generate-version.outputs.output1}}
+          echo "$BRANCH"
 #          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
 #          echo "Triggered on branch: $BRANCH"
 
