@@ -29,7 +29,6 @@ jobs:
 
   build-pluto:
     runs-on: ubuntu-latest
-    needs: build-saturn
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
