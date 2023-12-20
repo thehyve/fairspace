@@ -1,10 +1,8 @@
-/* eslint-disable */
 import React, {useContext} from 'react';
 import * as PropTypes from "prop-types";
 import {Box, Modal, Tooltip} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import LinkedDataEntityPage from "./LinkedDataEntityPage";
-import {MetadataWrapper} from '../LinkedDataWrapper';
 import UserContext from '../../users/UserContext';
 /**
  * Renders a link to the metadata editor.
@@ -26,7 +24,7 @@ const styleModalDialog = {
 };
 const styleCloseButton = {
     float: 'right'
-}
+};
 
 const getModal = (open, handleClose, uri) => (
     <Modal
@@ -37,14 +35,12 @@ const getModal = (open, handleClose, uri) => (
     >
         <Box sx={styleModalDialog}>
             <Tooltip title="Close - click or press 'Esc'">
-                <CloseIcon onClick={handleClose} sx={styleCloseButton}></CloseIcon>
+                <CloseIcon onClick={handleClose} sx={styleCloseButton} />
             </Tooltip>
-            <MetadataWrapper>
-                <LinkedDataEntityPage title="Metadata" subject={uri} />
-            </MetadataWrapper>
+            <LinkedDataEntityPage title="Metadata" subject={uri} />
         </Box>
     </Modal>
-)
+);
 
 const LinkedDataLink = ({uri, children}) => {
     const [open, setOpen] = React.useState(false);
