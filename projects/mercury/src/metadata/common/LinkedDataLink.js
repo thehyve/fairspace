@@ -1,48 +1,32 @@
 import React, {useContext} from 'react';
 import * as PropTypes from "prop-types";
 import {Box, Modal, Tooltip} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
 import CloseIcon from '@mui/icons-material/Close';
 import LinkedDataEntityPage from "./LinkedDataEntityPage";
 import UserContext from '../../users/UserContext';
+import styles from './LinkedDataLink.styles';
 /**
- * Renders a link to the metadata editor.
- *
- * @param props
- * @constructor
+ * Renders a link to the metadata editor in a modal dialog when clicked.
  */
 
-const styleModalDialog = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 800,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
-const styleCloseButton = {
-    float: 'right'
-};
-
-const getModal = (open, handleClose, uri) => (
+const getModal = (classes, open, handleClose, uri) => (
     <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
     >
-        <Box sx={styleModalDialog}>
+        <Box className={classes.styleModalDialog}>
             <Tooltip title="Close - click or press 'Esc'">
-                <CloseIcon onClick={handleClose} sx={styleCloseButton} />
+                <CloseIcon onClick={handleClose} className={classes.styleCloseButton} />
             </Tooltip>
             <LinkedDataEntityPage title="Metadata" subject={uri} />
         </Box>
     </Modal>
 );
 
-const LinkedDataLink = ({uri, children}) => {
+const LinkedDataLink = ({classes, uri, children}) => {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -54,7 +38,7 @@ const LinkedDataLink = ({uri, children}) => {
                 <div onClick={handleOpen}>
                     {children}
                 </div>
-                {getModal(open, handleClose, uri)}
+                {getModal(classes, open, handleClose, uri)}
             </div>
         );
     }
@@ -66,4 +50,4 @@ LinkedDataLink.propTypes = {
     children: PropTypes.any.isRequired
 };
 
-export default LinkedDataLink;
+export default withStyles(styles)(LinkedDataLink);
