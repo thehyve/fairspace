@@ -1,5 +1,5 @@
 const styles = (theme) => ({
-    styleModalDialog: {
+    modalDialog: {
         background: theme.palette.grey['200'],
         position: 'absolute',
         top: '50%',
@@ -9,13 +9,20 @@ const styles = (theme) => ({
         bgcolor: 'background.paper',
         border: '0px solid #000',
         boxShadow: 0,
+        outline: "none",
         p: 4,
     },
-    styleCloseButton: {
+    closeButton: {
         float: 'right',
         marginTop: 8,
         marginRight: 8
 
+    },
+    clickableDiv: {
+        'cursor': 'pointer',
+        '&:hover': {
+            textDecoration: 'underline'
+        }
     }
 });
 

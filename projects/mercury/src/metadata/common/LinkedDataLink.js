@@ -10,16 +10,16 @@ import styles from './LinkedDataLink.styles';
  * Renders a link to the metadata editor in a modal dialog when clicked.
  */
 
-const getModal = (classes, open, handleClose, uri) => (
+const renderModal = (classes, open, handleClose, uri) => (
     <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
     >
-        <Box className={classes.styleModalDialog}>
+        <Box className={classes.modalDialog}>
             <Tooltip title="Close - click or press 'Esc'">
-                <CloseIcon onClick={handleClose} className={classes.styleCloseButton} />
+                <CloseIcon onClick={handleClose} className={classes.closeButton} />
             </Tooltip>
             <LinkedDataEntityPage title="Metadata" subject={uri} />
         </Box>
@@ -35,10 +35,10 @@ const LinkedDataLink = ({classes, uri, children}) => {
     if (currentUser && currentUser.canViewPublicMetadata) {
         return (
             <div>
-                <div onClick={handleOpen}>
+                <div onClick={handleOpen} className={classes.clickableDiv}>
                     {children}
                 </div>
-                {getModal(classes, open, handleClose, uri)}
+                {renderModal(classes, open, handleClose, uri)}
             </div>
         );
     }
