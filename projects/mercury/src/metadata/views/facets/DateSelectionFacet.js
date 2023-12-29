@@ -41,26 +41,39 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         if (val.toString() === 'Invalid Date') {
             return false;
         }
-        return (val >= minDate && val <= maxDate);
+        // lib.es5 Date constructor (used in the getRangeLimit method) converts two-digits (XX) input year to 1900+XX.
+        // For instance, 68 turns to 1900 + 68 -> 1968.
+        // Thus, only 4 digits year are considered as valid.
+        const fourDigitsYearEntered = val.getFullYear().toString().length === 4;
+        return (val >= minDate && val <= maxDate && fourDigitsYearEntered);
     };
 
-    const handleChange = (newValue) => {
-        if (value !== newValue) {
-            setValue(newValue);
-            if (isValid(newValue[0]) && isValid(newValue[1])) {
-                onChange(newValue);
-            } else {
-                onChange(null);
-            }
+    const isValidInterval = (startDate: Date, endDate: Date): boolean => (
+        !startDate || !endDate || (startDate <= endDate)
+    );
+
+    const handleChange = (newDateInterval) => {
+        if (isValidInterval(newDateInterval)) {
+            onChange(newDateInterval);
         }
     };
 
     const handleMinDateChange = (newValue) => {
-        handleChange([getRangeLimit(newValue), value[1]]);
+        const oldEndDate = value[1];
+        setValue([newValue, oldEndDate]);
+        if (isValid(newValue)) {
+            const newDateInterval = [getRangeLimit(newValue), oldEndDate];
+            handleChange(newDateInterval);
+        }
     };
 
     const handleMaxDateChange = (newValue) => {
-        handleChange([value[0], getRangeLimit(newValue, true)]);
+        const oldStartDate = value[0];
+        setValue([oldStartDate, newValue]);
+        if (isValid(newValue)) {
+            const newDateInterval = [oldStartDate, getRangeLimit(newValue, true)];
+            handleChange(newDateInterval);
+        }
     };
 
     const renderDate = (val: any): string => {
@@ -79,7 +92,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
             <DatePicker
                 disableToolbar
                 variant="inline"
-                format={DATE_FORMAT}
+                inputFormat={DATE_FORMAT}
                 invalidDateMessage="Invalid date format"
                 margin="normal"
                 label={label}
@@ -88,7 +101,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 autoOk
                 minDate={min || minDate}
                 maxDate={max || maxDate}
-                initialFocusedDate={placeholderDate}
+                defaultCalendarMonth={placeholderDate}
                 placeholder={renderDate(placeholderDate)}
                 KeyboardButtonProps={{
                     'aria-label': 'change date',
