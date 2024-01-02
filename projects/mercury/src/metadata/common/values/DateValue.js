@@ -34,7 +34,7 @@ class DateValue extends React.Component {
         return (
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                    format={DATE_FORMAT}
+                    inputFormat={DATE_FORMAT}
                     invalidDateMessage="Invalid date format"
                     value={this.state.value}
                     onChange={this.handleChange}
