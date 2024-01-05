@@ -82,7 +82,7 @@ jobs:
           VERSION: ${{needs.generate-version.outputs.output1}}
         run: |
           echo $VERSION
-          sed -i "s/0.0.0-RELEASEVERSION/$VERSION/g" projects/mercury/package.json
+          sed -i "s/0.0.0-RELEASEVERSION/${{env.VERSION}}/g" projects/mercury/package.json
           sed -n "1,10p" < projects/mercury/package.json
 
       - name: Run install
