@@ -81,11 +81,9 @@ jobs:
         env:
           VERSION: ${{needs.generate-version.outputs.output1}}
         run: |
+          echo $VERSION
           sed -i "s/0.0.0-RELEASEVERSION/$VERSION/g" projects/mercury/package.json
-          sed "${1}q;d" projects/mercury/package.json
-          sed "${2}q;d" projects/mercury/package.json
-          sed "${3}q;d" projects/mercury/package.json
-          sed "${4}q;d" projects/mercury/package.json
+          sed -n "1,10p" < projects/mercury/package.json
 
       - name: Run install
         uses: borales/actions-yarn@v4
