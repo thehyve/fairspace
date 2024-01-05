@@ -14,7 +14,7 @@ env:
 on:
   push:
     branches:
-      - "dev"
+      - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
   # A job to generate one shared unique version tag per build cycle for all built artifacts
@@ -78,8 +78,14 @@ jobs:
           node-version: 18.x
 
       - name: Set deployment version
+        env:
+          VERSION: ${{needs.generate-version.outputs.output1}}
         run: |
-          sed -i "s/0.0.0-RELEASEVERSION/${{needs.generate-version.outputs.output1}}/g" projects/mercury/package.json
+          sed -i "s/0.0.0-RELEASEVERSION/$VERSION/g" projects/mercury/package.json
+          sed "${1}q;d" projects/mercury/package.json
+          sed "${2}q;d" projects/mercury/package.json
+          sed "${3}q;d" projects/mercury/package.json
+          sed "${4}q;d" projects/mercury/package.json
 
       - name: Run install
         uses: borales/actions-yarn@v4
