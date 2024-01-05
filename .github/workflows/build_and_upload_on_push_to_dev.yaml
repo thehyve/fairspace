@@ -67,6 +67,7 @@ jobs:
 
 
   build-mercury-fe-bundle:
+    needs: generate-version
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -201,8 +202,6 @@ jobs:
           images: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/saturn
 
       - name: Build and push Docker image
-        env:
-          SNAPSHOT_VERSION: ${{needs.generate-version.outputs.output1}}
         uses: docker/build-push-action@v5
         with:
           context: ./projects/saturn/
