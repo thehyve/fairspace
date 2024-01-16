@@ -13,6 +13,7 @@ export type MetadataViewFilter = {
     max: any;
     prefix: string;
     booleanValue?: boolean;
+    numericValue?: boolean;
 }
 
 export type MetadataViewFacetValue = {
