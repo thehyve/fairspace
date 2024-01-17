@@ -19,6 +19,9 @@ public class ViewRowCollection {
     }
 
     public List<ViewRow> getRowsForId(String id) {
+        if (!data.containsKey(id)) {
+            return new ArrayList<ViewRow>();
+        }
         return data.get(id);
     }
 }
