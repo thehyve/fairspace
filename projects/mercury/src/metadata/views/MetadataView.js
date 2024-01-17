@@ -13,7 +13,7 @@ import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
 import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
 import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, RESOURCES_VIEW} from "./metadataViewUtils";
+import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, ofNumericValueType, RESOURCES_VIEW} from "./metadataViewUtils";
 import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
@@ -87,6 +87,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
             [filter.min, filter.max] = values;
+            filter.numericValue = ofNumericValueType(type);
         } else if (ofBooleanValueType(type)) {
             filter.booleanValue = values.length > 0 ? values[0] : null;
         } else {

@@ -1,20 +1,22 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.config.ViewsConfig.*;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.*;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
 import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.function.Function;
-import java.util.stream.*;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
@@ -194,13 +196,19 @@ public class ViewStoreReader implements AutoCloseable {
                             .collect(Collectors.joining(", ")));
         }
         var constraints = new ArrayList<String>();
+        // NOTE: for NUMERIC filter, turned out, PreparedStatement may cast them as real or double,
+        // what causes a dramatic slow down for the query execution (up to x100).
+        // As a workaround, we force PrepareStatement to send the request with numeric type (the same as it is defined
+        // in the database schema)
         if (filter.getMin() != null) {
             values.add(filter.getMin());
-            constraints.add(fieldName + " >= ?");
+            var constraint = filter.numericValue ? " >= ?::numeric" : " >= ?";
+            constraints.add(fieldName + constraint);
         }
         if (filter.getMax() != null) {
             values.add(filter.getMax());
-            constraints.add(fieldName + " <= ?");
+            var constraint = filter.numericValue ? " <= ?::numeric" : " <= ?";
+            constraints.add(fieldName + constraint);
         }
         if (filter.getPrefix() != null && !filter.getPrefix().isBlank()) {
             // Use view label instead of id for prefix filters
