@@ -2740,6 +2740,52 @@ kubectl delete statefulset fairspace-new --namespace fairspace-new --cascade=orp
 This will remove the ``StatefulSet``, but keep all pods and volumes intact.
 After running ``helm upgrade --install`` the ``StatefulSet`` will be recreated and the running pod will be replaced with a pod running the new application version.
 
+===== Keep existing volumes on update of StatefulSet
+
+Any changes on the StatefulSet will require a clean deployment, with new volumes. If you want to change the StatefulSet while keeping your existing volumes follow the procedure as described below.
+
+To preserve your volumes get the volume id's (pv-name's):
+
+[source,shell]
+----
+$ kubectl get pv -n <namespace>
+----
+
+Now patch the volumes so they are not deleted automatically when the VolumeClaim is removed:
+
+[source,shell]
+----
+$ kubectl patch pv <pv-name> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+$ kubectl get pv # now shows status 'released'
+----
+
+Uninstall the statefulset and remove the VolumeClaims. In released status the volumes cannot bind to a new claim, therefore remove the claim reference:
+
+[source,shell]
+----
+$ kubectl edit pv <pv-name>
+----
+In the editor, remove the 'claimref' section.
+
+The final step is to add the previously gathered volume id's to the statefulset configuration:
+
+[source,yaml]
+----
+volumeClaimTemplates:
+- metadata:
+  name: postgres
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+  requests:
+    {...}
+  volumeName: "<volume-id>"
+----
+
+Now execute the deployment.
+
+For more details see https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd#pvc_to_pv
+
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm uninstall`` or ``kubectl delete``.
 
