@@ -1,19 +1,24 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.config.ViewsConfig.*;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.*;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
 import java.util.Date;
-import java.util.stream.*;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import javax.validation.constraints.NotBlank;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
@@ -33,6 +38,7 @@ public class ViewStoreReader implements AutoCloseable {
     final Connection connection;
     final int MAX_JOIN_ITEMS = 50;
 
+    // TODO: in whole class, use StringBuilder instead of String concats
     public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory) throws SQLException {
         this.searchConfig = searchConfig;
         this.configuration = viewStoreClientFactory.configuration;
@@ -193,13 +199,19 @@ public class ViewStoreReader implements AutoCloseable {
                             .collect(Collectors.joining(", ")));
         }
         var constraints = new ArrayList<String>();
+        // NOTE: for NUMERIC filter, turned out, PreparedStatement may cast them as real or double,
+        // what causes a dramatic slow down for the query execution (up to x100).
+        // As a workaround, we force PrepareStatement to send the request with numeric type (the same as it is defined
+        // in the database schema)
         if (filter.getMin() != null) {
             values.add(filter.getMin());
-            constraints.add(fieldName + " >= ?");
+            var constraint = filter.numericValue ? " >= ?::numeric" : " >= ?";
+            constraints.add(fieldName + constraint);
         }
         if (filter.getMax() != null) {
             values.add(filter.getMax());
-            constraints.add(fieldName + " <= ?");
+            var constraint = filter.numericValue ? " <= ?::numeric" : " <= ?";
+            constraints.add(fieldName + constraint);
         }
         if (filter.getPrefix() != null && !filter.getPrefix().isBlank()) {
             // Use view label instead of id for prefix filters
@@ -218,7 +230,7 @@ public class ViewStoreReader implements AutoCloseable {
             }).collect(Collectors.joining(" or "));
             constraints.add("(" + prefixes + ")");
         }
-        if(filter.booleanValue != null) {
+        if (filter.booleanValue != null) {
             if (filter.booleanValue) {
                 constraints.add("(" + fieldName + "=true)");
             } else {
@@ -246,11 +258,11 @@ public class ViewStoreReader implements AutoCloseable {
                     if (column != null && column.type.isSet()) {
                         var propertyTable = configuration.propertyTables.get(view.name).get(column.name);
                         var subConstraint = sqlConstraint("pt." + field, filter, values);
-                        return "exists (select *" +
-                                " from " + propertyTable.name + " pt " +
-                                " where pt." + idColumn(view.name).name + " = " + alias + ".id" +
-                                (subConstraint.isBlank() ? "" : " and " + subConstraint) +
-                                ")";
+                        return "exists (select *"
+                                + " from " + propertyTable.name + " pt "
+                                + " where pt." + idColumn(view.name).name + " = " + alias + ".id"
+                                + (subConstraint.isBlank() ? "" : " and " + subConstraint)
+                                + ")";
                     }
                     return sqlConstraint(alias + "." + field, filter, values);
                 })
@@ -373,8 +385,9 @@ public class ViewStoreReader implements AutoCloseable {
         }
     }
 
-    List<Map<String, Set<ValueDTO>>> retrieveJoinTableRows(
-            String view, View.JoinView joinView, String id) throws SQLException {
+    ViewRowCollection retrieveJoinTableRows(
+            String view, View.JoinView joinView, List<String> ids) throws SQLException {
+
         var joinedTable = configuration.viewTables.get(joinView.view);
         var joinViewConfig = configuration.viewConfig.get(joinView.view);
         var valueSetProperties = joinViewConfig.columns.stream()
@@ -388,48 +401,20 @@ public class ViewStoreReader implements AutoCloseable {
                 Stream.of("id", "label"),
                 joinView.include.stream()
                         .filter(column -> !valueSetProperties.contains(column)))
+                .distinct()
                 .collect(Collectors.toList());
 
-        var query = connection.prepareStatement(
-                "select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) +
-                        " from " + joinedTable.name + " j " +
-                        " where exists (" +
-                        "   select * from " + joinTable.name + " jt " +
-                        "   where jt." + idColumn(joinView.view).name + " = j.id" +
-                        "   and jt." + idColumn(view).name + " = ? )" +
-                        "limit " + String.valueOf(MAX_JOIN_ITEMS)
-        );
-        query.setString(1, id);
+        var query = getJoinQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
         var result = query.executeQuery();
-        List<Map<String, Set<ValueDTO>>> rows = new ArrayList<>();
+
+        var rows = new ViewRowCollection();
+
         while (result.next()) {
-            Map<String, Set<ValueDTO>> row = new HashMap<>();
-            row.put(joinView.view, Collections.singleton(new ValueDTO(result.getString("label"), result.getString("id"))));
-            for (var column : projectionColumns) {
-                var columnName = joinView.view + "_" + column;
-                var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
-                        .filter(c -> c.getName().equalsIgnoreCase(column))
-                        .findFirst().orElseThrow(() -> {
-                            throw new NoSuchElementException("Cannot find column " + column);
-                        });
-                if (columnDefinition.type == ColumnType.Number) {
-                    var value = result.getBigDecimal(columnDefinition.name);
-                    if (value != null) {
-                        row.put(columnName, Collections.singleton(new ValueDTO(value.toString(), value)));
-                    }
-                } else if (columnDefinition.type == Date) {
-                    var value = result.getTimestamp(columnDefinition.name);
-                    if (value != null) {
-                        row.put(columnName, Collections.singleton(new ValueDTO(value.toInstant().toString(), value.toString())));
-                    }
-                } else {
-                    var label = result.getString(columnDefinition.name);
-                    row.put(columnName, Collections.singleton(new ValueDTO(label, label)));
-                }
-            }
-            addValueSetValues(joinView.view, row, valueSetProperties, valueSetQueries);
-            rows.add(row);
+            var id = result.getString("rowid");
+            var row = buildRows(joinView, valueSetProperties, valueSetQueries, projectionColumns, result, rows);
+            rows.add(id, row);
         }
+
         for (var q : valueSetQueries.values()) {
             q.close();
         }
@@ -437,10 +422,60 @@ public class ViewStoreReader implements AutoCloseable {
         return rows;
     }
 
+    private ViewRow buildRows(View.JoinView joinView, List<@NotBlank String> valueSetProperties,
+            Map<String, PreparedStatement> valueSetQueries, List<String> projectionColumns, ResultSet result,
+            ViewRowCollection rows) throws SQLException {
+
+        var row = new ViewRow();
+        row.put(joinView.view, Collections.singleton(new ValueDTO(result.getString("label"), result.getString("id"))));
+        for (var column : projectionColumns) {
+            var columnName = joinView.view + "_" + column;
+            var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(column))
+                    .findFirst().orElseThrow(() -> {
+                        throw new NoSuchElementException("Cannot find column " + column);
+                    });
+            if (columnDefinition.type == ColumnType.Number) {
+                var value = result.getBigDecimal(columnDefinition.name);
+                if (value != null) {
+                    row.put(columnName, Collections.singleton(new ValueDTO(value.toString(), value)));
+                }
+            } else if (columnDefinition.type == Date) {
+                var value = result.getTimestamp(columnDefinition.name);
+                if (value != null) {
+                    row.put(columnName, Collections.singleton(new ValueDTO(value.toInstant().toString(), value.toString())));
+                }
+            } else {
+                var label = result.getString(columnDefinition.name);
+                row.put(columnName, Collections.singleton(new ValueDTO(label, label)));
+            }
+        }
+        addValueSetValues(joinView.view, row.getRawData(), valueSetProperties, valueSetQueries);
+        return row;
+    }
+
+    private PreparedStatement getJoinQuery(String view, View.JoinView joinView, Table joinedTable, Table joinTable,
+            List<String> projectionColumns, List<String> ids) throws SQLException {
+
+
+        Function<String, String> queryBody = id
+                -> "(select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) + " , '" + id + "' AS rowid"
+                + " from " + joinedTable.name + " j "
+                + " where exists ("
+                + "   select * from " + joinTable.name + " jt "
+                + "   where jt." + idColumn(joinView.view).name + " = j.id"
+                + "   and jt." + idColumn(view).name + " = '" + id + "'"
+                + ") limit " + String.valueOf(MAX_JOIN_ITEMS) + ")";
+
+        var subqueries = ids.stream().map(queryBody);
+        var query = subqueries.collect(Collectors.joining("\n UNION \n"));
+        return connection.prepareStatement(query);
+    }
+
     /**
      * Compute the range of numerical or date values in a column of a view.
      *
-     * @param view   the view name.
+     * @param view the view name.
      * @param column the column name.
      * @return a range object containing the minimum and maximum values.
      */
@@ -507,19 +542,18 @@ public class ViewStoreReader implements AutoCloseable {
             }
             // Fetch rows with columns from the view table
             var rows = this.retrieveViewTableRows(view, filters, offset, limit);
+
             // Add items from join tables
             if (includeJoinedViews) {
                 for (var joinView : viewConfig.join) {
+                    var rowIds = rows.stream().map(r
+                            -> (String) r.get(view).stream().findFirst().orElseThrow().getValue())
+                            .toList();
+
+                    var allJoinTableRows = this.retrieveJoinTableRows(view, joinView, rowIds);
                     for (var row : rows) {
-                        var id = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
-                        for (var joinTableRow : this.retrieveJoinTableRows(view, joinView, id)) {
-                            joinTableRow.forEach((key, values) -> {
-                                if (!row.containsKey(key)) {
-                                    row.put(key, new LinkedHashSet<>());
-                                }
-                                row.get(key).addAll(values);
-                            });
-                        }
+                        var rowId = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
+                        addJoinTableRowsForRow(row, allJoinTableRows.getRowsForId(rowId));
                     }
                 }
             }
@@ -528,6 +562,18 @@ public class ViewStoreReader implements AutoCloseable {
             throw e;
         } catch (SQLException e) {
             throw new QueryException("Error retrieving page rows", e);
+        }
+    }
+
+    private void addJoinTableRowsForRow(
+            Map<String, Set<ValueDTO>> row,
+            List<ViewRow> allJoinTableRows) {
+
+        for (var joinTableRow : allJoinTableRows) {
+            joinTableRow.getRawData().forEach((key, values) -> {
+                var value = row.computeIfAbsent(key, x -> new LinkedHashSet<>()); // TODO investigate, is LinkedHashSet best choice here?
+                value.addAll(values);
+            });
         }
     }
 
@@ -566,7 +612,7 @@ public class ViewStoreReader implements AutoCloseable {
                 .stream()
                 .map(uc -> "?")
                 .collect(Collectors.toList());
-        var collectionConstraint = "and collection in (" + String.join(", ",collectionPlaceholders) + ") ";
+        var collectionConstraint = "and collection in (" + String.join(", ", collectionPlaceholders) + ") ";
 
         var idConstraint = StringUtils.isBlank(request.getParentIRI()) ? "" :
                 "and id like '" + escapeLikeString(request.getParentIRI()) + "%' ";
@@ -579,7 +625,7 @@ public class ViewStoreReader implements AutoCloseable {
                 .append("order by id asc limit 1000");
 
         try (var statement = connection.prepareStatement(queryString.toString())) {
-            for(int i = 0; i< values.size(); i++) {
+            for (int i = 0; i < values.size(); i++) {
                 statement.setString(i + 1, values.get(i));
             }
 

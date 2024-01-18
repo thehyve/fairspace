@@ -21,3 +21,4 @@ export const getMetadataViewsPath = (viewName: string) => {
 
 export const ofRangeValueType: boolean = (type: ValueType) => type === 'Number' || type === 'Date';
 export const ofBooleanValueType: boolean = (type: ValueType) => type === 'Boolean';
+export const ofNumericValueType: boolean = (type: ValueType) => type === 'Number';

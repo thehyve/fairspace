@@ -18,6 +18,7 @@ public class ViewFilter {
     Object min;
     Object max;
     Boolean booleanValue;
+    Boolean numericValue;
     String prefix;
     /**
      * Used internally for filtering on resource location.
