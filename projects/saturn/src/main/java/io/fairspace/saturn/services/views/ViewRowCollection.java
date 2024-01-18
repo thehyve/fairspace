@@ -1,27 +1,23 @@
 package io.fairspace.saturn.services.views;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ViewRowCollection {
 
-    private Hashtable<String, List<ViewRow>> data = new Hashtable<String, List<ViewRow>>();
+    private Map<String, List<ViewRow>> data = new HashMap<>();
 
     public ViewRowCollection() {
     }
 
     public void add(String id, ViewRow row) {
-        if (!data.containsKey(id)) {
-            data.put(id, new ArrayList<>());
-        }
-        data.get(id).add(row);
+        var value = data.computeIfAbsent(id, x -> new ArrayList<>());
+        value.add(row);
     }
 
     public List<ViewRow> getRowsForId(String id) {
-        if (!data.containsKey(id)) {
-            return new ArrayList<ViewRow>();
-        }
-        return data.get(id);
+        return data.getOrDefault(id, new ArrayList<ViewRow>());
     }
 }

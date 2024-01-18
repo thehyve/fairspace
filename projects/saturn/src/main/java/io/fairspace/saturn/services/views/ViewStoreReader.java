@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import javax.validation.constraints.NotBlank;
+
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
@@ -36,6 +38,7 @@ public class ViewStoreReader implements AutoCloseable {
     final Connection connection;
     final int MAX_JOIN_ITEMS = 50;
 
+    // TODO: in whole class, use StringBuilder instead of String concats
     public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory) throws SQLException {
         this.searchConfig = searchConfig;
         this.configuration = viewStoreClientFactory.configuration;
@@ -384,6 +387,7 @@ public class ViewStoreReader implements AutoCloseable {
 
     ViewRowCollection retrieveJoinTableRows(
             String view, View.JoinView joinView, List<String> ids) throws SQLException {
+
         var joinedTable = configuration.viewTables.get(joinView.view);
         var joinViewConfig = configuration.viewConfig.get(joinView.view);
         var valueSetProperties = joinViewConfig.columns.stream()
@@ -400,40 +404,17 @@ public class ViewStoreReader implements AutoCloseable {
                 .distinct()
                 .collect(Collectors.toList());
 
-        var query = getQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
+        var query = getJoinQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
         var result = query.executeQuery();
 
         var rows = new ViewRowCollection();
 
         while (result.next()) {
-            var row = new ViewRow();
             var id = result.getString("rowid");
-            row.put(joinView.view, Collections.singleton(new ValueDTO(result.getString("label"), result.getString("id"))));
-            for (var column : projectionColumns) {
-                var columnName = joinView.view + "_" + column;
-                var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
-                        .filter(c -> c.getName().equalsIgnoreCase(column))
-                        .findFirst().orElseThrow(() -> {
-                            throw new NoSuchElementException("Cannot find column " + column);
-                        });
-                if (columnDefinition.type == ColumnType.Number) {
-                    var value = result.getBigDecimal(columnDefinition.name);
-                    if (value != null) {
-                        row.put(columnName, Collections.singleton(new ValueDTO(value.toString(), value)));
-                    }
-                } else if (columnDefinition.type == Date) {
-                    var value = result.getTimestamp(columnDefinition.name);
-                    if (value != null) {
-                        row.put(columnName, Collections.singleton(new ValueDTO(value.toInstant().toString(), value.toString())));
-                    }
-                } else {
-                    var label = result.getString(columnDefinition.name);
-                    row.put(columnName, Collections.singleton(new ValueDTO(label, label)));
-                }
-            }
-            addValueSetValues(joinView.view, row.getRawData(), valueSetProperties, valueSetQueries);
+            var row = buildRows(joinView, valueSetProperties, valueSetQueries, projectionColumns, result, rows);
             rows.add(id, row);
         }
+
         for (var q : valueSetQueries.values()) {
             q.close();
         }
@@ -441,7 +422,39 @@ public class ViewStoreReader implements AutoCloseable {
         return rows;
     }
 
-    private PreparedStatement getQuery(String view, View.JoinView joinView, Table joinedTable, Table joinTable,
+    private ViewRow buildRows(View.JoinView joinView, List<@NotBlank String> valueSetProperties,
+            Map<String, PreparedStatement> valueSetQueries, List<String> projectionColumns, ResultSet result,
+            ViewRowCollection rows) throws SQLException {
+
+        var row = new ViewRow();
+        row.put(joinView.view, Collections.singleton(new ValueDTO(result.getString("label"), result.getString("id"))));
+        for (var column : projectionColumns) {
+            var columnName = joinView.view + "_" + column;
+            var columnDefinition = configuration.viewTables.get(joinView.view).getColumns().stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(column))
+                    .findFirst().orElseThrow(() -> {
+                        throw new NoSuchElementException("Cannot find column " + column);
+                    });
+            if (columnDefinition.type == ColumnType.Number) {
+                var value = result.getBigDecimal(columnDefinition.name);
+                if (value != null) {
+                    row.put(columnName, Collections.singleton(new ValueDTO(value.toString(), value)));
+                }
+            } else if (columnDefinition.type == Date) {
+                var value = result.getTimestamp(columnDefinition.name);
+                if (value != null) {
+                    row.put(columnName, Collections.singleton(new ValueDTO(value.toInstant().toString(), value.toString())));
+                }
+            } else {
+                var label = result.getString(columnDefinition.name);
+                row.put(columnName, Collections.singleton(new ValueDTO(label, label)));
+            }
+        }
+        addValueSetValues(joinView.view, row.getRawData(), valueSetProperties, valueSetQueries);
+        return row;
+    }
+
+    private PreparedStatement getJoinQuery(String view, View.JoinView joinView, Table joinedTable, Table joinTable,
             List<String> projectionColumns, List<String> ids) throws SQLException {
 
 
@@ -558,10 +571,8 @@ public class ViewStoreReader implements AutoCloseable {
 
         for (var joinTableRow : allJoinTableRows) {
             joinTableRow.getRawData().forEach((key, values) -> {
-                if (!row.containsKey(key)) {
-                    row.put(key, new LinkedHashSet<>());
-                }
-                row.get(key).addAll(values);
+                var value = row.computeIfAbsent(key, x -> new LinkedHashSet<>()); // TODO investigate, is LinkedHashSet best choice here?
+                value.addAll(values);
             });
         }
     }
