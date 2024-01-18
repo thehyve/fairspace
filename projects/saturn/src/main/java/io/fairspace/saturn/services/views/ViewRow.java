@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,8 +12,9 @@ public class ViewRow {
     }
 
     // TODO, make obsolete by ViewStoreReader refactor
+    // TODO: return unmodifiable map
     public Map<String, Set<ValueDTO>> getRawData() {
-        return Collections.unmodifiableMap(data);
+        return data;
     }
 
     public void put(String key, Set<ValueDTO> value) {
