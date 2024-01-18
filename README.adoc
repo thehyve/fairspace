@@ -2767,7 +2767,7 @@ $ kubectl edit pv <pv-name>
 ----
 In the editor, remove the 'claimref' section.
 
-The final step is to add the previously gathered Volume id's to the statefulset configuration:
+The final step is to add the previously gathered volume id's to the statefulset configuration:
 
 [source,yaml]
 ----
