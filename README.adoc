@@ -2744,7 +2744,7 @@ After running ``helm upgrade --install`` the ``StatefulSet`` will be recreated a
 
 Any changes on the StatefulSet will require a clean deployment, with new volumes. If you want to change the StatefulSet while keeping your existing volumes follow the procedure as described below.
 
-To preserve your volumes get the volume id's:
+To preserve your volumes get the volume id's (pv-name's):
 
 [source,shell]
 ----
