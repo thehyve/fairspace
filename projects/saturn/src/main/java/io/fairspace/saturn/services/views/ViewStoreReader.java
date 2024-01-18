@@ -203,14 +203,15 @@ public class ViewStoreReader implements AutoCloseable {
         // what causes a dramatic slow down for the query execution (up to x100).
         // As a workaround, we force PrepareStatement to send the request with numeric type (the same as it is defined
         // in the database schema)
+        var isNumericFilter = filter.numericValue != null && filter.numericValue;
         if (filter.getMin() != null) {
             values.add(filter.getMin());
-            var constraint = filter.numericValue ? " >= ?::numeric" : " >= ?";
+            var constraint = isNumericFilter ? " >= ?::numeric" : " >= ?";
             constraints.add(fieldName + constraint);
         }
         if (filter.getMax() != null) {
             values.add(filter.getMax());
-            var constraint = filter.numericValue ? " <= ?::numeric" : " <= ?";
+            var constraint = isNumericFilter ? " <= ?::numeric" : " <= ?";
             constraints.add(fieldName + constraint);
         }
         if (filter.getPrefix() != null && !filter.getPrefix().isBlank()) {
