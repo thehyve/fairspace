@@ -14,7 +14,7 @@ env:
 on:
   push:
     branches:
-      - "dev"
+      - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
   # A job to generate one shared unique version tag per build cycle for all built artifacts
@@ -39,7 +39,7 @@ jobs:
           DATE=$(date "+%Y%m%d%H%M%S")
 
           # DOCKER TAG TO BE ATTACHED (SHARED WITHIN OUTPUT):
-          SNAPSHOT_VERSION=SNAPSHOT-$VER-$DATE
+          SNAPSHOT_VERSION=SNAPSHOT-$VER
           echo "snapshot_version=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
           echo "Docker tag to be attached to images: $SNAPSHOT_VERSION"
           
