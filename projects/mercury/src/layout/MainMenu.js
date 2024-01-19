@@ -2,13 +2,23 @@ import React, {useContext} from 'react';
 import withStyles from '@mui/styles/withStyles';
 import {NavLink} from "react-router-dom";
 import {Divider, List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
-import {Assignment, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from "@mui/icons-material";
+import {
+    Search,
+    SavedSearch,
+    Folder,
+    FolderSpecial,
+    OpenInNew,
+    VerifiedUser,
+    Widgets
+} from "@mui/icons-material";
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
 import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
+import ExternalMetadataSourceContext from "../metadata/external-sources/ExternalMetadataSourceContext";
 import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
+import {getExternalMetadataSourcePathPrefix} from "../metadata/external-sources/externalMetadataSourceUtils";
 
 const styles = {
     mainMenuButton: {
@@ -21,6 +31,7 @@ const MainMenu = ({classes}) => {
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
     const {externalStorages} = useContext(ExternalStoragesContext);
+    const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
     const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
@@ -73,11 +84,25 @@ const MainMenu = ({classes}) => {
                         selected={pathname.startsWith('/metadata-views')}
                     >
                         <ListItemIcon>
-                            <Assignment />
+                            <Search />
                         </ListItemIcon>
                         <ListItemText primary="Metadata" />
                     </ListItemButton>
                 )}
+                {currentUser.canViewPublicMetadata && externalMetadataSources && externalMetadataSources.map(source => (
+                    <ListItemButton
+                        className={classes.mainMenuButton}
+                        key={getExternalMetadataSourcePathPrefix(source.name)}
+                        component={NavLink}
+                        to={getExternalMetadataSourcePathPrefix(source.name)}
+                        selected={pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name))}
+                    >
+                        <ListItemIcon>
+                            <SavedSearch />
+                        </ListItemIcon>
+                        <ListItemText primary={source.label} />
+                    </ListItemButton>
+                ))}
                 {isAdmin(currentUser) && (
                     <ListItemButton
                         className={classes.mainMenuButton}

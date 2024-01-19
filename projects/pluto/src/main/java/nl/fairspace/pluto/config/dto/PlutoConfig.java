@@ -17,6 +17,14 @@ import java.util.Map;
 public class PlutoConfig {
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class MetadataSource {
+        @NotBlank private String name;
+        @NotBlank private String label;
+        @NotBlank private String url;
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Storage {
         @NotBlank private String name;
         @NotBlank private String label;
@@ -29,6 +37,7 @@ public class PlutoConfig {
     private boolean forceHttps = true;
     private List<String> domains = Collections.emptyList();
     private Map<String, Storage> storages = new LinkedHashMap<>();
+    private Map<String, MetadataSource> metadataSources = new LinkedHashMap<>();
     private String downstreamServiceHealthUrl;
     private String staticHtmlLocation;
 }

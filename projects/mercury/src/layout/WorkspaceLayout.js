@@ -15,6 +15,7 @@ import {MetadataViewFacetsProvider} from "../metadata/views/MetadataViewFacetsCo
 import {ExternalStoragesProvider} from "../external-storage/ExternalStoragesContext";
 import {StatusProvider} from "../status/StatusContext";
 import type {Workspace} from "../workspaces/WorkspacesAPI";
+import {ExternalMetadataSourcesProvider} from "../metadata/external-sources/ExternalMetadataSourceContext";
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
@@ -30,15 +31,17 @@ const WorkspaceLayoutInner = () => {
                         <ServicesProvider>
                             <FeaturesProvider>
                                 <ExternalStoragesProvider>
-                                    <MetadataViewFacetsProvider>
-                                        <MetadataViewProvider>
-                                            <Layout
-                                                renderMenu={() => <MainMenu />}
-                                                renderMain={() => <WorkspaceRoutes />}
-                                                renderTopbar={() => <TopBar title={title} />}
-                                            />
-                                        </MetadataViewProvider>
-                                    </MetadataViewFacetsProvider>
+                                    <ExternalMetadataSourcesProvider>
+                                        <MetadataViewFacetsProvider>
+                                            <MetadataViewProvider>
+                                                <Layout
+                                                    renderMenu={() => <MainMenu />}
+                                                    renderMain={() => <WorkspaceRoutes />}
+                                                    renderTopbar={() => <TopBar title={title} />}
+                                                />
+                                            </MetadataViewProvider>
+                                        </MetadataViewFacetsProvider>
+                                    </ExternalMetadataSourcesProvider>
                                 </ExternalStoragesProvider>
                             </FeaturesProvider>
                         </ServicesProvider>

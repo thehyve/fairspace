@@ -21,7 +21,7 @@ export type ViewData = {
     textFiltersObject: Object
 };
 
-const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
+const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number, metadataViewAPI): ViewData => {
     const [data, setData] = useState({});
     const [count, setCount] = useState({});
     const [loading, setLoading] = useState(true);
@@ -73,7 +73,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
-        return MetadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
+        return metadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
     };
 
     const refreshAll = useCallback(() => {

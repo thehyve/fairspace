@@ -1,22 +1,23 @@
-import React from 'react';
-import type {MetadataViewFilter} from "./MetadataViewAPI";
-import MetadataViewAPI from "./MetadataViewAPI";
-import useAsync from "../../common/hooks/UseAsync";
+import type {MetadataViewFilter} from "../views/MetadataViewAPI";
+import {MetadataViewAPI} from "../views/MetadataViewAPI";
 import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
 import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import useAsync from "../../common/hooks/UseAsync";
+import type {ExternalMetadataSource} from "./externalMetadataSourceUtils";
 
-const MetadataViewContext = React.createContext({});
+const SESSION_STORAGE_EXTERNAL_METADATA_FILTERS_KEY = 'FAIRSPACE_EXTERNAL_METADATA_FILTERS';
 
-const SESSION_STORAGE_METADATA_FILTERS_KEY = 'FAIRSPACE_METADATA_FILTERS';
-
-export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAPI}) => {
+/**
+ * This hook contains logic about files for a certain external storage.
+ */
+export const useExternalMetadataSource = (source: ExternalMetadataSource, metadataViewAPI = new MetadataViewAPI(source.path)) => {
     const {data = {}, error, loading, refresh} = useAsync(
         () => metadataViewAPI.getViews(),
         []
     );
 
     const [filters: MetadataViewFilter[], setFilters] = useStateWithSessionStorage(
-        SESSION_STORAGE_METADATA_FILTERS_KEY, []
+        `${SESSION_STORAGE_EXTERNAL_METADATA_FILTERS_KEY}_${source.name}`, []
     );
 
     const clearFilter = (facetName: string) => {
@@ -36,23 +37,15 @@ export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAP
         ]);
     };
 
-    return (
-        <MetadataViewContext.Provider
-            value={{
-                views: data.views,
-                filters,
-                updateFilters,
-                clearAllFilters,
-                clearFilter,
-                error,
-                loading,
-                refresh,
-                metadataViewAPI
-            }}
-        >
-            {children}
-        </MetadataViewContext.Provider>
-    );
+    return {
+        views: data.views,
+        filters,
+        updateFilters,
+        clearAllFilters,
+        clearFilter,
+        error,
+        loading,
+        refresh,
+        metadataViewAPI
+    };
 };
-
-export default MetadataViewContext;
