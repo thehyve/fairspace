@@ -28,30 +28,29 @@ import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
 import {accessLevelForCollection} from "../../collections/collectionUtils";
 
-type MetadataViewProperties = {
+type ContextualMetadataViewProperties = {
     classes: any;
+}
+
+type MetadataViewProperties = ContextualMetadataViewProperties & {
     facets: MetadataViewFacet[];
     views: MetadataViewOptions[];
-    metadataContext: any;
+    filters: MetadataViewFilter[];
     locationContext: string;
     currentViewName: string;
     pathPrefix: string;
     handleViewChangeRedirect: () => {};
 }
 
-type ContextualMetadataViewProperties = {
-    classes: any;
-}
-
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect, metadataContext, pathPrefix} = props;
+    const {views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix} = props;
 
     usePageTitleUpdater("Metadata");
 
     const {collections} = useContext(CollectionsContext);
     const {toggle, selected} = useSingleSelection();
 
-    const {filters, updateFilters, clearFilter, clearAllFilters, metadataViewAPI} = metadataContext;
+    const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
     const [isClosedPanel, setIsClosedPanel] = useState(true);
@@ -237,7 +236,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 collections={collections}
                                 textFiltersObject={textFiltersObject}
                                 setTextFiltersObject={setTextFiltersObject}
-                                metadataViewAPI={metadataViewAPI}
                             />
                         </Grid>
                     </Grid>
@@ -256,8 +254,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const metadataContext = useContext(MetadataViewContext);
-    const {views = [], loading, error} = metadataContext;
+    const {views = [], filters, loading, error} = useContext(MetadataViewContext);
     const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
@@ -280,9 +277,9 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
         return <MessageDisplay message="No metadata view found." />;
     }
 
-    const handleViewChangeRedirect = (viewName) => {
+    const handleViewChangeRedirect = (viewName, viewPath) => {
         if (viewName) {
-            history.push(getMetadataViewsPath(viewName));
+            history.push(getMetadataViewsPath(viewName, viewPath));
         }
     };
 
@@ -291,8 +288,8 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             {...props}
             facets={facets}
             views={views}
+            filters={filters}
             locationContext={currentViewName === RESOURCES_VIEW && locationContext}
-            metadataContext={metadataContext}
             currentViewName={currentViewName}
             handleViewChangeRedirect={handleViewChangeRedirect}
         />

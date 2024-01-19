@@ -36,7 +36,6 @@ import FeaturesContext from "../../common/contexts/FeaturesContext";
 import ProgressButton from "../../common/components/ProgressButton";
 import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
 import ErrorDialog from "../../common/components/ErrorDialog";
-import {MetadataViewAPI} from "./MetadataViewAPI";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -50,7 +49,6 @@ type MetadataViewTableContainerProperties = {
     locationContext: string;
     selected: MetadataViewEntityWithLinkedFiles;
     hasInactiveFilters: boolean;
-    metadataViewAPI: MetadataViewAPI;
     classes: any;
 };
 
@@ -100,7 +98,7 @@ const LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY = 'FAIRSPACE_METADATA_TABLE_ROWS
 const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_COLUMNS';
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes, metadataViewAPI} = props;
+    const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const {isFeatureEnabled} = useContext(FeaturesContext);
@@ -119,7 +117,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage, metadataViewAPI);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
     const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
     const resetRowCheckboxes = () => {

@@ -1,88 +1,49 @@
-import React, {useContext, useEffect} from 'react';
-import {useHistory} from "react-router-dom";
-import withStyles from "@mui/styles/withStyles";
-
-import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
+import React, {useContext} from 'react';
 import LoadingInlay from "../../common/components/LoadingInlay";
 import MessageDisplay from "../../common/components/MessageDisplay";
-import {MetadataView} from "../views/MetadataView";
-import {useExternalMetadataSource} from "./UseExternalMetadataSource";
-import {useExternalMetadataSourceViewFacets} from "./UseExternalMetadataSourceViewFacets";
-import {getMetadataViewsPath, RESOURCES_VIEW} from "../views/metadataViewUtils";
-import styles from "../views/MetadataView.styles";
+import MetadataView from "../views/MetadataView";
 import ExternalMetadataSourceContext from "./ExternalMetadataSourceContext";
-import type {Match} from "../../types";
 import type {ExternalMetadataSource} from "./externalMetadataSourceUtils";
 import {getExternalMetadataSourcePathPrefix} from "./externalMetadataSourceUtils";
+import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
+import {MetadataViewProvider} from "../views/MetadataViewContext";
+import {MetadataViewAPI} from "../views/MetadataViewAPI";
+import {MetadataViewFacetsProvider} from "../views/MetadataViewFacetsContext";
+import {VocabularyProvider} from "../vocabulary/VocabularyContext";
+import LinkedDataMetadataProvider from "../LinkedDataMetadataProvider";
 
-type ContextualExternalMetadataViewProperties = {
-    match: Match;
-    location: Location;
+export type ExternalMetadataSourceViewProperties = {
     classes: any;
-};
-
-type ExternalMetadataViewProperties = ContextualExternalMetadataViewProperties & {
-    externalMetadataSources: ExternalMetadataSource[];
-    history: History;
+    match: any;
 }
-
-const ExternalMetadataSourceView = (props: ExternalMetadataViewProperties) => {
-    const {externalMetadataSources, match, history} = props;
-
-    const source: ExternalMetadataSource = externalMetadataSources.find(s => s.name === match.params.source);
-    const metadataContext = useExternalMetadataSource(source);
-    const {views = [], loading, error} = metadataContext;
-    const {facets = [], facetsLoading, facetsError, initialLoad} = useExternalMetadataSourceViewFacets(source);
-    const currentViewName = getMetadataViewNameFromString(window.location.search);
-    const locationContext = getLocationContextFromString(window.location.search);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {initialLoad();}, []);
+const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties) => {
+    const {match} = props;
+    const {externalMetadataSources = [], loading, error} = useContext(ExternalMetadataSourceContext);
 
     if ((error && error.message)) {
         return <MessageDisplay message={error.message} />;
     }
-    if (facetsError && facetsError.message) {
-        return <MessageDisplay message={facetsError.message} />;
-    }
-    if (loading || facetsLoading) {
+    if (loading) {
         return <LoadingInlay />;
     }
 
-    if (views.length < 1) {
-        return <MessageDisplay message="No metadata view found." />;
-    }
-
-    const handleViewChangeRedirect = (viewName, viewPath) => {
-        if (viewName) {
-            history.push(getMetadataViewsPath(viewName, viewPath));
-        }
-    };
+    const source: ExternalMetadataSource = externalMetadataSources.find(s => s.name === match.params.source);
 
     return (
-        <MetadataView
-            {...props}
-            facets={facets}
-            views={views}
-            locationContext={currentViewName === RESOURCES_VIEW && locationContext}
-            currentViewName={currentViewName}
-            metadataContext={metadataContext}
-            handleViewChangeRedirect={handleViewChangeRedirect}
-            pathPrefix={getExternalMetadataSourcePathPrefix(source.name)}
-        />
+        <MetadataAPIPathContext.Provider value={{path: source.path}}>
+            <MetadataViewProvider metadataViewAPI={new MetadataViewAPI(source.path)} sourceName={source.name}>
+                <MetadataViewFacetsProvider metadataViewAPI={new MetadataViewAPI(source.path)}>
+                    <VocabularyProvider>
+                        <LinkedDataMetadataProvider>
+                            <MetadataView
+                                {...props}
+                                pathPrefix={getExternalMetadataSourcePathPrefix(source.name)}
+                            />
+                        </LinkedDataMetadataProvider>
+                    </VocabularyProvider>
+                </MetadataViewFacetsProvider>
+            </MetadataViewProvider>
+        </MetadataAPIPathContext.Provider>
     );
 };
-
-const ContextualExternalMetadataSourceView = (props: ContextualExternalMetadataViewProperties) => {
-    const {externalMetadataSources = []} = useContext(ExternalMetadataSourceContext);
-    const history = useHistory();
-
-    return (
-        <ExternalMetadataSourceView
-            {...props}
-            externalMetadataSources={externalMetadataSources}
-            history={history}
-        />
-    );
-};
-export default withStyles(styles)(ContextualExternalMetadataSourceView);
+export default ExternalMetadataSourceView;

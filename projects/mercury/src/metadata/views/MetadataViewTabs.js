@@ -7,7 +7,6 @@ import {RESOURCES_VIEW} from "./metadataViewUtils";
 import {TabPanel} from "../../workspaces/WorkspaceOverview";
 import MetadataViewTableContainer from "./MetadataViewTableContainer";
 import CollectionsContext from "../../collections/CollectionsContext";
-import {MetadataViewAPI} from "./MetadataViewAPI";
 
 type MetadataViewTabsProperties = {
     currentViewIndex: Number;
@@ -21,7 +20,6 @@ type MetadataViewTabsProperties = {
     hasInactiveFilters: Boolean;
     collections: CollectionsContext;
     classes: any;
-    metadataViewAPI: MetadataViewAPI;
 };
 
 const styles = () => ({
@@ -36,7 +34,7 @@ const styles = () => ({
 });
 
 export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
-    const {currentViewIndex, idColumn, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes, metadataViewAPI} = props;
+    const {currentViewIndex, idColumn, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const a11yProps = (index) => ({
@@ -88,7 +86,6 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                         collections={collections}
                         textFiltersObject={textFiltersObject}
                         setTextFiltersObject={setTextFiltersObject}
-                        metadataViewAPI={metadataViewAPI}
                     />
                 </TabPanel>
             ))}
