@@ -94,15 +94,16 @@ public class Services {
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
-        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory);
-
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
         queryService = viewStoreClientFactory == null
                 ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
                 : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
-        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory);
+        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory,
+                metadataPermissions);
+
+        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
 
         searchService = new SearchService(filteredDataset);
 

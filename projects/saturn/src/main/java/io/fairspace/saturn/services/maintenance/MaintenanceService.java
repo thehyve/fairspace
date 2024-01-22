@@ -19,11 +19,13 @@ public class MaintenanceService {
     private final UserService userService;
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
+    private final ViewService viewService;
 
-    public MaintenanceService(@NonNull UserService userService, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
+    public MaintenanceService(@NonNull UserService userService, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory, ViewService viewService) {
         this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
+        this.viewService = viewService;
     }
 
     public boolean disabled() {
@@ -49,6 +51,7 @@ public class MaintenanceService {
             log.info("Start asynchronous reindexing task");
             recreateIndex();
         });
+        viewService.refreshCaches();
     }
 
     public void recreateIndex() {
