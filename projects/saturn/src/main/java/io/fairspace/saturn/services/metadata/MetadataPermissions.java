@@ -32,6 +32,13 @@ public class MetadataPermissions {
         return userService.currentUser().isCanViewPublicMetadata();
     }
 
+    public boolean canReadFacets() {
+        if (userService.currentUser().isAdmin()) {
+            return true;
+        }
+        return userService.currentUser().isCanViewPublicMetadata();
+    }
+
     public boolean canWriteMetadata(Resource resource) {
         if (userService.currentUser().isAdmin()) {
             return true;
