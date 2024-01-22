@@ -5,18 +5,25 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.query.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
@@ -79,26 +86,39 @@ public class ViewService {
     private final ViewsConfig viewsConfig;
     private final Dataset ds;
     private final ViewStoreClientFactory viewStoreClientFactory;
+    private final MetadataPermissions metadataPermissions;
     private final LoadingCache<Boolean, List<FacetDTO>> facetsCache;
     private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
 
-    public ViewService(Config.Search searchConfig, ViewsConfig viewsConfig, Dataset ds, ViewStoreClientFactory viewStoreClientFactory) {
+    public ViewService(Config.Search searchConfig,
+                       ViewsConfig viewsConfig,
+                       Dataset ds,
+                       ViewStoreClientFactory viewStoreClientFactory,
+                       MetadataPermissions metadataPermissions) {
         this.searchConfig = searchConfig;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
         this.viewStoreClientFactory = viewStoreClientFactory;
+        this.metadataPermissions = metadataPermissions;
         this.facetsCache = buildFacetCache();
         this.viewsCache = buildViewsCache();
-        warmUpCaches();
+        refreshCaches();
     }
 
-    public void warmUpCaches() {
+    public void refreshCaches() {
+        log.info("Caches refreshing/warming up has been triggered");
+        FilteredDatasetGraph.disableQuadPermissionCheck();
         facetsCache.refresh(Boolean.TRUE);
         viewsCache.refresh(Boolean.TRUE);
+        FilteredDatasetGraph.enableQuadPermissionCheck();
+        log.info("Caches refreshing/warming up successfully finished");
     }
 
     public List<FacetDTO> getCachedFacets() {
         try {
+            if (!metadataPermissions.canReadFacets()) {
+                throw new AccessDeniedException("User does not have permissions to read facets");
+            }
             return facetsCache.get(Boolean.TRUE);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
@@ -147,7 +167,6 @@ public class ViewService {
 
     private LoadingCache<Boolean, List<ViewDTO>> buildViewsCache() {
         return CacheBuilder.newBuilder()
-                .refreshAfterWrite(1, TimeUnit.DAYS)
                 .build(new CacheLoader<>() {
                     @Override
                     public List<ViewDTO> load(Boolean key) {
@@ -203,6 +222,7 @@ public class ViewService {
                 binding.add("predicate", createResource(column.source));
                 try (var execution = QueryExecutionFactory.create(BOOLEAN_VALUE_QUERY, ds, binding)) {
                     var rowExec = execution.execSelect();
+                    // TODO: should we check all results until it's not null (not the first element only)?
                     if (rowExec.hasNext()) {
                         booleanValue = (Boolean) ofNullable(rowExec.next().getLiteral("booleanValue"))
                                 .map(Literal::getValue)
@@ -236,7 +256,6 @@ public class ViewService {
 
     private LoadingCache<Boolean, List<FacetDTO>> buildFacetCache() {
         return CacheBuilder.newBuilder()
-                .refreshAfterWrite(1, TimeUnit.DAYS)
                 .build(new CacheLoader<>() {
                     @Override
                     public List<FacetDTO> load(Boolean key) {

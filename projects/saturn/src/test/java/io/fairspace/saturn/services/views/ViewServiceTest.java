@@ -83,11 +83,13 @@ public class ViewServiceTest {
                 ConfigLoader.CONFIG.search,
                 config,
                 ds,
-                viewStoreClientFactory);
+                viewStoreClientFactory,
+                permissions);
     }
 
     @Test
     public void testFetchViewConfig() {
+        when(permissions.canReadFacets()).thenReturn(true);
         var facets = viewService.getCachedFacets();
         var dateFacets = facets.stream()
                 .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Date)
@@ -119,6 +121,7 @@ public class ViewServiceTest {
     @Test
     public void testFetchCachedFacets() {
         var sut = spy(viewService);
+        when(permissions.canReadFacets()).thenReturn(true);
 
         var facets = viewService.getCachedFacets();
         Assert.assertEquals(facets.size(), 11);

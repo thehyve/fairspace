@@ -88,7 +88,7 @@ public class JdbcQueryServiceTest {
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
 
-        var viewService = new ViewService(ConfigLoader.CONFIG.search, config, ds, viewStoreClientFactory);
+        var viewService = new ViewService(ConfigLoader.CONFIG.search, config, ds, viewStoreClientFactory, permissions);
 
         maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory, viewService);
 

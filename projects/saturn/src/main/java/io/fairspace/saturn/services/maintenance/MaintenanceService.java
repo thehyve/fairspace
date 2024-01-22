@@ -50,8 +50,8 @@ public class MaintenanceService {
         threadpool.submit(() -> {
             log.info("Start asynchronous reindexing task");
             recreateIndex();
-            viewService.warmUpCaches();
         });
+        viewService.refreshCaches();
     }
 
     public void recreateIndex() {

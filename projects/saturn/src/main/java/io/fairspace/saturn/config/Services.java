@@ -100,7 +100,8 @@ public class Services {
         queryService = viewStoreClientFactory == null
                 ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
                 : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
-        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory);
+        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory,
+                metadataPermissions);
 
         maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
 
