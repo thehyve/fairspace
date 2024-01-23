@@ -66,12 +66,11 @@ public class ViewStoreClientFactory {
                 .columns(List.of(
                         idColumn(),
                         valueColumn("type", ColumnType.Text),
-                        valueColumn("label", ColumnType.Text)
-                ))
+                        valueColumn("label", ColumnType.Text)))
                 .build());
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
-        for (View view: viewsConfig.views) {
+        for (View view : viewsConfig.views) {
             ensureViewExists(view);
         }
     }
@@ -85,7 +84,7 @@ public class ViewStoreClientFactory {
         var resultSet = connection.getMetaData().getColumns(null, null, table, null);
         var result = new LinkedHashMap<String, ColumnMetadata>();
         while (resultSet.next()) {
-            String columnName   = resultSet.getString("COLUMN_NAME");
+            String columnName = resultSet.getString("COLUMN_NAME");
             String dataTypeName = resultSet.getString("TYPE_NAME");
             Boolean nullable = resultSet.getBoolean("NULLABLE");
             var metadata = ColumnMetadata.builder()
@@ -103,62 +102,103 @@ public class ViewStoreClientFactory {
             var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
             var tableExists = resultSet.next();
             if (!tableExists) {
-                // Create new table
-                connection.setAutoCommit(true);
-                var columnSpecification =
-                        table.columns.stream()
-                                .filter(column -> !column.type.isSet())
-                                .map(column -> String.format("%s %s", column.name, databaseTypeForColumnType(column.type))
-                                ).collect(Collectors.joining(", "));
-                var keys = table.columns.stream()
-                        .filter(column -> column.type == ColumnType.Identifier)
-                        .map(column -> column.name)
-                        .collect(Collectors.joining(", "));
-                var command = String.format("create table %s ( %s, primary key ( %s ) )", table.name, columnSpecification, keys);
-                log.debug(command);
-                connection.createStatement().execute(command);
-                connection.setAutoCommit(false);
-                log.info("Table {} created.", table.name);
+                createTable(table, connection);
             } else {
-                var columnMetadata = getColumnMetadata(connection, table.name);
-                var newColumns = table.columns.stream()
-                        .filter(column -> !column.type.isSet() && !columnMetadata.containsKey(column.name))
-                        .collect(Collectors.toList());
-                try {
-                    log.debug("New columns: {}", new ObjectMapper().writeValueAsString(newColumns));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-                // Update existing table
-                if (!newColumns.isEmpty()) {
-                    connection.setAutoCommit(true);
-                    var command = newColumns.stream()
-                            .map(column -> String.format("alter table %s add column %s %s",
-                                    table.name, column.name, databaseTypeForColumnType(column.type)))
-                            .collect(Collectors.joining("; "));
-                    log.debug(command);
-                    connection.createStatement().execute(command);
-                    connection.setAutoCommit(false);
-                    log.info("Table {} updated.", table.name);
-                }
+                updateTable(table, connection);
             }
         }
     }
 
+    void ensureJoinTableExists(Table table) throws SQLException {
+        try (var connection = getConnection()) {
+            log.debug("Check if table {} exists ...", table.name);
+            var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
+            var tableExists = resultSet.next();
+            if (!tableExists) {
+                createTable(table, connection);
+                createIndexes(table, connection);
+            } else {
+                updateTable(table, connection);
+            }
+        }
+    }
+
+    private void updateTable(Table table, Connection connection) throws SQLException {
+        var columnMetadata = getColumnMetadata(connection, table.name);
+        var newColumns = table.columns.stream()
+                .filter(column -> !column.type.isSet() && !columnMetadata.containsKey(column.name))
+                .collect(Collectors.toList());
+        try {
+            log.debug("New columns: {}", new ObjectMapper().writeValueAsString(newColumns));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        // Update existing table
+        if (!newColumns.isEmpty()) {
+            connection.setAutoCommit(true);
+            var command = newColumns.stream()
+                    .map(column -> String.format("alter table %s add column %s %s",
+                            table.name, column.name, databaseTypeForColumnType(column.type)))
+                    .collect(Collectors.joining("; "));
+            log.debug(command);
+            connection.createStatement().execute(command);
+            connection.setAutoCommit(false);
+            log.info("Table {} updated.", table.name);
+        }
+    }
+
+    private void createTable(Table table, Connection connection) throws SQLException {
+        // Create new table
+        connection.setAutoCommit(true);
+        var columnSpecification = table.columns.stream()
+                .filter(column -> !column.type.isSet())
+                .map(column -> String.format("%s %s", column.name, databaseTypeForColumnType(column.type)))
+                .collect(Collectors.joining(", "));
+        var keys = table.columns.stream()
+                .filter(column -> column.type == ColumnType.Identifier)
+                .map(column -> column.name)
+                .collect(Collectors.joining(", "));
+        var command = String.format("create table %s ( %s, primary key ( %s ) )", table.name, columnSpecification,
+                keys);
+        log.debug(command);
+        connection.createStatement().execute(command);
+        connection.setAutoCommit(false);
+        log.info("Table {} created.", table.name);
+    }
+
+    private void createIndexes(Table table, Connection connection) throws SQLException {
+        // Create new table
+        connection.setAutoCommit(true);
+
+        var keys = table.columns.stream()
+                .filter(column -> column.type == ColumnType.Identifier)
+                .map(column -> column.name)
+                .toList();
+
+        for (var column : keys) {
+            // var command = String.format("create table %s ( %s, primary key ( %s ) )",
+            // table.name, columnSpecification, keys);
+            var indexName = String.format("%1$s_%2$s_idx", table.name, column);
+            var command = String.format("CREATE INDEX %3$s ON public.%1$s (%2$s)", table.name, column, indexName);
+
+            log.debug(command);
+            connection.createStatement().execute(command);
+            connection.setAutoCommit(false);
+            log.info("Index {} created.", indexName);
+        }
+    }
+
     void validateViewConfig(ViewsConfig.View view) {
-        if (view.columns.stream().anyMatch(column ->
-                column.name.equalsIgnoreCase("id"))) {
+        if (view.columns.stream().anyMatch(column -> column.name.equalsIgnoreCase("id"))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'id' of view " + view.name);
         }
-        if (view.columns.stream().anyMatch(column ->
-                column.name.equalsIgnoreCase("label"))) {
+        if (view.columns.stream().anyMatch(column -> column.name.equalsIgnoreCase("label"))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'label' of view " + view.name);
         }
         if (view.name.equalsIgnoreCase("resource") &&
-                view.columns.stream().anyMatch(column ->
-                        column.name.equalsIgnoreCase("collection"))) {
+                view.columns.stream().anyMatch(column -> column.name.equalsIgnoreCase("collection"))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'collection' of view " + view.name);
         }
@@ -178,7 +218,7 @@ public class ViewStoreClientFactory {
         if (view.name.equalsIgnoreCase("resource")) {
             columns.add(valueColumn("collection", ColumnType.Text));
         }
-        for (var column: view.columns) {
+        for (var column : view.columns) {
             if (column.type.isSet()) {
                 continue;
             }
@@ -208,7 +248,7 @@ public class ViewStoreClientFactory {
         }
         if (view.join != null) {
             // Add join tables
-            for (ViewsConfig.View.JoinView join: view.join) {
+            for (ViewsConfig.View.JoinView join : view.join) {
                 var joinTable = getJoinTable(join, view);
                 ensureTableExists(joinTable);
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
@@ -224,14 +264,14 @@ public class ViewStoreClientFactory {
                 .name(String.format("%s_%s", left.toLowerCase(), right.toLowerCase()))
                 .columns(Arrays.asList(
                         idColumn(left),
-                        idColumn(right)
-                ))
+                        idColumn(right)))
                 .build();
 
         return joinTable;
     }
 
-    @Data @Builder
+    @Data
+    @Builder
     public static class ColumnMetadata {
         String type;
         Boolean nullable;
