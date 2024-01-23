@@ -5,6 +5,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFilteredView;
 import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.core.Quad;
 
 import java.util.Set;
 
@@ -20,14 +21,7 @@ public class FilteredDatasetGraph extends DatasetGraphFilteredView {
 
     private FilteredDatasetGraph(Dataset ds, MetadataPermissions permissions) {
         super(ds.asDatasetGraph(),
-                q -> {
-                    boolean allowedToReadMetadata = q.isDefaultGraph();
-                    if (allowedToReadMetadata && permissionCheckEnabled.get()) {
-                        allowedToReadMetadata = permissions
-                                .canReadMetadata(ds.getDefaultModel().wrapAsResource(q.getSubject()));
-                    }
-                    return allowedToReadMetadata;
-                },
+                q -> isAllowedToReadMetadata(ds, permissions, q),
                 Set.of(defaultGraphIRI));
     }
 
@@ -37,5 +31,14 @@ public class FilteredDatasetGraph extends DatasetGraphFilteredView {
 
     public static void enableQuadPermissionCheck() {
         permissionCheckEnabled.set(true);
+    }
+
+    protected static boolean isAllowedToReadMetadata(Dataset ds, MetadataPermissions permissions, Quad quad) {
+        boolean allowedToReadMetadata = quad.isDefaultGraph();
+        if (allowedToReadMetadata && permissionCheckEnabled.get()) {
+            allowedToReadMetadata = permissions
+                    .canReadMetadata(ds.getDefaultModel().wrapAsResource(quad.getSubject()));
+        }
+        return allowedToReadMetadata;
     }
 }
