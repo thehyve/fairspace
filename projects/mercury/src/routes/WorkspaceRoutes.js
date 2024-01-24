@@ -119,7 +119,7 @@ const WorkspaceRoutes = () => {
                 render={() => (isAdmin(currentUser) && (<UserRolesPage />))}
             />
 
-            <Redirect to="/metadata-views" />
+            <Redirect to="/workspaces" />
         </Switch>
     );
 };

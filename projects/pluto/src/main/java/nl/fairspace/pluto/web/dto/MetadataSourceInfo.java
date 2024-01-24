@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
-@NoArgsConstructor
 public class MetadataSourceInfo {
     private String name;
     private String label;

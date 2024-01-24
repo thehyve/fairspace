@@ -1835,13 +1835,13 @@ storages:
 
 === Multi-Fairspace metadata views integration
 
-Fairspace can have only single data model configured. However, if there is a need to have data from multiple models,
-representing multiple domains that would be combined combined in single user interface, it is possible to integrate multiple Fairspace instances together.
+Fairspace works with a single data model configured. However, if there is a need to have data from multiple models,
+representing multiple domains that would be combined in single user interface, it is possible to integrate multiple Fairspace instances together.
 
 
-Fairspace (main) instance can be configured as a view interface of metadata from another (external) Fairspace instance.
+The main Fairspace instance can be configured as a view interface of metadata from another (external) Fairspace instance.
 External Fairspace can have a different metadata model configured than the main Fairspace.
-Important precondition is that the external instance has to be connected to the same Keycloak realm as the main instance.
+An important precondition is that the external instance has to be connected to the same Keycloak realm as the main instance.
 
 
 External metadata can be searched and browsed in the same way as the internal metadata views. When configured, there is an extra page,
@@ -1854,7 +1854,7 @@ For the external metadata pages, the tables and columns are created basing on th
 
 ==== Access policy
 
-Connection to the same Keycloak realm allows to authenticate a user in all integrated Fairspace instances with a single set of login credentials.
+Connection to the same Keycloak realm allows to authenticate a user in all integrated Fairspace instances with a single set of login credentials (single sign-on).
 Each Fairspace instance is responsible for controlling the access to its own metadata and perform
 the required checks to ensure that users only get to see metadata of an instance, if has a view public metadata role assigned within that instance.
 
