@@ -272,7 +272,7 @@ public class ViewStoreClientFactory {
 
     @Data
     @Builder
-    public static class ColumnMetadata {
+    private static class ColumnMetadata {
         String type;
         Boolean nullable;
     }
