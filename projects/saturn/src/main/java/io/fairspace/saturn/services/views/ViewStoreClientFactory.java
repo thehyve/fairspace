@@ -177,8 +177,8 @@ public class ViewStoreClientFactory {
         connection.setAutoCommit(true);
 
         for (var column : keys) {
-            var indexName = String.format("%1$s_%2$s_idx", table.name, column);
-            var command = String.format("CREATE INDEX IF NOT EXISTS %3$s ON public.%1$s (%2$s)", table.name, column, indexName);
+            var indexName = String.format("%s_%s_idx", table.name, column);
+            var command = String.format("CREATE INDEX IF NOT EXISTS %s ON public.%s (%s)", indexName, table.name, column);
 
             log.debug(command);
             connection.createStatement().execute(command);
