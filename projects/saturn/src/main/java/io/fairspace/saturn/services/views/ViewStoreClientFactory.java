@@ -61,7 +61,7 @@ public class ViewStoreClientFactory {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
         }
 
-        ensureTableExists(Table.builder()
+        createOrUpdateTable(Table.builder()
                 .name("label")
                 .columns(List.of(
                         idColumn(),
@@ -71,7 +71,7 @@ public class ViewStoreClientFactory {
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
         for (View view : viewsConfig.views) {
-            ensureViewExists(view);
+            createOrUpdateView(view);
         }
     }
 
@@ -96,7 +96,7 @@ public class ViewStoreClientFactory {
         return result;
     }
 
-    void ensureTableExists(Table table) throws SQLException {
+    void createOrUpdateTable(Table table) throws SQLException {
         try (var connection = getConnection()) {
             log.debug("Check if table {} exists ...", table.name);
             var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
@@ -109,7 +109,7 @@ public class ViewStoreClientFactory {
         }
     }
 
-    void ensureJoinTableExists(Table table) throws SQLException {
+    void createOrUpdateJoinTable(Table table) throws SQLException {
         try (var connection = getConnection()) {
             log.debug("Check if table {} exists ...", table.name);
             var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
@@ -209,7 +209,7 @@ public class ViewStoreClientFactory {
         }
     }
 
-    void ensureViewExists(ViewsConfig.View view) throws SQLException {
+    void createOrUpdateView(ViewsConfig.View view) throws SQLException {
         // Add view table
         validateViewConfig(view);
         var columns = new ArrayList<Table.ColumnDefinition>();
@@ -228,7 +228,7 @@ public class ViewStoreClientFactory {
                 .name(view.name.toLowerCase())
                 .columns(columns)
                 .build();
-        ensureTableExists(table);
+        createOrUpdateTable(table);
         configuration.viewTables.put(view.name, table);
         // Add property tables
         for (ViewsConfig.View.Column column : view.columns) {
@@ -242,7 +242,7 @@ public class ViewStoreClientFactory {
                     .name(String.format("%s_%s", view.name.toLowerCase(), column.name.toLowerCase()))
                     .columns(propertyTableColumns)
                     .build();
-            ensureTableExists(propertyTable);
+            createOrUpdateTable(propertyTable);
             configuration.propertyTables.putIfAbsent(view.name, new HashMap<>());
             configuration.propertyTables.get(view.name).put(column.name, propertyTable);
         }
@@ -250,7 +250,7 @@ public class ViewStoreClientFactory {
             // Add join tables
             for (ViewsConfig.View.JoinView join : view.join) {
                 var joinTable = getJoinTable(join, view);
-                ensureJoinTableExists(joinTable);
+                createOrUpdateJoinTable(joinTable);
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
             }
