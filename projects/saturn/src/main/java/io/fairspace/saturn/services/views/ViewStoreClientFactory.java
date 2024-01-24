@@ -114,6 +114,7 @@ public class ViewStoreClientFactory {
             log.debug("Check if table {} exists ...", table.name);
             var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
             var tableExists = resultSet.next();
+            
             if (!tableExists) {
                 createTable(table, connection);
                 createIndexes(table, connection);
@@ -167,25 +168,24 @@ public class ViewStoreClientFactory {
     }
 
     private void createIndexes(Table table, Connection connection) throws SQLException {
-        // Create new table
-        connection.setAutoCommit(true);
-
+        
         var keys = table.columns.stream()
                 .filter(column -> column.type == ColumnType.Identifier)
                 .map(column -> column.name)
                 .toList();
 
+        connection.setAutoCommit(true);
+
         for (var column : keys) {
-            // var command = String.format("create table %s ( %s, primary key ( %s ) )",
-            // table.name, columnSpecification, keys);
             var indexName = String.format("%1$s_%2$s_idx", table.name, column);
-            var command = String.format("CREATE INDEX %3$s ON public.%1$s (%2$s)", table.name, column, indexName);
+            var command = String.format("CREATE INDEX IF NOT EXISTS %3$s ON public.%1$s (%2$s)", table.name, column, indexName);
 
             log.debug(command);
             connection.createStatement().execute(command);
-            connection.setAutoCommit(false);
             log.info("Index {} created.", indexName);
         }
+        
+        connection.setAutoCommit(false);
     }
 
     void validateViewConfig(ViewsConfig.View view) {
@@ -250,7 +250,7 @@ public class ViewStoreClientFactory {
             // Add join tables
             for (ViewsConfig.View.JoinView join : view.join) {
                 var joinTable = getJoinTable(join, view);
-                ensureTableExists(joinTable);
+                ensureJoinTableExists(joinTable);
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
             }

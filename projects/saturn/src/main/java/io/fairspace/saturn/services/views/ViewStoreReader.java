@@ -469,7 +469,7 @@ public class ViewStoreReader implements AutoCloseable {
                 + ") limit " + String.valueOf(MAX_JOIN_ITEMS) + ")";
 
         var subqueries = ids.stream().map(queryBody);
-        var query = subqueries.collect(Collectors.joining("\n UNION \n"));
+        var query = subqueries.collect(Collectors.joining("\n UNION ALL \n"));
         return connection.prepareStatement(query);
     }
 
