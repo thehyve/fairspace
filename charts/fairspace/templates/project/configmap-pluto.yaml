@@ -19,7 +19,8 @@ data:
         realm: {{ .Values.external.keycloak.realm }}
       storages:
 {{ toYaml .Values.fairspace.storages | indent 8 }}
-
+      metadata-sources:
+{{ toYaml (index .Values.fairspace "metadata-sources") | indent 8 }}
     management:
       endpoint:
         health:

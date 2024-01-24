@@ -39,6 +39,7 @@ fairspace:
   features: []
   services: {}
   storages: {}
+  metadata-sources: {}
 
 # Generic settings for tracing
 tracing:
