@@ -132,7 +132,9 @@ public class ViewStoreClientFactory {
         try {
             log.debug("New columns: {}", new ObjectMapper().writeValueAsString(newColumns));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            var message = "Error during mapping of view columns";
+            log.error(message, e);
+            throw new IllegalStateException(message, e);
         }
         // Update existing table
         if (!newColumns.isEmpty()) {
