@@ -191,16 +191,16 @@ public class ViewStoreClientFactory {
     }
 
     void validateViewConfig(ViewsConfig.View view) {
-        if (view.columns.stream().anyMatch(column -> column.name.equalsIgnoreCase("id"))) {
+        if (view.columns.stream().anyMatch(column -> "id".equalsIgnoreCase(column.name))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'id' of view " + view.name);
         }
-        if (view.columns.stream().anyMatch(column -> column.name.equalsIgnoreCase("label"))) {
+        if (view.columns.stream().anyMatch(column -> "label".equalsIgnoreCase(column.name))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'label' of view " + view.name);
         }
         if (view.name.equalsIgnoreCase("resource") &&
-                view.columns.stream().anyMatch(column -> column.name.equalsIgnoreCase("collection"))) {
+                view.columns.stream().anyMatch(column -> "collection".equalsIgnoreCase(column.name))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'collection' of view " + view.name);
         }
