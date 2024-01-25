@@ -180,7 +180,7 @@ public class ViewStoreClientFactory {
 
         for (var column : keys) {
             var indexName = String.format("%s_%s_idx", table.name, column);
-            var command = String.format("CREATE INDEX IF NOT EXISTS %s ON public.%s (%s)", indexName, table.name, column);
+            var command = String.format("CREATE INDEX IF NOT EXISTS %s ON %s (%s)", indexName, table.name, column);
 
             log.debug(command);
             connection.createStatement().execute(command);
@@ -275,7 +275,7 @@ public class ViewStoreClientFactory {
     @Data
     @Builder
     private static class ColumnMetadata {
-        String type;
-        Boolean nullable;
+        private String type;
+        private Boolean nullable;
     }
 }
