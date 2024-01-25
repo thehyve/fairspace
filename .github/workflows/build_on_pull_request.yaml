@@ -1,0 +1,83 @@
+# This workflow is triggered on any PR's changes
+
+name: PR - Build Fairspace
+
+on:
+  pull_request:
+
+jobs:
+  build-saturn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: ./projects/saturn/gradlew build -p ./projects/saturn/
+
+
+  build-pluto:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        run: ./projects/pluto/gradlew build -p ./projects/pluto/
+
+
+  build-mercury:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set Node.js 18.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Install FE dependencies
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install # will run `yarn install`
+          dir: ./projects/mercury/
+
+      - name: Build FE bundle
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build # will run `yarn build`
+          dir: ./projects/mercury/
+
+      - name: Run FE tests
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: test # will run `yarn test`
+          dir: ./projects/mercury/
