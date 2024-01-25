@@ -18,11 +18,14 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const fetchMetadataBySubject = useCallback((subject) => metadataAPI.getDict({subject, withValueProperties: true})
         .catch(() => {
             throw new Error('An error occurred while loading the metadata');
+            // eslint-disable-next-line react-hooks/exhaustive-deps
         }), []);
 
     const submitLinkedDataChanges = useCallback((subject, values) => metadataAPI.get({subject})
         .then(meta => (meta.length && getFirstPredicateValue(meta[0], '@type')))
-        .then(type => metadataAPI.updateEntity(subject, values, vocabulary, type)), [vocabulary]);
+        .then(type => metadataAPI.updateEntity(subject, values, vocabulary, type)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [vocabulary]);
 
     const createLinkedDataEntity = useCallback((subject, values, type) => metadataAPI.get({subject})
         .then((meta) => {
@@ -31,7 +34,9 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
             }
         })
         .then(() => metadataAPI.updateEntity(subject, values, vocabulary, type))
-        .then(() => ({subject, type, values})), [vocabulary]);
+        .then(() => ({subject, type, values})),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [vocabulary]);
 
     const deleteLinkedDataEntity = (subject) => metadataAPI.delete(subject);
 
