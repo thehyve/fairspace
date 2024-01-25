@@ -2,6 +2,7 @@
 import axios, {CancelTokenSource} from "axios";
 import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
 import type {AccessLevel} from "../../collections/CollectionAPI";
+import FileAPI from "../../file/FileAPI";
 
 export type ValueType = 'Identifier' | 'Text' | 'Number' | 'Date' | 'Term' | 'Set' | 'TermSet' | 'Boolean';
 export const TextualValueTypes: ValueType[] = ['Identifier', 'Text', 'Set'];
@@ -76,21 +77,23 @@ type MetadataViewDataRequest = MetadataViewCountRequest & {|
     includeJoinedViews: boolean;
 |};
 
-const metadataViewUrl = "/api/views/";
-
 const defaultRequestOptions = {
     headers: {Accept: 'application/json'}
 };
 
-class MetadataViewAPI {
+export class MetadataViewAPI {
+    constructor(remoteURLPrefix = "/api") {
+        this.remoteURL = remoteURLPrefix + "/views";
+    }
+
     getViews(): Promise<MetadataViews> {
-        return axios.get(metadataViewUrl, defaultRequestOptions)
+        return axios.get(`${this.remoteURL}/`, defaultRequestOptions)
             .then(extractJsonData)
             .catch(handleHttpError("Failure when retrieving metadata views."));
     }
 
     getFacets(): Promise<MetadataFacets> {
-        return axios.get(`${metadataViewUrl}facets`, defaultRequestOptions)
+        return axios.get(`${this.remoteURL}/facets`, defaultRequestOptions)
             .then(extractJsonData)
             .catch(handleHttpError("Failure when retrieving metadata facets."));
     }
@@ -105,7 +108,7 @@ class MetadataViewAPI {
         };
         const requestOptions = cancelToken ? {...defaultRequestOptions, cancelToken: cancelToken.token} : defaultRequestOptions;
 
-        return axios.post(metadataViewUrl, viewRequest, requestOptions)
+        return axios.post(`${this.remoteURL}/`, viewRequest, requestOptions)
             .then(extractJsonData)
             .catch(handleHttpError("Error while fetching view data."));
     }
@@ -117,10 +120,12 @@ class MetadataViewAPI {
         };
         const requestOptions = cancelToken ? {...defaultRequestOptions, cancelToken: cancelToken.token} : defaultRequestOptions;
 
-        return axios.post(`${metadataViewUrl}count`, viewRequest, requestOptions)
+        return axios.post(`${this.remoteURL}/count`, viewRequest, requestOptions)
             .then(extractJsonData)
             .catch(handleHttpError("Error while fetching view count."));
     }
 }
 
-export default new MetadataViewAPI();
+const LocalMetadataViewAPI = new MetadataViewAPI();
+
+export default LocalMetadataViewAPI;

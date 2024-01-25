@@ -3,9 +3,9 @@ import LinkedDataAPI from "./LinkedDataAPI";
 import {toJsonLd} from "./jsonLdConverter";
 import {handleHttpError} from "../../common/utils/httpUtils";
 
-class MetadataAPI extends LinkedDataAPI {
-    constructor() {
-        super('metadata');
+export class MetadataAPI extends LinkedDataAPI {
+    constructor(remoteURLPrefix = "/api") {
+        super('metadata', remoteURLPrefix);
     }
 
     /**

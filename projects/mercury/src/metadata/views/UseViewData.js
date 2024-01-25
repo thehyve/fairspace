@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import axios from "axios";
-import MetadataViewAPI from "./MetadataViewAPI";
 import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
+import {MetadataViewAPI} from "./MetadataViewAPI";
+import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
 
 const LOCATION_FILTER_FIELD = 'location';
 
@@ -22,6 +23,8 @@ export type ViewData = {
 };
 
 const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
+    const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
+    const metadataViewAPI = new MetadataViewAPI(metadataAPIPath);
     const [data, setData] = useState({});
     const [count, setCount] = useState({});
     const [loading, setLoading] = useState(true);
@@ -56,7 +59,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
-        MetadataViewAPI.getCount(token, view, allFilters).then(res => {
+        metadataViewAPI.getCount(token, view, allFilters).then(res => {
             if (res) {
                 if (res.count == null) {
                     res.count = -1;
@@ -73,7 +76,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
-        return MetadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
+        return metadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
     };
 
     const refreshAll = useCallback(() => {

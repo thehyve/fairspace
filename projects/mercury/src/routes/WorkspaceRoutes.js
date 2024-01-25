@@ -15,7 +15,8 @@ import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
 import MetadataView from '../metadata/views/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
-import ExternalStoragePage from "../external-storage/ExternalStoragePage";
+import {ExternalStoragePage} from "../external-storage/ExternalStoragePage";
+import ExternalMetadataSourcesView from "../metadata/external-sources/ExternalMetadataSourceView";
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
@@ -76,6 +77,17 @@ const WorkspaceRoutes = () => {
                     <BreadcrumbsContext.Provider value={{segments: []}}>
                         <LinkedDataMetadataProvider>
                             <MetadataViewMemo />
+                        </LinkedDataMetadataProvider>
+                    </BreadcrumbsContext.Provider>
+                )}
+            />
+
+            <Route
+                path="/metadata-sources/:source"
+                render={(props) => (
+                    <BreadcrumbsContext.Provider value={{segments: []}}>
+                        <LinkedDataMetadataProvider>
+                            <ExternalMetadataSourcesView {...props} />
                         </LinkedDataMetadataProvider>
                     </BreadcrumbsContext.Provider>
                 )}

@@ -11,8 +11,8 @@ export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
     linkedFiles: MetadataViewEntity[];
 |}
 
-export const getMetadataViewsPath = (viewName: string) => {
-    let path = '/metadata-views';
+export const getMetadataViewsPath = (viewName: string, viewPath = '/metadata-views') => {
+    let path = viewPath;
     if (viewName) {
         path += `?view=${viewName}`;
     }

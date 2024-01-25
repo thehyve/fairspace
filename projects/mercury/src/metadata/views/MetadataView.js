@@ -28,22 +28,22 @@ import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
 import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
 import {accessLevelForCollection} from "../../collections/collectionUtils";
 
-type MetadataViewProperties = {
+type ContextualMetadataViewProperties = {
     classes: any;
+}
+
+type MetadataViewProperties = ContextualMetadataViewProperties & {
     facets: MetadataViewFacet[];
     views: MetadataViewOptions[];
     filters: MetadataViewFilter[];
     locationContext: string;
     currentViewName: string;
+    pathPrefix: string;
     handleViewChangeRedirect: () => {};
 }
 
-type ContextualMetadataViewProperties = {
-    classes: any;
-}
-
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, currentViewName, locationContext, classes, handleViewChangeRedirect, filters} = props;
+    const {views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix} = props;
 
     usePageTitleUpdater("Metadata");
 
@@ -69,7 +69,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         setIsClosedPanel(true);
         toggle();
         setTextFiltersObject({});
-        handleViewChangeRedirect(views[tabIndex].name);
+        handleViewChangeRedirect(views[tabIndex].name, pathPrefix);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [views]);
 
@@ -153,10 +153,10 @@ export const MetadataView = (props: MetadataViewProperties) => {
             return result;
         }
 
-        const pathPrefix = getMetadataViewsPath(RESOURCES_VIEW) + '&context=';
+        const prefix = getMetadataViewsPath(RESOURCES_VIEW) + '&context=';
         let path = locationContext;
         segments.reverse().forEach(segment => {
-            result.push({label: segment, href: (pathPrefix + encodeURIComponent(path))});
+            result.push({label: segment, href: (prefix + encodeURIComponent(path))});
             path = getParentPath(path);
         });
         return result.reverse();
@@ -175,7 +175,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         if (!selected) {
             return "";
         }
-        const metadataURL = window.location.host + getMetadataViewsPath();
+        const metadataURL = window.location.host + getMetadataViewsPath(currentView.name, pathPrefix);
         const prefilteringQueryString = queryString.stringify({
             view: currentView.name,
             [currentViewIdColumn.name.toLowerCase()]: selected.label
@@ -185,7 +185,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     return (
         <BreadcrumbsContext.Provider value={{
-            segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name), icon: <Assignment />}]
+            segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name, pathPrefix), icon: <Assignment />}]
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
@@ -255,7 +255,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], loading, error, filters} = useContext(MetadataViewContext);
+    const {views = [], filters, loading, error} = useContext(MetadataViewContext);
     const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
@@ -278,9 +278,9 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
         return <MessageDisplay message="No metadata view found." />;
     }
 
-    const handleViewChangeRedirect = (viewName) => {
+    const handleViewChangeRedirect = (viewName, viewPath) => {
         if (viewName) {
-            history.push(getMetadataViewsPath(viewName));
+            history.push(getMetadataViewsPath(viewName, viewPath));
         }
     };
 
@@ -289,9 +289,9 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             {...props}
             facets={facets}
             views={views}
+            filters={filters}
             locationContext={currentViewName === RESOURCES_VIEW && locationContext}
             currentViewName={currentViewName}
-            filters={filters}
             handleViewChangeRedirect={handleViewChangeRedirect}
         />
     );

@@ -11,10 +11,15 @@ pluto:
   storages:
     test:
        name: test
-       label: Test
+       label: "TEST Collections"
        url: http://localhost:8090/api/webdav
        search-url: http://localhost:8090/api/search/files
        root-directory-iri: http://localhost:8080/api/webdav
+  metadata-sources:
+    test:
+      name: test
+      label: "TEST Metadata"
+      url: http://localhost:8090/api/
 
 spring:
   cloud:
@@ -32,6 +37,12 @@ spring:
         - Path=/api/storages/test/search/files
         filters:
         - RewritePath=/api/storages/test/search/files, /api/search/files
+      - id: metadata-test
+        uri: ${pluto.metadata-sources.test.url}
+        predicates:
+          - Path=/api/metadata-sources/test/**
+        filters:
+          - RewritePath=/api/metadata-sources/test/(?<segment>(views|vocabulary|metadata).*), /api/$\{segment}
       - id: saturn-post-request-size
         uri: http://localhost:8090/api/
         predicates:
