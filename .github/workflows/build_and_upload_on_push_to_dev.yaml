@@ -39,7 +39,7 @@ jobs:
 
           # DOCKER TAG TO BE ATTACHED (SHARED WITHIN OUTPUT):
           VER=$(cat ./VERSION)
-          if [ $BRANCH == "dev" ]
+          if [ $BRANCH != "release" ]
           then
             VER=$VER-SNAPSHOT
           fi
