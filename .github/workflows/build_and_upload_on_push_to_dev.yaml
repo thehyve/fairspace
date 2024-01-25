@@ -14,6 +14,8 @@ env:
 on:
   push:
     branches:
+      - "dev"
+      - "release"
       - "infra/FAIRSPC-23_github_actions_CI"
 
 jobs:
@@ -21,7 +23,7 @@ jobs:
   generate-version:
     runs-on: ubuntu-latest
     outputs:
-      output1: ${{ steps.version.outputs.snapshot_version }}
+      output1: ${{ steps.version.outputs.fairspace_version }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -33,16 +35,18 @@ jobs:
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "Building images from the branch: $BRANCH"
           VER=$(cat ./VERSION)
-          echo "Building images of version: $VER"     
-
-          # GET DATE AND TIME FOR VERSIONING 
-          DATE=$(date "+%Y%m%d%H%M%S")
+          echo "Building images of version: $VER"
 
           # DOCKER TAG TO BE ATTACHED (SHARED WITHIN OUTPUT):
-          SNAPSHOT_VERSION=SNAPSHOT-$VER
-          echo "snapshot_version=$SNAPSHOT_VERSION" >> "$GITHUB_OUTPUT"
-          echo "Docker tag to be attached to images: $SNAPSHOT_VERSION"
-          
+          VER=$(cat ./VERSION)
+          if [ $BRANCH == "dev" ]
+          then
+            VER=$VER-SNAPSHOT
+          fi
+
+          echo "fairspace_version=$VER" >> "$GITHUB_OUTPUT"
+          echo "Docker tag to be attached to images: $VER"
+
 
   build-saturn-service:
     runs-on: ubuntu-latest
