@@ -1,5 +1,6 @@
 package nl.fairspace.pluto.web;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nl.fairspace.pluto.config.dto.PlutoConfig;
 import nl.fairspace.pluto.web.dto.MetadataSourceInfo;
@@ -15,10 +16,10 @@ import static nl.fairspace.pluto.config.Urls.METADATA_SOURCES_PATH;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class MetadataSourcesResource {
 
-    @Autowired
-    PlutoConfig plutoConfig;
+    private final PlutoConfig plutoConfig;
 
     /**
      * GET  /api/metadata-sources/ : returns configured external metadata sources.
