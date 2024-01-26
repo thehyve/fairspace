@@ -16,6 +16,7 @@ on:
     branches:
       - "dev"
       - "release"
+      - "view-performance"
 
 jobs:
   # A job to generate one shared unique version tag per build cycle for all built artifacts
