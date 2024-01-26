@@ -13,7 +13,9 @@ env:
 
 on:
   push:
-    branches: []
+    branches:
+      - dev
+      - release
 
 jobs:
   # A job to generate one shared unique version tag per build cycle for all built artifacts
