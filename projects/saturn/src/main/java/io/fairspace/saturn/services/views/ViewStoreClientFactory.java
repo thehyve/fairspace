@@ -1,19 +1,29 @@
 package io.fairspace.saturn.services.views;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
-import com.zaxxer.hikari.*;
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.config.ViewsConfig.*;
-import io.fairspace.saturn.vocabulary.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.Builder;
 import lombok.Data;
-import lombok.extern.slf4j.*;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.sql.*;
-import java.sql.*;
-import java.util.*;
-import java.util.stream.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
@@ -61,13 +71,11 @@ public class ViewStoreClientFactory {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
         }
 
-        createOrUpdateTable(Table.builder()
-                .name("label")
-                .columns(List.of(
+        createOrUpdateTable(new Table("label",
+                List.of(
                         idColumn(),
                         valueColumn("type", ColumnType.Text),
-                        valueColumn("label", ColumnType.Text)))
-                .build());
+                        valueColumn("label", ColumnType.Text))));
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
         for (View view : viewsConfig.views) {
@@ -227,27 +235,23 @@ public class ViewStoreClientFactory {
             }
             columns.add(valueColumn(column.name, column.type));
         }
-        var table = Table.builder()
-                .name(view.name.toLowerCase())
-                .columns(columns)
-                .build();
+        var table = new Table(view.name.toLowerCase(), columns);
         createOrUpdateTable(table);
         configuration.viewTables.put(view.name, table);
         // Add property tables
-        for (ViewsConfig.View.Column column : view.columns) {
-            if (!column.type.isSet()) {
-                continue;
-            }
+        var setColumns = view.columns.stream().filter(column -> column.type.isSet()).toList();
+        for (ViewsConfig.View.Column column : setColumns) {
             var propertyTableColumns = new ArrayList<Table.ColumnDefinition>();
             propertyTableColumns.add(idColumn(view.name));
             propertyTableColumns.add(valueColumn(column.name, ColumnType.Identifier));
-            var propertyTable = Table.builder()
-                    .name(String.format("%s_%s", view.name.toLowerCase(), column.name.toLowerCase()))
-                    .columns(propertyTableColumns)
-                    .build();
+            var name = String.format("%s_%s", view.name.toLowerCase(), column.name.toLowerCase());
+            var propertyTable = new Table(name, propertyTableColumns);
             createOrUpdateTable(propertyTable);
             configuration.propertyTables.putIfAbsent(view.name, new HashMap<>());
             configuration.propertyTables.get(view.name).put(column.name, propertyTable);
+        }
+        if (!setColumns.isEmpty()) {
+            createOrUpdateMaterializedView(view, setColumns);
         }
         if (view.join != null) {
             // Add join tables
@@ -256,21 +260,84 @@ public class ViewStoreClientFactory {
                 createOrUpdateJoinTable(joinTable);
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
+                var joinView = configuration.viewConfig.get(join.view);
+                var setJoinColumns = joinView.columns.stream().filter(column -> column.type.isSet()).toList();
+                if (!setJoinColumns.isEmpty()) {
+                    createOrUpdateMaterializedView(joinView, setJoinColumns);
+                }
             }
+
+        }
+    }
+
+    private void createOrUpdateMaterializedView(View view, List<View.Column> setColumns) throws SQLException {
+        var viewName = "materialized_view_%s".formatted(view.name.toLowerCase());
+        dropMaterializedViewIfExists(viewName);
+        createMaterializedView(viewName, view, setColumns);
+        alterOwnerToFairspace(viewName);
+        createMaterializedViewIndex(view.name.toLowerCase(), viewName);
+    }
+
+    private void createMaterializedViewIndex(String viewName, String materializedViewName) throws SQLException {
+        var query = "CREATE INDEX %s_id_idx on %s (%sid)".formatted(viewName, materializedViewName, viewName);
+        try (var connection = getConnection();
+             var ps = connection.prepareStatement(query)) {
+            ps.execute();
+            connection.commit();
+        }
+    }
+
+    private void alterOwnerToFairspace(String materializedViewName) throws SQLException {
+        var query = "ALTER MATERIALIZED VIEW %s OWNER TO fairspace".formatted(materializedViewName);
+        try (var connection = getConnection();
+             var ps = connection.prepareStatement(query)) {
+            ps.execute();
+            connection.commit();
+        }
+    }
+
+    private void createMaterializedView(String materializedViewName, View view, List<View.Column> setColumns) throws SQLException {
+        String viewName = view.name.toLowerCase();
+        var queryBuilder = new StringBuilder()
+                .append("CREATE MATERIALIZED VIEW ").append(materializedViewName).append(" AS ")
+                .append("SELECT v.id AS ").append(viewName).append("id, ");
+        for (int i = 0; i < setColumns.size(); i++) {
+            queryBuilder.append("i").append(i).append(".").append(setColumns.get(i).name.toLowerCase());
+            if (i != setColumns.size() - 1) {
+                queryBuilder.append(", ");
+            }
+        }
+        queryBuilder.append(" FROM ").append(viewName).append(" v ");
+        for (int i = 0; i < setColumns.size(); i++) {
+            var alias = "i" + i;
+            var columnName = setColumns.get(i).name.toLowerCase();
+            queryBuilder.append("LEFT JOIN ").append(viewName).append("_").append(columnName).append(" ").append(alias).append(" ON ")
+                    .append("v.id = ").append(alias).append(".").append(viewName).append("_id ");
+        }
+
+        try (var connection = getConnection();
+             var ps = connection.prepareStatement(queryBuilder.toString())) {
+            ps.execute();
+            connection.commit();
+        }
+    }
+
+    private void dropMaterializedViewIfExists(String viewName) throws SQLException {
+        var query = "DROP MATERIALIZED VIEW IF EXISTS %s CASCADE".formatted(viewName);
+        try (var connection = getConnection();
+             var ps = connection.prepareStatement(query)) {
+            ps.execute();
+            connection.commit();
         }
     }
 
     public static Table getJoinTable(View.JoinView join, View view) {
         String left = join.reverse ? join.view : view.name;
         String right = join.reverse ? view.name : join.view;
-        var joinTable = Table.builder()
-                .name(String.format("%s_%s", left.toLowerCase(), right.toLowerCase()))
-                .columns(Arrays.asList(
-                        idColumn(left),
-                        idColumn(right)))
-                .build();
-
-        return joinTable;
+        var name = String.format("%s_%s", left.toLowerCase(), right.toLowerCase());
+        return new Table(name, Arrays.asList(
+                idColumn(left),
+                idColumn(right)));
     }
 
     @Data
