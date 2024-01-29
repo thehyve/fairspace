@@ -114,12 +114,13 @@ public class ViewStoreClientFactory {
             log.debug("Check if table {} exists ...", table.name);
             var resultSet = connection.getMetaData().getTables(null, null, table.name, null);
             var tableExists = resultSet.next();
-            
+
             if (!tableExists) {
                 createTable(table, connection);
-                createIndexes(table, connection);
+                createIndexesIfNotExist(table, connection);
             } else {
                 updateTable(table, connection);
+                createIndexesIfNotExist(table, connection);
             }
         }
     }
@@ -169,8 +170,8 @@ public class ViewStoreClientFactory {
         log.info("Table {} created.", table.name);
     }
 
-    private void createIndexes(Table table, Connection connection) throws SQLException {
-        
+    private void createIndexesIfNotExist(Table table, Connection connection) throws SQLException {
+
         var keys = table.columns.stream()
                 .filter(column -> column.type == ColumnType.Identifier)
                 .map(column -> column.name)
@@ -186,7 +187,7 @@ public class ViewStoreClientFactory {
             connection.createStatement().execute(command);
             log.info("Index {} created.", indexName);
         }
-        
+
         connection.setAutoCommit(false);
     }
 
