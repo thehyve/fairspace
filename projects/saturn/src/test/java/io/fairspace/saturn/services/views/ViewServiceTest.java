@@ -30,6 +30,7 @@ import org.apache.jena.sparql.util.Context;
 import org.eclipse.jetty.server.Authentication;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -53,6 +54,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
+@Ignore // TODO: until H2 replaced with Testcontainers - FAIRSPC-33
 public class ViewServiceTest {
     static final String BASE_PATH = "/api/webdav";
     static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;

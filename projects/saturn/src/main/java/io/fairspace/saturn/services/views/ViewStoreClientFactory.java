@@ -32,9 +32,9 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 @Slf4j
 public class ViewStoreClientFactory {
 
-    @Getter
     private final boolean isH2Database;
 
+    @Getter
     private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
@@ -73,7 +73,7 @@ public class ViewStoreClientFactory {
 
         dataSource = new HikariDataSource(databaseConfig);
 
-        this.materializedViewService = new MaterializedViewService(isH2Database, dataSource);
+        materializedViewService = new MaterializedViewService(dataSource);
 
         try (var connection = dataSource.getConnection()) {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
@@ -89,13 +89,7 @@ public class ViewStoreClientFactory {
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
-        for (View view : viewsConfig.views) {
-            materializedViewService.createOrUpdateMaterializedView(view);
-            for (View.JoinView joinView: view.join) {
-                var jv = configuration.viewConfig.get(joinView.view);
-                materializedViewService.createOrUpdateMaterializedView(jv);
-            }
-        }
+        materializedViewService.createOrUpdateAllMaterializedViews();
     }
 
     public Connection getConnection() throws SQLException {

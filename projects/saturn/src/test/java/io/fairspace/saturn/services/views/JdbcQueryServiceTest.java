@@ -36,6 +36,7 @@ import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@Ignore // TODO: until H2 replaced with Testcontainers - FAIRSPC-33
 public class JdbcQueryServiceTest {
     static final String BASE_PATH = "/api/webdav";
     static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;

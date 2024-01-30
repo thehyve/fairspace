@@ -222,7 +222,7 @@ public class ViewUpdater implements AutoCloseable {
             copyValuesForType(view, type);
             var valueSetColumns = view.columns.stream()
                     .filter(column -> column.type.isSet())
-                    .collect(Collectors.toList());
+                    .toList();
             for (var valueSetColumn: valueSetColumns) {
                 copyValueSetsForColumn(view, type, valueSetColumn);
             }

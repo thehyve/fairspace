@@ -50,7 +50,6 @@ public class ViewStoreReader implements AutoCloseable {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
 
-    private final boolean isH2Database;
     final int MAX_JOIN_ITEMS = 50;
 
     // TODO: in whole class, use StringBuilder instead of String concats
@@ -58,7 +57,6 @@ public class ViewStoreReader implements AutoCloseable {
         this.searchConfig = searchConfig;
         this.configuration = viewStoreClientFactory.configuration;
         this.connection = viewStoreClientFactory.getConnection();
-        this.isH2Database = viewStoreClientFactory.isH2Database();
     }
 
     String label(String id) throws SQLException {
@@ -355,10 +353,11 @@ public class ViewStoreReader implements AutoCloseable {
                 .filter(column -> column.type.isSet())
                 .map(column -> column.name)
                 .toList();
-        var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, studyIds);
-
-        // merge the data from the view (for instance, Study) table and related tables (for instance, Study_TreatmentId)
-        viewRowsForSetType.forEach((key, value) -> rowsById.get(key).merge(value));
+        if (!valueSetProperties.isEmpty()) {
+            var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, studyIds);
+            // merge the data from the view (for instance, Study) table and related tables (for instance, Study_TreatmentId)
+            viewRowsForSetType.forEach((key, value) -> rowsById.get(key).merge(value));
+        }
         return rowsById;
     }
 
@@ -381,18 +380,12 @@ public class ViewStoreReader implements AutoCloseable {
             throws SQLException {
 
         var columns = String.join(", ", valueSetProperties);
-        var inClauseCondition = isH2Database ? "(%sid = ?)" : "%sid = ANY(?::text[])";
-        inClauseCondition = inClauseCondition.formatted(view);
-        var query = "select %sid, %s from materialized_view_%s where %s"
-                .formatted(view, columns, view, inClauseCondition);
+        var query = "select %sid, %s from materialized_view_%s where %sid = ANY(?::text[])"
+                .formatted(view, columns, view, view);
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            if (isH2Database) {
-                ps.setObject(1, viewIds);
-            } else {
-                Array array = ps.getConnection().createArrayOf("text", viewIds);
-                ps.setArray(1, array);
-            }
+            Array array = ps.getConnection().createArrayOf("text", viewIds);
+            ps.setArray(1, array);
             ResultSet resultSet = ps.executeQuery();
 
             Map<String, ViewRow> viewRowsForSetTypeById = new HashMap<>();
@@ -467,16 +460,22 @@ public class ViewStoreReader implements AutoCloseable {
 
     private PreparedStatement getJoinQuery(String view, View.JoinView joinView, Table joinedTable, Table joinTable,
                                            Set<String> projectionColumns, Collection<String> ids) throws SQLException {
+        var columns = projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", "));
 
-        Function<String, String> queryBody = viewId
-                -> "(select " + projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", ")) + " , '" + viewId + "' AS rowid"
-                + " from " + joinedTable.name + " j "
-                + " join materialized_view_" + joinedTable.name + "  jv on j.id = " + joinedTable.name + "id "
-                + " where exists ("
-                + "   select * from " + joinTable.name + " jt "
-                + "   where jt." + idColumn(joinView.view).name + " = j.id"
-                + "   and jt." + idColumn(view).name + " = '" + viewId + "'"
-                + ") limit " + MAX_JOIN_ITEMS + ")";
+        Function<String, String> queryBody = viewId -> {
+            var select = "(select " + columns + " , '" + viewId + "' AS rowid"
+                    + " from " + joinedTable.name + " j ";
+            var join = joinView.include.isEmpty()
+                    ? ""
+                    : " join materialized_view_" + joinedTable.name + "  jv on j.id = " + joinedTable.name + "id ";
+            var where = " where exists ("
+                    + "   select * from " + joinTable.name + " jt "
+                    + "   where jt." + idColumn(joinView.view).name + " = j.id"
+                    + "   and jt." + idColumn(view).name + " = '" + viewId + "'"
+                    + ") limit " + MAX_JOIN_ITEMS + ")";
+
+            return select + join + where;
+        };
 
         var query = ids.stream()
                 .map(queryBody)

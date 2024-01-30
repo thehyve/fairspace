@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.maintenance;
 
 import io.fairspace.saturn.config.ConfigLoader;
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.services.*;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.views.*;
@@ -21,7 +22,10 @@ public class MaintenanceService {
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final ViewService viewService;
 
-    public MaintenanceService(@NonNull UserService userService, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory, ViewService viewService) {
+    public MaintenanceService(@NonNull UserService userService,
+                              @NonNull Dataset dataset,
+                              ViewStoreClientFactory viewStoreClientFactory,
+                              ViewService viewService) {
         this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
@@ -52,6 +56,17 @@ public class MaintenanceService {
             recreateIndex();
         });
         viewService.refreshCaches();
+        try {
+            // now it is a part of reindexing, but if Fairspace is supposed to support an intensive
+            // metadata update, then consider async materialized views refresh with old data available
+            // until new are ready to be used OR switch to denormalized tables not to maintain materialized views
+            if (viewStoreClientFactory != null && viewStoreClientFactory.getMaterializedViewService() != null) {
+                viewStoreClientFactory.getMaterializedViewService().createOrUpdateAllMaterializedViews();
+            }
+        } catch (SQLException e) {
+            log.error("Failed to update materialized views on reindexing call");
+            throw new RuntimeException(e);
+        }
     }
 
     public void recreateIndex() {

@@ -1,39 +1,44 @@
 package io.fairspace.saturn.services.views;
 
+import io.fairspace.saturn.config.ConfigLoader;
 import io.fairspace.saturn.config.ViewsConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 
 @Slf4j
 public class MaterializedViewService {
 
-    private final boolean isH2Database;
-
     private final DataSource dataSource;
 
-    private final String tableOrView;
-
-    public MaterializedViewService(boolean isH2Database, DataSource dataSource) {
-        this.isH2Database = isH2Database;
-        this.tableOrView = isH2Database ? "TABLE" : "MATERIALIZED VIEW";
+    public MaterializedViewService(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public void createOrUpdateAllMaterializedViews() throws SQLException {
+        for (var view : VIEWS_CONFIG.views) {
+            createOrUpdateMaterializedView(view);
+        }
     }
 
     public void createOrUpdateMaterializedView(ViewsConfig.View view) throws SQLException {
         var setColumns = view.columns.stream().filter(column -> column.type.isSet()).toList();
         if (!setColumns.isEmpty()) {
             var viewName = "materialized_view_%s".formatted(view.name.toLowerCase());
-            log.info("{} refresh has started", view);
+            log.info("{} refresh has started", viewName);
             dropMaterializedViewIfExists(viewName);
             createMaterializedView(viewName, view, setColumns);
-            if (!isH2Database) {
-                alterOwnerToFairspace(viewName);
-            }
+            alterOwnerToFairspace(viewName);
             createMaterializedViewIndex(view.name.toLowerCase(), viewName);
-            log.info("{} refresh has finished successfully", view);
+            log.info("{} refresh has finished successfully", viewName);
         }
     }
 
@@ -47,7 +52,7 @@ public class MaterializedViewService {
     }
 
     private void alterOwnerToFairspace(String viewOrTableName) throws SQLException {
-        var query = "ALTER %s %s OWNER TO fairspace".formatted(tableOrView, viewOrTableName);
+        var query = "ALTER MATERIALIZED VIEW %s OWNER TO fairspace".formatted(viewOrTableName);
         try (var connection = dataSource.getConnection();
              var ps = connection.prepareStatement(query)) {
             ps.execute();
@@ -58,7 +63,7 @@ public class MaterializedViewService {
     private void createMaterializedView(String viewOrTableName, ViewsConfig.View view, List<ViewsConfig.View.Column> setColumns) throws SQLException {
         String viewName = view.name.toLowerCase();
         var queryBuilder = new StringBuilder()
-                .append("CREATE ").append(tableOrView).append(" ").append(viewOrTableName).append(" AS ")
+                .append("CREATE MATERIALIZED VIEW ").append(viewOrTableName).append(" AS ")
                 .append("SELECT v.id AS ").append(viewName).append("id, ");
         for (int i = 0; i < setColumns.size(); i++) {
             queryBuilder.append("i").append(i).append(".").append(setColumns.get(i).name.toLowerCase());
@@ -82,7 +87,7 @@ public class MaterializedViewService {
     }
 
     private void dropMaterializedViewIfExists(String viewName) throws SQLException {
-        var query = "DROP %s IF EXISTS %s CASCADE".formatted(tableOrView, viewName);
+        var query = "DROP MATERIALIZED VIEW IF EXISTS %s CASCADE".formatted(viewName);
         try (var connection = dataSource.getConnection();
              var ps = connection.prepareStatement(query)) {
             ps.execute();

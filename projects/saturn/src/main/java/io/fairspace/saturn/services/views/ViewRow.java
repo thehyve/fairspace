@@ -47,16 +47,8 @@ public class ViewRow {
         return this;
     }
 
-    private static Set<ValueDTO> addElementAndReturn(Set<ValueDTO> set, ValueDTO element) {
-        set.add(element);
-        return set;
-    }
-
     private static Set<ValueDTO> addElementsAndReturn(Set<ValueDTO> set, Set<ValueDTO> elements) {
         set.addAll(elements);
         return set;
     }
 }
-
-
-
