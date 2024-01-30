@@ -272,10 +272,12 @@ public class ViewStoreClientFactory {
 
     private void createOrUpdateMaterializedView(View view, List<View.Column> setColumns) throws SQLException {
         var viewName = "materialized_view_%s".formatted(view.name.toLowerCase());
+        log.info("{} refresh has started", view);
         dropMaterializedViewIfExists(viewName);
         createMaterializedView(viewName, view, setColumns);
         alterOwnerToFairspace(viewName);
         createMaterializedViewIndex(view.name.toLowerCase(), viewName);
+        log.info("{} refresh has finished successfully", view);
     }
 
     private void createMaterializedViewIndex(String viewName, String materializedViewName) throws SQLException {

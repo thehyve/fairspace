@@ -87,7 +87,7 @@ public class JdbcQueryService implements QueryService {
             filters.addAll(request.getFilters());
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try (var viewStoreReader = getViewStoreReader()){
+        try (var viewStoreReader = getViewStoreReader()) {
             List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
                     request.getView(), filters,
                     (page - 1) * size,
@@ -119,7 +119,7 @@ public class JdbcQueryService implements QueryService {
             filters = new ArrayList<>();
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try (var viewStoreReader = getViewStoreReader()){
+        try (var viewStoreReader = getViewStoreReader()) {
             return new CountDTO(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
@@ -376,6 +375,7 @@ public class ViewStoreReader implements AutoCloseable {
         // retrieve view rows with fields from the view table only (not of the Set type)
         var rowsById = getViewRowsForNonSetType(viewConfig, filters, offset, limit);
 
+        // TODO: with materialized or normal view we can retrieve all data in one go adding one more join in the query above
         // retrieve view rows with fields from table only (of the Set type only)
         String[] studyIds = rowsById.keySet().toArray(new String[0]);
         var valueSetProperties = viewConfig.columns.stream()
@@ -553,7 +553,6 @@ public class ViewStoreReader implements AutoCloseable {
      * @param limit              the maximum number of results to return.
      * @param includeJoinedViews if true, include joined views in the resulting rows.
      * @return the list of rows.
-     * @throws SQLException
      */
     public List<Map<String, Set<ValueDTO>>> retrieveRows(String view, List<ViewFilter> filters, int offset, int limit, boolean includeJoinedViews) {
         try {
@@ -583,12 +582,6 @@ public class ViewStoreReader implements AutoCloseable {
         allJoinTableRows.forEach(viewRow::merge);
     }
 
-    /**
-     * @param view
-     * @param filters
-     * @return
-     * @throws SQLTimeoutException
-     */
     public long countRows(String view, List<ViewFilter> filters) throws SQLTimeoutException {
         try (var q = query(view, "count(*) as rowCount", filters, null)) {
             q.setQueryTimeout((int) searchConfig.countRequestTimeout);
