@@ -22,7 +22,11 @@ import org.apache.jena.tdb2.params.StoreParamsCodec;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
@@ -86,14 +90,13 @@ public class Config {
     @AllArgsConstructor
     public static class CacheConfig {
         public String name;
-        public boolean enabled;
-        public boolean autoRefreshEnabled;
-        public Long refreshFrequencyInHours;
+        public boolean autoRefreshEnabled = false;
+        public Long refreshFrequencyInHours = 240L;
     }
 
     public static class Caches {
-        public CacheConfig facets = CacheConfig.builder().name("facets").enabled(true).build();
-        public CacheConfig views = CacheConfig.builder().name("views").enabled(true).build();
+        public CacheConfig facets = CacheConfig.builder().name("facets").build();
+        public CacheConfig views = CacheConfig.builder().name("views").build();
     }
 
     public static class Search {

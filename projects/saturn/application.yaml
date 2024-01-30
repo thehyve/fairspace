@@ -61,9 +61,7 @@ search:
   countRequestTimeout: 60000
 caches:
   facets:
-    enabled: true
     name: "facets"
   views:
-    enabled: true
     name: "views"
 

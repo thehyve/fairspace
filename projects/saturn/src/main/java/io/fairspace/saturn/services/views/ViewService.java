@@ -86,13 +86,12 @@ public class ViewService {
     public static final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS = "User does not have permissions to read facets";
 
     private final Config.Search searchConfig;
-    private final Config.Caches cachesConfig;
     private final ViewsConfig viewsConfig;
     private final Dataset ds;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final MetadataPermissions metadataPermissions;
-    private LoadingCache<Boolean, List<FacetDTO>> facetsCache;
-    private LoadingCache<Boolean, List<ViewDTO>> viewsCache;
+    private final LoadingCache<Boolean, List<FacetDTO>> facetsCache;
+    private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
 
     public ViewService(Config config,
                        ViewsConfig viewsConfig,
@@ -100,59 +99,45 @@ public class ViewService {
                        ViewStoreClientFactory viewStoreClientFactory,
                        MetadataPermissions metadataPermissions) {
         this.searchConfig = config.search;
-        this.cachesConfig = config.caches;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.metadataPermissions = metadataPermissions;
-        if (cachesConfig.facets.enabled) {
-            this.facetsCache = buildCache(this::fetchFacets, cachesConfig.facets);
-        }
-        if (cachesConfig.views.enabled) {
-            this.viewsCache = buildCache(this::fetchViews, cachesConfig.views);
-        }
+        this.facetsCache = buildCache(this::fetchFacets, config.caches.facets);
+        this.viewsCache = buildCache(this::fetchViews, config.caches.views);
         refreshCaches();
     }
 
     public void refreshCaches() {
         log.info("Caches refreshing/warming up has been triggered");
-        FilteredDatasetGraph.disableQuadPermissionCheck();
-        if (cachesConfig.facets.enabled) {
+        try {
+            FilteredDatasetGraph.disableQuadPermissionCheck();
             facetsCache.refresh(Boolean.TRUE);
-        }
-        if (cachesConfig.views.enabled) {
             viewsCache.refresh(Boolean.TRUE);
+        } finally {
+            FilteredDatasetGraph.enableQuadPermissionCheck();
         }
-        FilteredDatasetGraph.enableQuadPermissionCheck();
         log.info("Caches refreshing/warming up successfully finished");
     }
 
     public List<FacetDTO> getFacets() {
-        if (cachesConfig.facets.enabled) {
-            if (!metadataPermissions.canReadFacets()) {
-                // this check is needed for cached data only as, otherwise,
-                // the check will be performed during retrieving data from Jena
-                throw new AccessDeniedException(USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS);
-            }
-            try {
-                return facetsCache.get(Boolean.TRUE);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return fetchFacets();
+        if (!metadataPermissions.canReadFacets()) {
+            // this check is needed for cached data only as, otherwise,
+            // the check will be performed during retrieving data from Jena
+            throw new AccessDeniedException(USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS);
+        }
+        try {
+            return facetsCache.get(Boolean.TRUE);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 
     public List<ViewDTO> getViews() {
-        if (cachesConfig.views.enabled) {
-            try {
-                return viewsCache.get(Boolean.TRUE);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return fetchViews();
+        try {
+            return viewsCache.get(Boolean.TRUE);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
         }
     }
 

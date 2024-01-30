@@ -147,40 +147,6 @@ public class ViewServiceTest {
     }
 
     @Test
-    public void testFetchNotCachedFacetsWhenCacheIsDisabled() {
-        // given
-        var sut = spy(viewService);
-        ConfigLoader.CONFIG.caches.facets.enabled = false;
-
-        // when
-        var facets = sut.getFacets();
-
-        // then
-        Assert.assertEquals(facets.size(), 11);
-        verify(sut, times(1)).fetchFacets();
-
-        // rollback static value
-        ConfigLoader.CONFIG.caches.facets.enabled = true;
-    }
-
-    @Test
-    public void testFetchNotCachedViewsWhenCacheIsDisabled() {
-        // given
-        var sut = spy(viewService);
-        ConfigLoader.CONFIG.caches.views.enabled = false;
-
-        // when
-        var views = sut.getViews();
-
-        // then
-        Assert.assertEquals(views.size(), 4);
-        verify(sut, times(1)).fetchViews();
-
-        // rollback static value
-        ConfigLoader.CONFIG.caches.views.enabled = true;
-    }
-
-    @Test
     public void testFetchCachedViews() {
         // given
         var sut = spy(viewService);
