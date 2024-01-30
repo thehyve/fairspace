@@ -11,6 +11,7 @@ import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
@@ -30,19 +31,23 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 
 @Slf4j
 public class ViewStoreClientFactory {
-    public static boolean H2_DATABASE = false;
+
+    @Getter
+    private final boolean isH2Database;
+
+    private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
         return new ViewStoreClient(getConnection(), configuration);
     }
 
-    public static String databaseTypeForColumnType(ColumnType type) {
+    public String databaseTypeForColumnType(ColumnType type) {
         return switch (type) {
             case Text, Term -> "text";
             case Date -> "timestamp";
             case Number -> "numeric";
             case Boolean -> "boolean";
-            case Identifier -> H2_DATABASE ? "varchar not null" : "text not null";
+            case Identifier -> isH2Database ? "varchar not null" : "text not null";
             case Set, TermSet -> throw new IllegalArgumentException("No database type for column type set.");
         };
     }
@@ -55,7 +60,8 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase) throws SQLException {
+    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, boolean isH2Database) throws SQLException {
+        this.isH2Database = isH2Database;
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
         databaseConfig.setJdbcUrl(viewDatabase.url);
@@ -66,6 +72,8 @@ public class ViewStoreClientFactory {
         databaseConfig.setMaximumPoolSize(50);
 
         dataSource = new HikariDataSource(databaseConfig);
+
+        this.materializedViewService = new MaterializedViewService(isH2Database, dataSource);
 
         try (var connection = dataSource.getConnection()) {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
@@ -80,6 +88,13 @@ public class ViewStoreClientFactory {
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
+        }
+        for (View view : viewsConfig.views) {
+            materializedViewService.createOrUpdateMaterializedView(view);
+            for (View.JoinView joinView: view.join) {
+                var jv = configuration.viewConfig.get(joinView.view);
+                materializedViewService.createOrUpdateMaterializedView(jv);
+            }
         }
     }
 
@@ -250,9 +265,6 @@ public class ViewStoreClientFactory {
             configuration.propertyTables.putIfAbsent(view.name, new HashMap<>());
             configuration.propertyTables.get(view.name).put(column.name, propertyTable);
         }
-        if (!setColumns.isEmpty()) {
-            createOrUpdateMaterializedView(view, setColumns);
-        }
         if (view.join != null) {
             // Add join tables
             for (ViewsConfig.View.JoinView join : view.join) {
@@ -261,75 +273,8 @@ public class ViewStoreClientFactory {
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
                 var joinView = configuration.viewConfig.get(join.view);
-                var setJoinColumns = joinView.columns.stream().filter(column -> column.type.isSet()).toList();
-                if (!setJoinColumns.isEmpty()) {
-                    createOrUpdateMaterializedView(joinView, setJoinColumns);
-                }
             }
 
-        }
-    }
-
-    private void createOrUpdateMaterializedView(View view, List<View.Column> setColumns) throws SQLException {
-        var viewName = "materialized_view_%s".formatted(view.name.toLowerCase());
-        log.info("{} refresh has started", view);
-        dropMaterializedViewIfExists(viewName);
-        createMaterializedView(viewName, view, setColumns);
-        alterOwnerToFairspace(viewName);
-        createMaterializedViewIndex(view.name.toLowerCase(), viewName);
-        log.info("{} refresh has finished successfully", view);
-    }
-
-    private void createMaterializedViewIndex(String viewName, String materializedViewName) throws SQLException {
-        var query = "CREATE INDEX %s_id_idx on %s (%sid)".formatted(viewName, materializedViewName, viewName);
-        try (var connection = getConnection();
-             var ps = connection.prepareStatement(query)) {
-            ps.execute();
-            connection.commit();
-        }
-    }
-
-    private void alterOwnerToFairspace(String materializedViewName) throws SQLException {
-        var query = "ALTER MATERIALIZED VIEW %s OWNER TO fairspace".formatted(materializedViewName);
-        try (var connection = getConnection();
-             var ps = connection.prepareStatement(query)) {
-            ps.execute();
-            connection.commit();
-        }
-    }
-
-    private void createMaterializedView(String materializedViewName, View view, List<View.Column> setColumns) throws SQLException {
-        String viewName = view.name.toLowerCase();
-        var queryBuilder = new StringBuilder()
-                .append("CREATE MATERIALIZED VIEW ").append(materializedViewName).append(" AS ")
-                .append("SELECT v.id AS ").append(viewName).append("id, ");
-        for (int i = 0; i < setColumns.size(); i++) {
-            queryBuilder.append("i").append(i).append(".").append(setColumns.get(i).name.toLowerCase());
-            if (i != setColumns.size() - 1) {
-                queryBuilder.append(", ");
-            }
-        }
-        queryBuilder.append(" FROM ").append(viewName).append(" v ");
-        for (int i = 0; i < setColumns.size(); i++) {
-            var alias = "i" + i;
-            var columnName = setColumns.get(i).name.toLowerCase();
-            queryBuilder.append("LEFT JOIN ").append(viewName).append("_").append(columnName).append(" ").append(alias).append(" ON ")
-                    .append("v.id = ").append(alias).append(".").append(viewName).append("_id ");
-        }
-
-        try (var connection = getConnection();
-             var ps = connection.prepareStatement(queryBuilder.toString())) {
-            ps.execute();
-            connection.commit();
-        }
-    }
-
-    private void dropMaterializedViewIfExists(String viewName) throws SQLException {
-        var query = "DROP MATERIALIZED VIEW IF EXISTS %s CASCADE".formatted(viewName);
-        try (var connection = getConnection();
-             var ps = connection.prepareStatement(query)) {
-            ps.execute();
-            connection.commit();
         }
     }
 

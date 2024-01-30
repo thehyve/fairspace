@@ -32,8 +32,7 @@ public class HealthServiceTest {
         viewDatabase.username = "sa";
         viewDatabase.password = "";
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        ViewStoreClientFactory.H2_DATABASE = true;
-        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
+        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
 
         healthService = new HealthService(viewStoreClientFactory.dataSource);
     }

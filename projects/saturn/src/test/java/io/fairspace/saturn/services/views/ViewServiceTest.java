@@ -70,8 +70,7 @@ public class ViewServiceTest {
     public void before() throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
         var viewDatabase = buildViewDatabaseConfig();
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        ViewStoreClientFactory.H2_DATABASE = true;
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
 
         var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
 

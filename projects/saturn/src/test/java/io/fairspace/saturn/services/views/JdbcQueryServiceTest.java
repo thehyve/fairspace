@@ -79,8 +79,7 @@ public class JdbcQueryServiceTest {
         viewDatabase.username = "sa";
         viewDatabase.password = "";
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        ViewStoreClientFactory.H2_DATABASE = true;
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
 
         var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
         Dataset ds = wrap(dsg);

@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +49,8 @@ public class ViewStoreReader implements AutoCloseable {
     final Config.Search searchConfig;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
+
+    private final boolean isH2Database;
     final int MAX_JOIN_ITEMS = 50;
 
     // TODO: in whole class, use StringBuilder instead of String concats
@@ -58,6 +58,7 @@ public class ViewStoreReader implements AutoCloseable {
         this.searchConfig = searchConfig;
         this.configuration = viewStoreClientFactory.configuration;
         this.connection = viewStoreClientFactory.getConnection();
+        this.isH2Database = viewStoreClientFactory.isH2Database();
     }
 
     String label(String id) throws SQLException {
@@ -337,34 +338,6 @@ public class ViewStoreReader implements AutoCloseable {
         return query;
     }
 
-    Map<String, PreparedStatement> prepareValueSetQueries(String view, List<String> properties) throws SQLException {
-        var valueSetQueries = new LinkedHashMap<String, PreparedStatement>();
-        for (var propertyName : properties) {
-            var propertyTable = configuration.propertyTables.get(view).get(propertyName);
-            var valueSetQuery = connection.prepareStatement(
-                    "select " + propertyName.toLowerCase() +
-                            " from " + propertyTable.name + " p " +
-                            " where p." + idColumn(view).name + " = ?");
-            valueSetQueries.put(propertyName, valueSetQuery);
-        }
-        return valueSetQueries;
-    }
-
-    void addValueSetValues(String view, Map<String, Set<ValueDTO>> row, List<String> properties, Map<String, PreparedStatement> valueSetQueries) throws SQLException {
-        var rowId = (String) row.get(view).stream().findFirst().orElseThrow().getValue();
-        for (var propertyName : properties) {
-            var valueSetQuery = valueSetQueries.get(propertyName);
-            valueSetQuery.setString(1, rowId);
-            var valueSetResult = valueSetQuery.executeQuery();
-            var values = new LinkedHashSet<ValueDTO>();
-            while (valueSetResult.next()) {
-                var label = valueSetResult.getString(propertyName.toLowerCase());
-                values.add(new ValueDTO(label, label));
-            }
-            row.put(view + "_" + propertyName, values);
-        }
-    }
-
     Map<String, ViewRow> retrieveViewTableRows(
             String view, List<ViewFilter> filters, int offset, int limit) throws SQLException {
         var viewConfig = configuration.viewConfig.get(view);
@@ -408,12 +381,18 @@ public class ViewStoreReader implements AutoCloseable {
             throws SQLException {
 
         var columns = String.join(", ", valueSetProperties);
-        var query = "select %sid, %s from materialized_view_%s where %sid = ANY(?::text[])"
-                .formatted(view, columns, view, view);
+        var inClauseCondition = isH2Database ? "(%sid = ?)" : "%sid = ANY(?::text[])";
+        inClauseCondition = inClauseCondition.formatted(view);
+        var query = "select %sid, %s from materialized_view_%s where %s"
+                .formatted(view, columns, view, inClauseCondition);
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
-            Array array = ps.getConnection().createArrayOf("text", viewIds);
-            ps.setArray(1, array);
+            if (isH2Database) {
+                ps.setObject(1, viewIds);
+            } else {
+                Array array = ps.getConnection().createArrayOf("text", viewIds);
+                ps.setArray(1, array);
+            }
             ResultSet resultSet = ps.executeQuery();
 
             Map<String, ViewRow> viewRowsForSetTypeById = new HashMap<>();
