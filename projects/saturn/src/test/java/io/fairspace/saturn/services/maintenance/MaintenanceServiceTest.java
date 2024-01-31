@@ -15,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static io.fairspace.saturn.services.maintenance.MaintenanceService.REINDEXING_IS_ALREADY_IN_PROGRESS;
 import static io.fairspace.saturn.services.maintenance.MaintenanceService.SERVICE_NOT_AVAILABLE;
 import static org.junit.Assert.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -75,6 +76,8 @@ public class MaintenanceServiceTest {
         when(userService.currentUser()).thenReturn(currentUser);
 
         doReturn(false).when(sut).active();
+        doNothing().when(sut).recreateIndex();
+        doNothing().when(sut).updateMaterializedViews();
 
         // when
         sut.startRecreateIndexTask();
@@ -82,6 +85,7 @@ public class MaintenanceServiceTest {
 
         // then
         verify(sut).recreateIndex();
+        verify(sut).updateMaterializedViews();
         verify(viewService).refreshCaches();
     }
 

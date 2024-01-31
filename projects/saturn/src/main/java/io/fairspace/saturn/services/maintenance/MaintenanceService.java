@@ -79,7 +79,7 @@ public class MaintenanceService {
         }
     }
 
-    private void updateMaterializedViews() {
+    protected void updateMaterializedViews() {
         try {
             // now it is a part of reindexing, but if Fairspace is supposed to support an intensive
             // metadata update, then consider async materialized views refresh with old data available
