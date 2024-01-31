@@ -412,12 +412,14 @@ public class ViewStoreReader implements AutoCloseable {
 
         var rows = new ViewRowCollection();
 
-        try (var query = getJoinQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
-             var result = query.executeQuery()) {
-            while (result.next()) {
-                var id = result.getString("rowid");
-                var row = buildJoinRows(joinView, projectionColumns, result);
-                rows.add(id, row);
+        if (!ids.isEmpty()) {
+            try (var query = getJoinQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
+                 var result = query.executeQuery()) {
+                while (result.next()) {
+                    var id = result.getString("rowid");
+                    var row = buildJoinRows(joinView, projectionColumns, result);
+                    rows.add(id, row);
+                }
             }
         }
 
