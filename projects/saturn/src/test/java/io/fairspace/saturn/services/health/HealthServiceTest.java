@@ -1,8 +1,7 @@
 package io.fairspace.saturn.services.health;
 
-import com.zaxxer.hikari.*;
+import com.zaxxer.hikari.HikariDataSource;
 import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ConfigLoader;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -11,6 +10,7 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import static io.fairspace.saturn.TestUtils.loadViewsConfig;
 
 @RunWith(MockitoJUnitRunner.class)
+@Ignore // TODO: until H2 replaced with Testcontainers - FAIRSPC-33
 public class HealthServiceTest {
     HealthService healthService;
     ViewStoreClientFactory viewStoreClientFactory;
@@ -32,8 +33,7 @@ public class HealthServiceTest {
         viewDatabase.username = "sa";
         viewDatabase.password = "";
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        ViewStoreClientFactory.H2_DATABASE = true;
-        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
+        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
 
         healthService = new HealthService(viewStoreClientFactory.dataSource);
     }

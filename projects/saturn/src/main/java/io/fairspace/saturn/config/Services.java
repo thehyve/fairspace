@@ -103,7 +103,7 @@ public class Services {
         viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory,
                 metadataPermissions);
 
-        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
+        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService) ;
 
         searchService = new SearchService(filteredDataset);
 

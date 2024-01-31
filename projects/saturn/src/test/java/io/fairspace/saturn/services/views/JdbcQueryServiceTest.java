@@ -36,6 +36,7 @@ import static org.apache.jena.query.DatasetFactory.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@Ignore // TODO: until H2 replaced with Testcontainers - FAIRSPC-33
 public class JdbcQueryServiceTest {
     static final String BASE_PATH = "/api/webdav";
     static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;
@@ -79,8 +80,7 @@ public class JdbcQueryServiceTest {
         viewDatabase.username = "sa";
         viewDatabase.password = "";
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        ViewStoreClientFactory.H2_DATABASE = true;
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
 
         var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
         Dataset ds = wrap(dsg);

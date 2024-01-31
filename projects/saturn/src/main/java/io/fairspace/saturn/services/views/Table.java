@@ -3,10 +3,13 @@ package io.fairspace.saturn.services.views;
 import lombok.*;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.config.ViewsConfig.*;
+import static java.util.stream.Collectors.toMap;
 
-@Data @Builder
+@Data
 public class Table {
     @Data @Builder
     public static class ColumnDefinition {
@@ -35,7 +38,16 @@ public class Table {
     String name;
     List<ColumnDefinition> columns;
 
+    private final Map<String, ColumnDefinition> columnsById;
+
+    public Table(String name, List<ColumnDefinition> columns) {
+        this.name = name;
+        this.columns = columns;
+        this.columnsById = columns.stream()
+                .collect(Collectors.toMap(colDef -> colDef.getName().toLowerCase(), Function.identity()));
+    }
+
     public ColumnDefinition getColumn(String name) {
-        return columns.stream().filter(column -> column.getName().equals(name.toLowerCase())).findFirst().orElse(null);
+        return columnsById.get(name.toLowerCase());
     }
 }

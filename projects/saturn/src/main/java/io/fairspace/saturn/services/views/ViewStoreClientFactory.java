@@ -1,38 +1,53 @@
 package io.fairspace.saturn.services.views;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
-import com.zaxxer.hikari.*;
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.config.ViewsConfig.*;
-import io.fairspace.saturn.vocabulary.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.Builder;
 import lombok.Data;
-import lombok.extern.slf4j.*;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
-import javax.sql.*;
-import java.sql.*;
-import java.util.*;
-import java.util.stream.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
 
 @Slf4j
 public class ViewStoreClientFactory {
-    public static boolean H2_DATABASE = false;
+
+    private final boolean isH2Database;
+
+    @Getter
+    private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
         return new ViewStoreClient(getConnection(), configuration);
     }
 
-    public static String databaseTypeForColumnType(ColumnType type) {
+    public String databaseTypeForColumnType(ColumnType type) {
         return switch (type) {
             case Text, Term -> "text";
             case Date -> "timestamp";
             case Number -> "numeric";
             case Boolean -> "boolean";
-            case Identifier -> H2_DATABASE ? "varchar not null" : "text not null";
+            case Identifier -> isH2Database ? "varchar not null" : "text not null";
             case Set, TermSet -> throw new IllegalArgumentException("No database type for column type set.");
         };
     }
@@ -45,7 +60,8 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase) throws SQLException {
+    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, boolean isH2Database) throws SQLException {
+        this.isH2Database = isH2Database;
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
         databaseConfig.setJdbcUrl(viewDatabase.url);
@@ -57,22 +73,23 @@ public class ViewStoreClientFactory {
 
         dataSource = new HikariDataSource(databaseConfig);
 
+        materializedViewService = new MaterializedViewService(dataSource);
+
         try (var connection = dataSource.getConnection()) {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
         }
 
-        createOrUpdateTable(Table.builder()
-                .name("label")
-                .columns(List.of(
+        createOrUpdateTable(new Table("label",
+                List.of(
                         idColumn(),
                         valueColumn("type", ColumnType.Text),
-                        valueColumn("label", ColumnType.Text)))
-                .build());
+                        valueColumn("label", ColumnType.Text))));
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
+        materializedViewService.createOrUpdateAllMaterializedViews();
     }
 
     public Connection getConnection() throws SQLException {
@@ -227,24 +244,17 @@ public class ViewStoreClientFactory {
             }
             columns.add(valueColumn(column.name, column.type));
         }
-        var table = Table.builder()
-                .name(view.name.toLowerCase())
-                .columns(columns)
-                .build();
+        var table = new Table(view.name.toLowerCase(), columns);
         createOrUpdateTable(table);
         configuration.viewTables.put(view.name, table);
         // Add property tables
-        for (ViewsConfig.View.Column column : view.columns) {
-            if (!column.type.isSet()) {
-                continue;
-            }
+        var setColumns = view.columns.stream().filter(column -> column.type.isSet()).toList();
+        for (ViewsConfig.View.Column column : setColumns) {
             var propertyTableColumns = new ArrayList<Table.ColumnDefinition>();
             propertyTableColumns.add(idColumn(view.name));
             propertyTableColumns.add(valueColumn(column.name, ColumnType.Identifier));
-            var propertyTable = Table.builder()
-                    .name(String.format("%s_%s", view.name.toLowerCase(), column.name.toLowerCase()))
-                    .columns(propertyTableColumns)
-                    .build();
+            var name = String.format("%s_%s", view.name.toLowerCase(), column.name.toLowerCase());
+            var propertyTable = new Table(name, propertyTableColumns);
             createOrUpdateTable(propertyTable);
             configuration.propertyTables.putIfAbsent(view.name, new HashMap<>());
             configuration.propertyTables.get(view.name).put(column.name, propertyTable);
@@ -256,21 +266,19 @@ public class ViewStoreClientFactory {
                 createOrUpdateJoinTable(joinTable);
                 configuration.joinTables.putIfAbsent(view.name, new HashMap<>());
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
+                var joinView = configuration.viewConfig.get(join.view);
             }
+
         }
     }
 
     public static Table getJoinTable(View.JoinView join, View view) {
         String left = join.reverse ? join.view : view.name;
         String right = join.reverse ? view.name : join.view;
-        var joinTable = Table.builder()
-                .name(String.format("%s_%s", left.toLowerCase(), right.toLowerCase()))
-                .columns(Arrays.asList(
-                        idColumn(left),
-                        idColumn(right)))
-                .build();
-
-        return joinTable;
+        var name = String.format("%s_%s", left.toLowerCase(), right.toLowerCase());
+        return new Table(name, Arrays.asList(
+                idColumn(left),
+                idColumn(right)));
     }
 
     @Data
