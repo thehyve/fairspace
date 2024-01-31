@@ -348,13 +348,13 @@ public class ViewStoreReader implements AutoCloseable {
 
         // TODO: with materialized or normal view we can retrieve all data in one go adding one more join in the query above
         // retrieve view rows with fields from table only (of the Set type only)
-        String[] studyIds = rowsById.keySet().toArray(new String[0]);
+        String[] viewIds = rowsById.keySet().toArray(new String[0]);
         var valueSetProperties = viewConfig.columns.stream()
                 .filter(column -> column.type.isSet())
                 .map(column -> column.name)
                 .toList();
         if (!valueSetProperties.isEmpty()) {
-            var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, studyIds);
+            var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, viewIds);
             // merge the data from the view (for instance, Study) table and related tables (for instance, Study_TreatmentId)
             viewRowsForSetType.forEach((key, value) -> rowsById.get(key).merge(value));
         }
