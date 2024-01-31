@@ -13,13 +13,20 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
@@ -49,6 +56,8 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
+    public Caches caches = new Caches();
+
     public Search search = new Search();
 
     public static class Jena {
@@ -75,6 +84,19 @@ public class Config {
 
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
+    }
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CacheConfig {
+        public String name;
+        public boolean autoRefreshEnabled = false;
+        public Long refreshFrequencyInHours = 240L;
+    }
+
+    public static class Caches {
+        public CacheConfig facets = CacheConfig.builder().name("facets").build();
+        public CacheConfig views = CacheConfig.builder().name("views").build();
     }
 
     public static class Search {

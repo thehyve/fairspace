@@ -6,6 +6,7 @@ import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
+import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
@@ -45,11 +46,13 @@ import static io.fairspace.saturn.TestUtils.loadViewsConfig;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.services.views.ViewService.USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -81,7 +84,7 @@ public class ViewServiceTest {
         loadTestData(ds);
 
         viewService = new ViewService(
-                ConfigLoader.CONFIG.search,
+                ConfigLoader.CONFIG,
                 config,
                 ds,
                 viewStoreClientFactory,
@@ -91,7 +94,7 @@ public class ViewServiceTest {
     @Test
     public void testFetchViewConfig() {
         when(permissions.canReadFacets()).thenReturn(true);
-        var facets = viewService.getCachedFacets();
+        var facets = viewService.getFacets();
         var dateFacets = facets.stream()
                 .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Date)
                 .toList();
@@ -104,8 +107,18 @@ public class ViewServiceTest {
     }
 
     @Test
+    public void testNoAccessExceptionFetchingFacetsWhenUserHasNoPermissions() {
+        when(permissions.canReadFacets()).thenReturn(false);
+
+        Assert.assertThrows(
+                USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS,
+                AccessDeniedException.class,
+                () -> viewService.getFacets());
+    }
+
+    @Test
     public void testDisplayIndex_IsSet() {
-        var views = viewService.getCachedViews();
+        var views = viewService.getViews();
         var columns = views.get(1).getColumns().stream().toList();
         var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Morphology")).collect(Collectors.toList()).get(0);
         Assert.assertEquals(Integer.valueOf(1), selectedColumn.getDisplayIndex());
@@ -113,7 +126,7 @@ public class ViewServiceTest {
 
     @Test
     public void testDisplayIndex_IsNotSet() {
-        var views = viewService.getCachedViews();
+        var views = viewService.getViews();
         var columns = views.get(1).getColumns().stream().toList();
         var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Laterality")).collect(Collectors.toList()).get(0);
         Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), selectedColumn.getDisplayIndex());
@@ -121,20 +134,27 @@ public class ViewServiceTest {
 
     @Test
     public void testFetchCachedFacets() {
+        // given
         var sut = spy(viewService);
         when(permissions.canReadFacets()).thenReturn(true);
 
-        var facets = viewService.getCachedFacets();
+        // when
+        var facets = sut.getFacets();
+
+        // then
         Assert.assertEquals(facets.size(), 11);
         verify(sut, never()).fetchFacets();
     }
 
-
     @Test
     public void testFetchCachedViews() {
+        // given
         var sut = spy(viewService);
 
-        var views = viewService.getCachedViews();
+        // when
+        var views = viewService.getViews();
+
+        // then
         Assert.assertEquals(views.size(), 4);
         verify(sut, never()).fetchViews();
     }

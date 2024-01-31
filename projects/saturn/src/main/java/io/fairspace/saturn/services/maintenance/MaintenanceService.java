@@ -15,8 +15,12 @@ import java.util.concurrent.*;
 
 @Log4j2
 public class MaintenanceService {
+    public static final String SERVICE_NOT_AVAILABLE = "Service not available";
+    public static final String REINDEXING_IS_ALREADY_IN_PROGRESS = "Reindexing is already in progress.";
+
     private final ThreadPoolExecutor threadpool = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+
     private final UserService userService;
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
@@ -45,11 +49,11 @@ public class MaintenanceService {
             throw new AccessDeniedException();
         }
         if (disabled()) {
-            throw new NotAvailableException("Service not available");
+            throw new NotAvailableException(SERVICE_NOT_AVAILABLE);
         }
         if (active()) {
             log.info("Reindexing is already in progress.");
-            throw new ConflictException("Reindexing is already in progress.");
+            throw new ConflictException(REINDEXING_IS_ALREADY_IN_PROGRESS);
         }
         threadpool.submit(() -> {
             log.info("Start asynchronous reindexing task");
@@ -75,7 +79,7 @@ public class MaintenanceService {
         }
     }
 
-    private void updateMaterializedViews() {
+    protected void updateMaterializedViews() {
         try {
             // now it is a part of reindexing, but if Fairspace is supposed to support an intensive
             // metadata update, then consider async materialized views refresh with old data available

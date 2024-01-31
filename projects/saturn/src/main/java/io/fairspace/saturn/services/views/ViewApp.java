@@ -21,7 +21,7 @@ public class ViewApp extends BaseApp {
     protected void initApp() {
         get("/", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(new ViewsDTO(viewService.getCachedViews()));
+            return mapper.writeValueAsString(new ViewsDTO(viewService.getViews()));
         });
 
         post("/", (req, res) -> {
@@ -32,7 +32,7 @@ public class ViewApp extends BaseApp {
 
         get("/facets", (req, res) -> {
             res.type(APPLICATION_JSON.asString());
-            return mapper.writeValueAsString(new FacetsDTO(viewService.getCachedFacets()));
+            return mapper.writeValueAsString(new FacetsDTO(viewService.getFacets()));
         });
 
         post("/count", (req, res) -> {

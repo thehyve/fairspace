@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
@@ -52,16 +54,16 @@ public class ViewService {
             """, FS.NS));
 
     private static final Query RESOURCE_TYPE_VALUES_QUERY = QueryFactory.create(String.format("""
-          PREFIX fs: <%s>
-          SELECT ?value ?label
-          WHERE {
-             VALUES (?value ?label) {
-                (fs:Collection "Collection")
-                (fs:Directory "Directory")
-                (fs:File "File")
-             }
-          }
-          """, FS.NS));
+            PREFIX fs: <%s>
+            SELECT ?value ?label
+            WHERE {
+               VALUES (?value ?label) {
+                  (fs:Collection "Collection")
+                  (fs:Directory "Directory")
+                  (fs:File "File")
+               }
+            }
+            """, FS.NS));
 
     private static final Query BOUNDS_QUERY = QueryFactory.create(String.format("""
             PREFIX fs: <%s>
@@ -81,6 +83,7 @@ public class ViewService {
                FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
             }
             """, FS.NS));
+    public static final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS = "User does not have permissions to read facets";
 
     private final Config.Search searchConfig;
     private final ViewsConfig viewsConfig;
@@ -90,42 +93,47 @@ public class ViewService {
     private final LoadingCache<Boolean, List<FacetDTO>> facetsCache;
     private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
 
-    public ViewService(Config.Search searchConfig,
+    public ViewService(Config config,
                        ViewsConfig viewsConfig,
                        Dataset ds,
                        ViewStoreClientFactory viewStoreClientFactory,
                        MetadataPermissions metadataPermissions) {
-        this.searchConfig = searchConfig;
+        this.searchConfig = config.search;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.metadataPermissions = metadataPermissions;
-        this.facetsCache = buildFacetCache();
-        this.viewsCache = buildViewsCache();
+        this.facetsCache = buildCache(this::fetchFacets, config.caches.facets);
+        this.viewsCache = buildCache(this::fetchViews, config.caches.views);
         refreshCaches();
     }
 
     public void refreshCaches() {
         log.info("Caches refreshing/warming up has been triggered");
-        FilteredDatasetGraph.disableQuadPermissionCheck();
-        facetsCache.refresh(Boolean.TRUE);
-        viewsCache.refresh(Boolean.TRUE);
-        FilteredDatasetGraph.enableQuadPermissionCheck();
+        try {
+            FilteredDatasetGraph.disableQuadPermissionCheck();
+            facetsCache.refresh(Boolean.TRUE);
+            viewsCache.refresh(Boolean.TRUE);
+        } finally {
+            FilteredDatasetGraph.enableQuadPermissionCheck();
+        }
         log.info("Caches refreshing/warming up successfully finished");
     }
 
-    public List<FacetDTO> getCachedFacets() {
+    public List<FacetDTO> getFacets() {
+        if (!metadataPermissions.canReadFacets()) {
+            // this check is needed for cached data only as, otherwise,
+            // the check will be performed during retrieving data from Jena
+            throw new AccessDeniedException(USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS);
+        }
         try {
-            if (!metadataPermissions.canReadFacets()) {
-                throw new AccessDeniedException("User does not have permissions to read facets");
-            }
             return facetsCache.get(Boolean.TRUE);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<ViewDTO> getCachedViews() {
+    public List<ViewDTO> getViews() {
         try {
             return viewsCache.get(Boolean.TRUE);
         } catch (ExecutionException e) {
@@ -138,7 +146,8 @@ public class ViewService {
                 .map(v -> {
                     var columns = new ArrayList<ColumnDTO>();
 
-                    // The entity labal is the first column displayed, if you want a column before this label, assign a negative displayIndex value in views.yaml
+                    // The entity label is the first column displayed,
+                    // if you want a column before this label, assign a negative displayIndex value in views.yaml
                     final int ENTITY_LABEL_INDEX = 0;
 
                     columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, ENTITY_LABEL_INDEX));
@@ -163,18 +172,6 @@ public class ViewService {
                     return new ViewDTO(v.name, v.title, columns);
                 })
                 .collect(toList());
-    }
-
-    private LoadingCache<Boolean, List<ViewDTO>> buildViewsCache() {
-        return CacheBuilder.newBuilder()
-                .build(new CacheLoader<>() {
-                    @Override
-                    public List<ViewDTO> load(Boolean key) {
-                        var views = fetchViews();
-                        log.info("Views list has been cached, {} views in total", views.size());
-                        return views;
-                    }
-                });
     }
 
     protected List<FacetDTO> fetchFacets() {
@@ -254,18 +251,6 @@ public class ViewService {
         return new FacetDTO(view.name + "_" + column.name, column.title, column.type, values, booleanValue, min, max);
     }
 
-    private LoadingCache<Boolean, List<FacetDTO>> buildFacetCache() {
-        return CacheBuilder.newBuilder()
-                .build(new CacheLoader<>() {
-                    @Override
-                    public List<FacetDTO> load(Boolean key) {
-                        var facets = fetchFacets();
-                        log.info("Facets list has been cached, {} facets in total", facets.size());
-                        return facets;
-                    }
-                });
-    }
-
     private Object convertLiteralValue(Object value) {
         if (value instanceof XSDDateTime) {
             return ofEpochMilli(((XSDDateTime) value).asCalendar().getTimeInMillis());
@@ -281,6 +266,22 @@ public class ViewService {
         try (var reader = new ViewStoreReader(searchConfig, viewStoreClientFactory)) {
             return reader.aggregate(view.name, column.name);
         }
+    }
+
+    private <T> LoadingCache<Boolean, List<T>> buildCache(Supplier<List<T>> fetchSupplier, Config.CacheConfig cacheConfig) {
+        var cacheBuilder = CacheBuilder.newBuilder();
+        if (cacheConfig.autoRefreshEnabled) {
+            cacheBuilder.refreshAfterWrite(cacheConfig.refreshFrequencyInHours, TimeUnit.HOURS);
+        }
+        return cacheBuilder.build(new CacheLoader<>() {
+            @Override
+            public List<T> load(Boolean key) {
+                var cachedObjects = fetchSupplier.get();
+                log.info("List of {} has been cached, {} {} in total",
+                        cacheConfig.name, cachedObjects.size(), cacheConfig.name);
+                return cachedObjects;
+            }
+        });
     }
 
 }
