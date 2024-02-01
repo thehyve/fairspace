@@ -6,6 +6,7 @@ import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.util.Profiler;
 import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -344,7 +345,14 @@ public class ViewStoreReader implements AutoCloseable {
         }
 
         // retrieve view rows with fields from the view table only (not of the Set type)
-        var rowsById = getViewRowsForNonSetType(viewConfig, filters, offset, limit);
+        var rowsById = Profiler.profileAndExecute(() -> {
+                    try {
+                        return getViewRowsForNonSetType(viewConfig, filters, offset, limit);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+                "ViewStoreReader.getViewRowsForNonSetType()");
 
         // TODO: with materialized or normal view we can retrieve all data in one go adding one more join in the query above
         // retrieve view rows with fields from table only (of the Set type only)
@@ -354,7 +362,14 @@ public class ViewStoreReader implements AutoCloseable {
                 .map(column -> column.name)
                 .toList();
         if (!valueSetProperties.isEmpty()) {
-            var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, viewIds);
+            var viewRowsForSetType = Profiler.profileAndExecute(() -> {
+                        try {
+                            return getViewRowsForSetType(view, valueSetProperties, viewIds);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    "ViewStoreReader.getViewRowsForSetType()");
             // merge the data from the view (for instance, Study) table and related tables (for instance, Study_TreatmentId)
             viewRowsForSetType.forEach((key, value) -> rowsById.get(key).merge(value));
         }
@@ -541,20 +556,36 @@ public class ViewStoreReader implements AutoCloseable {
                 throw new IllegalArgumentException("View not supported: " + view);
             }
             // Fetch rows with columns from the view table
-            var rowsById = this.retrieveViewTableRows(view, filters, offset, limit);
+            var rowsById = Profiler.profileAndExecute(() -> {
+                        try {
+                            return this.retrieveViewTableRows(view, filters, offset, limit);
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    },
+                    "ViewStoreReader.retrieveViewTableRows()");
 
             // Add items from join tables
             if (includeJoinedViews) {
                 for (var joinView : viewConfig.join) {
-                    var allJoinTableRows = this.retrieveJoinTableRows(view, joinView, rowsById.keySet());
-                    rowsById.forEach((id, row) -> addJoinTableRowsForRow(row, allJoinTableRows.getRowsForId(id)));
+                    var allJoinTableRows = Profiler.profileAndExecute(() -> {
+                                try {
+                                    return this.retrieveJoinTableRows(view, joinView, rowsById.keySet());
+                                } catch (SQLException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            "ViewStoreReader.retrieveJoinTableRows()");
+                    Profiler.profileAndExecute(() -> rowsById.forEach((id, row) -> addJoinTableRowsForRow(row, allJoinTableRows.getRowsForId(id))),
+                            "ViewStoreReader.addJoinTableRowsForRow(FOR-LOOP)");
+                    ;
                 }
             }
             return rowsById.values().stream()
                     .map(ViewRow::getRawData)
                     .toList();
-        } catch (SQLException e) {
-            throw new QueryException("Error retrieving page rows", e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Error retrieving page rows", e);
         }
     }
 

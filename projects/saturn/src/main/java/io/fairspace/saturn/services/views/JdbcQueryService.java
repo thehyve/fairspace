@@ -4,6 +4,7 @@ import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.util.Profiler;
 import io.milton.resource.*;
 import lombok.*;
 import lombok.extern.log4j.Log4j2;
@@ -88,11 +89,14 @@ public class JdbcQueryService implements QueryService {
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
         try (var viewStoreReader = getViewStoreReader()) {
-            List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
-                    request.getView(), filters,
-                    (page - 1) * size,
-                    size + 1,
-                    request.includeJoinedViews()
+            List<Map<String, Set<ValueDTO>>> rows = Profiler.profileAndExecute(
+                    () -> viewStoreReader.retrieveRows(
+                            request.getView(), filters,
+                            (page - 1) * size,
+                            size + 1,
+                            request.includeJoinedViews()
+                    ),
+                    "ViewStoreReader.retrieveRows()"
             );
             var pageBuilder = ViewPageDTO.builder()
                     .rows(rows.subList(0, min(size, rows.size())))
