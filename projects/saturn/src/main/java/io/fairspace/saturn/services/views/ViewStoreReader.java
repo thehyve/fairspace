@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -60,16 +59,18 @@ public class ViewStoreReader implements AutoCloseable {
         this.connection = viewStoreClientFactory.getConnection();
     }
 
-    String label(String id) throws SQLException {
-        try (var query = connection.prepareStatement(
-                "select label from label where id = ?")) {
-            query.setString(1, id);
-            var result = query.executeQuery();
-            if (result.next()) {
-                return result.getString("label");
+    List<Object> getLabelsByIds(List<String> ids) throws SQLException {
+        String query = "select label from label where id = ANY(?::text[])";
+        try (var preparedStatement = connection.prepareStatement(query)) {
+            var array = preparedStatement.getConnection().createArrayOf("text", ids.toArray());
+            preparedStatement.setArray(1, array);
+            var result = preparedStatement.executeQuery();
+            var labels = new ArrayList<>();
+            while (result.next()) {
+                labels.add(result.getObject("label"));
             }
+            return labels;
         }
-        return null;
     }
 
     String iriForLabel(String type, String label) throws SQLException {
@@ -162,17 +163,8 @@ public class ViewStoreReader implements AutoCloseable {
                 continue;
             }
             if (EnumSet.of(ColumnType.Term, ColumnType.TermSet).contains(column.type)) {
-                var values = new ArrayList<>();
-                for (var value : filter.values) {
-                    var label = label(value.toString());
-                    if (label == null) {
-                        log.error("No label found for value " + value.toString());
-                        // throw new IllegalStateException("No label found for value " + value.toString());
-                        continue;
-                    }
-                    values.add(label);
-                }
-                filter.values = values;
+                var labelIds = filter.values.stream().map(Object::toString).toList();
+                filter.values = getLabelsByIds(labelIds);
             } else if (column.type == Date) {
                 if (filter.min != null) {
                     filter.min = Instant.parse(filter.min.toString());
