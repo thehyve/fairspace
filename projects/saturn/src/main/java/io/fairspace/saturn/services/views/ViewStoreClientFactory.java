@@ -73,8 +73,6 @@ public class ViewStoreClientFactory {
 
         dataSource = new HikariDataSource(databaseConfig);
 
-        materializedViewService = new MaterializedViewService(dataSource);
-
         try (var connection = dataSource.getConnection()) {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
         }
@@ -89,6 +87,7 @@ public class ViewStoreClientFactory {
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
+        materializedViewService = new MaterializedViewService(dataSource, configuration);
         materializedViewService.createOrUpdateAllMaterializedViews();
     }
 

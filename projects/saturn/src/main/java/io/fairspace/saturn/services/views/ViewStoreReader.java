@@ -395,7 +395,7 @@ public class ViewStoreReader implements AutoCloseable {
             throws SQLException {
 
         var columns = String.join(", ", valueSetProperties);
-        var query = "select %sid, %s from materialized_view_%s where %sid = ANY(?::text[])"
+        var query = "select %sid, %s from mv_%s where %sid = ANY(?::text[])"
                 .formatted(view, columns, view, view);
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -419,20 +419,21 @@ public class ViewStoreReader implements AutoCloseable {
             String view, View.JoinView joinView, Collection<String> ids) throws SQLException {
 
         var joinedTable = configuration.viewTables.get(joinView.view);
-        var joinTable = configuration.joinTables.get(view).get(joinView.view);
+        var viewIdColumn = idColumn(view).name;
+        var joinIdColumn = idColumn(joinView.view).name;
         var projectionColumns = Stream.concat(
-                        Stream.of("id", "label"),
-                        joinView.include.stream())
+                        Stream.of(joinView.view + "_id", joinView.view + "_label"),
+                        joinView.include.stream().map(i -> joinView.view + "_" + i))
                 .collect(Collectors.toSet());
 
         var rows = new ViewRowCollection();
 
         if (!ids.isEmpty()) {
-            try (var query = getJoinQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
+            try (var query = getJoinQuery(view,  joinedTable, ids);
                  var result = query.executeQuery()) {
                 while (result.next()) {
-                    var id = result.getString("rowid");
-                    var row = buildJoinRows(joinView, projectionColumns, result);
+                    var id = result.getString(viewIdColumn);
+                    var row = buildJoinRows(joinView, joinIdColumn, projectionColumns, result);
                     rows.add(id, row);
                 }
             }
@@ -441,63 +442,49 @@ public class ViewStoreReader implements AutoCloseable {
         return rows;
     }
 
-    private ViewRow buildJoinRows(View.JoinView joinView, Set<String> projectionColumns, ResultSet result) throws SQLException {
+    private ViewRow buildJoinRows(View.JoinView joinView, String joinViewId, Set<String> projectionColumns, ResultSet result) throws SQLException {
 
         var row = new ViewRow();
-        row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString("label"), result.getString("id"))));
+        row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString(joinView.view + "_label"), result.getString(joinViewId))));
 
         for (var column : projectionColumns) {
-            var columnName = joinView.view + "_" + column;
+//            var columnName = joinView.view + "_" + column;
             var columnDefinition = Optional
                     .ofNullable(configuration.viewTables.get(joinView.view).getColumn(column.toLowerCase()))
                     // to support Set/TermSet types which does not have column definition out of the views.yaml
                     // todo: find a better way to aggregate together set and non-set column types
                     .orElse(Table.ColumnDefinition.builder().name(column).build());
-            parseAndSetValueForColumn(result, columnDefinition, row, columnName);
+            parseAndSetValueForColumn(result, columnDefinition, row);
         }
         return row;
     }
 
-    private static void parseAndSetValueForColumn(ResultSet result, Table.ColumnDefinition columnDefinition, ViewRow row, String columnName) throws SQLException {
+    private static void parseAndSetValueForColumn(ResultSet result, Table.ColumnDefinition columnDefinition, ViewRow row) throws SQLException {
         if (columnDefinition.type == ColumnType.Number) {
             var value = result.getBigDecimal(columnDefinition.name);
             if (value != null) {
-                row.put(columnName, Sets.newHashSet(new ValueDTO(value.toString(), value)));
+                row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(value.toString(), value)));
             }
         } else if (columnDefinition.type == Date) {
             var value = result.getTimestamp(columnDefinition.name);
             if (value != null) {
-                row.put(columnName, Sets.newHashSet(new ValueDTO(value.toInstant().toString(), value.toString())));
+                row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(value.toInstant().toString(), value.toString())));
             }
         } else {
             var label = result.getString(columnDefinition.name);
-            row.put(columnName, Sets.newHashSet(new ValueDTO(label, label)));
+            row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(label, label)));
         }
     }
 
-    private PreparedStatement getJoinQuery(String view, View.JoinView joinView, Table joinedTable, Table joinTable,
-                                           Set<String> projectionColumns, Collection<String> ids) throws SQLException {
-        var columns = projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", "));
+    private PreparedStatement getJoinQuery(String view, Table joinedTable, Collection<String> ids) throws SQLException {
 
-        Function<String, String> queryBody = viewId -> {
-            var select = "(select " + columns + " , '" + viewId + "' AS rowid"
-                    + " from " + joinedTable.name + " j ";
-            var join = joinView.include.isEmpty()
-                    ? ""
-                    : " join materialized_view_" + joinedTable.name + "  jv on j.id = " + joinedTable.name + "id ";
-            var where = " where exists ("
-                    + "   select * from " + joinTable.name + " jt "
-                    + "   where jt." + idColumn(joinView.view).name + " = j.id"
-                    + "   and jt." + idColumn(view).name + " = '" + viewId + "'"
-                    + ") limit " + MAX_JOIN_ITEMS + ")";
+        var query = "select * from mv_%s_join_%s where %s = ANY(?::text[])"
+                        .formatted(view, joinedTable.name, idColumn(view).name);
 
-            return select + join + where;
-        };
-
-        var query = ids.stream()
-                .map(queryBody)
-                .collect(Collectors.joining(" UNION ALL "));
-        return connection.prepareStatement(query);
+        var ps = connection.prepareStatement(query);
+        var array = ps.getConnection().createArrayOf("text", ids.toArray());
+        ps.setArray(1, array);
+        return ps;
     }
 
     /**
