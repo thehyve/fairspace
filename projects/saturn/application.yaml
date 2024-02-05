@@ -59,6 +59,7 @@ viewDatabase:
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
+  maxJoinItems: 50
 caches:
   facets:
     name: "facets"

@@ -7,15 +7,16 @@ import java.util.Map;
 
 public class ViewRowCollection {
 
-    private final int MAX_JOIN_ITEMS = 50;
-    private Map<String, List<ViewRow>> data = new HashMap<>();
+    private final int maxJoinItems;
+    private final Map<String, List<ViewRow>> data = new HashMap<>();
 
-    public ViewRowCollection() {
+    public ViewRowCollection(int maxJoinItems) {
+        this.maxJoinItems = maxJoinItems;
     }
 
     public void add(String id, ViewRow row) {
         var value = data.computeIfAbsent(id, x -> new ArrayList<>());
-        if (value.size() <=MAX_JOIN_ITEMS) {
+        if (value.size() <= maxJoinItems) {
             value.add(row);
         }
     }

@@ -401,7 +401,7 @@ public class ViewStoreReader implements AutoCloseable {
                         joinView.include.stream().map(i -> joinView.view + "_" + i))
                 .collect(Collectors.toSet());
 
-        var rows = new ViewRowCollection();
+        var rows = new ViewRowCollection(searchConfig.maxJoinItems);
 
         if (!ids.isEmpty()) {
             try (var query = getJoinQuery(view, joinedTable, ids);
