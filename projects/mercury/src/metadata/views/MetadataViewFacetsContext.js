@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
-import MetadataViewAPI from "./MetadataViewAPI";
+import React, {useContext, useState} from 'react';
+import {MetadataViewAPI} from "./MetadataViewAPI";
+import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
 
 /**
  * This context provides a lazy-loaded data to the child objects.
@@ -7,7 +8,8 @@ import MetadataViewAPI from "./MetadataViewAPI";
  */
 const MetadataViewFacetsContext = React.createContext({});
 
-export const MetadataViewFacetsProvider = ({children, metadataViewApi = MetadataViewAPI}) => {
+export const MetadataViewFacetsProvider = ({children}) => {
+    const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
     const [data, setData] = useState({});
     const [facetsLoading, setFacetsLoading] = useState(true);
     const [facetsError, setFacetsError] = useState();
@@ -16,7 +18,7 @@ export const MetadataViewFacetsProvider = ({children, metadataViewApi = Metadata
     const initialLoad = () => {
         if (!requested) {
             setRequested(true);
-            metadataViewApi.getFacets()
+            (new MetadataViewAPI(metadataAPIPath)).getFacets()
                 .then(d => {
                     setData(d);
                     setFacetsError(undefined);

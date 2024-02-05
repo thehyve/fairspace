@@ -32,7 +32,7 @@ const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties)
     return (
         <MetadataAPIPathContext.Provider value={{path: source.path}}>
             <MetadataViewProvider metadataViewAPI={new MetadataViewAPI(source.path)} sourceName={source.name}>
-                <MetadataViewFacetsProvider metadataViewAPI={new MetadataViewAPI(source.path)}>
+                <MetadataViewFacetsProvider>
                     <VocabularyProvider>
                         <LinkedDataMetadataProvider>
                             <MetadataView
