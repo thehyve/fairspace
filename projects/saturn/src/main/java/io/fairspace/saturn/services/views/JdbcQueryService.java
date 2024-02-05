@@ -1,21 +1,26 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.util.Profiler;
-import io.milton.resource.*;
-import lombok.*;
+import io.milton.resource.CollectionResource;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import java.net.*;
-import java.nio.charset.*;
-import java.sql.*;
-import java.util.*;
-import java.util.stream.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import static java.lang.Integer.*;
+import static java.lang.Integer.min;
 
 /**
  * JDBC implementation of the query service. Depends on the
@@ -89,15 +94,11 @@ public class JdbcQueryService implements QueryService {
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
         try (var viewStoreReader = getViewStoreReader()) {
-            List<Map<String, Set<ValueDTO>>> rows = Profiler.profileAndExecute(
-                    () -> viewStoreReader.retrieveRows(
-                            request.getView(), filters,
-                            (page - 1) * size,
-                            size + 1,
-                            request.includeJoinedViews()
-                    ),
-                    "ViewStoreReader.retrieveRows()"
-            );
+            List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
+                    request.getView(), filters,
+                    (page - 1) * size,
+                    size + 1,
+                    request.includeJoinedViews());
             var pageBuilder = ViewPageDTO.builder()
                     .rows(rows.subList(0, min(size, rows.size())))
                     .hasNext(rows.size() > size);

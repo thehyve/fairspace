@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.views;
 
 import io.fairspace.saturn.services.BaseApp;
-import io.fairspace.saturn.util.Profiler;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
@@ -29,10 +28,7 @@ public class ViewApp extends BaseApp {
 
         post("/", (req, res) -> {
             var requestBody = mapper.readValue(req.body(), ViewRequest.class);
-            log.info("{} view request processing STARTED", requestBody.getView());
-            var result = Profiler.profileAndExecute(() -> queryService.retrieveViewPage(requestBody), "QueryService.retrieveViewPage()");
-            log.info("{} view request processing FINISHED", requestBody.getView());
-            log.info("============================================================");
+            var result = queryService.retrieveViewPage(requestBody);
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
         });
