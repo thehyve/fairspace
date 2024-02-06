@@ -51,6 +51,25 @@ export function handleHttpError(defaultMessage) {
     };
 }
 
+export function handleRemoteSourceHttpError(defaultMessage) {
+    return (e: Error | AxiosError) => {
+        if (e && axios.isCancel(e)) {
+            return;
+        }
+        if (!e || !e.response) {
+            throw Error(defaultMessage);
+        }
+        const {response: {status, data}} = e;
+        if (status === 400 && data) {
+            if (typeof data === 'string') {
+                throw Error(data);
+            }
+            throw data;
+        }
+        throw Error(defaultMessage);
+    };
+}
+
 /**
  * This function will extract the data property of the axios response if the content-type in the headers contains 'json'
  * otherwise it will throw an error

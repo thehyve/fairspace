@@ -33,7 +33,7 @@ type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
 }
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
-    const {externalStorages, match, location, history, classes = {}} = props;
+    const {externalStorages = [], match, location, history, classes = {}} = props;
 
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
     const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
