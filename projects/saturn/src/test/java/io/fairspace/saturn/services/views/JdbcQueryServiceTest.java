@@ -120,7 +120,7 @@ public class JdbcQueryServiceTest {
         selectAdmin();
 
         var taxonomies = model.read("test-taxonomies.ttl");
-        api.put(taxonomies);
+        api.put(taxonomies, Boolean.TRUE);
 
         var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
@@ -143,7 +143,7 @@ public class JdbcQueryServiceTest {
         coll3.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
 
         var testdata = model.read("testdata.ttl");
-        api.put(testdata);
+        api.put(testdata, Boolean.TRUE);
     }
 
     @Test

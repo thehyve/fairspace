@@ -1,24 +1,36 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.*;
-import io.fairspace.saturn.vocabulary.*;
-import lombok.extern.slf4j.*;
-import org.apache.commons.lang3.tuple.*;
-import org.apache.jena.graph.*;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.vocabulary.FS;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
-import org.apache.jena.sparql.core.*;
-import org.apache.jena.vocabulary.*;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 
-import java.net.*;
-import java.nio.charset.*;
-import java.sql.*;
-import java.time.*;
-import java.util.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.atomic.*;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
@@ -31,11 +43,13 @@ public class ViewUpdater implements AutoCloseable {
     private final ViewStoreClient viewStoreClient;
     private final DatasetGraph dsg;
     private final Graph graph;
+    private final MaterializedViewService materializedViewService;
 
-    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg) {
+    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg, MaterializedViewService materializedViewService) {
         this.viewStoreClient = viewStoreClient;
         this.dsg = dsg;
         this.graph = dsg.getDefaultGraph();
+        this.materializedViewService = materializedViewService;
     }
 
     @Override
@@ -45,6 +59,7 @@ public class ViewUpdater implements AutoCloseable {
 
     public void commit() throws SQLException {
         viewStoreClient.commit();
+        CompletableFuture.runAsync(materializedViewService::createOrUpdateAllMaterializedViews);
     }
 
     private List<Node> retrieveValues(Graph graph, Node subject, String source) {

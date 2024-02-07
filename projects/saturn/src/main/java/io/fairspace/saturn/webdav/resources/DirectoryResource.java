@@ -342,7 +342,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
 
         MetadataService metadataService = factory.context.get(METADATA_SERVICE);
         try {
-            metadataService.patch(model);
+            metadataService.patch(model, Boolean.TRUE);
         } catch (ValidationException e) {
             var message = new StringBuilder("Validation of the uploaded metadata failed.\n");
             var n = 0;

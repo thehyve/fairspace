@@ -23,10 +23,15 @@ public class MaterializedViewService {
         this.configuration = configuration;
     }
 
-    public void createOrUpdateAllMaterializedViews() throws SQLException {
-        for (var view : VIEWS_CONFIG.views) {
-            createOrUpdateViewMaterializedView(view);
-            createOrUpdateJoinMaterializedView(view);
+    public void createOrUpdateAllMaterializedViews() {
+        try {
+            for (var view : VIEWS_CONFIG.views) {
+                createOrUpdateViewMaterializedView(view);
+                createOrUpdateJoinMaterializedView(view);
+            }
+        } catch (SQLException e) {
+            log.error("Materialized view update failed", e);
+            throw new RuntimeException(e);
         }
     }
 

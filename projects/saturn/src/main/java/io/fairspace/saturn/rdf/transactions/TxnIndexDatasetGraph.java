@@ -1,17 +1,22 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.rdf.*;
-import io.fairspace.saturn.services.views.*;
-import lombok.*;
-import lombok.extern.slf4j.*;
+import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
+import io.fairspace.saturn.services.views.ViewStoreClientFactory;
+import io.fairspace.saturn.services.views.ViewUpdater;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.*;
-import org.apache.jena.sparql.core.*;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.query.TxnType;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.QuadAction;
 
 import java.util.Date;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.services.users.UserService.currentUserAsSymbol;
 
 @Slf4j
 public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
@@ -57,18 +62,24 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
             if (isExtraStorageTransaction()) {
                 updatedSubjects.clear();
             } else {
-                log.debug("Commit updated subjects: {}", updatedSubjects);
-                var start = new Date().getTime();
-                try (var viewStoreClient = viewStoreClientFactory.build();
-                     var viewUpdater = new ViewUpdater(viewStoreClient, dsg)) {
-                    updatedSubjects.forEach(viewUpdater::updateSubject);
-                    viewUpdater.commit();
-                    log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);
-                } catch (Exception e) {
-                    log.error("Updating {} subjects failed after {}ms", updatedSubjects.size(), new Date().getTime() - start, e);
-                    throw e;
-                } finally {
-                    updatedSubjects.clear();
+                var sessionKey = currentUserAsSymbol();
+                var doViewsUpdate = dsg.getContext().get(sessionKey, Boolean.TRUE); // true by default, should be set explicitly to switch it off
+                if (doViewsUpdate) {
+                    log.debug("Commit updated subjects: {}", updatedSubjects);
+                    var start = new Date().getTime();
+                    try (var viewStoreClient = viewStoreClientFactory.build();
+                         var viewUpdater = new ViewUpdater(viewStoreClient, dsg, viewStoreClientFactory.getMaterializedViewService())) {
+                        updatedSubjects.forEach(viewUpdater::updateSubject);
+                        viewUpdater.commit();
+                        log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);
+                    } catch (Exception e) {
+                        log.error("Updating {} subjects failed after {}ms", updatedSubjects.size(), new Date().getTime() - start, e);
+                        throw e;
+                    } finally {
+                        updatedSubjects.clear();
+                    }
+                } else {
+                    log.debug("Skipping views update");
                 }
             }
         }

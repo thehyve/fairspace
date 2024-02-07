@@ -26,8 +26,15 @@ import static io.fairspace.saturn.vocabulary.FS.NS;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -81,7 +88,7 @@ public class MetadataServiceTest {
     public void testPutWillAddStatements() {
         var delta = modelOf(STMT1, STMT2);
 
-        api.put(delta);
+        api.put(delta, Boolean.FALSE);
 
         assertTrue(api.get(S1.getURI(), false).contains(STMT1));
         assertTrue(api.get(S2.getURI(), false).contains(STMT2));
@@ -90,7 +97,7 @@ public class MetadataServiceTest {
     @Test
     public void testPutHandlesLifecycleForEntities() {
         var delta = modelOf(STMT1);
-        api.put(delta);
+        api.put(delta, Boolean.FALSE);
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.createdBy));
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateCreated));
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.modifiedBy));
@@ -107,7 +114,7 @@ public class MetadataServiceTest {
 
         // Put new statements
         var delta = modelOf(STMT1, STMT2);
-        api.put(delta);
+        api.put(delta, Boolean.FALSE);
 
         // Now ensure that the existing triples are still there
         // and the new ones are added
@@ -123,7 +130,7 @@ public class MetadataServiceTest {
     public void deleteModel() {
         txn.executeWrite(m -> m.add(STMT1).add(STMT2));
 
-        api.delete(modelOf(STMT1));
+        api.delete(modelOf(STMT1), Boolean.FALSE);
 
         txn.executeRead(m -> {
             assertFalse(m.contains(STMT1));
@@ -139,7 +146,7 @@ public class MetadataServiceTest {
         Statement newStmt2 = createStatement(S2, P1, S1);
         Statement newStmt3 = createStatement(S1, P2, S3);
 
-        api.patch(modelOf(newStmt1, newStmt2, newStmt3));
+        api.patch(modelOf(newStmt1, newStmt2, newStmt3), Boolean.FALSE);
 
         txn.executeRead(m -> {
             assertTrue(m.contains(newStmt1));
@@ -154,7 +161,7 @@ public class MetadataServiceTest {
     public void patchWithNil() {
         txn.executeWrite(m -> m.add(S1, P1, S2).add(S1, P1, S3));
 
-        api.patch(createDefaultModel().add(S1, P1, FS.nil));
+        api.patch(createDefaultModel().add(S1, P1, FS.nil), Boolean.FALSE);
 
         assertFalse(txn.calculateRead(m -> m.contains(S1, P1)));
     }
@@ -164,11 +171,11 @@ public class MetadataServiceTest {
         api.put(modelOf(
                 createStatement(S1, RDF.type, FS.Workspace),
                 createStatement(S1, RDFS.label, createStringLiteral("Test 1"))
-        ));
+        ), Boolean.FALSE);
         api.put(modelOf(
                 createStatement(S2, RDF.type, FS.Workspace),
                 createStatement(S2, RDFS.label, createStringLiteral("Test 2"))
-        ));
+        ), Boolean.FALSE);
     }
 
     @Test(expected = ValidationException.class)
@@ -176,11 +183,11 @@ public class MetadataServiceTest {
         api.put(modelOf(
                 createStatement(S1, RDF.type, FS.Workspace),
                 createStatement(S1, RDFS.label, createStringLiteral("Test"))
-                ));
+                ), Boolean.FALSE);
         api.put(modelOf(
                 createStatement(S2, RDF.type, FS.Workspace),
                 createStatement(S2, RDFS.label, createStringLiteral("Test"))
-        ));
+        ), Boolean.FALSE);
     }
 
     @Test(expected = ValidationException.class)
@@ -192,7 +199,7 @@ public class MetadataServiceTest {
                 .add(S2, RDFS.label, "Test 2")
         );
 
-        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral("Test 2 "))));
+        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral("Test 2 "))), Boolean.FALSE);
     }
 
     @Test(expected = ValidationException.class)
@@ -204,7 +211,7 @@ public class MetadataServiceTest {
                 .add(S2, RDFS.label, "Test 2")
         );
 
-        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral(" Test 2  "))));
+        api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral(" Test 2  "))), Boolean.FALSE);
     }
 
     @Test
@@ -212,11 +219,11 @@ public class MetadataServiceTest {
         api.put(modelOf(
                 createStatement(S1, RDF.type, FS.Workspace),
                 createStatement(S1, RDFS.label, createStringLiteral("Test"))
-        ));
+        ), Boolean.FALSE);
         api.put(modelOf(
                 createStatement(S2, RDF.type, createResource(NS + "Sample")),
                 createStatement(S2, RDFS.label, createStringLiteral("Test"))
-        ));
+        ), Boolean.FALSE);
     }
 
     @Test
@@ -224,7 +231,7 @@ public class MetadataServiceTest {
         api.put(modelOf(
                 createStatement(S1, RDF.type, FS.Workspace),
                 createStatement(S1, RDFS.label, createStringLiteral(" Label with whitespace  "))
-        ));
+        ), Boolean.FALSE);
         assertNotEquals(" Label with whitespace  ", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
         assertEquals("Label with whitespace", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
     }
@@ -233,7 +240,7 @@ public class MetadataServiceTest {
     public void patchLabelTrimmed() {
         txn.executeWrite(m -> m.add(S1, RDFS.label, createStringLiteral("Label 1")));
 
-        api.patch(createDefaultModel().add(S1, RDFS.label, createStringLiteral("Label 2 ")));
+        api.patch(createDefaultModel().add(S1, RDFS.label, createStringLiteral("Label 2 ")), Boolean.FALSE);
 
         assertEquals("Label 2", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
     }
@@ -241,7 +248,7 @@ public class MetadataServiceTest {
     @Test
     public void testPatchHandlesLifecycleForEntities() {
         var delta = modelOf(STMT1);
-        api.patch(delta);
+        api.patch(delta, Boolean.FALSE);
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.modifiedBy));
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateModified));
     }

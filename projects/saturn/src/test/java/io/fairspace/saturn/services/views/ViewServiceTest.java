@@ -186,7 +186,7 @@ public class ViewServiceTest {
         var request = getCurrentRequest();
 
         var taxonomies = model.read("test-taxonomies.ttl");
-        api.put(taxonomies);
+        api.put(taxonomies, Boolean.TRUE);
 
         User user = createTestUser("user", true);
         Authentication.User userAuthentication = mockAuthentication("admin");
@@ -203,6 +203,6 @@ public class ViewServiceTest {
         coll1.createNew("coffee.jpg", null, 0L, "image/jpeg");
 
         var testdata = model.read("testdata.ttl");
-        api.put(testdata);
+        api.put(testdata, Boolean.TRUE);
     }
 }
