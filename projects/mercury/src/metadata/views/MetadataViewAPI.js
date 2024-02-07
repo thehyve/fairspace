@@ -78,6 +78,7 @@ type MetadataViewDataRequest = MetadataViewCountRequest & {|
 |};
 
 const defaultRequestOptions = {
+    withCredentials: true,
     headers: {Accept: 'application/json'}
 };
 
