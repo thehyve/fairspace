@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import axios, {CancelTokenSource} from "axios";
-import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
+import {extractJsonData, handleHttpError, handleRemoteSourceHttpError} from "../../common/utils/httpUtils";
 import type {AccessLevel} from "../../collections/CollectionAPI";
 import FileAPI from "../../file/FileAPI";
 
@@ -84,18 +84,26 @@ const defaultRequestOptions = {
 export class MetadataViewAPI {
     constructor(remoteURLPrefix = "/api") {
         this.remoteURL = remoteURLPrefix + "/views";
+        this.isExternalSource = (remoteURLPrefix !== "/api");
+    }
+
+    handleMetadataViewHttpError(message: string) {
+        if (this.isExternalSource) {
+            return handleRemoteSourceHttpError(message);
+        }
+        return handleHttpError("Failure when retrieving metadata views.");
     }
 
     getViews(): Promise<MetadataViews> {
         return axios.get(`${this.remoteURL}/`, defaultRequestOptions)
             .then(extractJsonData)
-            .catch(handleHttpError("Failure when retrieving metadata views."));
+            .catch(this.handleMetadataViewHttpError("Failure when retrieving metadata views."));
     }
 
     getFacets(): Promise<MetadataFacets> {
         return axios.get(`${this.remoteURL}/facets`, defaultRequestOptions)
             .then(extractJsonData)
-            .catch(handleHttpError("Failure when retrieving metadata facets."));
+            .catch(this.handleMetadataViewHttpError("Failure when retrieving metadata facets."));
     }
 
     getViewData(cancelToken: CancelTokenSource, viewName: string, page, size, filters: MetadataViewFilter[] = []): Promise<MetadataViewData> {
@@ -110,7 +118,7 @@ export class MetadataViewAPI {
 
         return axios.post(`${this.remoteURL}/`, viewRequest, requestOptions)
             .then(extractJsonData)
-            .catch(handleHttpError("Error while fetching view data."));
+            .catch(this.handleMetadataViewHttpError("Error while fetching view data."));
     }
 
     getCount(cancelToken: CancelTokenSource, viewName: string, filters: MetadataViewFilter[] = []): Promise<MetadataViewDataCount> {
