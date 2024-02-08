@@ -27,6 +27,7 @@ public class SessionConfiguration {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName(plutoConfig.getSessionCookieName());
         serializer.setCookiePath("/");
+        serializer.setSameSite("None");
 
         serializer.setDomainNamePattern("^([a-zA-Z0-9\\.-]+)$");
         return serializer;

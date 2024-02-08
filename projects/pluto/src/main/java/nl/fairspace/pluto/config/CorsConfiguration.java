@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 public class CorsConfiguration extends org.springframework.web.cors.CorsConfiguration {
 
@@ -21,8 +23,8 @@ public class CorsConfiguration extends org.springframework.web.cors.CorsConfigur
         corsConfiguration.setAllowCredentials(true);
 
         corsConfiguration.setAllowedOrigins(plutoConfig.getDomains());
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowedMethods(List.of("*"));
+        corsConfiguration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
