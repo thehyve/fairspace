@@ -8,7 +8,6 @@ import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
 axios.defaults.headers.common['X-Requested-With'] = "XMLHttpRequest";
-axios.defaults.withCredentials = true;
 
 const container = document.getElementById('root');
 const root = createRoot(container);
