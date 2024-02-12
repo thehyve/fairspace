@@ -4,6 +4,7 @@ import {Redirect, Route, Switch} from "react-router-dom";
 import * as queryString from 'query-string';
 import WorkspaceOverview from "../workspaces/WorkspaceOverview";
 import Collections from "../collections/CollectionsPage";
+import Dashboard from "../dashboard/DashboardPage";
 import FilesPage from "../file/FilesPage";
 import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
@@ -34,6 +35,14 @@ const WorkspaceRoutes = () => {
             <Route path="/workspaces" exact component={WorkspacesPage} />
 
             <Route path="/workspace" exact component={WorkspaceOverview} />
+
+            <Route
+                path="/dashboard"
+                exact
+                render={() => (
+                    <Dashboard />
+                )}
+            />
 
             <Route
                 path="/collections"
@@ -120,7 +129,7 @@ const WorkspaceRoutes = () => {
                 render={() => (isAdmin(currentUser) && (<UserRolesPage />))}
             />
 
-            <Redirect to="/workspaces" />
+            <Redirect to="/dashboard" />
         </Switch>
     );
 };

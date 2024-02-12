@@ -11,6 +11,7 @@ import {
     VerifiedUser,
     Widgets
 } from "@mui/icons-material";
+import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
@@ -19,7 +20,7 @@ import ExternalStoragesContext from "../external-storage/ExternalStoragesContext
 import ExternalMetadataSourceContext from "../metadata/external-sources/ExternalMetadataSourceContext";
 import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
 import {getExternalMetadataSourcePathPrefix} from "../metadata/external-sources/externalMetadataSourceUtils";
-import {METADATA_VIEW_MENU_LABEL} from "../constants";
+import {APPLICATION_NAME, METADATA_VIEW_MENU_LABEL} from "../constants";
 
 const styles = {
     mainMenuButton: {
@@ -39,6 +40,17 @@ const MainMenu = ({classes}) => {
     return (
         <>
             <List>
+                <ListItemButton
+                    className={classes.mainMenuButton}
+                    component={NavLink}
+                    to="/dashboard"
+                    selected={pathname.startsWith('/dashboard')}
+                >
+                    <ListItemIcon>
+                        <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={APPLICATION_NAME} />
+                </ListItemButton>
                 <ListItemButton
                     className={classes.mainMenuButton}
                     component={NavLink}

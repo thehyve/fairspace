@@ -1,0 +1,77 @@
+/* eslint-disable */
+import React, {useContext} from "react";
+
+import withStyles from "@mui/styles/withStyles";
+import {APPLICATION_NAME, METADATA_VIEW_MENU_LABEL} from "../constants";
+import BreadCrumbs from "../common/components/BreadCrumbs";
+import styles from "./DashboardPage.styles";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
+import ExternalMetadataSourceContext from "../metadata/external-sources/ExternalMetadataSourceContext";
+import UserContext from "../users/UserContext";
+import {Grid, Link, Typography} from "@mui/material";
+import DomainInfo from "./DomainInfo";
+
+const DashboardPage = (props) => {
+    const {currentUser, classes} = props;
+    const {views} = useContext(MetadataViewContext);
+    const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
+    const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
+
+    return (
+        <Grid container justifyContent="center" spacing="5">
+            {<BreadCrumbs />}
+            <div className={classes.mainPage}>
+                <Grid container justifyContent="center" spacing="5">
+                    <Grid container justifyContent="center" spacing="5">
+                        <Typography variant="h3" paragraph={true}>
+                            {APPLICATION_NAME}
+                        </Typography>
+                    </Grid>
+                    <Grid container justifyContent="center" spacing="5" className={classes.header}>
+                        <Typography variant="h5" paragraph={true}>
+                            research data management
+                        </Typography>
+                    </Grid>
+                    <Grid container justifyContent="left" spacing="5">
+                    <Grid item xs={6} md={4}>
+                        <Typography variant="body1" paragraph={true}>
+                            {APPLICATION_NAME} contains your research metadata. Click on one of the domains and start exploring.
+                        </Typography>
+                        <Typography variant="body1" paragraph={true}>
+                                For more details on how to use Fairspace, please refer to the{" "}
+                                <Link href="https://docs.fairway.app/">
+                                    user manual
+                                </Link>
+                                , for example on how to query the API.
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={6} md={8}>
+                        <Grid container justifyContent="center" spacing={1}>
+                            {canViewMetadata && (
+                                <DomainInfo
+                                    domainName={METADATA_VIEW_MENU_LABEL}
+                                    domainLink="/metadata-views"
+                                />)
+                            }
+                            {canViewMetadata && externalMetadataSources.map((source) => (
+                                    <DomainInfo
+                                        domainName={source.label}
+                                        domainLink={source.name}
+                                    />
+                                ))}
+                        </Grid>
+                    </Grid>
+                    </Grid>
+                </Grid>
+            </div>
+        </Grid>
+    );
+};
+
+const ContextualDashboardPage = (props) => {
+    const {currentUser} = useContext(UserContext);
+
+    return <DashboardPage currentUser={currentUser} {...props} />;
+};
+
+export default withStyles(styles)(ContextualDashboardPage);
