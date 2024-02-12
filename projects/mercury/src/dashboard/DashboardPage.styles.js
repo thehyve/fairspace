@@ -7,7 +7,6 @@ const styles = (theme) => ({
         padding: 20,
     },
     header: {
-        // bottom border black
         borderBottom: '2px solid ' + theme.palette.primary.main,
         marginBottom: 50,
     }
