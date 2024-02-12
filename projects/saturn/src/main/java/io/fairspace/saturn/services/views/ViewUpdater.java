@@ -59,7 +59,7 @@ public class ViewUpdater implements AutoCloseable {
 
     public void commit() throws SQLException {
         viewStoreClient.commit();
-        CompletableFuture.runAsync(materializedViewService::createOrUpdateAllMaterializedViews);
+        materializedViewService.createOrUpdateAllMaterializedViews();
     }
 
     private List<Node> retrieveValues(Graph graph, Node subject, String source) {

@@ -4,14 +4,17 @@ import io.fairspace.saturn.config.ViewsConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 
 @Slf4j
-public class MaterializedViewService {
+public class MaterializedViewService  {
 
     public static final String INDEX_POSTFIX = "_idx";
     private final DataSource dataSource;
@@ -24,10 +27,10 @@ public class MaterializedViewService {
     }
 
     public void createOrUpdateAllMaterializedViews() {
-        try {
+        try (var connection = dataSource.getConnection()) {
             for (var view : VIEWS_CONFIG.views) {
-                createOrUpdateViewMaterializedView(view);
-                createOrUpdateJoinMaterializedView(view);
+                createOrUpdateViewMaterializedView(view, connection);
+                createOrUpdateJoinMaterializedView(view, connection);
             }
         } catch (SQLException e) {
             log.error("Materialized view update failed", e);
@@ -35,55 +38,42 @@ public class MaterializedViewService {
         }
     }
 
-    public void createOrUpdateViewMaterializedView(ViewsConfig.View view) throws SQLException {
+    public void createOrUpdateViewMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
         var setColumns = view.columns.stream().filter(column -> column.type.isSet()).toList();
         if (!setColumns.isEmpty()) {
             String viewName = view.name.toLowerCase();
             var mvName = "mv_%s".formatted(viewName);
             log.info("{} refresh has started", mvName);
-            dropMaterializedViewIfExists(mvName);
-            dropMaterializedViewIfExists("materialized_view_%s".formatted(viewName)); // to be removed, needed to remove old once after renaming
-            createViewMaterializedView(mvName, view, setColumns);
-            alterOwnerToFairspace(mvName);
-            createMaterializedViewIndex(viewName + INDEX_POSTFIX, mvName, viewName + "id");
+            dropMaterializedViewIfExists(mvName, connection);
+            createViewMaterializedView(mvName, view, setColumns, connection);
+            createMaterializedViewIndex(viewName + INDEX_POSTFIX, mvName, viewName + "id", connection);
             log.info("{} refresh has finished successfully", mvName);
         }
     }
 
-    public void createOrUpdateJoinMaterializedView(ViewsConfig.View view) throws SQLException {
+    public void createOrUpdateJoinMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
         for (ViewsConfig.View.JoinView joinView : view.join) {
             String viewName = view.name.toLowerCase();
             String joinViewName = joinView.view.toLowerCase();
             var mvName = "mv_%s_join_%s".formatted(viewName, joinViewName);
             log.info("{} refresh has started", mvName);
-            dropMaterializedViewIfExists(mvName);
-            createJoinMaterializedViews(view.name, joinView);
-            alterOwnerToFairspace(mvName);
-            createMaterializedViewIndex(mvName + "_" + viewName + INDEX_POSTFIX, mvName, viewName + "_id");
-            createMaterializedViewIndex(mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id");
+            dropMaterializedViewIfExists(mvName, connection);
+            createJoinMaterializedViews(view.name, joinView, connection);
+            createMaterializedViewIndex(mvName + "_" + viewName + INDEX_POSTFIX, mvName, viewName + "_id", connection);
+            createMaterializedViewIndex(mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id", connection);
             log.info("{} refresh has finished successfully", mvName);
         }
     }
 
-    private void createMaterializedViewIndex(String indexName, String materializedViewName, String columnName) throws SQLException {
+    private void createMaterializedViewIndex(String indexName, String materializedViewName, String columnName, Connection connection) throws SQLException {
         var query = "CREATE INDEX %s on %s (%s)".formatted(indexName, materializedViewName, columnName);
-        try (var connection = dataSource.getConnection();
-             var ps = connection.prepareStatement(query)) {
+        try (var ps = connection.prepareStatement(query)) {
             ps.execute();
             connection.commit();
         }
     }
 
-    private void alterOwnerToFairspace(String viewOrTableName) throws SQLException {
-        var query = "ALTER MATERIALIZED VIEW %s OWNER TO fairspace".formatted(viewOrTableName);
-        try (var connection = dataSource.getConnection();
-             var ps = connection.prepareStatement(query)) {
-            ps.execute();
-            connection.commit();
-        }
-    }
-
-    private void createViewMaterializedView(String viewOrTableName, ViewsConfig.View view, List<ViewsConfig.View.Column> setColumns) throws SQLException {
+    private void createViewMaterializedView(String viewOrTableName, ViewsConfig.View view, List<ViewsConfig.View.Column> setColumns, Connection connection) throws SQLException {
         String viewName = view.name.toLowerCase();
         var queryBuilder = new StringBuilder()
                 .append("CREATE MATERIALIZED VIEW ").append(viewOrTableName).append(" AS ")
@@ -102,14 +92,13 @@ public class MaterializedViewService {
                     .append("v.id = ").append(alias).append(".").append(viewName).append("_id ");
         }
 
-        try (var connection = dataSource.getConnection();
-             var ps = connection.prepareStatement(queryBuilder.toString())) {
+        try (var ps = connection.prepareStatement(queryBuilder.toString())) {
             ps.execute();
             connection.commit();
         }
     }
 
-    private void createJoinMaterializedViews(String viewName, ViewsConfig.View.JoinView joinView) throws SQLException {
+    private void createJoinMaterializedViews(String viewName, ViewsConfig.View.JoinView joinView, Connection connection) throws SQLException {
         var viewTableName = viewName.toLowerCase();
         var joinTable = configuration.joinTables.get(joinView.view).get(viewName).name;
         var joinedTable = configuration.viewTables.get(joinView.view).name.toLowerCase();
@@ -124,6 +113,15 @@ public class MaterializedViewService {
 
         var columns = new ArrayList<>(List.of(viewIdColumn, joinIdColumn, joinLabelColumn));
 
+        var tableAliases = new HashMap<String, String>();
+        for (int i = 0; i < joinView.include.size(); i++) {
+            var attr = joinView.include.get(i);
+            if ("id".equalsIgnoreCase(attr)) {
+                continue;
+            }
+            var isOfSetType = configuration.propertyTables.getOrDefault(joinView.view, Map.of()).containsKey(attr);
+            tableAliases.put(joinedTable + "_" + attr.toLowerCase(), isOfSetType ? "jt_" + (i + 1) : "jt_0");
+        }
         for (int i = 0; i < joinView.include.size(); i++) {
             var attr = joinView.include.get(i).toLowerCase();
             if ("id".equalsIgnoreCase(attr)) {
@@ -131,13 +129,13 @@ public class MaterializedViewService {
             }
             var columnName = joinedTable + "_" + attr;
             queryBuilder
-                    .append("jt_").append(i + 1).append(".").append(attr).append(" AS ").append(columnName).append(", ");
+                    .append(tableAliases.get(columnName)).append(".").append(attr).append(" AS ").append(columnName).append(", ");
             columns.add(columnName);
         }
 
         queryBuilder
                 .append("row_number() over (partition by v.id) as rn ")
-                .append("FROM ").append(viewTableName).append(" v ");
+                .append("from ").append(viewTableName).append(" v ");
 
         queryBuilder
                 .append("left join ").append(joinTable).append(" jt on v.id = jt.").append(viewTableName).append("_id ")
@@ -145,15 +143,14 @@ public class MaterializedViewService {
 
 
         for (int i = 0; i < joinView.include.size(); i++) {
-            var attr = joinView.include.get(i).toLowerCase();
-            if ("id".equalsIgnoreCase(attr)) {
+            var attr = joinView.include.get(i);
+            var isOfSetType = configuration.propertyTables.getOrDefault(joinView.view, Map.of()).containsKey(attr);
+            if (!isOfSetType) {
                 continue;
             }
+            var columnName = joinedTable + "_" + attr.toLowerCase();
             queryBuilder
-                    .append("left join ").append(joinedTable).append("_").append(attr).append(" jt_").append(i + 1).append(" on ").append("jt.").append(joinedTable).append("_id = ").append("jt_").append(i + 1).append(".").append(joinedTable).append("_id ");
-            if (i != joinView.include.size() - 1) {
-                queryBuilder.append(", ");
-            }
+                    .append("left join ").append(columnName).append(" ").append(tableAliases.get(columnName)).append(" on ").append("jt.").append(joinedTable).append("_id = ").append(tableAliases.get(columnName)).append(".").append(joinedTable).append("_id ");
         }
 
         queryBuilder
@@ -163,17 +160,15 @@ public class MaterializedViewService {
                 .append("select ").append(String.join(", ", columns))
                 .append(" from numbered_rows where rn <= ").append("50");
 
-        try (var connection = dataSource.getConnection();
-             var ps = connection.prepareStatement(queryBuilder.toString())) {
+        try (var ps = connection.prepareStatement(queryBuilder.toString())) {
             ps.execute();
             connection.commit();
         }
     }
 
-    private void dropMaterializedViewIfExists(String viewName) throws SQLException {
+    private void dropMaterializedViewIfExists(String viewName, Connection connection) throws SQLException {
         var query = "DROP MATERIALIZED VIEW IF EXISTS %s CASCADE".formatted(viewName);
-        try (var connection = dataSource.getConnection();
-             var ps = connection.prepareStatement(query)) {
+        try (var ps = connection.prepareStatement(query)) {
             ps.execute();
             connection.commit();
         }
