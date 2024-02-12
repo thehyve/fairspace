@@ -38,11 +38,10 @@ const DashboardPage = (props) => {
                             {APPLICATION_NAME} contains your research metadata. Click on one of the domains and start exploring.
                         </Typography>
                         <Typography variant="body1" paragraph={true}>
-                                For more details on how to use Fairspace, please refer to the{" "}
+                            For more details on how to use Fairspace, e.g. how to query the API, please refer the {" "}
                                 <Link href="https://docs.fairway.app/">
                                     user manual
-                                </Link>
-                                , for example on how to query the API.
+                                </Link>.
                         </Typography>
                     </Grid>
                     <Grid item xs={6} md={8}>
