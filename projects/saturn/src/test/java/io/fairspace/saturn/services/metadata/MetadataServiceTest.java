@@ -5,6 +5,7 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -18,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
@@ -36,6 +38,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,6 +54,7 @@ public class MetadataServiceTest {
 
     private Dataset ds = createTxnMem();
 
+    @Spy
     private Transactions txn = new SimpleTransactions(ds);
     private MetadataService api;
     @Mock
@@ -127,6 +131,19 @@ public class MetadataServiceTest {
     }
 
     @Test
+    public void testViewUpdateSetToFalseOnPut() {
+        // given
+        var delta = modelOf(STMT1, STMT2);
+
+        // when
+        api.put(delta, Boolean.FALSE);
+
+        // then
+        var symbol = UserService.currentUserAsSymbol();
+        verify(txn).setContextValue(symbol, Boolean.FALSE);
+    }
+
+    @Test
     public void deleteModel() {
         txn.executeWrite(m -> m.add(STMT1).add(STMT2));
 
@@ -136,6 +153,19 @@ public class MetadataServiceTest {
             assertFalse(m.contains(STMT1));
             assertTrue(m.contains(STMT2));
         });
+    }
+
+    @Test
+    public void testViewUpdateSetToFalseOnDelete() {
+        // given
+        txn.executeWrite(m -> m.add(STMT1).add(STMT2));
+
+        // when
+        api.delete(modelOf(STMT1), Boolean.FALSE);
+
+        // then
+        var symbol = UserService.currentUserAsSymbol();
+        verify(txn).setContextValue(symbol, Boolean.FALSE);
     }
 
     @Test
@@ -155,6 +185,20 @@ public class MetadataServiceTest {
             assertFalse(m.contains(STMT1));
             assertFalse(m.contains(STMT2));
         });
+    }
+
+    @Test
+    public void testViewUpdateSetToFalseOnPatch() {
+        // given
+        txn.executeWrite(m -> m.add(STMT1).add(STMT2));
+        Statement newStmt1 = createStatement(S1, P1, S3);
+
+        // when
+        api.patch(modelOf(newStmt1), Boolean.FALSE);
+
+        // then
+        var symbol = UserService.currentUserAsSymbol();
+        verify(txn).setContextValue(symbol, Boolean.FALSE);
     }
 
     @Test
