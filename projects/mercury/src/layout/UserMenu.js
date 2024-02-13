@@ -2,23 +2,25 @@ import React, {useContext, useState} from 'react';
 import {
     Avatar,
     Button,
+    Card,
+    CardActions,
+    CardContent,
     ClickAwayListener,
     Grow,
-    ListItemIcon, ListItemText,
     MenuItem,
     MenuList,
     Paper,
-    Popper
+    Popper,
+    Typography
 } from '@mui/material';
-import Divider from "@mui/material/Divider";
 import withStyles from '@mui/styles/withStyles';
 
 import {ErrorOutline} from '@mui/icons-material';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";
 import versionInfo from '../common/VersionInfo';
+import {APPLICATION_NAME} from '../constants';
 
 const styles = {
     row: {
@@ -39,9 +41,12 @@ const styles = {
         paddingTop: 0
     },
     userMenu: {
-        borderLeft: '28px solid #BBB',
-        padding: 20
+        backgroundColor: 'lightgrey',
+        cursor: 'default'
     },
+    customFont: {
+        fontFamily: 'sans-serif',
+    }
 };
 
 const UserMenu = ({classes}) => {
@@ -94,22 +99,31 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
-                                    <MenuItem className={classes.userMenu}>
-                                        <ListItemText
-                                            primary={currentUser.username}
-                                            secondary={currentUser.email}
-                                            style={{cursor: 'default'}}
-                                        />
-                                    </MenuItem>
-                                    <MenuItem className={classes.userMenu}>
-                                        {versionInfo.name} {versionInfo.version}
-                                    </MenuItem>
-                                    <Divider />
-                                    <MenuItem onClick={handleLogout}>
-                                        <ListItemIcon>
-                                            <ExitToAppIcon />
-                                        </ListItemIcon>
-                                        <ListItemText primary="Logout" />
+                                    <MenuItem
+                                        className={classes.userMenu}
+                                        disableFocusOnHover
+                                    >
+                                        <Card sx={{minWidth: 275}}>
+                                            <CardContent>
+                                                <Typography sx={{fontSize: 12}} color="text.secondary" gutterBottom>
+                                                Welcome
+                                                </Typography>
+                                                <Typography variant="h5" component="div">
+                                                    {currentUser.username}
+                                                </Typography>
+                                                <Typography sx={{mb: 1.5}} color="text.secondary">
+                                                    {currentUser.email}
+                                                </Typography>
+                                                <Typography variant="body2">
+                                                    {APPLICATION_NAME} version:
+                                                    <br />
+                                                    {versionInfo.version}
+                                                </Typography>
+                                            </CardContent>
+                                            <CardActions>
+                                                <Button size="small" onClick={handleLogout}>Logout</Button>
+                                            </CardActions>
+                                        </Card>
                                     </MenuItem>
                                 </MenuList>
                             </ClickAwayListener>

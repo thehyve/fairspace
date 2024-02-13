@@ -1,7 +1,5 @@
 import * as consts from "../constants";
 
-const fontPath = '/public/fonts/kinetika-semi-bold.ttf';
-
 const styles = (theme) => ({
     mainPage: {
         width: consts.MAIN_CONTENT_WIDTH,
@@ -18,8 +16,7 @@ const styles = (theme) => ({
         minHeight: '250px'
     },
     customFont: {
-        fontFamily: 'sans-serif',
-        src: `url({${fontPath})`,
+        fontFamily: "sans-serif",
     },
 });
 
