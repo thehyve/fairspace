@@ -51,7 +51,7 @@ data:
         gateway:
           routes:
 {{ if .Values.pluto.backends.storageRoutes }}
-{{ toYaml .Values.pluto.backends.storageRoutes | indent 8 }}
+{{ toYaml .Values.pluto.backends.storageRoutes | indent 10 }}
 {{ end }}
           - id: saturn-post-request-size
             uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090/api/" }}

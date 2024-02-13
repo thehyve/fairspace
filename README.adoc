@@ -1873,20 +1873,64 @@ Multiple external Fairspace metadata pages can be configured simultaneously. A l
 | Fairspace instance to connect to.
 |===
 
-Sample configuration of external metadata sources in YAML format:
+Sample configuration of *external* metadata sources in YAML format:
 [source, bash]
 ----
-metadata-sources:
-  metaSource1:
-    name: metadataSource1
-    label: "Test metadata 1"
-    url: https://fairspace-test1/api/
-  metaSource2:
-    name: metadataSource2
-    label: "Test metadata 2"
-    url: https://fairspace-test2/api/
+fairspace:
+    ...
+    metadata-sources:
+      additionalMetaSource1:
+        name: metadataSource1
+        label: "Test metadata 1"
+        url: https://fairspace-test1/api/
+      metaSource2:
+        name: metadataSource2
+        label: "Test metadata 2"
+        url: https://fairspace-test2/api/
 ----
 
+Configuration of gateway redirection in `values.yaml`:
+[source, bash]
+----
+pluto:
+  ...
+  backends:
+    storageRoutes:
+      - id: additional-metadata-domain1
+        uri: https://fairspace-test1
+        predicates:
+        - Path=/api/metadata-sources/metadataSource1/**
+        filters:
+        - RewritePath=/api/metadata-sources/metadataSource1/(?<segment>(views|vocabulary|metadata).*),/api/$\{segment}
+        - RewriteResponseHeader=Set-Cookie, ^([^=]+)=, DO_$1=
+      - id: additional-metadata-domain2
+        uri: https://fairspace-test2
+        predicates:
+        - Path=/api/metadata-sources/metadataSource2/**
+        filters:
+        - RewritePath=/api/metadata-sources/metadataSource2/(?<segment>(views|vocabulary|metadata).*),/api/$\{segment}
+        - RewriteResponseHeader=Set-Cookie, ^([^=]+)=, DO_$1=
+----
+
+where **RewriteResponseHeader** is important filter that needs to be added not to overwrite an existing browser session, which would lead to authorization errors.
+
+Configuration above gets transformed to the following Spring Cloud Gateway config in the `application.yaml` configuration of Pluto:
+
+[source, bash]
+----
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: additional-metadata-domain1
+        uri: https://fairspace-test1
+        predicates:
+        - Path=/api/metadata-sources/metadataSource1/**
+        filters:
+        - RewritePath=/api/metadata-sources/metadataSource1/(?<segment>(views|vocabulary|metadata).*),/api/$\{segment}
+        - RewriteResponseHeader=Set-Cookie, ^([^=]+)=, DO_$1=
+      - ...
+----
 
 == Structure and terminology
 
