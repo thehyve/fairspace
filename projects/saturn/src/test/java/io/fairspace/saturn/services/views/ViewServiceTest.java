@@ -52,7 +52,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +74,7 @@ public class ViewServiceTest {
     public void before() throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
         var viewDatabase = buildViewDatabaseConfig();
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true, new Config.Search());
 
         var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
 

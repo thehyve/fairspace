@@ -60,7 +60,7 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, boolean isH2Database) throws SQLException {
+    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, boolean isH2Database, Config.Search search) throws SQLException {
         this.isH2Database = isH2Database;
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
@@ -87,7 +87,7 @@ public class ViewStoreClientFactory {
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
-        materializedViewService = new MaterializedViewService(dataSource, configuration);
+        materializedViewService = new MaterializedViewService(dataSource, configuration, search.maxJoinItems);
         materializedViewService.createOrUpdateAllMaterializedViews();
     }
 

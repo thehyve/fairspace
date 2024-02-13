@@ -19,11 +19,13 @@ public class MaterializedViewService  {
     public static final String INDEX_POSTFIX = "_idx";
     private final DataSource dataSource;
 
-    final ViewStoreClient.ViewStoreConfiguration configuration;
+    private final ViewStoreClient.ViewStoreConfiguration configuration;
+    private final int maxJoinItems;
 
-    public MaterializedViewService(DataSource dataSource, ViewStoreClient.ViewStoreConfiguration configuration) {
+    public MaterializedViewService(DataSource dataSource, ViewStoreClient.ViewStoreConfiguration configuration, int maxJoinItems) {
         this.dataSource = dataSource;
         this.configuration = configuration;
+        this.maxJoinItems = maxJoinItems;
     }
 
     public void createOrUpdateAllMaterializedViews() {
@@ -158,7 +160,7 @@ public class MaterializedViewService  {
 
         queryBuilder
                 .append("select ").append(String.join(", ", columns))
-                .append(" from numbered_rows where rn <= ").append("50");
+                .append(" from numbered_rows where rn <= ").append(maxJoinItems);
 
         try (var ps = connection.prepareStatement(queryBuilder.toString())) {
             ps.execute();

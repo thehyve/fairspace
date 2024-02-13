@@ -33,7 +33,7 @@ public class HealthServiceTest {
         viewDatabase.username = "sa";
         viewDatabase.password = "";
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
+        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true, new Config.Search());
 
         healthService = new HealthService(viewStoreClientFactory.dataSource);
     }

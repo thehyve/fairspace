@@ -423,7 +423,6 @@ public class ViewStoreReader implements AutoCloseable {
         row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString(joinView.view + "_label"), result.getString(joinViewId))));
 
         for (var column : projectionColumns) {
-//            var columnName = joinView.view + "_" + column;
             var columnDefinition = Optional
                     .ofNullable(configuration.viewTables.get(joinView.view).getColumn(column.toLowerCase()))
                     // to support Set/TermSet types which does not have column definition out of the views.yaml
@@ -531,7 +530,7 @@ public class ViewStoreReader implements AutoCloseable {
                     .map(ViewRow::getRawData)
                     .toList();
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving page rows", e);
+            throw new QueryException("Error retrieving page rows", e);
         }
     }
 
