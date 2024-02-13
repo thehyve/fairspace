@@ -417,18 +417,20 @@ public class ViewStoreReader implements AutoCloseable {
         return rows;
     }
 
-    private ViewRow buildJoinRows(View.JoinView joinView, String joinViewId, Set<String> projectionColumns, ResultSet result) throws SQLException {
+    private ViewRow buildJoinRows(View.JoinView joinView, String joinViewIdName, Set<String> projectionColumns, ResultSet result) throws SQLException {
 
         var row = new ViewRow();
-        row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString(joinView.view + "_label"), result.getString(joinViewId))));
-
-        for (var column : projectionColumns) {
-            var columnDefinition = Optional
-                    .ofNullable(configuration.viewTables.get(joinView.view).getColumn(column.toLowerCase()))
-                    // to support Set/TermSet types which does not have column definition out of the views.yaml
-                    // todo: find a better way to aggregate together set and non-set column types
-                    .orElse(Table.ColumnDefinition.builder().name(column).build());
-            parseAndSetValueForColumn(result, columnDefinition, row);
+        var joinViewId = result.getString(joinViewIdName);
+        if (joinViewId != null) { // could be null as we do the left join for join views
+            row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString(joinView.view + "_label"), result.getString(joinViewIdName))));
+            for (var column : projectionColumns) {
+                var columnDefinition = Optional
+                        .ofNullable(configuration.viewTables.get(joinView.view).getColumn(column.toLowerCase()))
+                        // to support Set/TermSet types which does not have column definition out of the views.yaml
+                        // todo: find a better way to aggregate together set and non-set column types
+                        .orElse(Table.ColumnDefinition.builder().name(column).build());
+                parseAndSetValueForColumn(result, columnDefinition, row);
+            }
         }
         return row;
     }
@@ -446,7 +448,9 @@ public class ViewStoreReader implements AutoCloseable {
             }
         } else {
             var label = result.getString(columnDefinition.name);
-            row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(label, label)));
+            if (label != null) {
+                row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(label, label)));
+            }
         }
     }
 
