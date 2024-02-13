@@ -74,7 +74,7 @@ public class MaintenanceService {
 
     public void recreateIndex() {
         try (var viewStoreClient = viewStoreClientFactory.build();
-             var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph(), materializedViewService)) {
+             var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph())) {
             var start = new Date().getTime();
             // Index entities
             for (var view : ConfigLoader.VIEWS_CONFIG.views) {

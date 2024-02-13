@@ -68,7 +68,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     log.debug("Commit updated subjects: {}", updatedSubjects);
                     var start = new Date().getTime();
                     try (var viewStoreClient = viewStoreClientFactory.build();
-                         var viewUpdater = new ViewUpdater(viewStoreClient, dsg, viewStoreClientFactory.getMaterializedViewService())) {
+                         var viewUpdater = new ViewUpdater(viewStoreClient, dsg)) {
                         updatedSubjects.forEach(viewUpdater::updateSubject);
                         viewUpdater.commit();
                         log.debug("Updating {} subjects took {}ms", updatedSubjects.size(), new Date().getTime() - start);

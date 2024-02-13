@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -43,13 +42,11 @@ public class ViewUpdater implements AutoCloseable {
     private final ViewStoreClient viewStoreClient;
     private final DatasetGraph dsg;
     private final Graph graph;
-    private final MaterializedViewService materializedViewService;
 
-    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg, MaterializedViewService materializedViewService) {
+    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg) {
         this.viewStoreClient = viewStoreClient;
         this.dsg = dsg;
         this.graph = dsg.getDefaultGraph();
-        this.materializedViewService = materializedViewService;
     }
 
     @Override
@@ -59,7 +56,6 @@ public class ViewUpdater implements AutoCloseable {
 
     public void commit() throws SQLException {
         viewStoreClient.commit();
-        materializedViewService.createOrUpdateAllMaterializedViews();
     }
 
     private List<Node> retrieveValues(Graph graph, Node subject, String source) {
@@ -332,7 +328,7 @@ public class ViewUpdater implements AutoCloseable {
      */
     public void copyValueSetsForColumn(ViewsConfig.View view, String type, ViewsConfig.View.Column column) throws SQLException {
         var property = column.name;
-        var propertyTable = viewStoreClient.configuration.propertyTables.get(view.name).get(property);
+        var propertyTable = viewStoreClient.getConfiguration().propertyTables.get(view.name).get(property);
         var idColumn = idColumn(view.name);
         var propertyColumn = valueColumn(column.name, ViewsConfig.ColumnType.Identifier);
         var predicate = Arrays.stream(column.source.split("\\s+"))
@@ -383,7 +379,7 @@ public class ViewUpdater implements AutoCloseable {
      * @param join The join relation.
      */
     public void copyLinks(ViewsConfig.View view, String type, ViewsConfig.View.JoinView join) throws SQLException {
-        var joinTable = viewStoreClient.configuration.joinTables.get(view.name).get(join.view);
+        var joinTable = viewStoreClient.getConfiguration().joinTables.get(view.name).get(join.view);
         var idColumn = idColumn(view.name);
         var joinColumn = idColumn(join.view);
         var predicate = Arrays.stream(join.on.split("\\s+"))

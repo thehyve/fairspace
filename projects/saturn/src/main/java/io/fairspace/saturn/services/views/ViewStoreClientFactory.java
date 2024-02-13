@@ -38,7 +38,7 @@ public class ViewStoreClientFactory {
     private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
-        return new ViewStoreClient(getConnection(), configuration);
+        return new ViewStoreClient(getConnection(), configuration, materializedViewService);
     }
 
     public String databaseTypeForColumnType(ColumnType type) {
