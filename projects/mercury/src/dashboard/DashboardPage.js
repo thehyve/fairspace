@@ -22,7 +22,7 @@ const DashboardPage = (props) => {
             <Paper className={classes.mainPage}>
                 <Grid container justifyContent="center" spacing="5">
                     <Grid container justifyContent="center" spacing="5">
-                        <Typography variant="h3" paragraph>
+                        <Typography className={classes.customFont} variant="h3" paragraph>
                             {APPLICATION_NAME}
                         </Typography>
                     </Grid>
