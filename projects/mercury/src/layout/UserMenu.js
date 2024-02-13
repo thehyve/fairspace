@@ -18,6 +18,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import UserContext from "../users/UserContext";
 import LogoutContext from "../users/LogoutContext";
 import {getDisplayName} from "../users/userUtils";
+import versionInfo from '../common/VersionInfo';
 
 const styles = {
     row: {
@@ -28,6 +29,8 @@ const styles = {
     },
     avatar: {
         margin: 10,
+        width: 28,
+        height: 28,
     },
     logout: {
         width: 50
@@ -36,7 +39,7 @@ const styles = {
         paddingTop: 0
     },
     userMenu: {
-        borderLeft: '8px solid #999',
+        borderLeft: '28px solid #BBB',
         padding: 20
     },
 };
@@ -97,6 +100,9 @@ const UserMenu = ({classes}) => {
                                             secondary={currentUser.email}
                                             style={{cursor: 'default'}}
                                         />
+                                    </MenuItem>
+                                    <MenuItem className={classes.userMenu}>
+                                        {versionInfo.name} {versionInfo.version}
                                     </MenuItem>
                                     <Divider />
                                     <MenuItem onClick={handleLogout}>

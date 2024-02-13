@@ -1,7 +1,7 @@
 import React, {useContext} from "react";
 
 import withStyles from "@mui/styles/withStyles";
-import {Grid, Link, Typography} from "@mui/material";
+import {Grid, Link, Paper, Typography} from "@mui/material";
 import BreadCrumbs from "../common/components/BreadCrumbs";
 import styles from "./DashboardPage.styles";
 import MetadataViewContext from "../metadata/views/MetadataViewContext";
@@ -19,7 +19,7 @@ const DashboardPage = (props) => {
     return (
         <Grid container justifyContent="center" spacing="5">
             <BreadCrumbs />
-            <div className={classes.mainPage}>
+            <Paper className={classes.mainPage}>
                 <Grid container justifyContent="center" spacing="5">
                     <Grid container justifyContent="center" spacing="5">
                         <Typography variant="h3" paragraph>
@@ -31,11 +31,14 @@ const DashboardPage = (props) => {
                             research data management
                         </Typography>
                     </Grid>
-                    <Grid container justifyContent="left" spacing="5">
-                        <Grid item xs={6} md={4}>
+                    <Grid container justifyContent="left" spacing="20" className={classes.textRow}>
+                        <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
                                 {APPLICATION_NAME} contains your research metadata. Click on one of the domains and start exploring.
                             </Typography>
+                        </Grid>
+                        <Grid item xs={6} md={2} />
+                        <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
                                 For more details on how to use Fairspace, e.g. how to query the API, please refer the {" "}
                                 <Link href="https://docs.fairway.app/">
@@ -43,25 +46,23 @@ const DashboardPage = (props) => {
                                 </Link>.
                             </Typography>
                         </Grid>
-                        <Grid item xs={6} md={8}>
-                            <Grid container justifyContent="center" spacing={1}>
-                                {canViewMetadata && (
-                                    <DomainInfo
-                                        domainName={METADATA_VIEW_MENU_LABEL}
-                                        domainLink="/metadata-views"
-                                    />
-                                )}
-                                {canViewMetadata && externalMetadataSources.map((source) => (
-                                    <DomainInfo
-                                        domainName={source.label}
-                                        domainLink={source.name}
-                                    />
-                                ))}
-                            </Grid>
-                        </Grid>
+                    </Grid>
+                    <Grid container justifyContent="center" spacing="5">
+                        {canViewMetadata && (
+                            <DomainInfo
+                                domainName={METADATA_VIEW_MENU_LABEL}
+                                domainLink="/metadata-views"
+                            />
+                        )}
+                        {canViewMetadata && externalMetadataSources.map((source) => (
+                            <DomainInfo
+                                domainName={source.label}
+                                domainLink={source.name}
+                            />
+                        ))}
                     </Grid>
                 </Grid>
-            </div>
+            </Paper>
         </Grid>
     );
 };

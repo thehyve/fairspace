@@ -20,7 +20,7 @@ import ExternalStoragesContext from "../external-storage/ExternalStoragesContext
 import ExternalMetadataSourceContext from "../metadata/external-sources/ExternalMetadataSourceContext";
 import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
 import {getExternalMetadataSourcePathPrefix} from "../metadata/external-sources/externalMetadataSourceUtils";
-import {APPLICATION_NAME, METADATA_VIEW_MENU_LABEL} from "../constants";
+import {METADATA_VIEW_MENU_LABEL} from "../constants";
 
 const styles = {
     mainMenuButton: {
@@ -49,7 +49,7 @@ const MainMenu = ({classes}) => {
                     <ListItemIcon>
                         <HomeIcon />
                     </ListItemIcon>
-                    <ListItemText primary={APPLICATION_NAME} />
+                    <ListItemText primary="Home" />
                 </ListItemButton>
                 <ListItemButton
                     className={classes.mainMenuButton}

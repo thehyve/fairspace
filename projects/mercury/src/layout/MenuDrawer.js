@@ -12,7 +12,7 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose),
+            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose)
         }}
     >
         <div className={classes.toolbar}>
