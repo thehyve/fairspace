@@ -17,12 +17,14 @@ const renderModal = (classes, open, handleClose, uri) => (
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
     >
-        <Box className={classes.modalDialog}>
-            <Tooltip title="Close - click or press 'Esc'">
-                <CloseIcon onClick={handleClose} className={classes.closeButton} />
-            </Tooltip>
-            <LinkedDataEntityPage title="Metadata" subject={uri} />
-        </Box>
+        <div className={classes.modalContent}>
+            <Box className={classes.modalDialog}>
+                <Tooltip title="Close - click or press 'Esc'">
+                    <CloseIcon onClick={handleClose} className={classes.closeButton} />
+                </Tooltip>
+                <LinkedDataEntityPage title="Metadata" subject={uri} />
+            </Box>
+        </div>
     </Modal>
 );
 
