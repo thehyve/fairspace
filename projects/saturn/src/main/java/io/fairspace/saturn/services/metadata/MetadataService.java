@@ -7,7 +7,11 @@ import io.fairspace.saturn.services.metadata.validation.ValidationException;
 import io.fairspace.saturn.services.metadata.validation.Violation;
 import io.fairspace.saturn.vocabulary.FS;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.jena.rdf.model.*;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
@@ -19,8 +23,11 @@ import java.util.Set;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
-import static io.fairspace.saturn.rdf.ModelUtils.*;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.trimLabels;
+import static io.fairspace.saturn.rdf.ModelUtils.updatedView;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+import static io.fairspace.saturn.services.users.UserService.currentUserAsSymbol;
 import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -48,9 +55,9 @@ public class MetadataService {
      * If any of the fields is null, that field is not included to filter statements. For example, if only
      * subject is given and predicate and object are null, then all statements with the given subject will be returned.
      *
-     * @param subject              Subject URI for which you want to return statements
+     * @param subject             Subject URI for which you want to return statements
      * @param withValueProperties If set to true, the returned model will also include statements specifying values for
-     *                             certain properties marked as fs:importantProperty in the vocabulary
+     *                            certain properties marked as fs:importantProperty in the vocabulary
      * @return
      */
     public Model get(String subject, boolean withValueProperties) {
@@ -81,20 +88,20 @@ public class MetadataService {
 
     private void addStatements(Model fairspaceData, Model returnValues, Property property, Resource resource, boolean withValueProperties) {
         ExtendedIterator<Statement> statements = fairspaceData.listStatements(null, property, resource)
-            .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
-            .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted));
+                .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
+                .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted));
 
         int numberOfStatementsAdded = 0;
 
-        while(statements.hasNext()) {
-            Statement stmt = (Statement)statements.next();
+        while (statements.hasNext()) {
+            Statement stmt = (Statement) statements.next();
 
             returnValues.add(stmt);
             if (withValueProperties) {
                 addImportantProperties(stmt.getSubject(), returnValues);
             }
 
-            if(numberOfStatementsAdded++ == MAX_LIST_LENGTH){
+            if (numberOfStatementsAdded++ == MAX_LIST_LENGTH) {
                 break;
             }
         }
@@ -119,8 +126,8 @@ public class MetadataService {
      *
      * @param model
      */
-    public void put(Model model) {
-        logUpdates(update(EMPTY_MODEL, model));
+    public void put(Model model, Boolean doViewsUpdate) {
+        logUpdates(update(EMPTY_MODEL, model, doViewsUpdate));
     }
 
     /**
@@ -165,8 +172,8 @@ public class MetadataService {
      *
      * @param model
      */
-    public void delete(Model model) {
-        logDeleted(update(model, EMPTY_MODEL));
+    public void delete(Model model, Boolean doViewsUpdate) {
+        logDeleted(update(model, EMPTY_MODEL, doViewsUpdate));
     }
 
     /**
@@ -183,7 +190,7 @@ public class MetadataService {
      *
      * @param model
      */
-    public void patch(Model model) {
+    public void patch(Model model, Boolean doViewsUpdate) {
         logUpdates(transactions.calculateWrite(before -> {
             var existing = createDefaultModel();
             model.listStatements()
@@ -192,11 +199,16 @@ public class MetadataService {
                     .toSet()
                     .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
-            return update(existing.difference(model), model.remove(existing).removeAll(null, null, FS.nil));
+            return update(
+                    existing.difference(model),
+                    model.remove(existing).removeAll(null, null, FS.nil),
+                    doViewsUpdate);
         }));
     }
 
-    private Set<Resource> update(Model modelToRemove, Model modelToAdd) {
+    private Set<Resource> update(Model modelToRemove, Model modelToAdd, Boolean doViewsUpdate) {
+        var symbol = currentUserAsSymbol();
+        transactions.setContextValue(symbol, doViewsUpdate); // to be read downstream when Jena's transaction is being committed
         return transactions.calculateWrite(before -> {
             trimLabels(modelToAdd);
             var after = updatedView(before, modelToRemove, modelToAdd);

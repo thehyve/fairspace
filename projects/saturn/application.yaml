@@ -56,9 +56,13 @@ features:
 viewDatabase:
   enabled: true
   url: jdbc:postgresql://localhost:9432/fairspace
+  autoCommit: false
+  maxPoolSize: 50
+  connectionTimeout: 1000
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
+  maxJoinItems: 50
 caches:
   facets:
     name: "facets"

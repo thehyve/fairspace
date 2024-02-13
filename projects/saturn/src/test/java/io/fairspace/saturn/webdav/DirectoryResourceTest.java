@@ -110,7 +110,7 @@ public class DirectoryResourceTest {
         selectAdmin();
 
         var taxonomies = model.read("test-taxonomies.ttl");
-        metadataService.put(taxonomies);
+        metadataService.put(taxonomies, Boolean.FALSE);
 
         var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
 
@@ -125,7 +125,7 @@ public class DirectoryResourceTest {
         coll1.createNew("coffee.jpg", null, 0L, "image/jpeg");
 
         var testdata = model.read("testdata.ttl");
-        metadataService.put(testdata);
+        metadataService.put(testdata, Boolean.FALSE);
     }
 
     @Test

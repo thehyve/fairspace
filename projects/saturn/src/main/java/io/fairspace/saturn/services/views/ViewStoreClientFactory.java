@@ -32,13 +32,11 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 @Slf4j
 public class ViewStoreClientFactory {
 
-    private final boolean isH2Database;
-
     @Getter
     private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
-        return new ViewStoreClient(getConnection(), configuration);
+        return new ViewStoreClient(getConnection(), configuration, materializedViewService);
     }
 
     public String databaseTypeForColumnType(ColumnType type) {
@@ -47,7 +45,7 @@ public class ViewStoreClientFactory {
             case Date -> "timestamp";
             case Number -> "numeric";
             case Boolean -> "boolean";
-            case Identifier -> isH2Database ? "varchar not null" : "text not null";
+            case Identifier -> "text not null";
             case Set, TermSet -> throw new IllegalArgumentException("No database type for column type set.");
         };
     }
@@ -60,20 +58,17 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, boolean isH2Database) throws SQLException {
-        this.isH2Database = isH2Database;
+    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, Config.Search search) throws SQLException {
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
         databaseConfig.setJdbcUrl(viewDatabase.url);
         databaseConfig.setUsername(viewDatabase.username);
         databaseConfig.setPassword(viewDatabase.password);
-        databaseConfig.setAutoCommit(false);
-        databaseConfig.setConnectionTimeout(1000);
-        databaseConfig.setMaximumPoolSize(50);
+        databaseConfig.setAutoCommit(viewDatabase.autoCommit);
+        databaseConfig.setConnectionTimeout(viewDatabase.connectionTimeout);
+        databaseConfig.setMaximumPoolSize(viewDatabase.maxPoolSize);
 
         dataSource = new HikariDataSource(databaseConfig);
-
-        materializedViewService = new MaterializedViewService(dataSource);
 
         try (var connection = dataSource.getConnection()) {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
@@ -89,6 +84,7 @@ public class ViewStoreClientFactory {
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
+        materializedViewService = new MaterializedViewService(dataSource, configuration, search.maxJoinItems);
         materializedViewService.createOrUpdateAllMaterializedViews();
     }
 

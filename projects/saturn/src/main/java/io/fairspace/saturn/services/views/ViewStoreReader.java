@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,8 +49,6 @@ public class ViewStoreReader implements AutoCloseable {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
 
-    final int MAX_JOIN_ITEMS = 50;
-
     // TODO: in whole class, use StringBuilder instead of String concats
     public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory) throws SQLException {
         this.searchConfig = searchConfig;
@@ -59,16 +56,18 @@ public class ViewStoreReader implements AutoCloseable {
         this.connection = viewStoreClientFactory.getConnection();
     }
 
-    String label(String id) throws SQLException {
-        try (var query = connection.prepareStatement(
-                "select label from label where id = ?")) {
-            query.setString(1, id);
-            var result = query.executeQuery();
-            if (result.next()) {
-                return result.getString("label");
+    List<Object> getLabelsByIds(List<String> ids) throws SQLException {
+        String query = "select label from label where id = ANY(?::text[])";
+        try (var preparedStatement = connection.prepareStatement(query)) {
+            var array = preparedStatement.getConnection().createArrayOf("text", ids.toArray());
+            preparedStatement.setArray(1, array);
+            var result = preparedStatement.executeQuery();
+            var labels = new ArrayList<>();
+            while (result.next()) {
+                labels.add(result.getObject("label"));
             }
+            return labels;
         }
-        return null;
     }
 
     String iriForLabel(String type, String label) throws SQLException {
@@ -161,17 +160,8 @@ public class ViewStoreReader implements AutoCloseable {
                 continue;
             }
             if (EnumSet.of(ColumnType.Term, ColumnType.TermSet).contains(column.type)) {
-                var values = new ArrayList<>();
-                for (var value : filter.values) {
-                    var label = label(value.toString());
-                    if (label == null) {
-                        log.error("No label found for value " + value.toString());
-                        // throw new IllegalStateException("No label found for value " + value.toString());
-                        continue;
-                    }
-                    values.add(label);
-                }
-                filter.values = values;
+                var labelIds = filter.values.stream().map(Object::toString).toList();
+                filter.values = getLabelsByIds(labelIds);
             } else if (column.type == Date) {
                 if (filter.min != null) {
                     filter.min = Instant.parse(filter.min.toString());
@@ -308,7 +298,7 @@ public class ViewStoreReader implements AutoCloseable {
                             (subConstraints.isBlank() ? "" : " and " + subConstraints) +
                             ")";
                 })
-                .collect(Collectors.toList());
+                .toList();
         constraints = Stream.concat(
                         Stream.of(constraints),
                         subqueries.stream())
@@ -380,7 +370,7 @@ public class ViewStoreReader implements AutoCloseable {
             throws SQLException {
 
         var columns = String.join(", ", valueSetProperties);
-        var query = "select %sid, %s from materialized_view_%s where %sid = ANY(?::text[])"
+        var query = "select %sid, %s from mv_%s where %sid = ANY(?::text[])"
                 .formatted(view, columns, view, view);
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
@@ -404,20 +394,21 @@ public class ViewStoreReader implements AutoCloseable {
             String view, View.JoinView joinView, Collection<String> ids) throws SQLException {
 
         var joinedTable = configuration.viewTables.get(joinView.view);
-        var joinTable = configuration.joinTables.get(view).get(joinView.view);
+        var viewIdColumn = idColumn(view).name;
+        var joinIdColumn = idColumn(joinView.view).name;
         var projectionColumns = Stream.concat(
-                        Stream.of("id", "label"),
-                        joinView.include.stream())
+                        Stream.of(joinView.view + "_id", joinView.view + "_label"),
+                        joinView.include.stream().map(i -> joinView.view + "_" + i))
                 .collect(Collectors.toSet());
 
-        var rows = new ViewRowCollection();
+        var rows = new ViewRowCollection(searchConfig.maxJoinItems);
 
         if (!ids.isEmpty()) {
-            try (var query = getJoinQuery(view, joinView, joinedTable, joinTable, projectionColumns, ids);
+            try (var query = getJoinQuery(view, joinedTable, ids);
                  var result = query.executeQuery()) {
                 while (result.next()) {
-                    var id = result.getString("rowid");
-                    var row = buildJoinRows(joinView, projectionColumns, result);
+                    var id = result.getString(viewIdColumn);
+                    var row = buildJoinRows(joinView, joinIdColumn, projectionColumns, result);
                     rows.add(id, row);
                 }
             }
@@ -426,63 +417,52 @@ public class ViewStoreReader implements AutoCloseable {
         return rows;
     }
 
-    private ViewRow buildJoinRows(View.JoinView joinView, Set<String> projectionColumns, ResultSet result) throws SQLException {
+    private ViewRow buildJoinRows(View.JoinView joinView, String joinViewIdName, Set<String> projectionColumns, ResultSet result) throws SQLException {
 
         var row = new ViewRow();
-        row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString("label"), result.getString("id"))));
-
-        for (var column : projectionColumns) {
-            var columnName = joinView.view + "_" + column;
-            var columnDefinition = Optional
-                    .ofNullable(configuration.viewTables.get(joinView.view).getColumn(column.toLowerCase()))
-                    // to support Set/TermSet types which does not have column definition out of the views.yaml
-                    // todo: find a better way to aggregate together set and non-set column types
-                    .orElse(Table.ColumnDefinition.builder().name(column).build());
-            parseAndSetValueForColumn(result, columnDefinition, row, columnName);
+        var joinViewId = result.getString(joinViewIdName);
+        if (joinViewId != null) { // could be null as we do the left join for join views
+            row.put(joinView.view, Sets.newHashSet(new ValueDTO(result.getString(joinView.view + "_label"), result.getString(joinViewIdName))));
+            for (var column : projectionColumns) {
+                var columnDefinition = Optional
+                        .ofNullable(configuration.viewTables.get(joinView.view).getColumn(column.toLowerCase()))
+                        // to support Set/TermSet types which does not have column definition out of the views.yaml
+                        // todo: find a better way to aggregate together set and non-set column types
+                        .orElse(Table.ColumnDefinition.builder().name(column).build());
+                parseAndSetValueForColumn(result, columnDefinition, row);
+            }
         }
         return row;
     }
 
-    private static void parseAndSetValueForColumn(ResultSet result, Table.ColumnDefinition columnDefinition, ViewRow row, String columnName) throws SQLException {
+    private static void parseAndSetValueForColumn(ResultSet result, Table.ColumnDefinition columnDefinition, ViewRow row) throws SQLException {
         if (columnDefinition.type == ColumnType.Number) {
             var value = result.getBigDecimal(columnDefinition.name);
             if (value != null) {
-                row.put(columnName, Sets.newHashSet(new ValueDTO(value.toString(), value)));
+                row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(value.toString(), value)));
             }
         } else if (columnDefinition.type == Date) {
             var value = result.getTimestamp(columnDefinition.name);
             if (value != null) {
-                row.put(columnName, Sets.newHashSet(new ValueDTO(value.toInstant().toString(), value.toString())));
+                row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(value.toInstant().toString(), value.toString())));
             }
         } else {
             var label = result.getString(columnDefinition.name);
-            row.put(columnName, Sets.newHashSet(new ValueDTO(label, label)));
+            if (label != null) {
+                row.put(columnDefinition.name, Sets.newHashSet(new ValueDTO(label, label)));
+            }
         }
     }
 
-    private PreparedStatement getJoinQuery(String view, View.JoinView joinView, Table joinedTable, Table joinTable,
-                                           Set<String> projectionColumns, Collection<String> ids) throws SQLException {
-        var columns = projectionColumns.stream().map(String::toLowerCase).collect(Collectors.joining(", "));
+    private PreparedStatement getJoinQuery(String view, Table joinedTable, Collection<String> ids) throws SQLException {
 
-        Function<String, String> queryBody = viewId -> {
-            var select = "(select " + columns + " , '" + viewId + "' AS rowid"
-                    + " from " + joinedTable.name + " j ";
-            var join = joinView.include.isEmpty()
-                    ? ""
-                    : " join materialized_view_" + joinedTable.name + "  jv on j.id = " + joinedTable.name + "id ";
-            var where = " where exists ("
-                    + "   select * from " + joinTable.name + " jt "
-                    + "   where jt." + idColumn(joinView.view).name + " = j.id"
-                    + "   and jt." + idColumn(view).name + " = '" + viewId + "'"
-                    + ") limit " + MAX_JOIN_ITEMS + ")";
+        var query = "select * from mv_%s_join_%s where %s = ANY(?::text[])"
+                .formatted(view, joinedTable.name, idColumn(view).name);
 
-            return select + join + where;
-        };
-
-        var query = ids.stream()
-                .map(queryBody)
-                .collect(Collectors.joining(" UNION ALL "));
-        return connection.prepareStatement(query);
+        var ps = connection.prepareStatement(query);
+        var array = ps.getConnection().createArrayOf("text", ids.toArray());
+        ps.setArray(1, array);
+        return ps;
     }
 
     /**
@@ -582,7 +562,7 @@ public class ViewStoreReader implements AutoCloseable {
 
         var searchString = "%" + escapeLikeString(request.getQuery().toLowerCase()) + "%";
 
-        ArrayList<String> values = new ArrayList<String>();
+        var values = new ArrayList<String>();
         values.add(searchString);
         values.add(searchString);
         values.addAll(userCollections);

@@ -102,13 +102,18 @@ public class Config {
     public static class Search {
         public long pageRequestTimeout = 10_000;
         public long countRequestTimeout = 100_1000;
+        public int maxJoinItems = 50; // used to limit number of joined entries (from the join view) to decrease the response size
     }
+
 
     public static class ViewDatabase {
         public boolean enabled = false;
         public String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 5432, "fairspace");
         public String username = "fairspace";
         public String password = "fairspace";
+        public int maxPoolSize = 50;
+        public long connectionTimeout = 1000;
+        public boolean autoCommit = false;
     }
 
     public static class ExtraStorage {

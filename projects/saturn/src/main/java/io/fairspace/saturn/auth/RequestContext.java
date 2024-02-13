@@ -11,7 +11,10 @@ import java.security.Principal;
 import java.util.Optional;
 
 public class RequestContext {
+
     private static final ThreadLocal<Request> currentRequest = new ThreadLocal<>();
+
+    private static final ThreadLocal<String> currentUserUri = new ThreadLocal<>();
 
     public static Request getCurrentRequest() {
         return Optional.ofNullable(HttpConnection.getCurrentConnection())
@@ -22,6 +25,14 @@ public class RequestContext {
 
     public static void setCurrentRequest(Request request) {
         currentRequest.set(request);
+    }
+
+    public static Optional<String> getCurrentUserStringUri() {
+        if (currentUserUri.get() == null) {
+            var uri = getUserURI();
+            currentUserUri.set(uri == null ? null : uri.getURI());
+        }
+        return Optional.ofNullable(currentUserUri.get());
     }
 
     private static Optional<UserIdentity> getUserIdentity() {

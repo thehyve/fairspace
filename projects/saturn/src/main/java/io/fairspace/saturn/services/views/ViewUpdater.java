@@ -1,24 +1,35 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.*;
-import io.fairspace.saturn.vocabulary.*;
-import lombok.extern.slf4j.*;
-import org.apache.commons.lang3.tuple.*;
-import org.apache.jena.graph.*;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.vocabulary.FS;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.*;
-import org.apache.jena.sparql.core.*;
-import org.apache.jena.vocabulary.*;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 
-import java.net.*;
-import java.nio.charset.*;
-import java.sql.*;
-import java.time.*;
-import java.util.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
+import java.time.DateTimeException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.atomic.*;
-import java.util.stream.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
@@ -317,7 +328,7 @@ public class ViewUpdater implements AutoCloseable {
      */
     public void copyValueSetsForColumn(ViewsConfig.View view, String type, ViewsConfig.View.Column column) throws SQLException {
         var property = column.name;
-        var propertyTable = viewStoreClient.configuration.propertyTables.get(view.name).get(property);
+        var propertyTable = viewStoreClient.getConfiguration().propertyTables.get(view.name).get(property);
         var idColumn = idColumn(view.name);
         var propertyColumn = valueColumn(column.name, ViewsConfig.ColumnType.Identifier);
         var predicate = Arrays.stream(column.source.split("\\s+"))
@@ -368,7 +379,7 @@ public class ViewUpdater implements AutoCloseable {
      * @param join The join relation.
      */
     public void copyLinks(ViewsConfig.View view, String type, ViewsConfig.View.JoinView join) throws SQLException {
-        var joinTable = viewStoreClient.configuration.joinTables.get(view.name).get(join.view);
+        var joinTable = viewStoreClient.getConfiguration().joinTables.get(view.name).get(join.view);
         var idColumn = idColumn(view.name);
         var joinColumn = idColumn(join.view);
         var predicate = Arrays.stream(join.on.split("\\s+"))

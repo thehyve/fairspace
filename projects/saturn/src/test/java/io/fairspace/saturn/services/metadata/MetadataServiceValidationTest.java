@@ -26,18 +26,24 @@ import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceValidationTest {
     @Mock
-    MetadataRequestValidator validator;
+    private MetadataRequestValidator validator;
     @Mock
-    MetadataPermissions permissions;
+    private MetadataPermissions permissions;
 
     private static final Resource resource1 = createResource("http://localhost/iri/S1");
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
@@ -71,7 +77,7 @@ public class MetadataServiceValidationTest {
 
     @Test
     public void testPutShouldSucceedOnValidationSuccess() {
-        api.put(modelOf(LBL_STMT1));
+        api.put(modelOf(LBL_STMT1), Boolean.FALSE);
 
         Model model = ds.getDefaultModel();
         assertTrue(model.contains(LBL_STMT1));
@@ -81,7 +87,7 @@ public class MetadataServiceValidationTest {
     public void testPutShouldFailOnValidationError() {
         produceValidationError();
 
-        api.put(createDefaultModel());
+        api.put(createDefaultModel(), Boolean.FALSE);
     }
 
     private void produceValidationError() {
@@ -95,7 +101,7 @@ public class MetadataServiceValidationTest {
 
     @Test
     public void testPatchShouldSucceedOnValidationSuccess() {
-        api.patch(modelOf(LBL_STMT1));
+        api.patch(modelOf(LBL_STMT1), Boolean.FALSE);
 
         Model model = ds.getDefaultModel();
         assertTrue(model.contains(LBL_STMT1));
@@ -104,7 +110,7 @@ public class MetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void patchShouldNotAcceptMachineOnlyTriples() {
         produceValidationError();
-        api.patch(createDefaultModel());
+        api.patch(createDefaultModel(), Boolean.FALSE);
     }
 
     @Test
@@ -120,14 +126,14 @@ public class MetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void deleteShouldFailOnMachineOnValidationFailure() {
         produceValidationError();
-        api.delete(modelOf(resource1, property1, resource2));
+        api.delete(modelOf(resource1, property1, resource2), Boolean.FALSE);
     }
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
         txn.executeWrite(m -> m.add(STMT1));
 
-        api.delete(modelOf(LBL_STMT1));
+        api.delete(modelOf(LBL_STMT1), Boolean.FALSE);
 
         Model model = ds.getDefaultModel();
         assertFalse(model.contains(LBL_STMT1));
@@ -136,7 +142,7 @@ public class MetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void deleteModelShouldNotAcceptMachineOnlyTriples() {
         produceValidationError();
-        api.delete(createDefaultModel());
+        api.delete(createDefaultModel(), Boolean.FALSE);
     }
 
     @Test
@@ -146,7 +152,7 @@ public class MetadataServiceValidationTest {
         var toAdd = modelOf(resource1, property1, createTypedLiteral(1));
 
         txn.executeWrite(ds -> {
-            api.put(toAdd);
+            api.put(toAdd, Boolean.FALSE);
             ds.abort();
         });
 
@@ -167,7 +173,7 @@ public class MetadataServiceValidationTest {
         var toAdd = modelOf(resource1, property1, resource2);
 
         txn.executeWrite(ds -> {
-            api.put(toAdd);
+            api.put(toAdd, Boolean.FALSE);
             ds.abort();
         });
 
@@ -202,7 +208,7 @@ public class MetadataServiceValidationTest {
         var toAdd = modelOf(resource1, property2, resource2);
 
         txn.executeWrite(ds -> {
-            api.put(toAdd);
+            api.put(toAdd, Boolean.FALSE);
             ds.abort();
         });
 

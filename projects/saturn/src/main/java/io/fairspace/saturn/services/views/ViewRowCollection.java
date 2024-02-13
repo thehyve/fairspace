@@ -7,14 +7,18 @@ import java.util.Map;
 
 public class ViewRowCollection {
 
-    private Map<String, List<ViewRow>> data = new HashMap<>();
+    private final int maxJoinItems;
+    private final Map<String, List<ViewRow>> data = new HashMap<>();
 
-    public ViewRowCollection() {
+    public ViewRowCollection(int maxJoinItems) {
+        this.maxJoinItems = maxJoinItems;
     }
 
     public void add(String id, ViewRow row) {
         var value = data.computeIfAbsent(id, x -> new ArrayList<>());
-        value.add(row);
+        if (value.size() <= maxJoinItems) {
+            value.add(row);
+        }
     }
 
     public List<ViewRow> getRowsForId(String id) {

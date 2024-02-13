@@ -25,7 +25,7 @@ public class App {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (CONFIG.viewDatabase.enabled) {
             try {
-                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase, false);
+                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase, CONFIG.search);
             } catch (SQLException e) {
                 log.error("Error connecting to the view database.", e);
                 throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn

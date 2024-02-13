@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.users;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.fairspace.saturn.auth.RequestContext;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.dao.PersistentEntity;
@@ -11,6 +12,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import lombok.extern.log4j.*;
 import org.apache.commons.lang3.*;
 import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.util.Symbol;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -78,6 +80,11 @@ public class UserService {
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static Symbol currentUserAsSymbol() {
+        var uri = RequestContext.getCurrentUserStringUri().orElse("anonymous");
+        return Symbol.create(uri);
     }
 
     private Map<Node, User> fetchUsers() {

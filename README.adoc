@@ -1016,7 +1016,7 @@ curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLO
 ===== API specification
 
 |===
-3+| ``GET /api/metadata/``
+3+| ``GET /api/metadata``
 
 3+| Retrieve metadata
 3+| _Parameters:_
@@ -1066,12 +1066,16 @@ curl -G -H "Accept: application/ld+json" \
 ====
 
 |===
-3+| ``PUT /api/metadata/``
+3+| ``PUT /api/metadata``
 
 3+| Add metadata. Existing metadata is left untouched.
     The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
     otherwise ``400`` is returned.
   Only available for users with _Add shared metadata_ role.
+3+| _Parameters:_
+| ``doViewsUpdate``
+| boolean
+| Flag to switch on and off materialized views refresh once metadata updated. The materialized views are used to speed up the metadata search. ``true`` by default. Recommended to set to ``false`` for batch update (e.g. for metadata uploading via pipeline). (_Optional_)
 3+| _Request body:_
 3+| Serialised RDF triples.
 |===
@@ -1104,7 +1108,10 @@ example:Study_001 a test:Study ;
     The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
     otherwise ``400`` is returned.
   Only available for users with _Add shared metadata_ role.
-
+3+| _Parameters:_
+| ``doViewsUpdate``
+| boolean
+| Flag to switch on and off materialized views refresh once metadata updated. The materialized views are used to speed up the metadata search. ``true`` by default. Recommended to set to ``false`` for batch update (e.g. for metadata uploading via pipeline). (_Optional_)
 3+| _Request body:_
 3+| Serialised RDF triples.
 |===
@@ -1133,11 +1140,13 @@ If a request body is provided, the triples specified in the body will be deleted
 Otherwise, the subject specified in the subject parameter will be marked as deleted.
 Please note that the subject will still exist in the database.
 Only available for users with _Add shared metadata_ role.
-
 3+| _Parameters:_
 | ``subject``
 | string
 | The subject to filter on. (_Optional_)
+| ``doViewsUpdate``
+| boolean
+| Flag to switch on and off materialized views refresh once metadata updated. The materialized views are used to speed up the metadata search. ``true`` by default. Recommended to set to ``false`` for batch update (e.g. for metadata uploading via pipeline). (_Optional_)
 3+| _Request body:_
 3+| Serialised RDF triples. (_Optional_)
 |===

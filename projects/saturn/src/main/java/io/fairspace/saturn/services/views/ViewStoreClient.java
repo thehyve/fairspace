@@ -3,6 +3,7 @@ package io.fairspace.saturn.services.views;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.config.ViewsConfig.*;
 import io.fairspace.saturn.services.views.Table.*;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.tuple.*;
@@ -49,23 +50,28 @@ public class ViewStoreClient implements AutoCloseable {
         }
     }
 
-    public final Connection connection;
-    final ViewStoreConfiguration configuration;
+    private final Connection connection;
+    @Getter
+    private final ViewStoreConfiguration configuration;
+    private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient(
             Connection connection,
-            ViewStoreConfiguration configuration) {
+            ViewStoreConfiguration configuration, MaterializedViewService materializedViewService) {
         this.connection = connection;
         this.configuration = configuration;
+        this.materializedViewService = materializedViewService;
     }
 
     @Override
     public void close() throws SQLException {
         connection.close();
+
     }
 
     public void commit() throws SQLException {
         this.connection.commit();
+        materializedViewService.createOrUpdateAllMaterializedViews();
     }
 
     public void deleteRow(String view, String uri) throws SQLException {

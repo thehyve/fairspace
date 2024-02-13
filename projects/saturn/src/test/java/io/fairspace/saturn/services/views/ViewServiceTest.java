@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.views;
 
+import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ConfigLoader;
 import io.fairspace.saturn.config.ViewsConfig;
@@ -31,7 +32,6 @@ import org.apache.jena.sparql.util.Context;
 import org.eclipse.jetty.server.Authentication;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -52,13 +52,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore // TODO: until H2 replaced with Testcontainers - FAIRSPC-33
-public class ViewServiceTest {
+public class ViewServiceTest extends PostgresAwareTest {
     static final String BASE_PATH = "/api/webdav";
     static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;
 
@@ -75,7 +73,7 @@ public class ViewServiceTest {
     public void before() throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
         var viewDatabase = buildViewDatabaseConfig();
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, true);
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, new Config.Search());
 
         var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory);
 
@@ -161,9 +159,10 @@ public class ViewServiceTest {
 
     private Config.ViewDatabase buildViewDatabaseConfig() {
         var viewDatabase = new Config.ViewDatabase();
-        viewDatabase.url = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE";
-        viewDatabase.username = "sa";
-        viewDatabase.password = "";
+        viewDatabase.url = postgres.getJdbcUrl();
+        viewDatabase.username = postgres.getUsername();
+        viewDatabase.password = postgres.getPassword();
+        viewDatabase.maxPoolSize = 5;
         return viewDatabase;
     }
 
@@ -186,7 +185,7 @@ public class ViewServiceTest {
         var request = getCurrentRequest();
 
         var taxonomies = model.read("test-taxonomies.ttl");
-        api.put(taxonomies);
+        api.put(taxonomies, Boolean.TRUE);
 
         User user = createTestUser("user", true);
         Authentication.User userAuthentication = mockAuthentication("admin");
@@ -203,6 +202,6 @@ public class ViewServiceTest {
         coll1.createNew("coffee.jpg", null, 0L, "image/jpeg");
 
         var testdata = model.read("testdata.ttl");
-        api.put(testdata);
+        api.put(testdata, Boolean.TRUE);
     }
 }
