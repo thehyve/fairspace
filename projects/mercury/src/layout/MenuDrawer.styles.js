@@ -30,6 +30,11 @@ const styles = theme => ({
         justifyContent: 'flex-end',
         padding: '0 8px',
         ...theme.mixins.toolbar,
+    },
+    customerLogo: {
+        position: "absolute",
+        bottom: 50,
+        height: 100
     }
 });
 

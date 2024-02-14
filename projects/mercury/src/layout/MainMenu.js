@@ -11,6 +11,7 @@ import {
     VerifiedUser,
     Widgets
 } from "@mui/icons-material";
+import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from "../common/contexts/ServicesContext";
 import UserContext from "../users/UserContext";
 import {isAdmin} from "../users/userUtils";
@@ -39,6 +40,17 @@ const MainMenu = ({classes}) => {
     return (
         <>
             <List>
+                <ListItemButton
+                    className={classes.mainMenuButton}
+                    component={NavLink}
+                    to="/dashboard"
+                    selected={pathname.startsWith('/dashboard')}
+                >
+                    <ListItemIcon>
+                        <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Home" />
+                </ListItemButton>
                 <ListItemButton
                     className={classes.mainMenuButton}
                     component={NavLink}
