@@ -65,7 +65,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 var sessionKey = currentUserAsSymbol();
                 var doViewsUpdate = dsg.getContext().get(sessionKey, Boolean.TRUE); // true by default, should be set explicitly to switch it off
                 if (doViewsUpdate) {
-                    log.debug("Commit updated subjects: {}", updatedSubjects);
+                    log.info("Commit updated subjects: {}", updatedSubjects);
                     var start = new Date().getTime();
                     try (var viewStoreClient = viewStoreClientFactory.build();
                          var viewUpdater = new ViewUpdater(viewStoreClient, dsg)) {
