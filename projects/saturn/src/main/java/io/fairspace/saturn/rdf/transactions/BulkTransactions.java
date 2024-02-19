@@ -15,7 +15,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUserStringUri;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+import static io.fairspace.saturn.auth.RequestContext.setCurrentUserStringUri;
 import static java.lang.Thread.currentThread;
 
 public class BulkTransactions extends BaseTransactions {
@@ -52,8 +54,8 @@ public class BulkTransactions extends BaseTransactions {
                 }
                 throw new JenaTransactionException("Can't promote to a write transaction");
             }
-
-            var task = new Task<>(getCurrentRequest(), job);
+            var currentUser = getCurrentUserStringUri().orElse(null);
+            var task = new Task<>(getCurrentRequest(), currentUser, job);
 
             queue.offer(task);
             return task.get();
@@ -100,18 +102,21 @@ public class BulkTransactions extends BaseTransactions {
     private static class Task<R, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
         private final Request request;
+        private final String userUri;
         private final ThrowingFunction<? super Model, R, E> job;
         private R result;
         private Throwable error;
 
-        Task(Request request, ThrowingFunction<? super Model, R, E> job) {
+        Task(Request request, String userUri, ThrowingFunction<? super Model, R, E> job) {
             this.request = request;
+            this.userUri = userUri;
             this.job = job;
         }
 
         boolean perform(Model model) {
             try {
                 setCurrentRequest(request);
+                setCurrentUserStringUri(userUri); // setting for the worker's thread
 
                 result = job.apply(model);
                 error = null;

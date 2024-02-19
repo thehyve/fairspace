@@ -30,15 +30,19 @@ public class RequestContext {
     public static Optional<String> getCurrentUserStringUri() {
         if (currentUserUri.get() == null) {
             var uri = getUserURI();
-            currentUserUri.set(uri == null ? null : uri.getURI());
+            setCurrentUserStringUri(uri == null ? null : uri.getURI());
         }
         return Optional.ofNullable(currentUserUri.get());
+    }
+
+    public static void setCurrentUserStringUri(String uri) {
+        currentUserUri.set(uri);
     }
 
     private static Optional<UserIdentity> getUserIdentity() {
         return Optional.ofNullable(getCurrentRequest())
                 .map(Request::getAuthentication)
-                .map(x -> (Authentication.User)x)
+                .map(x -> (Authentication.User) x)
                 .map(Authentication.User::getUserIdentity);
     }
 
@@ -55,7 +59,7 @@ public class RequestContext {
 
     public static AccessToken getAccessToken() {
         return getPrincipal()
-                .map(x -> (KeycloakPrincipal<?>)x)
+                .map(x -> (KeycloakPrincipal<?>) x)
                 .map(KeycloakPrincipal::getKeycloakSecurityContext)
                 .map(KeycloakSecurityContext::getToken)
                 .orElse(null);
@@ -63,7 +67,7 @@ public class RequestContext {
 
     public static String getIdTokenString() {
         return getPrincipal()
-                .map(x -> (KeycloakPrincipal<?>)x)
+                .map(x -> (KeycloakPrincipal<?>) x)
                 .map(KeycloakPrincipal::getKeycloakSecurityContext)
                 .map(KeycloakSecurityContext::getIdTokenString)
                 .orElse(null);

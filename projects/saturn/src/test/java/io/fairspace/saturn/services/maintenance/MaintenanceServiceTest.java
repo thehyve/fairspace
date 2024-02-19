@@ -77,7 +77,6 @@ public class MaintenanceServiceTest {
 
         doReturn(false).when(sut).active();
         doNothing().when(sut).recreateIndex();
-        doNothing().when(sut).updateMaterializedViews();
 
         // when
         sut.startRecreateIndexTask();
@@ -85,7 +84,6 @@ public class MaintenanceServiceTest {
 
         // then
         verify(sut).recreateIndex();
-        verify(sut).updateMaterializedViews();
         verify(viewService).refreshCaches();
     }
 

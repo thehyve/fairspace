@@ -228,6 +228,7 @@ public class ViewUpdater implements AutoCloseable {
 
     public void recreateIndexForView(ViewStoreClient viewStoreClient, ViewsConfig.View view) throws SQLException {
         // Clear database tables for view
+        log.info("Recreating index for view {} started", view.name);
         viewStoreClient.truncateViewTables(view.name);
         for (String type : view.types) {
             copyValuesForType(view, type);
@@ -243,6 +244,7 @@ public class ViewUpdater implements AutoCloseable {
                 }
             }
         }
+        log.info("Recreating index for view {} finished", view.name);
     }
 
     private Map<String, Object> transformResult(

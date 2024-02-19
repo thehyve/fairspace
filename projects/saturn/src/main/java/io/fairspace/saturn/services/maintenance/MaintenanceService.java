@@ -5,7 +5,6 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.ConflictException;
 import io.fairspace.saturn.services.NotAvailableException;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.views.MaterializedViewService;
 import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.views.ViewUpdater;
@@ -31,7 +30,6 @@ public class MaintenanceService {
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final ViewService viewService;
-    private final MaterializedViewService materializedViewService;
 
     public MaintenanceService(@NonNull UserService userService,
                               @NonNull Dataset dataset,
@@ -40,7 +38,6 @@ public class MaintenanceService {
         this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
-        this.materializedViewService = viewStoreClientFactory != null ? viewStoreClientFactory.getMaterializedViewService() : null;
         this.viewService = viewService;
     }
 
@@ -66,8 +63,8 @@ public class MaintenanceService {
         threadpool.submit(() -> {
             log.info("Start asynchronous reindexing task");
             recreateIndex();
-            updateMaterializedViews();
             viewService.refreshCaches();
+            log.info("Asynchronous reindexing task has finished.");
         });
 
     }
@@ -85,12 +82,5 @@ public class MaintenanceService {
         } catch (SQLException e) {
             throw new RuntimeException("Failed to recreate index", e);
         }
-    }
-
-    protected void updateMaterializedViews() {
-        // now it is a part of reindexing, but if Fairspace is supposed to support an intensive
-        // metadata update, then consider async materialized views refresh with old data available
-        // until new are ready to be used OR switch to denormalized tables not to maintain materialized views
-        materializedViewService.createOrUpdateAllMaterializedViews();
     }
 }
