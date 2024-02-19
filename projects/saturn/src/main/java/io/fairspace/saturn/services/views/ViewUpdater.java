@@ -350,7 +350,7 @@ public class ViewUpdater implements AutoCloseable {
             try {
                 var val = getValue(column, q.get(column.name).asNode());
                 if (val == null) {
-                    throw new RuntimeException("Something for view %s for type %s in column %s".formatted(view.name, type, column.name));
+                    throw new RuntimeException("Error querying view %s for type %s in column %s".formatted(view.name, type, column.name));
                 }
                 rows.add(Pair.of(q.getResource("id").getURI(), val.toString()));
 
