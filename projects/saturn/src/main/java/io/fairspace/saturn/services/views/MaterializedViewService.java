@@ -60,7 +60,7 @@ public class MaterializedViewService  {
             var mvName = "mv_%s_join_%s".formatted(viewName, joinViewName);
             log.info("{} refresh has started", mvName);
             dropMaterializedViewIfExists(mvName, connection);
-            createJoinMaterializedViews(view.name, joinView, connection);
+            createJoinMaterializedViews(view, joinView, connection);
             createMaterializedViewIndex(mvName + "_" + viewName + INDEX_POSTFIX, mvName, viewName + "_id", connection);
             createMaterializedViewIndex(mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id", connection);
             log.info("{} refresh has finished successfully", mvName);
@@ -100,9 +100,9 @@ public class MaterializedViewService  {
         }
     }
 
-    private void createJoinMaterializedViews(String viewName, ViewsConfig.View.JoinView joinView, Connection connection) throws SQLException {
-        var viewTableName = viewName.toLowerCase();
-        var joinTable = configuration.joinTables.get(joinView.view).get(viewName).name;
+    private void createJoinMaterializedViews(ViewsConfig.View view, ViewsConfig.View.JoinView joinView, Connection connection) throws SQLException {
+        var viewTableName = view.name.toLowerCase();
+        var joinTable = configuration.joinTables.get(view.name).get(joinView.view).name;
         var joinedTable = configuration.viewTables.get(joinView.view).name.toLowerCase();
         var viewIdColumn = viewTableName + "_id";
         var joinIdColumn = joinedTable + "_id";
