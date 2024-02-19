@@ -52,6 +52,9 @@ public class SparqlUtils {
         executeRead(dsg, () -> {
             try (var qExec = query(dsg, query)) {
                 qExec.execSelect().forEachRemaining(rowAction);
+            } catch (Exception e) {
+                log.error("Error executing select query: \n %s".formatted(query), e);
+                throw new RuntimeException(e);
             }
         });
     }
@@ -88,6 +91,10 @@ public class SparqlUtils {
                             .build();
                     results.add(dto);
                 }
+            } catch (Exception e) {
+                String message = "Error executing select query: \n %s".formatted(query.toString());
+                log.error(message, e);
+                throw new RuntimeException(message, e);
             }
             return results;
         });
