@@ -348,10 +348,12 @@ public class ViewUpdater implements AutoCloseable {
         SparqlUtils.querySelect(dsg, query, (QuerySolution q) -> {
             // read query results
             try {
-                rows.add(Pair.of(
-                        q.getResource("id").getURI(),
-                        getValue(column, q.get(column.name).asNode()).toString())
-                );
+                var val = getValue(column, q.get(column.name).asNode());
+                if (val == null) {
+                    throw new RuntimeException("Error querying view %s for type %s in column %s".formatted(view.name, type, column.name));
+                }
+                rows.add(Pair.of(q.getResource("id").getURI(), val.toString()));
+
                 // copy in chunks to the view database
                 if (rows.size() == 1000) {
                     updateCount[0] += viewStoreClient.insertValues(propertyTable, idColumn, propertyColumn, rows);
