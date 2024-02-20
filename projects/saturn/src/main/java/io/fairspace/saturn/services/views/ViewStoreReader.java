@@ -264,7 +264,7 @@ public class ViewStoreReader implements AutoCloseable {
                         return "exists (select *"
                                 + " from " + propertyTable.name + " pt "
                                 + " where pt." + idColumn(view.name).name + " = " + alias + ".id"
-                                + (subConstraint.isBlank() ? "" : " and " + subConstraint)
+                                + (subConstraint == null || subConstraint.isBlank() ? "" : " and " + subConstraint)
                                 + ")";
                     }
                     return sqlConstraint(alias + "." + field, filter, values);
