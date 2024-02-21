@@ -290,7 +290,7 @@ public class ViewStoreReader implements AutoCloseable {
                     var subView = entry.getKey();
                     if (configuration.joinTables.get(view) == null ||
                             !configuration.joinTables.get(view).containsKey(subView)) {
-                        resultCondition = "false"; // to return now rows
+                        resultCondition = "false"; // to return no rows
                     } else {
                         var subConstraints = sqlFilter("jv", configuration.viewConfig.get(subView), entry.getValue(), values);
                         var subViewTable = configuration.viewTables.get(subView);
