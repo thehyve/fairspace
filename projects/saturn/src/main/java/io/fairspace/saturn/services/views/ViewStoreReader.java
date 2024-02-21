@@ -286,17 +286,24 @@ public class ViewStoreReader implements AutoCloseable {
         var subqueries = filtersByView.entrySet().stream()
                 .filter(entry -> !entry.getKey().equals(view))
                 .map(entry -> {
+                    String resultCondition;
                     var subView = entry.getKey();
-                    var subConstraints = sqlFilter("jv", configuration.viewConfig.get(subView), entry.getValue(), values);
-                    var subViewTable = configuration.viewTables.get(subView);
-                    var joinTable = configuration.joinTables.get(view).get(subView);
-                    return "exists (select *" +
-                            " from " + joinTable.name + " jt " +
-                            " join " + subViewTable.name + " jv " +
-                            " on jv.id = jt." + idColumn(subView).name +
-                            " where jt." + idColumn(view).name + " = v.id" +
-                            (subConstraints.isBlank() ? "" : " and " + subConstraints) +
-                            ")";
+                    if (configuration.joinTables.get(view) == null ||
+                            !configuration.joinTables.get(view).containsKey(subView)) {
+                        resultCondition = "false"; // to return no rows
+                    } else {
+                        var subConstraints = sqlFilter("jv", configuration.viewConfig.get(subView), entry.getValue(), values);
+                        var subViewTable = configuration.viewTables.get(subView);
+                        var joinTable = configuration.joinTables.get(view).get(subView);
+                        resultCondition = "exists (select *" +
+                                " from " + joinTable.name + " jt " +
+                                " join " + subViewTable.name + " jv " +
+                                " on jv.id = jt." + idColumn(subView).name +
+                                " where jt." + idColumn(view).name + " = v.id" +
+                                (subConstraints.isBlank() ? "" : " and " + subConstraints) +
+                                ")";
+                    }
+                    return resultCondition;
                 })
                 .toList();
         constraints = Stream.concat(
@@ -336,17 +343,19 @@ public class ViewStoreReader implements AutoCloseable {
         // retrieve view rows with fields from the view table only (not of the Set type)
         var rowsById = getViewRowsForNonSetType(viewConfig, filters, offset, limit);
 
-        // TODO: with materialized or normal view we can retrieve all data in one go adding one more join in the query above
-        // retrieve view rows with fields from table only (of the Set type only)
-        String[] viewIds = rowsById.keySet().toArray(new String[0]);
-        var valueSetProperties = viewConfig.columns.stream()
-                .filter(column -> column.type.isSet())
-                .map(column -> column.name)
-                .toList();
-        if (!valueSetProperties.isEmpty()) {
-            var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, viewIds);
-            // merge the data from the view (for instance, Study) table and related tables (for instance, Study_TreatmentId)
-            viewRowsForSetType.forEach((key, value) -> rowsById.get(key).merge(value));
+        if (!rowsById.isEmpty()) {
+            // TODO: with materialized or normal view we can retrieve all data in one go adding one more join in the query above
+            // retrieve view rows with fields from table only (of the Set type only)
+            String[] viewIds = rowsById.keySet().toArray(new String[0]);
+            var valueSetProperties = viewConfig.columns.stream()
+                    .filter(column -> column.type.isSet())
+                    .map(column -> column.name)
+                    .toList();
+            if (!valueSetProperties.isEmpty()) {
+                var viewRowsForSetType = getViewRowsForSetType(view, valueSetProperties, viewIds);
+                // merge the data from the view (for instance, Study) table and related tables (for instance, Study_TreatmentId)
+                viewRowsForSetType.forEach((key, value) -> rowsById.get(key).merge(value));
+            }
         }
         return rowsById;
     }
@@ -524,7 +533,7 @@ public class ViewStoreReader implements AutoCloseable {
             var rowsById = this.retrieveViewTableRows(view, filters, offset, limit);
 
             // Add items from join tables
-            if (includeJoinedViews) {
+            if (includeJoinedViews && !rowsById.isEmpty()) {
                 for (var joinView : viewConfig.join) {
                     var allJoinTableRows = this.retrieveJoinTableRows(view, joinView, rowsById.keySet());
                     rowsById.forEach((id, row) -> addJoinTableRowsForRow(row, allJoinTableRows.getRowsForId(id)));
