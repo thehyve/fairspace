@@ -3216,6 +3216,16 @@ To improve the performance of metadata views, especially for counts and paginati
 (PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
 which enables recreation of the database at any point of time.
 
+For models containing multiple attributes of Set/TermSet types, additional tables are created to store the values of these attributes.
+These tables are then left-joined with the main table to retrieve their values.
+However, if there are many such attributes, the performance of data retrieval from the views may degrade.
+To address this issue, materialized views are used for enhanced performance.
+
+There are two types of materialized views: one for denormalized data, which includes the view ID and attribute data of Set/TermSet types, and another for joined views.
+For each joined view, there is one corresponding join materialized view (as specified in the views.yaml config).
+
+Materialized views are refreshed during database reindexing and metadata updates, provided that the doViewsUpdate flag is set to true in the metadata endpoints.
+
 ==== Extra file storage
 
 Similar to the primary file storage, the extra storage is a virtual file system
