@@ -106,7 +106,12 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                             </Grid>
                         );
                     }
-                    return <></>;
+                    return (
+                        <Grid key={filter.field} item>
+                            <Typography variant="overline" component="span">Study</Typography>
+                            {renderActiveFilterValues({type: 'term', backgroundColor: 'black', values: [{value: filter.values[0], label: filter.values[0]}]}, filter)}
+                        </Grid>
+                    );
                 })
             }
         </Grid>

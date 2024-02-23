@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useContext, useEffect} from 'react';
 import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import {Link as RouterLink} from "react-router-dom";
@@ -13,6 +13,7 @@ import type {Collection} from "../../collections/CollectionAPI";
 import {collectionAccessIcon} from "../../collections/collectionUtils";
 import {getPathFromIri, redirectLink} from "../../file/fileUtils";
 import ColumnFilterInput from "../../common/components/ColumnFilterInput";
+import MetadataViewContext from "./MetadataViewContext";
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -56,6 +57,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const isResourcesView = view === RESOURCES_VIEW;
     const {checkboxes, setCheckboxState} = props;
+    const {updateFilters} = useContext(MetadataViewContext);
 
     const isCustomResourceColumn = (column: MetadataViewColumn) => (
         isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
@@ -162,7 +164,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         );
     };
 
-    const renderTableCell = (row: Map<string, any>, column: MetadataViewColumn, onClickHandler) => {
+    const renderTableCell = (row: Map<string, any>, column: MetadataViewColumn, onClickHandler, onDoubleClick) => {
         if (isCustomResourceColumn(column)) {
             return renderCustomResourceColumn(row, column);
         }
@@ -171,7 +173,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         const displayValue = (value || []).map(v => ((column.type === 'Date') ? formatDate(v.value) : v.label)).join(', ');
 
         return (
-            <TableCell key={column.name} onClick={onClickHandler}>
+            <TableCell key={column.name} onClick={onClickHandler} onDoubleClick={onDoubleClick}>
                 <span className={classes.cellContents}>{displayValue}</span>
             </TableCell>
         );
@@ -218,7 +220,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                             row[idColumn.name][0].value,
                             row[idColumn.name][0].label,
                             dataLinkColumn ? row[dataLinkColumn.name] : []
-                        )))}
+                        ), () => updateFilters([{field: idColumn.name, values: [row[idColumn.name][0].value]}])))}
                     </TableRow>
                 ))}
             </TableBody>
