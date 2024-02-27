@@ -1,9 +1,12 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.Optional;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
 import io.milton.http.*;
@@ -14,16 +17,14 @@ import io.milton.resource.Resource;
 import io.milton.servlet.ServletResponse;
 import org.apache.jena.rdf.model.Literal;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.Optional;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.App.API_PREFIX;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
+
 import static io.milton.http.ResponseStatus.SC_UNSUPPORTED_MEDIA_TYPE;
 import static io.milton.servlet.MiltonServlet.clearThreadlocals;
 import static io.milton.servlet.MiltonServlet.setThreadlocals;
@@ -60,18 +61,20 @@ public class WebDAVServlet extends HttpServlet {
             }
 
             @Override
-            protected void buildProtocolHandlers(WebDavResponseHandler webdavResponseHandler, ResourceTypeHelper resourceTypeHelper) {
+            protected void buildProtocolHandlers(
+                    WebDavResponseHandler webdavResponseHandler, ResourceTypeHelper resourceTypeHelper) {
                 super.buildProtocolHandlers(webdavResponseHandler, resourceTypeHelper);
 
-                setProtocolHandlers(new ProtocolHandlers(getProtocols()
-                        .stream()
+                setProtocolHandlers(new ProtocolHandlers(getProtocols().stream()
                         .map(p -> new TransactionalHttpExtensionWrapper(p, txn))
                         .collect(toList())));
             }
 
             @Override
-            protected DefaultHttp11ResponseHandler createDefaultHttp11ResponseHandler(AuthenticationService authenticationService) {
-                return new DefaultHttp11ResponseHandler(authenticationService, geteTagGenerator(), getContentGenerator()) {
+            protected DefaultHttp11ResponseHandler createDefaultHttp11ResponseHandler(
+                    AuthenticationService authenticationService) {
+                return new DefaultHttp11ResponseHandler(
+                        authenticationService, geteTagGenerator(), getContentGenerator()) {
                     @Override
                     public void respondBadRequest(Resource resource, Response response, Request request) {
                         super.respondBadRequest(resource, response, request);
@@ -118,13 +121,9 @@ public class WebDAVServlet extends HttpServlet {
         }
     }
 
-
     public static Integer fileVersion() {
         return Optional.ofNullable(getCurrentRequest())
-                .map(r -> (isEmpty(r.getParameter("version"))
-                        ? r.getHeader("Version")
-                        : r.getParameter("version")
-                ))
+                .map(r -> (isEmpty(r.getParameter("version")) ? r.getHeader("Version") : r.getParameter("version")))
                 .map(Integer::parseInt)
                 .orElse(null);
     }

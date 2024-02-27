@@ -1,6 +1,8 @@
 package io.fairspace.saturn.webdav.resources;
 
-import io.fairspace.saturn.webdav.DavFactory;
+import java.util.Date;
+import java.util.List;
+
 import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
@@ -11,8 +13,7 @@ import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PropFindableResource;
 import io.milton.resource.Resource;
 
-import java.util.Date;
-import java.util.List;
+import io.fairspace.saturn.webdav.DavFactory;
 
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 
@@ -23,6 +24,7 @@ public abstract class RootResource implements CollectionResource, MakeCollection
     protected RootResource(DavFactory factory) {
         this.factory = factory;
     }
+
     @Override
     public Resource child(String childName) throws NotAuthorizedException {
         return factory.getResource(childSubject(this.factory.rootSubject, childName));

@@ -15,6 +15,7 @@ plugins {
     id 'jacoco'
 //    id  'com.github.spotbugs' version '1.6.10'
     id "org.owasp.dependencycheck" version "8.2.1"
+    id "com.diffplug.spotless" version "6.25.0"
 }
 
 group 'io.fairspace'
@@ -91,6 +92,19 @@ jacocoTestReport {
     reports {
         xml.enabled false
         csv.enabled true
+    }
+}
+
+spotless {
+    java {
+        palantirJavaFormat()
+
+        importOrder('java|javax', '', 'io.fairspace', '\\#io.fairspace', '\\#')
+        removeUnusedImports()
+
+        trimTrailingWhitespace()
+
+        toggleOffOn()
     }
 }
 

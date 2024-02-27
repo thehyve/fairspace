@@ -1,13 +1,13 @@
 package io.fairspace.saturn.services.views;
 
-import com.google.common.collect.Sets;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 public class ViewRow {
 
@@ -21,7 +21,8 @@ public class ViewRow {
         this.data = data;
     }
 
-    public static ViewRow viewSetOf(ResultSet resultSet, List<String> columnsNames, String viewName) throws SQLException {
+    public static ViewRow viewSetOf(ResultSet resultSet, List<String> columnsNames, String viewName)
+            throws SQLException {
         var data = new HashMap<String, Set<ValueDTO>>();
         for (String columnName : columnsNames) {
             String label = resultSet.getString(columnName);

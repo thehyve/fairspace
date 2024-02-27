@@ -1,10 +1,10 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import org.junit.Test;
 
 import static org.apache.jena.graph.NodeFactory.createBlankNode;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -20,10 +20,22 @@ public class SparqlTransactionCodecTest {
 
         writeListener.onBegin();
         writeListener.onMetadata("userId", "userName", 123L);
-        writeListener.onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
-        writeListener.onDelete(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
+        writeListener.onAdd(
+                createURI("http://example.com/graph"),
+                createURI("http://example.com/subject"),
+                createURI("http://example.com/predicate"),
+                createURI("http://example.com/object"));
+        writeListener.onDelete(
+                createURI("http://example.com/graph"),
+                createURI("http://example.com/subject"),
+                createURI("http://example.com/predicate"),
+                createURI("http://example.com/object"));
         var blank = createBlankNode();
-        writeListener.onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), blank);
+        writeListener.onAdd(
+                createURI("http://example.com/graph"),
+                createURI("http://example.com/subject"),
+                createURI("http://example.com/predicate"),
+                blank);
         writeListener.onCommit();
 
         var in = new ByteArrayInputStream(out.toByteArray());
@@ -32,9 +44,24 @@ public class SparqlTransactionCodecTest {
 
         verify(readListener).onBegin();
         verify(readListener).onMetadata("userId", "userName", 123L);
-        verify(readListener).onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
-        verify(readListener).onDelete(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), createURI("http://example.com/object"));
-        verify(readListener).onAdd(createURI("http://example.com/graph"), createURI("http://example.com/subject"), createURI("http://example.com/predicate"), blank);
+        verify(readListener)
+                .onAdd(
+                        createURI("http://example.com/graph"),
+                        createURI("http://example.com/subject"),
+                        createURI("http://example.com/predicate"),
+                        createURI("http://example.com/object"));
+        verify(readListener)
+                .onDelete(
+                        createURI("http://example.com/graph"),
+                        createURI("http://example.com/subject"),
+                        createURI("http://example.com/predicate"),
+                        createURI("http://example.com/object"));
+        verify(readListener)
+                .onAdd(
+                        createURI("http://example.com/graph"),
+                        createURI("http://example.com/subject"),
+                        createURI("http://example.com/predicate"),
+                        blank);
         verify(readListener).onCommit();
         verifyNoMoreInteractions(readListener);
     }
@@ -46,7 +73,7 @@ public class SparqlTransactionCodecTest {
         var writeListener = codec.write(out);
 
         writeListener.onBegin();
-        writeListener.onMetadata(null, null,123L);
+        writeListener.onMetadata(null, null, 123L);
         writeListener.onCommit();
 
         var in = new ByteArrayInputStream(out.toByteArray());

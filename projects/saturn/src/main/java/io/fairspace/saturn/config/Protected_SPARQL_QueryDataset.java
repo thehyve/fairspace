@@ -1,9 +1,10 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.services.users.*;
 import lombok.*;
 import lombok.extern.slf4j.*;
 import org.apache.jena.fuseki.servlets.*;
+
+import io.fairspace.saturn.services.users.*;
 
 import static org.apache.jena.fuseki.servlets.ServletOps.errorForbidden;
 
@@ -20,7 +21,9 @@ public class Protected_SPARQL_QueryDataset extends SPARQL_QueryDataset {
     protected void validateRequest(HttpAction action) {
         var user = userService.currentUser();
         if (user == null || !user.isCanQueryMetadata()) {
-            log.error("The current user has no metadata querying role: {}", userService.currentUser().getName());
+            log.error(
+                    "The current user has no metadata querying role: {}",
+                    userService.currentUser().getName());
             errorForbidden("The current user has no metadata querying role");
         } else {
             super.validateRequest(action);

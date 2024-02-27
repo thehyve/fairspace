@@ -1,8 +1,7 @@
 package io.fairspace.saturn.services;
 
 public class AccessDeniedException extends RuntimeException {
-    public AccessDeniedException() {
-    }
+    public AccessDeniedException() {}
 
     public AccessDeniedException(String message) {
         super(message);
@@ -16,7 +15,8 @@ public class AccessDeniedException extends RuntimeException {
         super(cause);
     }
 
-    public AccessDeniedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public AccessDeniedException(
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

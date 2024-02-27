@@ -1,6 +1,5 @@
 package io.fairspace.saturn.rdf.search;
 
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -10,6 +9,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -92,5 +93,4 @@ public class FilteredDatasetGraphTest {
         // then
         assertFalse(actual);
     }
-
 }

@@ -1,10 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.fairspace.saturn.webdav.resources.CollectionResource;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import org.apache.jena.rdf.model.Model;
@@ -17,8 +12,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.resources.CollectionResource;
+
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,8 +43,10 @@ public class CollectionResourceTest {
 
     @Mock
     BlobStore store;
+
     @Mock
     UserService userService;
+
     @Mock
     MetadataService metadataService;
 

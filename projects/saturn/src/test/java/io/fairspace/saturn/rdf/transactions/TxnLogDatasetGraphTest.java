@@ -1,5 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import java.io.IOException;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -9,9 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
-
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
@@ -21,9 +22,11 @@ import static org.mockito.Mockito.*;
 public class TxnLogDatasetGraphTest {
     @Mock
     private TransactionLog log;
+
     private Dataset ds;
     private BulkTransactions txn;
-    private static final Statement statement = createStatement(createResource("http://example.com/s1"),
+    private static final Statement statement = createStatement(
+            createResource("http://example.com/s1"),
             createProperty("http://example.com/p1"),
             createPlainLiteral("blah"));
 
@@ -34,17 +37,24 @@ public class TxnLogDatasetGraphTest {
         txn = new BulkTransactions(ds);
     }
 
-
     @Test
     public void shouldLogWriteTransactions() throws IOException {
-        txn.calculateWrite(m -> m
-                .add(statement)
-                .remove(statement));
+        txn.calculateWrite(m -> m.add(statement).remove(statement));
 
         verify(log).onBegin();
         verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
-        verify(log).onAdd(defaultGraphNodeGenerated, statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
-        verify(log).onDelete(defaultGraphNodeGenerated, statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log)
+                .onAdd(
+                        defaultGraphNodeGenerated,
+                        statement.getSubject().asNode(),
+                        statement.getPredicate().asNode(),
+                        statement.getObject().asNode());
+        verify(log)
+                .onDelete(
+                        defaultGraphNodeGenerated,
+                        statement.getSubject().asNode(),
+                        statement.getPredicate().asNode(),
+                        statement.getObject().asNode());
         verify(log).onCommit();
         verifyNoMoreInteractions(log);
     }
@@ -52,16 +62,24 @@ public class TxnLogDatasetGraphTest {
     @Test
     public void shouldHandleAbortedTransactions() throws IOException {
         txn.executeWrite(m -> {
-            m
-                    .add(statement)
-                    .remove(statement);
+            m.add(statement).remove(statement);
             ds.abort();
         });
 
         verify(log).onBegin();
         verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
-        verify(log).onAdd(defaultGraphNodeGenerated, statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
-        verify(log).onDelete(defaultGraphNodeGenerated, statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log)
+                .onAdd(
+                        defaultGraphNodeGenerated,
+                        statement.getSubject().asNode(),
+                        statement.getPredicate().asNode(),
+                        statement.getObject().asNode());
+        verify(log)
+                .onDelete(
+                        defaultGraphNodeGenerated,
+                        statement.getSubject().asNode(),
+                        statement.getPredicate().asNode(),
+                        statement.getObject().asNode());
         verify(log).onAbort();
         verifyNoMoreInteractions(log);
     }
@@ -77,17 +95,25 @@ public class TxnLogDatasetGraphTest {
     public void testThatAnExceptionWithinATransactionIsHandledProperly() throws IOException {
         try {
             txn.executeWrite(m -> {
-                m
-                        .add(statement)
-                        .remove(statement);
+                m.add(statement).remove(statement);
                 throw new RuntimeException();
             });
         } catch (Exception ignore) {
         }
         verify(log).onBegin();
         verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
-        verify(log).onAdd(defaultGraphNodeGenerated, statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
-        verify(log).onDelete(defaultGraphNodeGenerated, statement.getSubject().asNode(), statement.getPredicate().asNode(), statement.getObject().asNode());
+        verify(log)
+                .onAdd(
+                        defaultGraphNodeGenerated,
+                        statement.getSubject().asNode(),
+                        statement.getPredicate().asNode(),
+                        statement.getObject().asNode());
+        verify(log)
+                .onDelete(
+                        defaultGraphNodeGenerated,
+                        statement.getSubject().asNode(),
+                        statement.getPredicate().asNode(),
+                        statement.getObject().asNode());
         verify(log).onAbort();
     }
 }

@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.views;
 
+import java.util.List;
+
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
-
-import java.util.List;
 
 /**
  * High-level interface for fetching metadata view pages and counts.
@@ -24,5 +24,4 @@ public interface QueryService {
     CountDTO count(CountRequest request);
 
     List<SearchResultDTO> searchFiles(FileSearchRequest request);
-
 }

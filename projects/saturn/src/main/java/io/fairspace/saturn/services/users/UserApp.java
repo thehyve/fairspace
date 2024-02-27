@@ -21,7 +21,7 @@ public class UserApp extends BaseApp {
             return mapper.writeValueAsString(service.getUsers());
         });
 
-        patch("/",  (req, res) -> {
+        patch("/", (req, res) -> {
             service.update(mapper.readValue(req.body(), UserRolesUpdate.class));
             res.status(SC_NO_CONTENT);
             return "";

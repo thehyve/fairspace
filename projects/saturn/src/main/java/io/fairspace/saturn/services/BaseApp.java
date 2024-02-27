@@ -3,19 +3,21 @@ package io.fairspace.saturn.services;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import io.fairspace.saturn.rdf.dao.DAOException;
-import io.fairspace.saturn.util.UnsupportedMediaTypeException;
 import lombok.extern.log4j.*;
 import spark.*;
 import spark.servlet.SparkApplication;
 
+import io.fairspace.saturn.rdf.dao.DAOException;
+import io.fairspace.saturn.util.UnsupportedMediaTypeException;
+
+import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
+import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
+
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
-import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static javax.servlet.http.HttpServletResponse.*;
-import static spark.Spark.path;
 import static spark.Spark.notFound;
+import static spark.Spark.path;
 import static spark.globalstate.ServletFlag.isRunningFromServlet;
 
 @Log4j2

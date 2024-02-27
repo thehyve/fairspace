@@ -1,20 +1,21 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.sql.DataSource;
+
+import lombok.extern.slf4j.Slf4j;
+
+import io.fairspace.saturn.config.ViewsConfig;
 
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 
 @Slf4j
-public class MaterializedViewService  {
+public class MaterializedViewService {
 
     public static final String INDEX_POSTFIX = "_idx";
     private final DataSource dataSource;
@@ -22,7 +23,8 @@ public class MaterializedViewService  {
     private final ViewStoreClient.ViewStoreConfiguration configuration;
     private final int maxJoinItems;
 
-    public MaterializedViewService(DataSource dataSource, ViewStoreClient.ViewStoreConfiguration configuration, int maxJoinItems) {
+    public MaterializedViewService(
+            DataSource dataSource, ViewStoreClient.ViewStoreConfiguration configuration, int maxJoinItems) {
         this.dataSource = dataSource;
         this.configuration = configuration;
         this.maxJoinItems = maxJoinItems;
@@ -41,7 +43,8 @@ public class MaterializedViewService  {
     }
 
     public void createOrUpdateViewMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
-        var setColumns = view.columns.stream().filter(column -> column.type.isSet()).toList();
+        var setColumns =
+                view.columns.stream().filter(column -> column.type.isSet()).toList();
         if (!setColumns.isEmpty()) {
             String viewName = view.name.toLowerCase();
             var mvName = "mv_%s".formatted(viewName);
@@ -62,12 +65,15 @@ public class MaterializedViewService  {
             dropMaterializedViewIfExists(mvName, connection);
             createJoinMaterializedViews(view, joinView, connection);
             createMaterializedViewIndex(mvName + "_" + viewName + INDEX_POSTFIX, mvName, viewName + "_id", connection);
-            createMaterializedViewIndex(mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id", connection);
+            createMaterializedViewIndex(
+                    mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id", connection);
             log.info("{} refresh has finished successfully", mvName);
         }
     }
 
-    private void createMaterializedViewIndex(String indexName, String materializedViewName, String columnName, Connection connection) throws SQLException {
+    private void createMaterializedViewIndex(
+            String indexName, String materializedViewName, String columnName, Connection connection)
+            throws SQLException {
         var query = "CREATE INDEX %s on %s (%s)".formatted(indexName, materializedViewName, columnName);
         try (var ps = connection.prepareStatement(query)) {
             ps.execute();
@@ -75,13 +81,26 @@ public class MaterializedViewService  {
         }
     }
 
-    private void createViewMaterializedView(String viewOrTableName, ViewsConfig.View view, List<ViewsConfig.View.Column> setColumns, Connection connection) throws SQLException {
+    private void createViewMaterializedView(
+            String viewOrTableName,
+            ViewsConfig.View view,
+            List<ViewsConfig.View.Column> setColumns,
+            Connection connection)
+            throws SQLException {
         String viewName = view.name.toLowerCase();
         var queryBuilder = new StringBuilder()
-                .append("CREATE MATERIALIZED VIEW ").append(viewOrTableName).append(" AS ")
-                .append("SELECT v.id AS ").append(viewName).append("id, ");
+                .append("CREATE MATERIALIZED VIEW ")
+                .append(viewOrTableName)
+                .append(" AS ")
+                .append("SELECT v.id AS ")
+                .append(viewName)
+                .append("id, ");
         for (int i = 0; i < setColumns.size(); i++) {
-            queryBuilder.append("i").append(i).append(".").append(setColumns.get(i).name.toLowerCase());
+            queryBuilder
+                    .append("i")
+                    .append(i)
+                    .append(".")
+                    .append(setColumns.get(i).name.toLowerCase());
             if (i != setColumns.size() - 1) {
                 queryBuilder.append(", ");
             }
@@ -90,8 +109,19 @@ public class MaterializedViewService  {
         for (int i = 0; i < setColumns.size(); i++) {
             var alias = "i" + i;
             var columnName = setColumns.get(i).name.toLowerCase();
-            queryBuilder.append("LEFT JOIN ").append(viewName).append("_").append(columnName).append(" ").append(alias).append(" ON ")
-                    .append("v.id = ").append(alias).append(".").append(viewName).append("_id ");
+            queryBuilder
+                    .append("LEFT JOIN ")
+                    .append(viewName)
+                    .append("_")
+                    .append(columnName)
+                    .append(" ")
+                    .append(alias)
+                    .append(" ON ")
+                    .append("v.id = ")
+                    .append(alias)
+                    .append(".")
+                    .append(viewName)
+                    .append("_id ");
         }
 
         try (var ps = connection.prepareStatement(queryBuilder.toString())) {
@@ -100,7 +130,8 @@ public class MaterializedViewService  {
         }
     }
 
-    private void createJoinMaterializedViews(ViewsConfig.View view, ViewsConfig.View.JoinView joinView, Connection connection) throws SQLException {
+    private void createJoinMaterializedViews(
+            ViewsConfig.View view, ViewsConfig.View.JoinView joinView, Connection connection) throws SQLException {
         var viewTableName = view.name.toLowerCase();
         var joinTable = configuration.joinTables.get(view.name).get(joinView.view).name;
         var joinedTable = configuration.viewTables.get(joinView.view).name.toLowerCase();
@@ -108,10 +139,20 @@ public class MaterializedViewService  {
         var joinIdColumn = joinedTable + "_id";
         var joinLabelColumn = joinedTable + "_label";
         var queryBuilder = new StringBuilder()
-                .append("create materialized view mv_").append(viewTableName).append("_join_").append(joinedTable).append(" as ")
-                .append("with numbered_rows AS (select v.id  AS ").append(viewIdColumn).append(", ")
-                .append("jt.").append(joinIdColumn).append(", ")
-                .append("jt_0.label AS ").append(joinLabelColumn).append(", ");
+                .append("create materialized view mv_")
+                .append(viewTableName)
+                .append("_join_")
+                .append(joinedTable)
+                .append(" as ")
+                .append("with numbered_rows AS (select v.id  AS ")
+                .append(viewIdColumn)
+                .append(", ")
+                .append("jt.")
+                .append(joinIdColumn)
+                .append(", ")
+                .append("jt_0.label AS ")
+                .append(joinLabelColumn)
+                .append(", ");
 
         var columns = new ArrayList<>(List.of(viewIdColumn, joinIdColumn, joinLabelColumn));
 
@@ -121,7 +162,10 @@ public class MaterializedViewService  {
             if ("id".equalsIgnoreCase(attr)) {
                 continue;
             }
-            var isOfSetType = configuration.propertyTables.getOrDefault(joinView.view, Map.of()).containsKey(attr);
+            var isOfSetType = configuration
+                    .propertyTables
+                    .getOrDefault(joinView.view, Map.of())
+                    .containsKey(attr);
             tableAliases.put(joinedTable + "_" + attr.toLowerCase(), isOfSetType ? "jt_" + (i + 1) : "jt_0");
         }
         for (int i = 0; i < joinView.include.size(); i++) {
@@ -131,36 +175,65 @@ public class MaterializedViewService  {
             }
             var columnName = joinedTable + "_" + attr;
             queryBuilder
-                    .append(tableAliases.get(columnName)).append(".").append(attr).append(" AS ").append(columnName).append(", ");
+                    .append(tableAliases.get(columnName))
+                    .append(".")
+                    .append(attr)
+                    .append(" AS ")
+                    .append(columnName)
+                    .append(", ");
             columns.add(columnName);
         }
 
         queryBuilder
                 .append("row_number() over (partition by v.id) as rn ")
-                .append("from ").append(viewTableName).append(" v ");
+                .append("from ")
+                .append(viewTableName)
+                .append(" v ");
 
         queryBuilder
-                .append("left join ").append(joinTable).append(" jt on v.id = jt.").append(viewTableName).append("_id ")
-                .append("left join ").append(joinedTable).append(" jt_0 on jt_0.id = jt.").append(joinedTable).append("_id ");
-
+                .append("left join ")
+                .append(joinTable)
+                .append(" jt on v.id = jt.")
+                .append(viewTableName)
+                .append("_id ")
+                .append("left join ")
+                .append(joinedTable)
+                .append(" jt_0 on jt_0.id = jt.")
+                .append(joinedTable)
+                .append("_id ");
 
         for (int i = 0; i < joinView.include.size(); i++) {
             var attr = joinView.include.get(i);
-            var isOfSetType = configuration.propertyTables.getOrDefault(joinView.view, Map.of()).containsKey(attr);
+            var isOfSetType = configuration
+                    .propertyTables
+                    .getOrDefault(joinView.view, Map.of())
+                    .containsKey(attr);
             if (!isOfSetType) {
                 continue;
             }
             var columnName = joinedTable + "_" + attr.toLowerCase();
             queryBuilder
-                    .append("left join ").append(columnName).append(" ").append(tableAliases.get(columnName)).append(" on ").append("jt.").append(joinedTable).append("_id = ").append(tableAliases.get(columnName)).append(".").append(joinedTable).append("_id ");
+                    .append("left join ")
+                    .append(columnName)
+                    .append(" ")
+                    .append(tableAliases.get(columnName))
+                    .append(" on ")
+                    .append("jt.")
+                    .append(joinedTable)
+                    .append("_id = ")
+                    .append(tableAliases.get(columnName))
+                    .append(".")
+                    .append(joinedTable)
+                    .append("_id ");
         }
 
-        queryBuilder
-                .append(") ");
+        queryBuilder.append(") ");
 
         queryBuilder
-                .append("select ").append(String.join(", ", columns))
-                .append(" from numbered_rows where rn <= ").append(maxJoinItems);
+                .append("select ")
+                .append(String.join(", ", columns))
+                .append(" from numbered_rows where rn <= ")
+                .append(maxJoinItems);
 
         try (var ps = connection.prepareStatement(queryBuilder.toString())) {
             ps.execute();
@@ -175,5 +248,4 @@ public class MaterializedViewService  {
             connection.commit();
         }
     }
-
 }

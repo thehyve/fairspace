@@ -1,13 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
+import java.time.*;
+import java.util.*;
+
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.*;
@@ -18,11 +13,18 @@ import org.apache.jena.sparql.expr.*;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.time.*;
-import java.util.*;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
@@ -102,12 +104,15 @@ public class SparqlQueryService implements QueryService {
 
             var prop = createProperty(j.on);
             var refs = j.reverse
-                    ? resource.getModel().listResourcesWithProperty(prop, resource).toList()
+                    ? resource.getModel()
+                            .listResourcesWithProperty(prop, resource)
+                            .toList()
                     : getResourceProperties(resource, prop);
 
             for (var colName : j.include) {
                 if (colName.equals("id")) {
-                    result.put(joinView.name, refs.stream().map(this::toValueDTO).collect(toSet()));
+                    result.put(
+                            joinView.name, refs.stream().map(this::toValueDTO).collect(toSet()));
                 } else {
                     var col = joinView.columns.stream()
                             .filter(c -> c.name.equals(colName))
@@ -115,9 +120,8 @@ public class SparqlQueryService implements QueryService {
                             .orElseThrow(() -> new RuntimeException("Unknown column: " + colName));
 
                     var values = refs.stream()
-                            .flatMap(ref -> getValues(ref, col)
-                                    .stream()).
-                                    collect(toCollection(TreeSet::new));
+                            .flatMap(ref -> getValues(ref, col).stream())
+                            .collect(toCollection(TreeSet::new));
 
                     result.put(joinView.name + "_" + colName, values);
                 }
@@ -142,8 +146,7 @@ public class SparqlQueryService implements QueryService {
     }
 
     private View getView(String viewName) {
-        return searchConfig.views
-                .stream()
+        return searchConfig.views.stream()
                 .filter(v -> v.name.equals(viewName))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
@@ -178,20 +181,21 @@ public class SparqlQueryService implements QueryService {
         if (request.getFilters() != null) {
             var filters = new ArrayList<>(request.getFilters());
 
-            filters.stream()
-                    .filter(f -> f.field.equals("location"))
-                    .findFirst()
-                    .ifPresent(locationFilter -> {
+            filters.stream().filter(f -> f.field.equals("location")).findFirst().ifPresent(locationFilter -> {
                 filters.remove(locationFilter);
 
                 if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
                     locationFilter.values.forEach(v -> validateIRI(v.toString()));
-                    var fileLink = view.join.stream().filter(v -> v.view.equals(RESOURCES_VIEW))
-                            .findFirst().orElse(null);
+                    var fileLink = view.join.stream()
+                            .filter(v -> v.view.equals(RESOURCES_VIEW))
+                            .findFirst()
+                            .orElse(null);
                     if (fileLink != null) {
                         builder.append("FILTER EXISTS {\n")
                                 .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
-                                .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                                .append(locationFilter.values.stream()
+                                        .map(v -> "<" + v + ">")
+                                        .collect(joining(", ")))
                                 .append("))\n ?file <")
                                 .append(fileLink.on)
                                 .append("> ?")
@@ -199,9 +203,12 @@ public class SparqlQueryService implements QueryService {
                                 .append(" . \n")
                                 .append("}\n");
                     } else {
-                        builder.append("?").append(view.name)
+                        builder.append("?")
+                                .append(view.name)
                                 .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
-                                .append(locationFilter.values.stream().map(v -> "<" + v + ">").collect(joining(", ")))
+                                .append(locationFilter.values.stream()
+                                        .map(v -> "<" + v + ">")
+                                        .collect(joining(", ")))
                                 .append("))\n");
                     }
                 }
@@ -216,8 +223,7 @@ public class SparqlQueryService implements QueryService {
                         if (!entity.equals(view.name)) {
                             builder.append("FILTER EXISTS {\n");
 
-                            var join = view.join
-                                    .stream()
+                            var join = view.join.stream()
                                     .filter(j -> j.view.equals(entity))
                                     .findFirst()
                                     .orElseThrow(() -> new RuntimeException("Unknown view: " + entity));
@@ -231,8 +237,7 @@ public class SparqlQueryService implements QueryService {
                                     .append(" .\n");
                         }
 
-                        request.getFilters()
-                                .stream()
+                        request.getFilters().stream()
                                 .filter(f -> f.getField().startsWith(entity))
                                 .sorted(comparing(f -> f.field.contains("_") ? getColumn(f.field).priority : 0))
                                 .forEach(f -> {
@@ -281,18 +286,21 @@ public class SparqlQueryService implements QueryService {
 
         Expr expr;
         if (filter.min != null && filter.max != null) {
-            expr = new E_LogicalAnd(new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, type)), new E_LessThanOrEqual(variable, toNodeValue(filter.max, type)));
+            expr = new E_LogicalAnd(
+                    new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, type)),
+                    new E_LessThanOrEqual(variable, toNodeValue(filter.max, type)));
         } else if (filter.min != null) {
             expr = new E_GreaterThanOrEqual(variable, toNodeValue(filter.min, type));
         } else if (filter.max != null) {
             expr = new E_LessThanOrEqual(variable, toNodeValue(filter.max, type));
         } else if (filter.values != null && !filter.values.isEmpty()) {
-            List<Expr> values = filter.values.stream()
-                    .map(o -> toNodeValue(o, type))
-                    .collect(toList());
+            List<Expr> values =
+                    filter.values.stream().map(o -> toNodeValue(o, type)).collect(toList());
             expr = new E_OneOf(variable, new ExprList(values));
         } else if (filter.prefix != null && !filter.prefix.isBlank()) {
-            expr = new E_StrStartsWith(new E_StrLowerCase(variable), makeString(filter.prefix.trim().toLowerCase()));
+            expr = new E_StrStartsWith(
+                    new E_StrLowerCase(variable),
+                    makeString(filter.prefix.trim().toLowerCase()));
         } else if (filter.booleanValue != null) {
             expr = new E_Equals(variable, makeBoolean(filter.booleanValue));
         } else {
@@ -310,9 +318,14 @@ public class SparqlQueryService implements QueryService {
         var viewConfig = getView(fieldNameParts[0]);
         return viewConfig.columns.stream()
                 .filter(column -> column.name.equalsIgnoreCase(fieldNameParts[1]))
-                .findFirst().orElseThrow(() -> {
+                .findFirst()
+                .orElseThrow(() -> {
                     log.error("Unknown column for view {}: {}", fieldNameParts[0], fieldNameParts[1]);
-                    log.error("Expected one of {}", viewConfig.columns.stream().map(column -> column.name).collect(joining(", ")));
+                    log.error(
+                            "Expected one of {}",
+                            viewConfig.columns.stream()
+                                    .map(column -> column.name)
+                                    .collect(joining(", ")));
                     throw new IllegalArgumentException(
                             "Unknown column for view " + fieldNameParts[0] + ": " + fieldNameParts[1]);
                 });

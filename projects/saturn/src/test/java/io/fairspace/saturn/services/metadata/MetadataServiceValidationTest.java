@@ -1,10 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -19,10 +14,17 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
+
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.when;
 public class MetadataServiceValidationTest {
     @Mock
     private MetadataRequestValidator validator;
+
     @Mock
     private MetadataPermissions permissions;
 
@@ -92,11 +95,13 @@ public class MetadataServiceValidationTest {
 
     private void produceValidationError() {
         doAnswer(invocation -> {
-            ViolationHandler handler = invocation.getArgument(4);
-            handler.onViolation("ERROR", createResource(), null, null);
+                    ViolationHandler handler = invocation.getArgument(4);
+                    handler.onViolation("ERROR", createResource(), null, null);
 
-            return null;
-        }).when(validator).validate(any(), any(), any(), any(), any());
+                    return null;
+                })
+                .when(validator)
+                .validate(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -156,14 +161,13 @@ public class MetadataServiceValidationTest {
             ds.abort();
         });
 
-        verify(validator).validate(
-                isomorphic(modelOf(resource1, RDF.type, class1)),
-                isomorphic(modelOf(
-                        resource1, RDF.type, class1,
-                        resource1, property1, createTypedLiteral(1))),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(toAdd),
-                any());
+        verify(validator)
+                .validate(
+                        isomorphic(modelOf(resource1, RDF.type, class1)),
+                        isomorphic(modelOf(resource1, RDF.type, class1, resource1, property1, createTypedLiteral(1))),
+                        isomorphic(EMPTY_MODEL),
+                        isomorphic(toAdd),
+                        any());
     }
 
     @Test
@@ -177,14 +181,13 @@ public class MetadataServiceValidationTest {
             ds.abort();
         });
 
-        verify(validator).validate(
-                isomorphic(modelOf(resource2, RDF.type, class2)),
-                isomorphic(modelOf(
-                        resource2, RDF.type, class2,
-                        resource1, property1, resource2)),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(toAdd),
-                any());
+        verify(validator)
+                .validate(
+                        isomorphic(modelOf(resource2, RDF.type, class2)),
+                        isomorphic(modelOf(resource2, RDF.type, class2, resource1, property1, resource2)),
+                        isomorphic(EMPTY_MODEL),
+                        isomorphic(toAdd),
+                        any());
     }
 
     @Test
@@ -193,15 +196,33 @@ public class MetadataServiceValidationTest {
         var node2 = createResource();
         var node3 = createResource();
         var modelWithList = modelOf(
-                resource1, property1, node1,
-                node1, RDF.first, createTypedLiteral(1),
-                node1, RDF.rest, node2,
-                node2, RDF.first, createTypedLiteral(2),
-                node2, RDF.rest, node3,
-                node3, RDF.first, resource2,
-                resource2, RDF.type, class2,
-                node3, RDF.rest, RDF.nil,
-                resource2, RDF.type, class2);
+                resource1,
+                property1,
+                node1,
+                node1,
+                RDF.first,
+                createTypedLiteral(1),
+                node1,
+                RDF.rest,
+                node2,
+                node2,
+                RDF.first,
+                createTypedLiteral(2),
+                node2,
+                RDF.rest,
+                node3,
+                node3,
+                RDF.first,
+                resource2,
+                resource2,
+                RDF.type,
+                class2,
+                node3,
+                RDF.rest,
+                RDF.nil,
+                resource2,
+                RDF.type,
+                class2);
 
         ds.setDefaultModel(modelWithList);
 
@@ -212,12 +233,12 @@ public class MetadataServiceValidationTest {
             ds.abort();
         });
 
-        verify(validator).validate(
-                isomorphic(modelWithList),
-                isomorphic(modelWithList.union(toAdd)),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(toAdd),
-                any());
+        verify(validator)
+                .validate(
+                        isomorphic(modelWithList),
+                        isomorphic(modelWithList.union(toAdd)),
+                        isomorphic(EMPTY_MODEL),
+                        isomorphic(toAdd),
+                        any());
     }
 }
-

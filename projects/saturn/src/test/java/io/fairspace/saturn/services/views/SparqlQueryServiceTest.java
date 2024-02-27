@@ -1,18 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.dao.*;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
-import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.metadata.*;
-import io.fairspace.saturn.services.metadata.validation.*;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.users.*;
-import io.fairspace.saturn.services.workspaces.*;
-import io.fairspace.saturn.webdav.*;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import java.io.*;
+import java.util.*;
+
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.*;
 import io.milton.resource.*;
@@ -26,11 +16,22 @@ import org.junit.runner.*;
 import org.mockito.*;
 import org.mockito.junit.*;
 
-import java.io.*;
-import java.util.*;
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.rdf.dao.*;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.metadata.*;
+import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.users.*;
+import io.fairspace.saturn.services.workspaces.*;
+import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.*;
+
 import static org.apache.jena.query.DatasetFactory.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -45,10 +46,13 @@ public class SparqlQueryServiceTest {
 
     @Mock
     BlobStore store;
+
     @Mock
     UserService userService;
+
     @Mock
     private MetadataPermissions permissions;
+
     WorkspaceService workspaceService;
     MetadataService api;
     QueryService queryService;
@@ -62,7 +66,6 @@ public class SparqlQueryServiceTest {
     User admin;
     Authentication.User adminAuthentication;
     private org.eclipse.jetty.server.Request request;
-
 
     private void selectRegularUser() {
         lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
@@ -111,7 +114,8 @@ public class SparqlQueryServiceTest {
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        queryService = new SparqlQueryService(ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
+        queryService = new SparqlQueryService(
+                ConfigLoader.CONFIG.search, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
@@ -126,7 +130,8 @@ public class SparqlQueryServiceTest {
         var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies, Boolean.FALSE);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
+        var workspace = workspaceService.createWorkspace(
+                Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 
@@ -157,13 +162,25 @@ public class SparqlQueryServiceTest {
         assertEquals(2, page.getRows().size());
         // The implementation does not sort results. Probably deterministic,
         // but no certain order is guaranteed.
-        var row = page.getRows().get(0).get("Sample").iterator().next().getValue().equals("http://example.com/samples#s1-a")
-                ? page.getRows().get(0) : page.getRows().get(1);
-        assertEquals("Sample A for subject 1", row.get("Sample").iterator().next().getLabel());
-        assertEquals(SAMPLE_NATURE_BLOOD, row.get("Sample_nature").iterator().next().getValue());
+        var row = page.getRows()
+                        .get(0)
+                        .get("Sample")
+                        .iterator()
+                        .next()
+                        .getValue()
+                        .equals("http://example.com/samples#s1-a")
+                ? page.getRows().get(0)
+                : page.getRows().get(1);
+        assertEquals(
+                "Sample A for subject 1", row.get("Sample").iterator().next().getLabel());
+        assertEquals(
+                SAMPLE_NATURE_BLOOD, row.get("Sample_nature").iterator().next().getValue());
         assertEquals("Blood", row.get("Sample_nature").iterator().next().getLabel());
         assertEquals("Liver", row.get("Sample_topography").iterator().next().getLabel());
-        assertEquals(45.2f, ((Number) row.get("Sample_tumorCellularity").iterator().next().getValue()).floatValue(), 0.01);
+        assertEquals(
+                45.2f,
+                ((Number) row.get("Sample_tumorCellularity").iterator().next().getValue()).floatValue(),
+                0.01);
     }
 
     @Test
@@ -190,12 +207,10 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(List.of(
-                ViewFilter.builder()
-                        .field("Sample_nature")
-                        .values(List.of(SAMPLE_NATURE_BLOOD))
-                        .build()
-        ));
+        request.setFilters(List.of(ViewFilter.builder()
+                .field("Sample_nature")
+                .values(List.of(SAMPLE_NATURE_BLOOD))
+                .build()));
         var page = queryService.retrieveViewPage(request);
         assertEquals(1, page.getRows().size());
     }
@@ -206,12 +221,8 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(List.of(
-                ViewFilter.builder()
-                        .field("Sample")
-                        .prefix("sample b")
-                        .build()
-        ));
+        request.setFilters(
+                List.of(ViewFilter.builder().field("Sample").prefix("sample b").build()));
         var page = queryService.retrieveViewPage(request);
         assertEquals(1, page.getRows().size());
     }
@@ -222,12 +233,10 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("Resource_analysisType")
-                        .values(Collections.singletonList(ANALYSIS_TYPE_RNA_SEQ))
-                        .build()
-        ));
+        request.setFilters(Collections.singletonList(ViewFilter.builder()
+                .field("Resource_analysisType")
+                .values(Collections.singletonList(ANALYSIS_TYPE_RNA_SEQ))
+                .build()));
         var page = queryService.retrieveViewPage(request);
         assertEquals(1, page.getRows().size());
     }
@@ -238,12 +247,10 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("location")
-                        .values(Collections.singletonList(baseUri + "/coll2"))
-                        .build()
-        ));
+        request.setFilters(Collections.singletonList(ViewFilter.builder()
+                .field("location")
+                .values(Collections.singletonList(baseUri + "/coll2"))
+                .build()));
         var page = queryService.retrieveViewPage(request);
         assertEquals(1, page.getRows().size());
     }
@@ -254,13 +261,12 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("location")
-                        .values(Collections.singletonList(">; INSERT something"))
-                        .build()
-        ));
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> queryService.retrieveViewPage(request));
+        request.setFilters(Collections.singletonList(ViewFilter.builder()
+                .field("location")
+                .values(Collections.singletonList(">; INSERT something"))
+                .build()));
+        Exception exception =
+                assertThrows(IllegalArgumentException.class, () -> queryService.retrieveViewPage(request));
         String expectedMessage = "Invalid IRI";
         String actualMessage = exception.getMessage();
 
@@ -298,12 +304,10 @@ public class SparqlQueryServiceTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(List.of(
-                ViewFilter.builder()
-                        .field("Resource_analysisType")
-                        .values(List.of(ANALYSIS_TYPE_IMAGING))
-                        .build()
-        ));
+        request.setFilters(List.of(ViewFilter.builder()
+                .field("Resource_analysisType")
+                .values(List.of(ANALYSIS_TYPE_IMAGING))
+                .build()));
         var page = queryService.retrieveViewPage(request);
         assertEquals(0, page.getRows().size());
     }

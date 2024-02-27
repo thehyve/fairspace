@@ -1,8 +1,9 @@
 package io.fairspace.saturn.webdav.resources;
 
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.Access;
-import io.fairspace.saturn.webdav.DavFactory;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
@@ -14,12 +15,13 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
+
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 
 @Log4j2
@@ -33,19 +35,26 @@ public class ExtraStorageRootResource extends RootResource {
     public boolean authorise(Request request, Request.Method method, Auth auth) {
         return true;
     }
+
     @Override
     public List<? extends Resource> getChildren() {
-        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.ExtraStorageDirectory)
+        return factory.rootSubject
+                .getModel()
+                .listSubjectsWithProperty(RDF.type, FS.ExtraStorageDirectory)
                 .mapWith(factory::getResource)
                 .filterDrop(Objects::isNull)
                 .toList();
     }
 
     @Override
-    public CollectionResource createCollection(String name) throws ConflictException, BadRequestException, NotAuthorizedException {
-        if (!CONFIG.extraStorage.defaultRootCollections.contains(name)){
+    public CollectionResource createCollection(String name)
+            throws ConflictException, BadRequestException, NotAuthorizedException {
+        if (!CONFIG.extraStorage.defaultRootCollections.contains(name)) {
             // Currently all root extra storage directories should be specified in the extra storage config
-            throw new NotAuthorizedException( String.format("Directory with name %s not specified in the configuration.", name), this, SC_FORBIDDEN);
+            throw new NotAuthorizedException(
+                    String.format("Directory with name %s not specified in the configuration.", name),
+                    this,
+                    SC_FORBIDDEN);
         }
 
         if (name != null) {
@@ -59,8 +68,7 @@ public class ExtraStorageRootResource extends RootResource {
 
         var subj = childSubject(factory.rootSubject, name);
         subj.getModel().removeAll(subj, null, null).removeAll(null, null, subj);
-        subj.addProperty(RDF.type, FS.ExtraStorageDirectory)
-                .addProperty(RDFS.label, name);
+        subj.addProperty(RDF.type, FS.ExtraStorageDirectory).addProperty(RDFS.label, name);
 
         return (CollectionResource) factory.getResource(subj, Access.Manage);
     }
@@ -73,11 +81,13 @@ public class ExtraStorageRootResource extends RootResource {
     }
 
     private Optional<Resource> findStorageWithName(String name) {
-        return factory.rootSubject.getModel().listSubjects()
+        return factory.rootSubject
+                .getModel()
+                .listSubjects()
                 .filterDrop(Objects::isNull)
-                .filterKeep(r -> r.getProperty(RDFS.label) != null && r.getProperty(RDFS.label).getString().equals(name))
+                .filterKeep(r -> r.getProperty(RDFS.label) != null
+                        && r.getProperty(RDFS.label).getString().equals(name))
                 .mapWith(factory::getResource)
                 .nextOptional();
     }
-
 }

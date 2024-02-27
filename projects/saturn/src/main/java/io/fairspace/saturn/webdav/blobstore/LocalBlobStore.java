@@ -1,10 +1,9 @@
 package io.fairspace.saturn.webdav.blobstore;
 
+import java.io.*;
 
 import io.milton.common.RangeUtils;
 import io.milton.http.Range;
-
-import java.io.*;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.IOUtils.copyLarge;
@@ -14,7 +13,7 @@ public class LocalBlobStore implements BlobStore {
 
     public LocalBlobStore(File dir) {
         this.dir = dir;
-        if(!dir.exists() && !dir.mkdirs()) {
+        if (!dir.exists() && !dir.mkdirs()) {
             throw new RuntimeException("Cannot initialize the local blob store");
         }
     }
@@ -29,7 +28,7 @@ public class LocalBlobStore implements BlobStore {
             dest = new File(dir, id);
         }
         try (var out = new BufferedOutputStream(new FileOutputStream(dest))) {
-             copyLarge(in, out);
+            copyLarge(in, out);
         } catch (IOException e) {
             dest.delete();
             throw e;
@@ -40,7 +39,7 @@ public class LocalBlobStore implements BlobStore {
     @Override
     public void read(String id, OutputStream out, long start, Long finish) throws IOException {
         var src = new File(dir, id);
-        try(var in = new BufferedInputStream(new FileInputStream(src))) {
+        try (var in = new BufferedInputStream(new FileInputStream(src))) {
             RangeUtils.writeRange(in, new Range(start, finish), out);
         }
     }

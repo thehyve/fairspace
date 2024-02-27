@@ -1,8 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import org.apache.jena.graph.Node;
-
 import java.io.*;
+
+import org.apache.jena.graph.Node;
 
 import static java.nio.file.Files.move;
 import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
@@ -42,7 +42,6 @@ public class LocalTransactionLog implements TransactionLog {
     private long count;
     private OutputStream outputStream;
     private TransactionListener writingListener;
-
 
     public LocalTransactionLog(File directory, TransactionCodec codec) {
         this.directory = directory;

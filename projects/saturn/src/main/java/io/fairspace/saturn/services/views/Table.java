@@ -1,17 +1,17 @@
 package io.fairspace.saturn.services.views;
 
-import lombok.*;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.*;
+
 import static io.fairspace.saturn.config.ViewsConfig.*;
-import static java.util.stream.Collectors.toMap;
 
 @Data
 public class Table {
-    @Data @Builder
+    @Data
+    @Builder
     public static class ColumnDefinition {
         String name;
         ColumnType type;
@@ -29,10 +29,7 @@ public class Table {
     }
 
     public static ColumnDefinition valueColumn(String name, ColumnType type) {
-        return ColumnDefinition.builder()
-                .name(name.toLowerCase())
-                .type(type)
-                .build();
+        return ColumnDefinition.builder().name(name.toLowerCase()).type(type).build();
     }
 
     String name;

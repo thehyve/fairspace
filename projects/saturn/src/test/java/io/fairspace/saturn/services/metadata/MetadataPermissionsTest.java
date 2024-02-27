@@ -1,12 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.Access;
-import io.fairspace.saturn.webdav.DavFactory;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -15,6 +8,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -26,8 +27,10 @@ public class MetadataPermissionsTest {
 
     @Mock
     private WorkspaceService workspaceService;
+
     @Mock
     private DavFactory davFactory;
+
     @Mock
     private UserService userService;
 
@@ -91,7 +94,6 @@ public class MetadataPermissionsTest {
         assertTrue(actual);
     }
 
-
     @Test
     public void testCanReadMetadataOfFileSystemResourceWhichCanBeListed() {
         // given
@@ -145,13 +147,11 @@ public class MetadataPermissionsTest {
         ws.setCanCollaborate(true);
         when(workspaceService.getWorkspace(mockNode)).thenReturn(ws);
 
-
         var actual = sut.canReadMetadata(mockResource);
 
         // then
         assertTrue(actual);
     }
-
 
     @Test
     public void testCanNotReadMetadataOfWorkspaceWhenCanNotCollaborate() {
@@ -169,7 +169,6 @@ public class MetadataPermissionsTest {
         Workspace ws = new Workspace();
         ws.setCanCollaborate(false);
         when(workspaceService.getWorkspace(mockNode)).thenReturn(ws);
-
 
         var actual = sut.canReadMetadata(mockResource);
 
@@ -190,7 +189,6 @@ public class MetadataPermissionsTest {
 
         when(mockResource.hasProperty(RDF.type, FS.Workspace)).thenReturn(false);
 
-
         var actual = sut.canReadMetadata(mockResource);
 
         // then
@@ -209,7 +207,6 @@ public class MetadataPermissionsTest {
         when(davFactory.isFileSystemResource(mockResource)).thenReturn(false);
 
         when(mockResource.hasProperty(RDF.type, FS.Workspace)).thenReturn(false);
-
 
         var actual = sut.canReadMetadata(mockResource);
 
@@ -231,7 +228,6 @@ public class MetadataPermissionsTest {
         // then
         assertTrue(actual);
     }
-
 
     @Test
     public void testCanWriteMetadataOfFileSystemResourceWhichCanBeWritten() {
@@ -286,13 +282,11 @@ public class MetadataPermissionsTest {
         ws.setCanManage(true);
         when(workspaceService.getWorkspace(mockNode)).thenReturn(ws);
 
-
         var actual = sut.canWriteMetadata(mockResource);
 
         // then
         assertTrue(actual);
     }
-
 
     @Test
     public void testCanNotWriteMetadataOfWorkspaceWhenCanNotManageCollaborate() {
@@ -310,7 +304,6 @@ public class MetadataPermissionsTest {
         Workspace ws = new Workspace();
         ws.setCanManage(false);
         when(workspaceService.getWorkspace(mockNode)).thenReturn(ws);
-
 
         var actual = sut.canWriteMetadata(mockResource);
 
@@ -331,7 +324,6 @@ public class MetadataPermissionsTest {
 
         when(mockResource.hasProperty(RDF.type, FS.Workspace)).thenReturn(false);
 
-
         var actual = sut.canWriteMetadata(mockResource);
 
         // then
@@ -350,7 +342,6 @@ public class MetadataPermissionsTest {
         when(davFactory.isFileSystemResource(mockResource)).thenReturn(false);
 
         when(mockResource.hasProperty(RDF.type, FS.Workspace)).thenReturn(false);
-
 
         var actual = sut.canReadMetadata(mockResource);
 

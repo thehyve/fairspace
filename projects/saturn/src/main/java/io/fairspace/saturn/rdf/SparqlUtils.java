@@ -1,6 +1,11 @@
 package io.fairspace.saturn.rdf;
 
-import io.fairspace.saturn.services.search.SearchResultDTO;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.function.Consumer;
+
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
@@ -11,13 +16,10 @@ import org.apache.jena.sparql.core.*;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Consumer;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -35,7 +37,8 @@ public class SparqlUtils {
     }
 
     public static Instant parseXSDDateTimeLiteral(Literal literal) {
-        return Instant.ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
+        return Instant.ofEpochMilli(
+                ((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
     }
 
     public static Literal toXSDDateTimeLiteral(Instant instant) {
@@ -60,12 +63,12 @@ public class SparqlUtils {
     }
 
     public static void update(Dataset dataset, String updateString) {
-        executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset).execute());
+        executeWrite(dataset, () -> UpdateExecutionFactory.create(UpdateFactory.create(updateString), dataset)
+                .execute());
     }
 
     public static String getQueryRegex(String query) {
-        return ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)"
-                + query.replaceAll("[^a-zA-Z0-9]", "\\\\$0"))
+        return ("(^|\\s|\\.|\\-|\\,|\\;|\\(|\\[|\\{|\\?|\\!|\\\\|\\/|_)" + query.replaceAll("[^a-zA-Z0-9]", "\\\\$0"))
                 .replace("/\\/g", "\\\\");
     }
 
@@ -80,8 +83,12 @@ public class SparqlUtils {
                 for (var row : (Iterable<QuerySolution>) selectExecution::execSelect) {
                     var id = row.getResource("id").getURI();
                     var label = row.getLiteral("label").getString();
-                    var type = ofNullable(row.getResource("type")).map(Resource::getURI).orElse(null);
-                    var comment = ofNullable(row.getLiteral("comment")).map(Literal::getString).orElse(null);
+                    var type = ofNullable(row.getResource("type"))
+                            .map(Resource::getURI)
+                            .orElse(null);
+                    var comment = ofNullable(row.getLiteral("comment"))
+                            .map(Literal::getString)
+                            .orElse(null);
 
                     var dto = SearchResultDTO.builder()
                             .id(id)

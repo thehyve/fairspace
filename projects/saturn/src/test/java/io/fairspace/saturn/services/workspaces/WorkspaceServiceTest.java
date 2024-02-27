@@ -1,11 +1,7 @@
 package io.fairspace.saturn.services.workspaces;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
+import javax.mail.Session;
+
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -15,9 +11,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.mail.Session;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
@@ -37,10 +39,13 @@ public class WorkspaceServiceTest {
 
     private Transactions txn = new SimpleTransactions(createTxnMem());
     private WorkspaceService service;
+
     @Mock
     Session session;
+
     @Mock
     private UserService userService;
+
     User user = new User();
 
     @Before
@@ -49,15 +54,13 @@ public class WorkspaceServiceTest {
         when(userService.currentUser()).thenReturn(user);
         service = new WorkspaceService(txn, userService);
 
-        txn.executeWrite(model -> model
-                .add(WORKSPACE_1, RDF.type, FS.Workspace)
+        txn.executeWrite(model -> model.add(WORKSPACE_1, RDF.type, FS.Workspace)
                 .add(EMPTY_WORKSPACE, RDF.type, FS.Workspace)
                 .add(COLLECTION_1, RDF.type, FS.Collection)
                 .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1)
                 .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1)
                 .add(WORKSPACE_1, PROPERTY_1, RESOURCE_1)
-                .add(EMPTY_WORKSPACE, PROPERTY_2, RESOURCE_2)
-        );
+                .add(EMPTY_WORKSPACE, PROPERTY_2, RESOURCE_2));
     }
 
     @Test
@@ -82,7 +85,7 @@ public class WorkspaceServiceTest {
         try {
             service.deleteWorkspace(createURI(RESOURCE_1.getURI()));
             fail();
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Invalid resource type", e.getMessage());
         }
     }
@@ -93,7 +96,7 @@ public class WorkspaceServiceTest {
         try {
             service.deleteWorkspace(createURI(WORKSPACE_1.getURI()));
             fail();
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             assertEquals("Workspace is not empty", e.getMessage());
         }
     }

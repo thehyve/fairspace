@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.milton.http.Handler;
 import io.milton.http.HttpManager;
 import io.milton.http.Request;
@@ -11,6 +10,8 @@ import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.http.exceptions.NotFoundException;
 import io.milton.resource.Resource;
 import lombok.SneakyThrows;
+
+import io.fairspace.saturn.rdf.transactions.Transactions;
 
 class TransactionalHandlerWrapper implements Handler {
     private final Handler wrapped;
@@ -28,7 +29,8 @@ class TransactionalHandlerWrapper implements Handler {
 
     @Override
     @SneakyThrows
-    public void process(HttpManager httpManager, Request request, Response response) throws ConflictException, NotAuthorizedException, BadRequestException, NotFoundException {
+    public void process(HttpManager httpManager, Request request, Response response)
+            throws ConflictException, NotAuthorizedException, BadRequestException, NotFoundException {
         if (request.getMethod().isWrite) {
             txn.executeWrite(ds -> wrapped.process(httpManager, request, response));
         } else {

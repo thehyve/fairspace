@@ -1,8 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import java.io.File;
+import java.io.IOException;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.LockMRSW;
@@ -10,8 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;
 import static junit.framework.TestCase.assertTrue;
@@ -22,7 +22,6 @@ import static org.apache.jena.query.ReadWrite.WRITE;
 public class TransactionsTest {
     private Config.Jena config = new Config.Jena();
     private Dataset ds;
-
 
     @Before
     public void before() {
@@ -75,5 +74,4 @@ public class TransactionsTest {
         ds.commit();
         ds.commit();
     }
-
 }

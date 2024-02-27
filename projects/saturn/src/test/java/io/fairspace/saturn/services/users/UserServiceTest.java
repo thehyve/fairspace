@@ -1,9 +1,8 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.dao.*;
-import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.workspaces.*;
+import java.util.*;
+import java.util.stream.*;
+
 import org.eclipse.jetty.server.*;
 import org.junit.*;
 import org.junit.runner.*;
@@ -12,12 +11,15 @@ import org.keycloak.representations.idm.*;
 import org.mockito.*;
 import org.mockito.junit.*;
 
-import java.util.*;
-import java.util.stream.*;
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.rdf.dao.*;
+import io.fairspace.saturn.rdf.transactions.*;
+import io.fairspace.saturn.services.workspaces.*;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -28,8 +30,10 @@ public class UserServiceTest {
     private org.eclipse.jetty.server.Request request;
     private Transactions tx = new SimpleTransactions(createTxnMem());
     private WorkspaceService workspaceService;
+
     @Mock
     private UsersResource usersResource;
+
     private UserService userService;
     User user;
     Authentication.User userAuthentication;
@@ -61,8 +65,8 @@ public class UserServiceTest {
             new DAO(model).write(admin);
         });
 
-        keycloakUsers = List.of(user, admin).stream().map(
-                user -> {
+        keycloakUsers = List.of(user, admin).stream()
+                .map(user -> {
                     var keycloakUser = new UserRepresentation();
                     keycloakUser.setId(user.getId());
                     keycloakUser.setUsername(user.getUsername());
@@ -76,9 +80,7 @@ public class UserServiceTest {
 
         selectAdmin();
         // Create test workspace
-        workspaceService.createWorkspace(Workspace.builder()
-                .code("ws1")
-                .build());
+        workspaceService.createWorkspace(Workspace.builder().code("ws1").build());
     }
 
     private void triggerKeycloakUserUpdate() {
@@ -110,9 +112,7 @@ public class UserServiceTest {
      */
     @Test
     public void testFetchUsersWhileFetchingWorkspaces() throws InterruptedException {
-        var pristineUser = tx.calculateRead(model ->
-                new DAO(model).read(User.class, generateMetadataIri("user"))
-        );
+        var pristineUser = tx.calculateRead(model -> new DAO(model).read(User.class, generateMetadataIri("user")));
         Assert.assertEquals("user", pristineUser.getName());
 
         triggerKeycloakUserUpdate();
@@ -123,9 +123,7 @@ public class UserServiceTest {
         workspaceService.listWorkspaces();
 
         Thread.sleep(500);
-        var updatedUser = tx.calculateRead(model ->
-                new DAO(model).read(User.class, generateMetadataIri("user"))
-        );
+        var updatedUser = tx.calculateRead(model -> new DAO(model).read(User.class, generateMetadataIri("user")));
         // Check that the updated user was correctly saved to the database.
         Assert.assertEquals("Updated", updatedUser.getName());
     }

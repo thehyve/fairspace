@@ -1,11 +1,10 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.services.metadata.validation.Violation;
-import io.fairspace.saturn.vocabulary.FS;
+import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -16,10 +15,12 @@ import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.apache.jena.vocabulary.RDF;
 
-import java.time.Instant;
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.services.metadata.validation.Violation;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
@@ -30,6 +31,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 import static io.fairspace.saturn.services.users.UserService.currentUserAsSymbol;
 import static io.fairspace.saturn.vocabulary.ShapeUtils.getPropertyShapesForResource;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 public class MetadataService {
@@ -42,7 +44,11 @@ public class MetadataService {
     // If you change this, also change it in 'constants.js'
     private final int MAX_LIST_LENGTH = 100;
 
-    public MetadataService(Transactions transactions, Model vocabulary, MetadataRequestValidator validator, MetadataPermissions permissions) {
+    public MetadataService(
+            Transactions transactions,
+            Model vocabulary,
+            MetadataRequestValidator validator,
+            MetadataPermissions permissions) {
         this.transactions = transactions;
         this.vocabulary = vocabulary;
         this.validator = validator;
@@ -76,18 +82,24 @@ public class MetadataService {
                 }
             });
 
-            getPropertyShapesForResource(resource, vocabulary)
-                    .stream()
+            getPropertyShapesForResource(resource, vocabulary).stream()
                     .map(ps -> ps.getProperty(SHACLM.path).getResource().getPropertyResourceValue(SHACLM.inversePath))
                     .filter(Objects::nonNull)
                     .map(p -> p.as(Property.class))
-                    .forEach(property -> addStatements(fairspaceData, returnValues, property, resource, withValueProperties));
+                    .forEach(property ->
+                            addStatements(fairspaceData, returnValues, property, resource, withValueProperties));
         });
         return returnValues;
     }
 
-    private void addStatements(Model fairspaceData, Model returnValues, Property property, Resource resource, boolean withValueProperties) {
-        ExtendedIterator<Statement> statements = fairspaceData.listStatements(null, property, resource)
+    private void addStatements(
+            Model fairspaceData,
+            Model returnValues,
+            Property property,
+            Resource resource,
+            boolean withValueProperties) {
+        ExtendedIterator<Statement> statements = fairspaceData
+                .listStatements(null, property, resource)
                 .filterKeep(stmt -> permissions.canReadMetadata(stmt.getSubject()))
                 .filterDrop(stmt -> stmt.getSubject().hasProperty(FS.dateDeleted));
 
@@ -108,14 +120,12 @@ public class MetadataService {
     }
 
     private void addImportantProperties(Resource s, Model dest) {
-        getPropertyShapesForResource(s, vocabulary)
-                .forEach(shape -> {
-                    if (shape.hasLiteral(FS.importantProperty, true)) {
-                        var property = shape.getPropertyResourceValue(SHACLM.path).as(Property.class);
-                        s.listProperties(property)
-                                .forEachRemaining(dest::add);
-                    }
-                });
+        getPropertyShapesForResource(s, vocabulary).forEach(shape -> {
+            if (shape.hasLiteral(FS.importantProperty, true)) {
+                var property = shape.getPropertyResourceValue(SHACLM.path).as(Property.class);
+                s.listProperties(property).forEachRemaining(dest::add);
+            }
+        });
     }
 
     /**
@@ -197,18 +207,18 @@ public class MetadataService {
                     .filterKeep(stmt -> stmt.getSubject().isURIResource())
                     .mapWith(stmt -> Pair.of(stmt.getSubject(), stmt.getPredicate()))
                     .toSet()
-                    .forEach(pair -> existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
+                    .forEach(pair ->
+                            existing.add(before.listStatements(pair.getKey(), pair.getValue(), (RDFNode) null)));
 
             return update(
-                    existing.difference(model),
-                    model.remove(existing).removeAll(null, null, FS.nil),
-                    doViewsUpdate);
+                    existing.difference(model), model.remove(existing).removeAll(null, null, FS.nil), doViewsUpdate);
         }));
     }
 
     private Set<Resource> update(Model modelToRemove, Model modelToAdd, Boolean doViewsUpdate) {
         var symbol = currentUserAsSymbol();
-        transactions.setContextValue(symbol, doViewsUpdate); // to be read downstream when Jena's transaction is being committed
+        transactions.setContextValue(
+                symbol, doViewsUpdate); // to be read downstream when Jena's transaction is being committed
         return transactions.calculateWrite(before -> {
             trimLabels(modelToAdd);
             var after = updatedView(before, modelToRemove, modelToAdd);
@@ -217,7 +227,10 @@ public class MetadataService {
 
             persist(modelToRemove, modelToAdd);
 
-            return modelToRemove.listSubjects().andThen(modelToAdd.listSubjects()).toSet();
+            return modelToRemove
+                    .listSubjects()
+                    .andThen(modelToAdd.listSubjects())
+                    .toSet();
         });
     }
 
@@ -230,7 +243,8 @@ public class MetadataService {
     }
 
     private void validate(Model before, Model after, Model modelToRemove, Model modelToAdd) {
-        modelToAdd.listSubjects()
+        modelToAdd
+                .listSubjects()
                 .andThen(modelToRemove.listSubjects())
                 .filterDrop(s -> permissions.canWriteMetadata(s.inModel(before)))
                 .forEachRemaining(s -> {
@@ -238,9 +252,16 @@ public class MetadataService {
                 });
 
         var violations = new LinkedHashSet<Violation>();
-        validator.validate(before, after, modelToRemove, modelToAdd,
-                (message, subject, predicate, object) ->
-                        violations.add(new Violation(message, subject.toString(), Objects.toString(predicate, null), Objects.toString(object, null))));
+        validator.validate(
+                before,
+                after,
+                modelToRemove,
+                modelToAdd,
+                (message, subject, predicate, object) -> violations.add(new Violation(
+                        message,
+                        subject.toString(),
+                        Objects.toString(predicate, null),
+                        Objects.toString(object, null))));
 
         if (!violations.isEmpty()) {
             throw new ValidationException(violations);
@@ -249,9 +270,11 @@ public class MetadataService {
 
     private void persist(Model modelToRemove, Model modelToAdd) {
         transactions.executeWrite(model -> {
-            var created = modelToAdd.listSubjects()
+            var created = modelToAdd
+                    .listSubjects()
                     .filterKeep(RDFNode::isURIResource)
-                    .filterDrop(s -> model.listStatements(s, null, (RDFNode) null).hasNext())
+                    .filterDrop(
+                            s -> model.listStatements(s, null, (RDFNode) null).hasNext())
                     .toSet();
 
             model.remove(modelToRemove).add(modelToAdd);
@@ -261,11 +284,13 @@ public class MetadataService {
 
             created.forEach(s -> model.add(s, FS.createdBy, user).add(s, FS.dateCreated, now));
 
-            modelToAdd.listSubjects().andThen(modelToRemove.listSubjects())
+            modelToAdd
+                    .listSubjects()
+                    .andThen(modelToRemove.listSubjects())
                     .filterKeep(RDFNode::isURIResource)
-                    .filterKeep(s -> model.listStatements(s, null, (RDFNode) null).hasNext())
-                    .forEachRemaining(s -> model
-                            .removeAll(s, FS.modifiedBy, null)
+                    .filterKeep(
+                            s -> model.listStatements(s, null, (RDFNode) null).hasNext())
+                    .forEachRemaining(s -> model.removeAll(s, FS.modifiedBy, null)
                             .removeAll(s, FS.dateModified, null)
                             .add(s, FS.modifiedBy, user)
                             .add(s, FS.dateModified, now));

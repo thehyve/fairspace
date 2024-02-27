@@ -14,7 +14,9 @@ public class Restore {
             return;
         }
 
-        log.warn("Your metadata database is gone. Restoring from the transaction log containing {} transactions", logSize);
+        log.warn(
+                "Your metadata database is gone. Restoring from the transaction log containing {} transactions",
+                logSize);
 
         Txn.executeWrite(dsg, () -> {
             var prevProgress = -1L;

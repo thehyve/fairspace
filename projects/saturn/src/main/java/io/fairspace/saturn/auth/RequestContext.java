@@ -1,14 +1,15 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.saturn.rdf.SparqlUtils;
+import java.security.Principal;
+import java.util.Optional;
+
 import org.apache.jena.graph.Node;
 import org.eclipse.jetty.server.*;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 
-import java.security.Principal;
-import java.util.Optional;
+import io.fairspace.saturn.rdf.SparqlUtils;
 
 public class RequestContext {
 

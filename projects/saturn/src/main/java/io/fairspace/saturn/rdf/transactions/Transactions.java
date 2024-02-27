@@ -5,9 +5,7 @@ import com.pivovarit.function.ThrowingFunction;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.Symbol;
 
-
 public interface Transactions extends AutoCloseable {
-
 
     <R, E extends Exception> R calculateWrite(ThrowingFunction<? super Model, R, E> job) throws E;
 
@@ -28,5 +26,4 @@ public interface Transactions extends AutoCloseable {
     }
 
     void setContextValue(Symbol symbol, Object object);
-
 }

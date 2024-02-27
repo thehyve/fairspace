@@ -1,12 +1,13 @@
 package io.fairspace.saturn.services.metadata;
 
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.rdf.model.Model;
+import spark.Request;
+
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.BaseApp;
 import io.fairspace.saturn.services.PayloadParsingException;
 import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import lombok.extern.log4j.Log4j2;
-import org.apache.jena.rdf.model.Model;
-import spark.Request;
 
 import static io.fairspace.saturn.services.errors.ErrorHelper.errorBody;
 import static io.fairspace.saturn.services.errors.ErrorHelper.exceptionHandler;
@@ -15,6 +16,7 @@ import static io.fairspace.saturn.services.metadata.Serialization.getFormat;
 import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+
 import static java.lang.Boolean.FALSE;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -101,8 +103,6 @@ public class MetadataApp extends BaseApp {
     }
 
     private Model getMetadata(Request req) {
-        return api.get(
-                req.queryParams("subject"),
-                req.queryParams().contains("withValueProperties"));
+        return api.get(req.queryParams("subject"), req.queryParams().contains("withValueProperties"));
     }
 }

@@ -1,20 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.vocabulary.FS;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-import org.apache.jena.vocabulary.XSD;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -30,6 +15,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
+
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
@@ -61,14 +62,16 @@ public class ViewUpdater implements AutoCloseable {
     private List<Node> retrieveValues(Graph graph, Node subject, String source) {
         var predicates = source.split("\\s+");
         var nodes = List.of(subject);
-        for (var predicate: predicates) {
+        for (var predicate : predicates) {
             var next = new ArrayList<Node>();
             var predicateNode = NodeFactory.createURI(predicate);
-            for (var node: nodes) {
+            for (var node : nodes) {
                 if (node.isLiteral()) {
                     continue;
                 }
-                next.addAll(graph.find(node, predicateNode, Node.ANY).mapWith(Triple::getObject).toList());
+                next.addAll(graph.find(node, predicateNode, Node.ANY)
+                        .mapWith(Triple::getObject)
+                        .toList());
             }
             nodes = next;
         }
@@ -78,7 +81,8 @@ public class ViewUpdater implements AutoCloseable {
     private static String getLabel(Graph graph, Node subject) {
         var labelNode = graph.find(subject, RDFS.label.asNode(), Node.ANY)
                 .mapWith(Triple::getObject)
-                .nextOptional().orElse(null);
+                .nextOptional()
+                .orElse(null);
         if (labelNode == null) {
             return null;
         }
@@ -144,85 +148,95 @@ public class ViewUpdater implements AutoCloseable {
         var start = new Date().getTime();
         var type = typeNode.get().getObject();
         log.debug("Subject {} of type {}", subject.getURI(), type.getLocalName());
-        VIEWS_CONFIG.views.stream().filter(view -> view.types.contains(type.getURI())).forEach(view -> {
-            if (graph.find(subject, FS.dateDeleted.asNode(), Node.ANY).hasNext()) {
-                log.debug("Deleting entity {} of type {} from view {}", subject.getURI(), type.getLocalName(), view.name);
-                try {
-                    viewStoreClient.deleteRow(view.name, subject.getURI());
-                } catch (SQLException e) {
-                    log.error("Failed to delete row from view", e);
-                }
-            } else {
-                log.debug("Updating entity {} of type {} in view {}", subject.getURI(), type.getLocalName(), view.name);
-                var row = new HashMap<String, Object>();
-                row.put("id", subject.getURI());
-                row.put("label", getLabel(graph, subject));
-                addCollectionToProtectedResourceRow(type.getURI(), subject, row);
-                // Update subject value columns
-                try {
-                    for (var column: view.columns) {
-                        var objects = retrieveValues(graph, subject, column.source);
-                        if (objects.isEmpty()) {
-                            continue;
+        VIEWS_CONFIG.views.stream()
+                .filter(view -> view.types.contains(type.getURI()))
+                .forEach(view -> {
+                    if (graph.find(subject, FS.dateDeleted.asNode(), Node.ANY).hasNext()) {
+                        log.debug(
+                                "Deleting entity {} of type {} from view {}",
+                                subject.getURI(),
+                                type.getLocalName(),
+                                view.name);
+                        try {
+                            viewStoreClient.deleteRow(view.name, subject.getURI());
+                        } catch (SQLException e) {
+                            log.error("Failed to delete row from view", e);
                         }
-                        row.put(column.name, getValue(column, objects.get(0)));
-                    }
-                    viewStoreClient.updateRows(view.name, List.of(row), false);
-                } catch (SQLException e) {
-                    log.error("Failed to update view row", e);
-                }
-                // Update subject value sets
-                for (ViewsConfig.View.Column column: view.columns) {
-                    if (!column.type.isSet()) {
-                        continue;
-                    }
-                    var objects = retrieveValues(graph, subject, column.source);
-                    if (objects.isEmpty()) {
-                        // continue;
-                    }
-                    try {
-                        var values = new HashSet<String>();
-                        for (var term: objects) {
-                            if (column.type == ViewsConfig.ColumnType.TermSet) {
-                                var label = getLabel(graph, term);
-                                viewStoreClient.addLabel(term.getURI(), column.rdfType, label);
-                                values.add(label);
-                            } else {
-                                values.add(term.getLiteralValue().toString());
+                    } else {
+                        log.debug(
+                                "Updating entity {} of type {} in view {}",
+                                subject.getURI(),
+                                type.getLocalName(),
+                                view.name);
+                        var row = new HashMap<String, Object>();
+                        row.put("id", subject.getURI());
+                        row.put("label", getLabel(graph, subject));
+                        addCollectionToProtectedResourceRow(type.getURI(), subject, row);
+                        // Update subject value columns
+                        try {
+                            for (var column : view.columns) {
+                                var objects = retrieveValues(graph, subject, column.source);
+                                if (objects.isEmpty()) {
+                                    continue;
+                                }
+                                row.put(column.name, getValue(column, objects.get(0)));
+                            }
+                            viewStoreClient.updateRows(view.name, List.of(row), false);
+                        } catch (SQLException e) {
+                            log.error("Failed to update view row", e);
+                        }
+                        // Update subject value sets
+                        for (ViewsConfig.View.Column column : view.columns) {
+                            if (!column.type.isSet()) {
+                                continue;
+                            }
+                            var objects = retrieveValues(graph, subject, column.source);
+                            if (objects.isEmpty()) {
+                                // continue;
+                            }
+                            try {
+                                var values = new HashSet<String>();
+                                for (var term : objects) {
+                                    if (column.type == ViewsConfig.ColumnType.TermSet) {
+                                        var label = getLabel(graph, term);
+                                        viewStoreClient.addLabel(term.getURI(), column.rdfType, label);
+                                        values.add(label);
+                                    } else {
+                                        values.add(term.getLiteralValue().toString());
+                                    }
+                                }
+                                viewStoreClient.updateValues(view.name, subject.getURI(), column.name, values);
+                            } catch (SQLException e) {
+                                log.error("Failed to update view value sets", e);
                             }
                         }
-                        viewStoreClient.updateValues(
-                                view.name,
-                                subject.getURI(),
-                                column.name,
-                                values);
-                    } catch (SQLException e) {
-                        log.error("Failed to update view value sets", e);
-                    }
-                }
-                // Update subject links
-                if (view.join != null) {
-                    for (var joinView: view.join) {
-                        var relation = NodeFactory.createURI(joinView.on);
-                        var objects = joinView.reverse ?
-                                graph.find(Node.ANY, relation, subject).mapWith(Triple::getSubject).toList() :
-                                graph.find(subject, relation, Node.ANY).mapWith(Triple::getObject).toList();
-                        if (objects.isEmpty()) {
-                            continue;
-                        }
-                        try {
-                            viewStoreClient.updateLinks(
-                                    view.name,
-                                    subject.getURI(),
-                                    joinView.view,
-                                    objects.stream().map(Node::getURI).collect(Collectors.toSet()));
-                        } catch (SQLException e) {
-                            log.error("Failed to update view links", e);
+                        // Update subject links
+                        if (view.join != null) {
+                            for (var joinView : view.join) {
+                                var relation = NodeFactory.createURI(joinView.on);
+                                var objects = joinView.reverse
+                                        ? graph.find(Node.ANY, relation, subject)
+                                                .mapWith(Triple::getSubject)
+                                                .toList()
+                                        : graph.find(subject, relation, Node.ANY)
+                                                .mapWith(Triple::getObject)
+                                                .toList();
+                                if (objects.isEmpty()) {
+                                    continue;
+                                }
+                                try {
+                                    viewStoreClient.updateLinks(
+                                            view.name,
+                                            subject.getURI(),
+                                            joinView.view,
+                                            objects.stream().map(Node::getURI).collect(Collectors.toSet()));
+                                } catch (SQLException e) {
+                                    log.error("Failed to update view links", e);
+                                }
+                            }
                         }
                     }
-                }
-            }
-        });
+                });
         log.debug("Updating subject of type {} took {}ms", type.getLocalName(), new Date().getTime() - start);
     }
 
@@ -232,13 +246,12 @@ public class ViewUpdater implements AutoCloseable {
         viewStoreClient.truncateViewTables(view.name);
         for (String type : view.types) {
             copyValuesForType(view, type);
-            var valueSetColumns = view.columns.stream()
-                    .filter(column -> column.type.isSet())
-                    .toList();
-            for (var valueSetColumn: valueSetColumns) {
+            var valueSetColumns =
+                    view.columns.stream().filter(column -> column.type.isSet()).toList();
+            for (var valueSetColumn : valueSetColumns) {
                 copyValueSetsForColumn(view, type, valueSetColumn);
             }
-            for (var join: view.join) {
+            for (var join : view.join) {
                 if (!join.reverse) {
                     copyLinks(view, type, join);
                 }
@@ -254,7 +267,7 @@ public class ViewUpdater implements AutoCloseable {
         values.put("id", subject.getURI());
         values.put("label", result.getLiteral("label").toString());
         addCollectionToProtectedResourceRow(type, subject.asNode(), values);
-        for (var column: columns) {
+        for (var column : columns) {
             var resultNode = result.get(column.name);
             if (resultNode != null) {
                 values.put(column.name.toLowerCase(), getValue(column, resultNode.asNode()));
@@ -273,17 +286,15 @@ public class ViewUpdater implements AutoCloseable {
      * @param type The subject type (for when the view includes multiple types)
      */
     public void copyValuesForType(ViewsConfig.View view, String type) throws SQLException {
-        var columns = view.columns.stream()
-                .filter(column -> !column.type.isSet())
-                .collect(Collectors.toList());
+        var columns =
+                view.columns.stream().filter(column -> !column.type.isSet()).collect(Collectors.toList());
         var attributes = columns.stream()
                 .map(column -> "OPTIONAL {?id <" + column.source + "> " + "?" + column.name + " . }\n")
                 .collect(Collectors.joining());
-        var attributeNames = columns.stream()
-                .map(c -> "?" + c.name)
-                .collect(Collectors.joining(" "));
+        var attributeNames = columns.stream().map(c -> "?" + c.name).collect(Collectors.joining(" "));
 
-        var query = """
+        var query =
+                """
                     PREFIX rdfs: <%s>
                     SELECT ?id ?label %s
                     WHERE {
@@ -291,7 +302,8 @@ public class ViewUpdater implements AutoCloseable {
                         %s
                         ?id rdfs:label ?label .
                     }
-                """.formatted(RDFS.getURI(), attributeNames, type, attributes);
+                """
+                        .formatted(RDFS.getURI(), attributeNames, type, attributes);
 
         var rows = new ArrayList<Map<String, Object>>();
         var error = new AtomicReference<SQLException>();
@@ -328,20 +340,25 @@ public class ViewUpdater implements AutoCloseable {
      * @param type The subject type (for when the view includes multiple types)
      * @param column The view column of value set property.
      */
-    public void copyValueSetsForColumn(ViewsConfig.View view, String type, ViewsConfig.View.Column column) throws SQLException {
+    public void copyValueSetsForColumn(ViewsConfig.View view, String type, ViewsConfig.View.Column column)
+            throws SQLException {
         var property = column.name;
-        var propertyTable = viewStoreClient.getConfiguration().propertyTables.get(view.name).get(property);
+        var propertyTable =
+                viewStoreClient.getConfiguration().propertyTables.get(view.name).get(property);
         var idColumn = idColumn(view.name);
         var propertyColumn = valueColumn(column.name, ViewsConfig.ColumnType.Identifier);
         var predicate = Arrays.stream(column.source.split("\\s+"))
-                .map("<%s>"::formatted).collect(Collectors.joining("/"));
-        var query = """
+                .map("<%s>"::formatted)
+                .collect(Collectors.joining("/"));
+        var query =
+                """
                     SELECT ?id ?%s
                     WHERE {
                         ?id a <%s> .
                         ?id %s ?%s .
                     }
-                """.formatted(property, type, predicate, property);
+                """
+                        .formatted(property, type, predicate, property);
         var rows = new ArrayList<Pair<String, String>>();
         var error = new AtomicReference<SQLException>();
         final int[] updateCount = new int[1];
@@ -350,7 +367,8 @@ public class ViewUpdater implements AutoCloseable {
             try {
                 var val = getValue(column, q.get(column.name).asNode());
                 if (val == null) {
-                    throw new RuntimeException("Error querying view %s for type %s in column %s".formatted(view.name, type, column.name));
+                    throw new RuntimeException(
+                            "Error querying view %s for type %s in column %s".formatted(view.name, type, column.name));
                 }
                 rows.add(Pair.of(q.getResource("id").getURI(), val.toString()));
 
@@ -383,18 +401,21 @@ public class ViewUpdater implements AutoCloseable {
      * @param join The join relation.
      */
     public void copyLinks(ViewsConfig.View view, String type, ViewsConfig.View.JoinView join) throws SQLException {
-        var joinTable = viewStoreClient.getConfiguration().joinTables.get(view.name).get(join.view);
+        var joinTable =
+                viewStoreClient.getConfiguration().joinTables.get(view.name).get(join.view);
         var idColumn = idColumn(view.name);
         var joinColumn = idColumn(join.view);
-        var predicate = Arrays.stream(join.on.split("\\s+"))
-                .map("<%s>"::formatted).collect(Collectors.joining("/"));
-        var query = """
+        var predicate =
+                Arrays.stream(join.on.split("\\s+")).map("<%s>"::formatted).collect(Collectors.joining("/"));
+        var query =
+                """
                     SELECT ?source ?target
                     WHERE {
                         ?source a <%s> .
                         ?source %s ?target .
                     }
-                """.formatted(type, predicate);
+                """
+                        .formatted(type, predicate);
         var rows = new ArrayList<Pair<String, String>>();
         var error = new AtomicReference<SQLException>();
         final int[] updateCount = new int[1];
@@ -403,8 +424,7 @@ public class ViewUpdater implements AutoCloseable {
             try {
                 rows.add(Pair.of(
                         q.getResource("source").getURI(),
-                        q.getResource("target").getURI()
-                ));
+                        q.getResource("target").getURI()));
                 // copy in chunks to the view database
                 if (rows.size() == 1000) {
                     updateCount[0] += viewStoreClient.insertValues(joinTable, idColumn, joinColumn, rows);

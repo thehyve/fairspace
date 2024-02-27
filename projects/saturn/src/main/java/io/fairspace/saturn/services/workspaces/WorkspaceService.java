@@ -1,11 +1,10 @@
 package io.fairspace.saturn.services.workspaces;
 
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import lombok.extern.log4j.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
@@ -13,15 +12,18 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
 
 @Log4j2
@@ -37,35 +39,40 @@ public class WorkspaceService {
     public List<Workspace> listWorkspaces() {
         return tx.calculateRead(m -> {
             var user = m.wrapAsResource(getUserURI());
-            return new DAO(m).list(Workspace.class)
-                    .stream()
-                    .peek(ws -> {
-                        var res = m.wrapAsResource(ws.getIri());
-                        ws.setCanManage(userService.currentUser().isAdmin() || user.hasProperty(FS.isManagerOf, res));
-                        ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
-                        var workspaceCollections = m
-                                .listSubjectsWithProperty(FS.ownedBy, res)
-                                .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
-                                .toList();
-                        var totalCollectionCount = workspaceCollections.size();
-                        var nonDeletedCollectionCount = (int) workspaceCollections.stream()
-                                .filter(collection -> !collection.hasProperty(FS.dateDeleted))
-                                .count();
-                        var memberCount = m
-                                .listSubjectsWithProperty(RDF.type, FS.User)
-                                .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
-                                .toList().size();
-                        var managers = new DAO(m).list(User.class).stream()
-                                .filter(u -> m.wrapAsResource(u.getIri()).hasProperty(FS.isManagerOf, res))
-                                .collect(toList());
-                        ws.setSummary(WorkspaceSummary.builder()
-                                .totalCollectionCount(totalCollectionCount)
-                                .nonDeletedCollectionCount(nonDeletedCollectionCount)
-                                .memberCount(memberCount + managers.size())
-                                .build());
-                        ws.setManagers(managers);
-                    }).filter(ws -> userService.currentUser().isCanViewPublicMetadata() || ws.isCanManage() || ws.isCanCollaborate())
-                    .collect(toList());
+            return new DAO(m)
+                    .list(Workspace.class).stream()
+                            .peek(ws -> {
+                                var res = m.wrapAsResource(ws.getIri());
+                                ws.setCanManage(
+                                        userService.currentUser().isAdmin() || user.hasProperty(FS.isManagerOf, res));
+                                ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
+                                var workspaceCollections = m.listSubjectsWithProperty(FS.ownedBy, res)
+                                        .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
+                                        .toList();
+                                var totalCollectionCount = workspaceCollections.size();
+                                var nonDeletedCollectionCount = (int) workspaceCollections.stream()
+                                        .filter(collection -> !collection.hasProperty(FS.dateDeleted))
+                                        .count();
+                                var memberCount = m.listSubjectsWithProperty(RDF.type, FS.User)
+                                        .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
+                                        .toList()
+                                        .size();
+                                var managers = new DAO(m)
+                                        .list(User.class).stream()
+                                                .filter(u -> m.wrapAsResource(u.getIri())
+                                                        .hasProperty(FS.isManagerOf, res))
+                                                .collect(toList());
+                                ws.setSummary(WorkspaceSummary.builder()
+                                        .totalCollectionCount(totalCollectionCount)
+                                        .nonDeletedCollectionCount(nonDeletedCollectionCount)
+                                        .memberCount(memberCount + managers.size())
+                                        .build());
+                                ws.setManagers(managers);
+                            })
+                            .filter(ws -> userService.currentUser().isCanViewPublicMetadata()
+                                    || ws.isCanManage()
+                                    || ws.isCanCollaborate())
+                            .collect(toList());
         });
     }
 
@@ -84,13 +91,13 @@ public class WorkspaceService {
     }
 
     private Optional<Workspace> findExistingWorkspace(Model model, String name) {
-        return new DAO(model).list(Workspace.class)
-                .stream()
-                .filter(ws -> {
-                    var res = model.wrapAsResource(ws.getIri());
-                    return res.hasLiteral(model.createProperty(RDFS.uri, "label"), name);
-                })
-                .findAny();
+        return new DAO(model)
+                .list(Workspace.class).stream()
+                        .filter(ws -> {
+                            var res = model.wrapAsResource(ws.getIri());
+                            return res.hasLiteral(model.createProperty(RDFS.uri, "label"), name);
+                        })
+                        .findAny();
     }
 
     public Workspace createWorkspace(Workspace ws) {
@@ -158,7 +165,8 @@ public class WorkspaceService {
             var userResource = m.wrapAsResource(user);
             validateResource(workspaceResource, FS.Workspace);
             validateResource(userResource, FS.User);
-            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.isManagerOf, workspaceResource) || userService.currentUser().isAdmin();
+            var canManage = m.wrapAsResource(getUserURI()).hasProperty(FS.isManagerOf, workspaceResource)
+                    || userService.currentUser().isAdmin();
             if (!canManage) {
                 throw new AccessDeniedException();
             }
@@ -172,8 +180,11 @@ public class WorkspaceService {
                     userResource.addProperty(FS.isManagerOf, workspaceResource);
                 }
                 default -> {
-                    var writeableCollections = workspaceResource.getModel().listSubjectsWithProperty(FS.ownedBy, workspaceResource)
-                            .filterKeep(coll -> userResource.hasProperty(FS.canManage, coll) || userResource.hasProperty(FS.canWrite, coll))
+                    var writeableCollections = workspaceResource
+                            .getModel()
+                            .listSubjectsWithProperty(FS.ownedBy, workspaceResource)
+                            .filterKeep(coll -> userResource.hasProperty(FS.canManage, coll)
+                                    || userResource.hasProperty(FS.canWrite, coll))
                             .toList();
                     writeableCollections.forEach(c -> c.getModel()
                             .removeAll(userResource, FS.canManage, c)
