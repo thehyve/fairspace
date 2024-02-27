@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, {useContext, useEffect, useState} from 'react';
 import {
     CircularProgress,
@@ -18,6 +19,7 @@ import Popover from "@mui/material/Popover";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import FilterIcon from "@mui/icons-material/Filter";
 import FormGroup from "@mui/material/FormGroup";
 import useDeepCompareEffect from "use-deep-compare-effect";
 
@@ -43,6 +45,8 @@ type MetadataViewTableContainerProperties = {
     filters: MetadataViewFilter[];
     textFiltersObject: Object;
     setTextFiltersObject: () => {};
+    entityFilter: MetadataViewFilter;
+    setEntityFilter: () => {};
     toggleRow: () => {};
     view: string;
     collections: Collection[];
@@ -98,7 +102,7 @@ const LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY = 'FAIRSPACE_METADATA_TABLE_ROWS
 const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_COLUMNS';
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
+    const {view, filters, entityFilter, setEntityFilter, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const {isFeatureEnabled} = useContext(FeaturesContext);
@@ -117,7 +121,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, entityFilter, locationContext, rowsPerPage);
     const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
     const resetRowCheckboxes = () => {
@@ -202,6 +206,35 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
         return new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
+    };
+
+    const getSelectedEntityIds = () => {
+        const selectedIds = [];
+        if (Object.keys(rowCheckboxes).length > 0) {
+            data.rows.forEach(row => {
+                const rowKey = row[idColumn.name][0].value;
+                const rowLabel = row[idColumn.name][0].label;
+                if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
+                    selectedIds.push({key: rowKey, label: rowLabel});
+                }
+            });
+        }
+        return selectedIds;
+    };
+
+    const filterEntities = () => {
+        const selectedIds = getSelectedEntityIds();
+        if (selectedIds.length > 0) {
+            const newFilter =
+                ({
+                    field: idColumn.name,
+                    values: selectedIds
+                });
+            setEntityFilter(newFilter);
+        }
+        else {
+            setEntityFilter({});
+        }
     };
 
     const exportTable = () => {
@@ -336,6 +369,10 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         resetRowCheckboxes();
     }, [data]);
 
+    useEffect(() => {
+        setPage(0);
+    }, [entityFilter]);
+
     useDeepCompareEffect(() => {
         if (rowCheckboxes && Object.keys(rowCheckboxes).length > 0 && Object.values(rowCheckboxes).includes(true)) {
             setCurrentSelectionExported(false);
@@ -346,6 +383,16 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     return (
         <Paper>
+            <span>
+                <IconButton
+                    aria-label="Show {view}"
+                    color="primary"
+                    onClick={filterEntities}
+                >
+                    <FilterIcon fontSize="medium" />
+                    {view}
+                </IconButton>
+            </span>
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
                 <MetadataViewActiveTextFilters

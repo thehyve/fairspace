@@ -8,6 +8,7 @@ import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueTy
 type MetadataViewFacetsProperties = {
     views: MetadataViewOptions[];
     filters: MetadataViewFilter[];
+    entityFilter: MetadataViewFilter;
     facetsEx: MetadataViewFacet[];
     filterCandidates: MetadataViewFilter[];
     clearFilterCandidates: () => {};
@@ -108,6 +109,8 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
         );
     };
 
+    const disableButton = filterCandidates.length === 0;
+
     const renderFacetConfirmButtons = () => (
         <Grid
             container
@@ -119,7 +122,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                     onClick={clearFilterCandidates}
                     variant="contained"
                     className={classes.confirmFiltersButton}
-                    disabled={filterCandidates.length === 0}
+                    disabled={disableButton}
                 >
                     Cancel
                 </Button>
@@ -130,7 +133,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                     variant="contained"
                     color="secondary"
                     className={classes.confirmFiltersButton}
-                    disabled={filterCandidates.length === 0}
+                    disabled={disableButton}
                 >
                     Apply filters
                 </Button>

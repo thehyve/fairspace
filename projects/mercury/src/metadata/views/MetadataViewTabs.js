@@ -14,6 +14,8 @@ type MetadataViewTabsProperties = {
     changeTab: () => {};
     views: MetadataViewOptions[];
     filters: MetadataViewFilter[];
+    entityFilter: MetadataViewFilter;
+    setEntityFilter: () => {};
     locationContext: string;
     selected: [];
     toggleRow: () => [];
@@ -34,7 +36,7 @@ const styles = () => ({
 });
 
 export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
-    const {currentViewIndex, idColumn, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
+    const {currentViewIndex, idColumn, changeTab, views, filters, entityFilter, setEntityFilter, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const a11yProps = (index) => ({
@@ -79,6 +81,8 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                         idColumn={idColumn}
                         view={view.name}
                         filters={filters}
+                        entityFilter={entityFilter}
+                        setEntityFilter={setEntityFilter}
                         locationContext={locationContext}
                         selected={selected}
                         toggleRow={toggleRow}

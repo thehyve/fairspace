@@ -22,7 +22,7 @@ export type ViewData = {
     textFiltersObject: Object
 };
 
-const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
+const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, entityFilter: MetadataViewFilter, locationContext: string, rowsPerPage: number): ViewData => {
     const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
     const metadataViewAPI = new MetadataViewAPI(metadataAPIPath);
     const [data, setData] = useState({});
@@ -45,11 +45,19 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
             prefix: value
         }));
 
-    const allFilters = !locationContext ? (
-        [...filters, ...textFilters]
-    ) : (
-        [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter, ...textFilters]
-    );
+    const allFilters = () => {
+        const relevantFilters = [...textFilters, ...filters];
+
+        if (entityFilter.length > 0) {
+            relevantFilters.push(entityFilter);
+        }
+
+        if (locationContext) {
+            return ([...relevantFilters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter]);
+        }
+
+        return relevantFilters;
+    };
 
     const fetchCount = () => {
         setCount({count: -1});

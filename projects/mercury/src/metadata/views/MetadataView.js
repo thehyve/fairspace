@@ -53,6 +53,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
+    const [entityFilter, setEntityFilter] = useState({});
     const [isClosedPanel, setIsClosedPanel] = useState(true);
 
     const toggleRow = useCallback((entity: MetadataViewEntity) => {
@@ -117,6 +118,28 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterCandidates]);
+
+    const updateEntityFilterCandidates = (newEntityFilter: MetadataViewFilter) => {
+        if (filterCandidates.find(f => f.field === newEntityFilter.field)) {
+            let updatedFilters;
+            const existingFilter = filters.find(f => f.field === newEntityFilter.field);
+            if (!newEntityFilter.values || (existingFilter && existingFilter.values && _.isEqual(existingFilter.values.sort(), newEntityFilter.values.sort()) && (
+                (newEntityFilter.values.filter(v => v !== null).length === 0) || existingFilter.values))) {
+                updatedFilters = [...filterCandidates.filter(f => f.field !== newEntityFilter.field)];
+            } else {
+                updatedFilters = [...filterCandidates.filter(f => f.field !== newEntityFilter.field), newEntityFilter];
+            }
+            setFilterCandidates(updatedFilters);
+        } else {
+            setFilterCandidates([...filterCandidates, newEntityFilter]);
+        }
+    };
+
+    const updateEntityFilter = (newEntityFilter) => {
+        updateEntityFilterCandidates(newEntityFilter);
+
+        setEntityFilter(newEntityFilter);
+    };
 
     const handleClearAllFilters = () => {
         setFilterCandidates([]);
@@ -215,6 +238,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             <MetadataViewFacets
                                 views={views}
                                 filters={filters}
+                                entityFilter={entityFilter}
                                 facetsEx={facetsEx}
                                 clearFilterCandidates={clearFilterCandidates}
                                 filterCandidates={filterCandidates}
@@ -230,6 +254,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 changeTab={changeTab}
                                 views={views}
                                 filters={filters}
+                                entityFilter={entityFilter}
+                                setEntityFilter={updateEntityFilter}
                                 locationContext={locationContext}
                                 selected={selected}
                                 toggleRow={toggleRow}
