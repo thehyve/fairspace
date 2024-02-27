@@ -1,10 +1,9 @@
 package nl.fairspace.pluto.auth.web;
 
+import java.net.URISyntaxException;
+
 import com.nimbusds.oauth2.sdk.id.State;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.OAuthFlow;
-import nl.fairspace.pluto.auth.config.OidcConfig;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -15,7 +14,9 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
-import java.net.URISyntaxException;
+import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.config.OidcConfig;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 import static nl.fairspace.pluto.auth.AuthConstants.*;
 
@@ -34,47 +35,44 @@ public class AuthEndpoints {
 
     @GetMapping("/login")
     public Mono<ResponseEntity<String>> login(
-            ServerWebExchange exchange,
-            @RequestParam(name = "redirectUrl", required = false) String redirectUrl) throws URISyntaxException {
-       return exchange.getSession().map(session -> {
-           // Generate random state string for pairing the response to the request
-           State state = new State();
-           session.getAttributes().put(LOGIN_STATE_SESSION_ATTRIBUTE, state.getValue());
+            ServerWebExchange exchange, @RequestParam(name = "redirectUrl", required = false) String redirectUrl)
+            throws URISyntaxException {
+        return exchange.getSession().map(session -> {
+            // Generate random state string for pairing the response to the request
+            State state = new State();
+            session.getAttributes().put(LOGIN_STATE_SESSION_ATTRIBUTE, state.getValue());
 
-           // If a redirectUrl is specified, store it to use later on
-           if (StringUtils.hasText(redirectUrl)) {
-               session.getAttributes().put(PREVIOUS_REQUEST_SESSION_ATTRIBUTE, redirectUrl);
-           }
+            // If a redirectUrl is specified, store it to use later on
+            if (StringUtils.hasText(redirectUrl)) {
+                session.getAttributes().put(PREVIOUS_REQUEST_SESSION_ATTRIBUTE, redirectUrl);
+            }
 
-           String location = null;
-           try {
-               location = oAuthFlow.getLoginUri(exchange.getRequest(), state).toString();
-           } catch (URISyntaxException e) {
-               log.error("Error parsing login URI: " + e.getMessage());
-               return ResponseEntity
-                       .status(HttpStatus.FORBIDDEN)
-                       .body("Error parsing login URI.");
-           }
+            String location = null;
+            try {
+                location = oAuthFlow.getLoginUri(exchange.getRequest(), state).toString();
+            } catch (URISyntaxException e) {
+                log.error("Error parsing login URI: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error parsing login URI.");
+            }
 
-           return ResponseEntity
-                   .status(HttpStatus.SEE_OTHER)
-                   .header("Location", location)
-                   .build();
-       });
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
+                    .header("Location", location)
+                    .build();
+        });
     }
 
     @GetMapping("/logout")
     public Mono<ResponseEntity<Void>> logout(ServerWebExchange exchange) {
         return exchange.getSession().map(session -> {
-            OAuthAuthenticationToken authenticationToken = (OAuthAuthenticationToken)session.getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
+            OAuthAuthenticationToken authenticationToken =
+                    (OAuthAuthenticationToken) session.getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
             String location = getAuthProviderLogoutUrl(authenticationToken);
 
             // Invalidate current session
             session.getAttributes().remove(AUTHORIZATION_SESSION_ATTRIBUTE);
             session.invalidate();
 
-            return ResponseEntity
-                    .status(HttpStatus.SEE_OTHER)
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location)
                     .build();
         });
@@ -82,9 +80,7 @@ public class AuthEndpoints {
 
     @GetMapping("/authorize")
     public Mono<ResponseEntity<String>> authorize(
-            ServerWebExchange exchange,
-            @RequestParam("state") String state,
-            @RequestParam("code") String code) {
+            ServerWebExchange exchange, @RequestParam("state") String state, @RequestParam("code") String code) {
         return exchange.getSession().map(session -> {
             // Match state to avoid CSRF attacks
             if (state == null || !state.equals(session.getAttribute(LOGIN_STATE_SESSION_ATTRIBUTE))) {
@@ -98,8 +94,7 @@ public class AuthEndpoints {
                 token = oAuthFlow.retrieveToken(code, exchange.getRequest());
             } catch (Exception e) {
                 log.error("Error retrieving token from the auth provider: " + e.getMessage());
-                return ResponseEntity
-                        .status(HttpStatus.FORBIDDEN)
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("Error retrieving token from the auth provider.");
             }
 
@@ -112,8 +107,7 @@ public class AuthEndpoints {
 
             // Redirect the user
             String location = getRedirectLocation(session);
-            return ResponseEntity
-                    .status(HttpStatus.SEE_OTHER)
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location)
                     .build();
         });

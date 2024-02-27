@@ -1,5 +1,10 @@
 package nl.fairspace.pluto.auth;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Date;
+import java.util.Map;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.KeySourceException;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -10,11 +15,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.*;
 import lombok.extern.slf4j.Slf4j;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Date;
-import java.util.Map;
 
 @Slf4j
 public class JwtTokenValidator {
@@ -29,7 +29,7 @@ public class JwtTokenValidator {
     }
 
     public static JwtTokenValidator create(URL jwkSetUrl, JWSAlgorithm expectedJWSAlgorithm) {
-        return  new JwtTokenValidator(jwtProcessor(expectedJWSAlgorithm, jwkSetUrl));
+        return new JwtTokenValidator(jwtProcessor(expectedJWSAlgorithm, jwkSetUrl));
     }
 
     /**
@@ -37,7 +37,8 @@ public class JwtTokenValidator {
      * @param expectedJWSAlgorithm The expected JWS algorithm of the access tokens (agreed out-of-band)
      * @return
      */
-    private static <C extends SecurityContext> JWTProcessor<C> jwtProcessor(JWSAlgorithm expectedJWSAlgorithm, URL jwkSetUrl) {
+    private static <C extends SecurityContext> JWTProcessor<C> jwtProcessor(
+            JWSAlgorithm expectedJWSAlgorithm, URL jwkSetUrl) {
         // Set up a JWT processor to parse the tokens and then check their signature
         // and validity time window (bounded by the "iat", "nbf" and "exp" claims)
         ConfigurableJWTProcessor<C> jwtProcessor = new DefaultJWTProcessor<C>();
@@ -82,7 +83,7 @@ public class JwtTokenValidator {
     }
 
     public Map<String, Object> parseAndValidate(String token) {
-        if(token == null || token.isEmpty()) {
+        if (token == null || token.isEmpty()) {
             log.debug("Token provided for validation is empty");
             return null;
         }
@@ -91,17 +92,17 @@ public class JwtTokenValidator {
         try {
             JWTClaimsSet claimsSet = jwtProcessor.process(token, null);
 
-            if(claimsSet != null) {
+            if (claimsSet != null) {
                 return claimsSet.getClaims();
             } else {
                 log.warn("Provided JWT is valid and could be parsed, but does not result in a claimsset");
                 return null;
             }
         } catch (KeySourceException e) {
-            log.warn("Exception while retrieving keys for JWT validation: {}", e.getMessage() );
+            log.warn("Exception while retrieving keys for JWT validation: {}", e.getMessage());
             return null;
         } catch (Exception e) {
-            log.warn("Provided JWT is invalid or not secured: {}", e.getMessage() );
+            log.warn("Provided JWT is invalid or not secured: {}", e.getMessage());
             log.debug("Stacktrace", e);
             return null;
         }

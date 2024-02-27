@@ -12,6 +12,7 @@ plugins {
     id 'jacoco'
     id "org.owasp.dependencycheck" version '8.2.1'
     id 'io.spring.dependency-management' version '1.1.0'
+    id "com.diffplug.spotless" version "6.25.0"
 }
 
 
@@ -66,6 +67,19 @@ dependencies {
 
 springBoot {
     buildInfo()
+}
+
+spotless {
+    java {
+        palantirJavaFormat()
+
+        importOrder('java|javax', '', 'nl.fairspace', '\\#nl.fairspace', '\\#')
+        removeUnusedImports()
+
+        trimTrailingWhitespace()
+
+        toggleOffOn()
+    }
 }
 
 jacocoTestReport {

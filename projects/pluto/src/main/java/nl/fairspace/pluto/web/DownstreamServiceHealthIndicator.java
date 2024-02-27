@@ -1,14 +1,15 @@
 package nl.fairspace.pluto.web;
 
-import nl.fairspace.pluto.config.dto.PlutoConfig;
-import nl.fairspace.pluto.web.dto.DownstreamServiceHealthStatus;
+import java.util.Objects;
+
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Objects;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
+import nl.fairspace.pluto.web.dto.DownstreamServiceHealthStatus;
 
 @Component("downstreamServiceCheck")
 public class DownstreamServiceHealthIndicator implements HealthIndicator {
@@ -27,8 +28,8 @@ public class DownstreamServiceHealthIndicator implements HealthIndicator {
             return Health.up().build();
         }
         try {
-            ResponseEntity<DownstreamServiceHealthStatus> responseEntity
-                    = restTemplate.getForEntity(plutoConfig.getDownstreamServiceHealthUrl(), DownstreamServiceHealthStatus.class);
+            ResponseEntity<DownstreamServiceHealthStatus> responseEntity = restTemplate.getForEntity(
+                    plutoConfig.getDownstreamServiceHealthUrl(), DownstreamServiceHealthStatus.class);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 DownstreamServiceHealthStatus responseBody = Objects.requireNonNull(responseEntity.getBody());
                 Health.Builder builder = responseBody.getStatus().equals("UP") ? Health.up() : Health.down();
