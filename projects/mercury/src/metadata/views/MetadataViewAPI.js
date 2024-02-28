@@ -23,6 +23,12 @@ export type MetadataViewFacetValue = {
     access?: AccessLevel;
 };
 
+export type MetadataViewEntityFilter = {
+    field: string;
+    values: any[];
+    facetValues: MetadataViewFacetValue[];
+}
+
 export type MetadataViewFacet = {
     name: string;
     title: string;

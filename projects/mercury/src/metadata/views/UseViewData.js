@@ -48,7 +48,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
     const allFilters = () => {
         const relevantFilters = [...textFilters, ...filters];
 
-        if (entityFilter.length > 0) {
+        if (entityFilter) {
             relevantFilters.push(entityFilter);
         }
 
@@ -58,6 +58,11 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
         return relevantFilters;
     };
+    // const allFilters = !locationContext ? (
+    //     [...filters, ...textFilters]
+    // ) : (
+    //     [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter, ...textFilters]
+    // );
 
     const fetchCount = () => {
         setCount({count: -1});
@@ -67,7 +72,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
-        metadataViewAPI.getCount(token, view, allFilters).then(res => {
+        metadataViewAPI.getCount(token, view, allFilters()).then(res => {
             if (res) {
                 if (res.count == null) {
                     res.count = -1;
@@ -84,7 +89,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
-        return metadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters);
+        return metadataViewAPI.getViewData(token, view, newPage, newRowsPerPage, allFilters());
     };
 
     const refreshAll = useCallback(() => {
@@ -126,7 +131,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters, locationContext, textFiltersObject]);
+    useEffect(() => {refreshAll();}, [view, filters, entityFilter, locationContext, textFiltersObject]);
 
     return {
         data,

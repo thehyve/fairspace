@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, {useContext, useEffect, useState} from 'react';
 import {
     CircularProgress,
@@ -18,8 +17,9 @@ import FormControl from "@mui/material/FormControl";
 import Popover from "@mui/material/Popover";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import GetAppIcon from "@mui/icons-material/GetApp";
-import FilterIcon from "@mui/icons-material/Filter";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FormGroup from "@mui/material/FormGroup";
 import useDeepCompareEffect from "use-deep-compare-effect";
 
@@ -208,33 +208,38 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         return new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
     };
 
-    const getSelectedEntityIds = () => {
-        const selectedIds = [];
+    const getEntityFilterFacetValues = () => {
+        const selectedRows = [];
         if (Object.keys(rowCheckboxes).length > 0) {
             data.rows.forEach(row => {
                 const rowKey = row[idColumn.name][0].value;
                 const rowLabel = row[idColumn.name][0].label;
                 if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
-                    selectedIds.push({key: rowKey, label: rowLabel});
+                    selectedRows.push({value: rowKey, label: rowLabel});
+                    // TODO cleanup
+                    // selectedIds.push(rowKey);
                 }
             });
         }
-        return selectedIds;
+        return selectedRows;
     };
 
     const filterEntities = () => {
-        const selectedIds = getSelectedEntityIds();
-        if (selectedIds.length > 0) {
-            const newFilter =
-                ({
-                    field: idColumn.name,
-                    values: selectedIds
-                });
+        const facetValues = getEntityFilterFacetValues();
+        if (facetValues.length > 0) {
+            const newFilter = ({
+                field: idColumn.name,
+                values: facetValues.map(fv => fv.value),
+                facetValues
+            });
             setEntityFilter(newFilter);
+        } else {
+            setEntityFilter(null);
         }
-        else {
-            setEntityFilter({});
-        }
+    };
+
+    const clearEntityFilter = () => {
+        setEntityFilter(null);
     };
 
     const exportTable = () => {
@@ -369,9 +374,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         resetRowCheckboxes();
     }, [data]);
 
-    useEffect(() => {
-        setPage(0);
-    }, [entityFilter]);
+    // useEffect(() => {
+    //     setPage(0);
+    // }, [entityFilter]);
 
     useDeepCompareEffect(() => {
         if (rowCheckboxes && Object.keys(rowCheckboxes).length > 0 && Object.values(rowCheckboxes).includes(true)) {
@@ -383,16 +388,6 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     return (
         <Paper>
-            <span>
-                <IconButton
-                    aria-label="Show {view}"
-                    color="primary"
-                    onClick={filterEntities}
-                >
-                    <FilterIcon fontSize="medium" />
-                    {view}
-                </IconButton>
-            </span>
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
                 <MetadataViewActiveTextFilters
@@ -438,6 +433,25 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                             </Tooltip>
                         </ProgressButton>
                     )}
+                    <span>
+                        <IconButton
+                            aria-label="Show {view}"
+                            color="primary"
+                            onClick={filterEntities}
+                            disabled={checkedCount === 0 || (entityFilter && entityFilter.values.length > 0)}
+                        >
+                            <FilterAltIcon fontSize="medium" />
+                            {/* {view} */}
+                        </IconButton>
+                        <IconButton
+                            aria-label="Clear Filter"
+                            color="primary"
+                            onClick={clearEntityFilter}
+                            disabled={!(entityFilter && entityFilter.values.length > 0)}
+                        >
+                            <FilterAltOffIcon fontSize="medium" />
+                        </IconButton>
+                    </span>
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 100]}
                         component="div"

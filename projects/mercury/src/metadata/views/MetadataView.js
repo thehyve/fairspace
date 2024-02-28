@@ -7,7 +7,7 @@ import {Assignment, Close} from "@mui/icons-material";
 import queryString from "query-string";
 
 import styles from "./MetadataView.styles";
-import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewFacet, MetadataViewFilter, MetadataViewEntityFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from "./MetadataViewContext";
 import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
@@ -15,6 +15,7 @@ import {getLocationContextFromString, getMetadataViewNameFromString} from "../..
 import type {MetadataViewEntity} from "./metadataViewUtils";
 import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, ofNumericValueType, RESOURCES_VIEW} from "./metadataViewUtils";
 import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
+import MetadataViewActiveEntitiesFilter from "./MetadataViewActiveEntitiesFilter";
 import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
 import {useSingleSelection} from "../../file/UseSelection";
 import LoadingInlay from "../../common/components/LoadingInlay";
@@ -53,7 +54,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
-    const [entityFilter, setEntityFilter] = useState({});
+    const [entityFilter, setEntityFilter] = useState(null);
     const [isClosedPanel, setIsClosedPanel] = useState(true);
 
     const toggleRow = useCallback((entity: MetadataViewEntity) => {
@@ -83,7 +84,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         updateFilters(filterCandidates);
         clearFilterCandidates();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filterCandidates, updateFilters]);
+    }, [filterCandidates, entityFilter, updateFilters]);
 
     const setFilterValues = (type: ValueType, filter: MetadataViewFilter, values: any[]) => {
         if (ofRangeValueType(type)) {
@@ -93,6 +94,19 @@ export const MetadataView = (props: MetadataViewProperties) => {
             filter.booleanValue = values.length > 0 ? values[0] : null;
         } else {
             filter.values = values;
+        }
+    };
+
+    const updateEntityFilters = (newEntityFilter: MetadataViewEntityFilter) => {
+        newEntityFilter.facetValues = newEntityFilter.values.map(valueIri => {
+            const value = newEntityFilter.facetValues.find(val => val.value === valueIri);
+            return value;
+        });
+
+        if (newEntityFilter.values.length > 0) {
+            setEntityFilter({...newEntityFilter});
+        } else {
+            setEntityFilter(null);
         }
     };
 
@@ -118,28 +132,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filterCandidates]);
-
-    const updateEntityFilterCandidates = (newEntityFilter: MetadataViewFilter) => {
-        if (filterCandidates.find(f => f.field === newEntityFilter.field)) {
-            let updatedFilters;
-            const existingFilter = filters.find(f => f.field === newEntityFilter.field);
-            if (!newEntityFilter.values || (existingFilter && existingFilter.values && _.isEqual(existingFilter.values.sort(), newEntityFilter.values.sort()) && (
-                (newEntityFilter.values.filter(v => v !== null).length === 0) || existingFilter.values))) {
-                updatedFilters = [...filterCandidates.filter(f => f.field !== newEntityFilter.field)];
-            } else {
-                updatedFilters = [...filterCandidates.filter(f => f.field !== newEntityFilter.field), newEntityFilter];
-            }
-            setFilterCandidates(updatedFilters);
-        } else {
-            setFilterCandidates([...filterCandidates, newEntityFilter]);
-        }
-    };
-
-    const updateEntityFilter = (newEntityFilter) => {
-        updateEntityFilterCandidates(newEntityFilter);
-
-        setEntityFilter(newEntityFilter);
-    };
 
     const handleClearAllFilters = () => {
         setFilterCandidates([]);
@@ -212,17 +204,34 @@ export const MetadataView = (props: MetadataViewProperties) => {
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
-            {(areFacetFiltersNonEmpty || areTextFiltersNonEmpty) && (
+            {(areFacetFiltersNonEmpty || areTextFiltersNonEmpty || entityFilter) && (
                 <Grid container justifyContent="space-between" direction="row-reverse">
                     <Grid item xs={2} className={classes.clearAllButtonContainer}>
                         <Button className={classes.clearAllButton} startIcon={<Close />} onClick={handleClearAllFilters}>
                             Clear all filters
                         </Button>
                     </Grid>
-                    {areFacetFiltersNonEmpty && (
-                        <Grid item container xs alignItems="center" spacing={1} className={classes.activeFilters}>
+                    {entityFilter && (currentView.name !== entityFilter.field) && (
+                        <Grid item container xs={12} alignItems="center" spacing={1} className={classes.activeFilters}>
+                            <Grid item xs={12}>
+                                <Typography variant="caption" component="span" color="textSecondary">Showing only {currentView.name} related to the filtered {entityFilter.field}.</Typography>
+                            </Grid>
+                        </Grid>
+                    )}
+                    {entityFilter && (
+                        <Grid item container xs={12} alignItems="center" spacing={1} className={classes.activeFilters}>
                             <Grid item>
-                                <Typography variant="overline" component="span" color="textSecondary">Active filters:</Typography>
+                                <Typography variant="overline" component="span" color="textSecondary">Active {entityFilter.field} filter:</Typography>
+                            </Grid>
+                            <Grid item>
+                                <MetadataViewActiveEntitiesFilter facet={{name: entityFilter.field, type: 'Text', values: entityFilter.facetValues}} filter={entityFilter} setFilter={updateEntityFilters} />
+                            </Grid>
+                        </Grid>
+                    )}
+                    {areFacetFiltersNonEmpty && (
+                        <Grid item container xs={12} alignItems="center" spacing={1} className={classes.activeFilters}>
+                            <Grid item>
+                                <Typography variant="overline" component="span" color="textSecondary">Active facet filters:</Typography>
                             </Grid>
                             <Grid item>
                                 <MetadataViewActiveFacetFilters facets={facetsEx} filters={filters} setFilters={updateFilters} />
@@ -238,7 +247,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
                             <MetadataViewFacets
                                 views={views}
                                 filters={filters}
-                                entityFilter={entityFilter}
                                 facetsEx={facetsEx}
                                 clearFilterCandidates={clearFilterCandidates}
                                 filterCandidates={filterCandidates}
@@ -255,7 +263,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                                 views={views}
                                 filters={filters}
                                 entityFilter={entityFilter}
-                                setEntityFilter={updateEntityFilter}
+                                setEntityFilter={setEntityFilter}
                                 locationContext={locationContext}
                                 selected={selected}
                                 toggleRow={toggleRow}
