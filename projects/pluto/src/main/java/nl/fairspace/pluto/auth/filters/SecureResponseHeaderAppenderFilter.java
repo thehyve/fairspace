@@ -20,17 +20,15 @@ public class SecureResponseHeaderAppenderFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        return chain.filter(exchange)
-                .then(Mono.fromRunnable(() -> {
-                    var headers = exchange.getResponse().getHeaders();
-                    headers.add("X-Frame-Options", "DENY");
-                    headers.add("X-Content-Type-Options", "nosniff");
-                    headers.add("X-XSS-Protection", "0");
-                    headers.add("X-Permitted-Cross-Domain-Policies", "none");
-                    headers.add(
-                            "Content-Security-Policy",
-                            "default-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' 'unsafe-inline' https://*"
-                    );
-                }));
+        return chain.filter(exchange).then(Mono.fromRunnable(() -> {
+            var headers = exchange.getResponse().getHeaders();
+            headers.add("X-Frame-Options", "DENY");
+            headers.add("X-Content-Type-Options", "nosniff");
+            headers.add("X-XSS-Protection", "0");
+            headers.add("X-Permitted-Cross-Domain-Policies", "none");
+            headers.add(
+                    "Content-Security-Policy",
+                    "default-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' 'unsafe-inline' https://*");
+        }));
     }
 }

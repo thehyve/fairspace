@@ -1,12 +1,13 @@
 package nl.fairspace.pluto.auth.filters;
 
-import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.AuthConstants;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
-import org.springframework.web.server.ServerWebExchange;
-
 import java.util.Arrays;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.server.ServerWebExchange;
+
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 /**
  * This filter will mark every request that has a valid JWT token and that has a certain authority (if specified) as authenticated
@@ -46,15 +47,15 @@ public class AuthorizedCheckAuthenticationFilter extends CheckAuthenticationFilt
             return validAuthorities.length == 0;
         }
 
-        boolean hasAuthority = validAuthorities.length == 0 || Stream.of(validAuthorities)
-                .anyMatch(authority -> authentication.getAuthorities().contains(authority));
+        boolean hasAuthority = validAuthorities.length == 0
+                || Stream.of(validAuthorities)
+                        .anyMatch(authority -> authentication.getAuthorities().contains(authority));
 
         if (!hasAuthority) {
             log.trace(
                     "JWT does not contain a required authority ({}) for request {}",
                     String.join(",", validAuthorities),
-                    exchange.getRequest().getURI()
-            );
+                    exchange.getRequest().getURI());
         }
 
         return hasAuthority;

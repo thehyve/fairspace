@@ -1,15 +1,16 @@
 package nl.fairspace.pluto.auth.filters;
 
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.AuthConstants;
-import nl.fairspace.pluto.auth.JwtTokenValidator;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
@@ -31,16 +32,17 @@ public class HeaderAuthenticationFilter implements GatewayFilter {
     }
 
     private OAuthAuthenticationToken retrieveHeaderAuthorization(ServerWebExchange exchange) {
-        log.debug("Check authentication header for " + exchange.getRequest().getURI().getPath());
+        log.debug("Check authentication header for "
+                + exchange.getRequest().getURI().getPath());
 
         String authorizationHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
 
-        if(authorizationHeader == null) {
+        if (authorizationHeader == null) {
             log.trace("No Authorization header provided");
             return null;
         }
 
-        if(!authorizationHeader.startsWith(BEARER_PREFIX)) {
+        if (!authorizationHeader.startsWith(BEARER_PREFIX)) {
             log.info("Authorization header does not contain a Bearer token");
             return null;
         }
@@ -50,7 +52,7 @@ public class HeaderAuthenticationFilter implements GatewayFilter {
         // Validate the token. If it validates, a claimsset will be returned
         Map<String, Object> claims = jwtTokenValidator.parseAndValidate(token);
 
-        if(claims != null) {
+        if (claims != null) {
             log.trace("Valid JWT provided in Authorization header.");
             return new OAuthAuthenticationToken(token, claims);
         } else {
@@ -62,7 +64,7 @@ public class HeaderAuthenticationFilter implements GatewayFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // If the authorization is already set, skip this filter
-        if(exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
+        if (exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
             return chain.filter(exchange);
         }
 
@@ -71,11 +73,10 @@ public class HeaderAuthenticationFilter implements GatewayFilter {
 
         log.trace("Retrieved authentication token from request: {}", authenticationToken);
 
-        if(authenticationToken != null) {
+        if (authenticationToken != null) {
             exchange.getAttributes().put(AUTHORIZATION_REQUEST_ATTRIBUTE, authenticationToken);
         }
 
         return chain.filter(exchange);
     }
-
 }

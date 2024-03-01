@@ -1,8 +1,9 @@
 package nl.fairspace.pluto.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.AuthConstants;
 import org.springframework.web.server.ServerWebExchange;
+
+import nl.fairspace.pluto.auth.AuthConstants;
 
 /**
  * This filter will mark every request that has a valid JWT token as authenticated
@@ -22,8 +23,10 @@ public class AuthenticatedCheckAuthenticationFilter extends CheckAuthenticationF
     protected boolean isAuthorized(ServerWebExchange exchange) {
         boolean hasAuthentication = hasAuthentication(exchange);
 
-        if(!hasAuthentication) {
-            log.debug("No valid JWT has been provided for request {}", exchange.getRequest().getURI());
+        if (!hasAuthentication) {
+            log.debug(
+                    "No valid JWT has been provided for request {}",
+                    exchange.getRequest().getURI());
         }
 
         return hasAuthentication;

@@ -1,5 +1,7 @@
 package nl.fairspace.pluto.auth;
 
+import java.time.Duration;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +12,6 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.time.Duration;
-
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -19,7 +19,6 @@ public class AuthorizationFailedHandlerTest {
     AuthorizationFailedHandler authorizationFailedHandler;
 
     ServerWebExchange exchange;
-
 
     @Before
     public void setUp() {
@@ -34,7 +33,9 @@ public class AuthorizationFailedHandlerTest {
         exchange = MockServerWebExchange.from(request);
         authorizationFailedHandler.handleFailedAuthorization(exchange);
         assertEquals(HttpStatusCode.valueOf(302), exchange.getResponse().getStatusCode());
-        assertEquals("http://localhost/login", exchange.getResponse().getHeaders().get(HttpHeaders.LOCATION).get(0));
+        assertEquals(
+                "http://localhost/login",
+                exchange.getResponse().getHeaders().get(HttpHeaders.LOCATION).get(0));
     }
 
     @Test
@@ -45,7 +46,9 @@ public class AuthorizationFailedHandlerTest {
         exchange = MockServerWebExchange.from(request);
         authorizationFailedHandler.handleFailedAuthorization(exchange);
         assertEquals(HttpStatusCode.valueOf(302), exchange.getResponse().getStatusCode());
-        assertEquals("http://localhost/login", exchange.getResponse().getHeaders().get(HttpHeaders.LOCATION).get(0));
+        assertEquals(
+                "http://localhost/login",
+                exchange.getResponse().getHeaders().get(HttpHeaders.LOCATION).get(0));
     }
 
     @Test
@@ -57,8 +60,9 @@ public class AuthorizationFailedHandlerTest {
         authorizationFailedHandler.handleFailedAuthorization(exchange);
         assertEquals(
                 "http://request-uri",
-                exchange.getSession().block(Duration.ofMillis(500)).getAttribute(AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE)
-        );
+                exchange.getSession()
+                        .block(Duration.ofMillis(500))
+                        .getAttribute(AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE));
     }
 
     @Test
@@ -83,7 +87,8 @@ public class AuthorizationFailedHandlerTest {
 
     @Test
     public void test401WithoutHeaders() {
-        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        MockServerHttpRequest request =
+                MockServerHttpRequest.get("http://localhost").build();
         assertEquals(0, request.getHeaders().size());
         exchange = MockServerWebExchange.from(request);
         authorizationFailedHandler.handleFailedAuthorization(exchange);

@@ -1,5 +1,10 @@
 package nl.fairspace.pluto;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -9,11 +14,6 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.PlainJWT;
 import com.nimbusds.jwt.SignedJWT;
-
-import java.security.interfaces.RSAPrivateKey;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 public class JWTBuilder {
     private String keyId;
@@ -77,7 +77,7 @@ public class JWTBuilder {
     }
 
     public JWT build() throws JOSEException {
-        if(privateKey == null) {
+        if (privateKey == null) {
             return buildUnsigned();
         } else {
             return buildSigned();
@@ -89,9 +89,8 @@ public class JWTBuilder {
         JWSSigner signer = new RSASSASigner(privateKey);
 
         JWTClaimsSet claimsSet = getJwtClaimsSet();
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
-                .keyID(keyId)
-                .build();
+        JWSHeader header =
+                new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(keyId).build();
 
         SignedJWT signedJWT = new SignedJWT(header, claimsSet);
 

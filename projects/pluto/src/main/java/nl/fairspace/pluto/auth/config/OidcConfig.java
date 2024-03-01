@@ -1,9 +1,9 @@
 package nl.fairspace.pluto.auth.config;
 
+import java.net.URI;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import lombok.Data;
-
-import java.net.URI;
 
 @Data
 public class OidcConfig {
