@@ -1,8 +1,9 @@
 package nl.fairspace.pluto.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.AuthConstants;
 import org.springframework.web.server.ServerWebExchange;
+
+import nl.fairspace.pluto.auth.AuthConstants;
 
 /**
  * This filter will mark every request as authorized.

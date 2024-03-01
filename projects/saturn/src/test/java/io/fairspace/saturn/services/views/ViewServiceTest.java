@@ -1,5 +1,27 @@
 package io.fairspace.saturn.services.views;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.stream.Collectors;
+
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.MakeCollectionableResource;
+import io.milton.resource.PutableResource;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.util.Context;
+import org.eclipse.jetty.server.Authentication;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ConfigLoader;
@@ -19,27 +41,6 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.milton.http.ResourceFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.MakeCollectionableResource;
-import io.milton.resource.PutableResource;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.util.Context;
-import org.eclipse.jetty.server.Authentication;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.loadViewsConfig;
@@ -47,6 +48,7 @@ import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.services.views.ViewService.USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS;
+
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -62,15 +64,19 @@ public class ViewServiceTest extends PostgresAwareTest {
 
     @Mock
     BlobStore store;
+
     @Mock
     UserService userService;
+
     @Mock
     private MetadataPermissions permissions;
+
     MetadataService api;
     ViewService viewService;
 
     @Before
-    public void before() throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
+    public void before()
+            throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
         var viewDatabase = buildViewDatabaseConfig();
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
         var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, new Config.Search());
@@ -81,12 +87,7 @@ public class ViewServiceTest extends PostgresAwareTest {
 
         loadTestData(ds);
 
-        viewService = new ViewService(
-                ConfigLoader.CONFIG,
-                config,
-                ds,
-                viewStoreClientFactory,
-                permissions);
+        viewService = new ViewService(ConfigLoader.CONFIG, config, ds, viewStoreClientFactory, permissions);
     }
 
     @Test
@@ -118,7 +119,10 @@ public class ViewServiceTest extends PostgresAwareTest {
     public void testDisplayIndex_IsSet() {
         var views = viewService.getViews();
         var columns = views.get(1).getColumns().stream().toList();
-        var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Morphology")).collect(Collectors.toList()).get(0);
+        var selectedColumn = columns.stream()
+                .filter(c -> c.getTitle().equals("Morphology"))
+                .collect(Collectors.toList())
+                .get(0);
         Assert.assertEquals(Integer.valueOf(1), selectedColumn.getDisplayIndex());
     }
 
@@ -126,7 +130,10 @@ public class ViewServiceTest extends PostgresAwareTest {
     public void testDisplayIndex_IsNotSet() {
         var views = viewService.getViews();
         var columns = views.get(1).getColumns().stream().toList();
-        var selectedColumn = columns.stream().filter(c -> c.getTitle().equals("Laterality")).collect(Collectors.toList()).get(0);
+        var selectedColumn = columns.stream()
+                .filter(c -> c.getTitle().equals("Laterality"))
+                .collect(Collectors.toList())
+                .get(0);
         Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), selectedColumn.getDisplayIndex());
     }
 
@@ -166,7 +173,8 @@ public class ViewServiceTest extends PostgresAwareTest {
         return viewDatabase;
     }
 
-    private void loadTestData(Dataset ds) throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+    private void loadTestData(Dataset ds)
+            throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         // TODO: loaded data to be mocked instead of loading them this way
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
@@ -192,7 +200,8 @@ public class ViewServiceTest extends PostgresAwareTest {
         lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
         lenient().when(userService.currentUser()).thenReturn(user);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
+        var workspace = workspaceService.createWorkspace(
+                Workspace.builder().code("Test").build());
 
         when(request.getHeader("Owner")).thenReturn(workspace.getIri().getURI());
         when(request.getAttribute("BLOB")).thenReturn(new BlobInfo("id", 0, "md5"));

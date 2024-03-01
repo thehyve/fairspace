@@ -94,7 +94,6 @@ public class FS {
     public static final String MD5_URI = NS + "md5";
     public static final Property md5 = createProperty(MD5_URI);
 
-
     public static final String CONNECTION_STRING_URI = NS + "connectionString";
     public static final Property connectionString = createProperty(CONNECTION_STRING_URI);
 
@@ -155,4 +154,3 @@ public class FS {
     public static final String CAN_QUERY_METADATA_URI = NS + "canQueryMetadata";
     public static final String IS_SUPERADMIN_URI = NS + "isSuperadmin";
 }
-

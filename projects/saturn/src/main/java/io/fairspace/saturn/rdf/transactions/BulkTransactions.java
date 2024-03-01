@@ -1,5 +1,11 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.pivovarit.function.ThrowingFunction;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
@@ -8,36 +14,34 @@ import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.system.Txn;
 import org.eclipse.jetty.server.Request;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUserStringUri;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.setCurrentUserStringUri;
+
 import static java.lang.Thread.currentThread;
 
 public class BulkTransactions extends BaseTransactions {
     private final LinkedBlockingQueue<Task<?, ?>> queue = new LinkedBlockingQueue<>();
     private static final AtomicInteger threadCounter = new AtomicInteger();
-    private final Thread worker = new Thread(() -> {
-        while (true) {
-            var tasks = new ArrayList<Task<?, ?>>();
-            try {
-                tasks.add(queue.take());
-            } catch (InterruptedException e) {
-                return;
-            }
-            queue.drainTo(tasks);
+    private final Thread worker = new Thread(
+            () -> {
+                while (true) {
+                    var tasks = new ArrayList<Task<?, ?>>();
+                    try {
+                        tasks.add(queue.take());
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                    queue.drainTo(tasks);
 
-            while (!tryExecute(tasks)) ;
+                    while (!tryExecute(tasks))
+                        ;
 
-            tasks.forEach(Task::completed);  // mark all tasks as committed
-        }
-    }, "Batch transaction processor " + threadCounter.incrementAndGet());
+                    tasks.forEach(Task::completed); // mark all tasks as committed
+                }
+            },
+            "Batch transaction processor " + threadCounter.incrementAndGet());
 
     public BulkTransactions(Dataset ds) {
         super(ds);

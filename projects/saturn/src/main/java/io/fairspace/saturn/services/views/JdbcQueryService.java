@@ -1,14 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.milton.resource.CollectionResource;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -19,6 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.milton.resource.CollectionResource;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 
 import static java.lang.Integer.min;
 
@@ -36,7 +37,11 @@ public class JdbcQueryService implements QueryService {
     private final Config.Search searchConfig;
     private final ViewStoreClientFactory viewStoreClientFactory;
 
-    public JdbcQueryService(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory, Transactions transactions, CollectionResource rootSubject) {
+    public JdbcQueryService(
+            Config.Search searchConfig,
+            ViewStoreClientFactory viewStoreClientFactory,
+            Transactions transactions,
+            CollectionResource rootSubject) {
         this.searchConfig = searchConfig;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.transactions = transactions;
@@ -55,26 +60,23 @@ public class JdbcQueryService implements QueryService {
 
     @SneakyThrows
     protected void applyCollectionsFilterIfRequired(String view, List<ViewFilter> filters) {
-        boolean collectionsFilterRequired = view.equalsIgnoreCase("Resource") ||
-                filters.stream().anyMatch(
-                        filter -> filter.getField().split("_")[0].equalsIgnoreCase("Resource"));
+        boolean collectionsFilterRequired = view.equalsIgnoreCase("Resource")
+                || filters.stream()
+                        .anyMatch(filter -> filter.getField().split("_")[0].equalsIgnoreCase("Resource"));
         if (!collectionsFilterRequired) {
             return;
         }
-        var collections = transactions.calculateRead(m ->
-                rootSubject.getChildren().stream()
-                        .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
-                        .collect(Collectors.toList()));
-        if (filters.stream()
-                .anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
+        var collections = transactions.calculateRead(m -> rootSubject.getChildren().stream()
+                .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
+                .collect(Collectors.toList()));
+        if (filters.stream().anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
             // Update existing filters in place
             filters.stream()
                     .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
-                    .forEach(filter -> filter.setValues(
-                            filter.values.stream()
-                                    .map(value -> getCollectionName(value.toString()))
-                                    .filter(collections::contains).collect(Collectors.toList()))
-                    );
+                    .forEach(filter -> filter.setValues(filter.values.stream()
+                            .map(value -> getCollectionName(value.toString()))
+                            .filter(collections::contains)
+                            .collect(Collectors.toList())));
             return;
         }
         // Add collection name filter
@@ -95,18 +97,13 @@ public class JdbcQueryService implements QueryService {
         applyCollectionsFilterIfRequired(request.getView(), filters);
         try (var viewStoreReader = getViewStoreReader()) {
             List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
-                    request.getView(), filters,
-                    (page - 1) * size,
-                    size + 1,
-                    request.includeJoinedViews());
+                    request.getView(), filters, (page - 1) * size, size + 1, request.includeJoinedViews());
             var pageBuilder = ViewPageDTO.builder()
                     .rows(rows.subList(0, min(size, rows.size())))
                     .hasNext(rows.size() > size);
             if (request.includeCounts()) {
                 long count = viewStoreReader.countRows(request.getView(), filters);
-                pageBuilder = pageBuilder
-                        .totalCount(count)
-                        .totalPages(count / size + ((count % size > 0) ? 1 : 0));
+                pageBuilder = pageBuilder.totalCount(count).totalPages(count / size + ((count % size > 0) ? 1 : 0));
             }
             return pageBuilder.build();
         } catch (SQLTimeoutException e) {
@@ -133,10 +130,9 @@ public class JdbcQueryService implements QueryService {
 
     @SneakyThrows
     public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
-        var collectionsForUser = transactions.calculateRead(m ->
-                rootSubject.getChildren().stream()
-                        .map(collection -> getCollectionName(collection.getUniqueId()))
-                        .collect(Collectors.toList()));
+        var collectionsForUser = transactions.calculateRead(m -> rootSubject.getChildren().stream()
+                .map(collection -> getCollectionName(collection.getUniqueId()))
+                .collect(Collectors.toList()));
 
         try (var viewStoreReader = getViewStoreReader()) {
             return viewStoreReader.searchFiles(request, collectionsForUser);

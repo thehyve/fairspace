@@ -1,8 +1,9 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.services.users.User;
+import java.io.File;
+import java.io.IOException;
+import java.time.Instant;
+
 import org.apache.jena.rdf.model.Model;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Request;
@@ -11,11 +12,12 @@ import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.Instant;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.services.users.User;
 
 import static io.fairspace.saturn.auth.RequestContext.setCurrentRequest;
+
 import static java.time.Instant.now;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

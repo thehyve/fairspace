@@ -1,9 +1,9 @@
 package io.fairspace.saturn.config;
 
+import javax.servlet.FilterConfig;
+
 import spark.servlet.SparkApplication;
 import spark.servlet.SparkFilter;
-
-import javax.servlet.FilterConfig;
 
 public class SaturnSparkFilter extends SparkFilter {
     private final SparkApplication[] apps;

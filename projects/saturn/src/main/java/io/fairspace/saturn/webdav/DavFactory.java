@@ -1,9 +1,7 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.fairspace.saturn.webdav.resources.*;
+import java.net.URI;
+
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
@@ -11,7 +9,10 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 
-import java.net.URI;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.resources.*;
 
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.util.EnumUtils.max;
@@ -31,14 +32,19 @@ public class DavFactory implements ResourceFactory {
     // Represents the root URI, not stored in the database
     private final String baseUri;
 
-    public DavFactory(org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, Context context) {
+    public DavFactory(
+            org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, Context context) {
         this.rootSubject = rootSubject;
         this.store = store;
         this.userService = userService;
         this.context = context;
         var uri = URI.create(rootSubject.getURI());
-        this.baseUri = URI.create(uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : "")).toString();
-        root = uri.toString().endsWith("/api/webdav") ? new CollectionRootResource(this) : new ExtraStorageRootResource(this);
+        this.baseUri = URI.create(
+                        uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : ""))
+                .toString();
+        root = uri.toString().endsWith("/api/webdav")
+                ? new CollectionRootResource(this)
+                : new ExtraStorageRootResource(this);
     }
 
     @Override
@@ -51,8 +57,7 @@ public class DavFactory implements ResourceFactory {
             return root;
         }
 
-        if (!subject.getModel().containsResource(subject)
-                || subject.hasProperty(FS.movedTo)) {
+        if (!subject.getModel().containsResource(subject) || subject.hasProperty(FS.movedTo)) {
             return null;
         }
 
@@ -60,7 +65,9 @@ public class DavFactory implements ResourceFactory {
     }
 
     public Resource getResource(org.apache.jena.rdf.model.Resource subject, Access access) {
-        if (isExtraStoreResource() && subject.hasProperty(RDF.type, FS.File) && !subject.hasProperty(FS.createdBy, currentUserResource())) {
+        if (isExtraStoreResource()
+                && subject.hasProperty(RDF.type, FS.File)
+                && !subject.hasProperty(FS.createdBy, currentUserResource())) {
             return null;
         }
         if (subject.hasProperty(FS.dateDeleted) && !showDeleted()) {
@@ -100,7 +107,8 @@ public class DavFactory implements ResourceFactory {
 
         var uri = subject.getURI();
         var nextSeparatorPos = uri.indexOf('/', rootSubject.getURI().length() + 1);
-        var coll = rootSubject.getModel().createResource(nextSeparatorPos < 0 ? uri : uri.substring(0, nextSeparatorPos));
+        var coll =
+                rootSubject.getModel().createResource(nextSeparatorPos < 0 ? uri : uri.substring(0, nextSeparatorPos));
         if (!coll.hasProperty(RDF.type, FS.Collection)) {
             return Access.None;
         }
@@ -115,15 +123,19 @@ public class DavFactory implements ResourceFactory {
             access = Access.Manage;
         }
 
-        if (coll.hasLiteral(FS.accessMode, DataPublished.name()) && (userService.currentUser().isCanViewPublicData() || access.canRead())) {
+        if (coll.hasLiteral(FS.accessMode, DataPublished.name())
+                && (userService.currentUser().isCanViewPublicData() || access.canRead())) {
             return Access.Read;
         }
-        if (!access.canList() && userService.currentUser().isCanViewPublicMetadata()
-                && (coll.hasLiteral(FS.accessMode, MetadataPublished.name()) || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
+        if (!access.canList()
+                && userService.currentUser().isCanViewPublicMetadata()
+                && (coll.hasLiteral(FS.accessMode, MetadataPublished.name())
+                        || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
             access = Access.List;
         }
 
-        var userWorkspacesIterator = rootSubject.getModel()
+        var userWorkspacesIterator = rootSubject
+                .getModel()
                 .listSubjectsWithProperty(RDF.type, FS.Workspace)
                 .filterKeep(ws -> user.hasProperty(FS.isManagerOf, ws) || user.hasProperty(FS.isMemberOf, ws))
                 .filterDrop(ws -> ws.hasProperty(FS.dateDeleted));
@@ -161,7 +173,8 @@ public class DavFactory implements ResourceFactory {
         return Access.None;
     }
 
-    public static Access getGrantedPermission(org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
+    public static Access getGrantedPermission(
+            org.apache.jena.rdf.model.Resource resource, org.apache.jena.rdf.model.Resource principal) {
         if (principal.hasProperty(FS.canManage, resource)) {
             return Access.Manage;
         }
@@ -177,7 +190,8 @@ public class DavFactory implements ResourceFactory {
         return Access.None;
     }
 
-    public static org.apache.jena.rdf.model.Resource childSubject(org.apache.jena.rdf.model.Resource subject, String name) {
+    public static org.apache.jena.rdf.model.Resource childSubject(
+            org.apache.jena.rdf.model.Resource subject, String name) {
         return subject.getModel().createResource(subject.getURI() + "/" + encodePath(name));
     }
 

@@ -11,8 +11,7 @@ import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 
 @Log4j2
 public class ErrorHelper {
-    private static final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JsonldModule());
+    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JsonldModule());
 
     public static <T extends Exception> ExceptionHandler<T> exceptionHandler(int status, String message) {
         return (e, req, res) -> {

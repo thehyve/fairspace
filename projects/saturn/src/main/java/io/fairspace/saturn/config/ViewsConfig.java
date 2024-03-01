@@ -1,11 +1,11 @@
 package io.fairspace.saturn.config;
 
+import java.util.*;
+import javax.validation.constraints.*;
+
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.dataformat.yaml.*;
-
-import javax.validation.constraints.*;
-import java.util.*;
 
 public class ViewsConfig {
     public static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
@@ -33,8 +33,9 @@ public class ViewsConfig {
         }
 
         private static final Map<String, ColumnType> mapping = new HashMap<>();
+
         static {
-            for (ColumnType type: values()) {
+            for (ColumnType type : values()) {
                 mapping.put(type.name().toLowerCase(), type);
             }
         }
@@ -56,11 +57,13 @@ public class ViewsConfig {
         /**
          * The view name.
          */
-        @NotBlank public String name;
+        @NotBlank
+        public String name;
         /**
          * The view title.
          */
-        @NotBlank public String title;
+        @NotBlank
+        public String title;
         /**
          * The name of the items that appear as rows.
          */
@@ -81,25 +84,39 @@ public class ViewsConfig {
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public List<Column> columns;
 
-
         public static class Column {
-            @NotBlank public String name;
-            @NotBlank public String title;
-            @NotNull public ColumnType type;
-            @NotBlank public String source;
+            @NotBlank
+            public String name;
+
+            @NotBlank
+            public String title;
+
+            @NotNull
+            public ColumnType type;
+
+            @NotBlank
+            public String source;
             // displayIndex determines the order of columns on the view page.
-            @NotNull public Integer displayIndex = Integer.MAX_VALUE;
+            @NotNull
+            public Integer displayIndex = Integer.MAX_VALUE;
+
             public String rdfType;
             public int priority;
         }
 
         public static class JoinView {
-            @NotBlank public String view;
-            @NotBlank public String on;
+            @NotBlank
+            public String view;
+
+            @NotBlank
+            public String on;
+
             public boolean reverse = false;
+
             @JsonSetter(nulls = Nulls.AS_EMPTY)
             public List<String> include;
-            // displayIndex determines the order of columns on the view page, for joinView it is the column displaying the related entity
+            // displayIndex determines the order of columns on the view page, for joinView it is the column displaying
+            // the related entity
             public Integer displayIndex = Integer.MAX_VALUE;
         }
     }

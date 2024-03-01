@@ -16,7 +16,8 @@ public class ShaclValidator extends VocabularyAwareValidator {
     public ShaclValidator(Model vocabulary) {
         super(vocabulary);
 
-        shapes = Shapes.parse(vocabulary);;
+        shapes = Shapes.parse(vocabulary);
+        ;
     }
 
     @Override
@@ -33,14 +34,13 @@ public class ShaclValidator extends VocabularyAwareValidator {
 
         var data = after.getGraph();
 
-        affected.forEach(node ->
-                plainValidationNode(shapes, data, node)
-                        .getEntries()
-                        .forEach(entry -> {
-                            if (entry.severity().level() == SHACL.Violation) {
-                                violationHandler.onViolation(entry.message(), entry.focusNode(), pathToNode(entry.resultPath()), entry.value());
-                            }
-                        }));
+        affected.forEach(
+                node -> plainValidationNode(shapes, data, node).getEntries().forEach(entry -> {
+                    if (entry.severity().level() == SHACL.Violation) {
+                        violationHandler.onViolation(
+                                entry.message(), entry.focusNode(), pathToNode(entry.resultPath()), entry.value());
+                    }
+                }));
     }
 
     private static Node pathToNode(Path path) {

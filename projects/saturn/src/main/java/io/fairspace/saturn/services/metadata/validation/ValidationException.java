@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Set;
 
 @RequiredArgsConstructor
 @Getter

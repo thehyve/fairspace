@@ -1,5 +1,10 @@
 package io.fairspace.saturn.auth;
 
+import java.io.*;
+import java.util.*;
+import javax.security.cert.*;
+import javax.servlet.ServletRequest;
+
 import org.eclipse.jetty.http.*;
 import org.eclipse.jetty.server.Request;
 import org.keycloak.KeycloakPrincipal;
@@ -14,12 +19,6 @@ import org.keycloak.adapters.spi.*;
 import org.keycloak.common.util.*;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
-import javax.security.cert.*;
-import javax.servlet.ServletRequest;
-
-import java.io.*;
-import java.util.*;
-
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
@@ -29,6 +28,7 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
      */
     static class ProxiedRequestWrapper implements HttpFacade.Request {
         final HttpFacade.Request request;
+
         public ProxiedRequestWrapper(HttpFacade.Request request) {
             this.request = request;
         }
@@ -111,6 +111,7 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
 
     static class ProxiedRequestFacadeWrapper implements HttpFacade {
         final JettyHttpFacade facade;
+
         public ProxiedRequestFacadeWrapper(JettyHttpFacade facade) {
             this.facade = facade;
         }
@@ -137,8 +138,10 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
     }
 
     @Override
-    protected JettyRequestAuthenticator createRequestAuthenticator(Request request, JettyHttpFacade facade, KeycloakDeployment deployment, AdapterTokenStore tokenStore) {
-        return new Jetty94RequestAuthenticator(new ProxiedRequestFacadeWrapper(facade), deployment, tokenStore, -1, request) {
+    protected JettyRequestAuthenticator createRequestAuthenticator(
+            Request request, JettyHttpFacade facade, KeycloakDeployment deployment, AdapterTokenStore tokenStore) {
+        return new Jetty94RequestAuthenticator(
+                new ProxiedRequestFacadeWrapper(facade), deployment, tokenStore, -1, request) {
             @Override
             public AuthChallenge getChallenge() {
                 // No redirects for API requests
@@ -146,8 +149,11 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
                     return new AuthChallenge() {
                         @Override
                         public boolean challenge(HttpFacade exchange) {
-                            if (deployment.isEnableBasicAuth() && exchange.getRequest().getCookie("JSESSIONID") == null
-                                    && !exchange.getRequest().getHeader("X-Requested-With").equals("XMLHttpRequest")) {
+                            if (deployment.isEnableBasicAuth()
+                                    && exchange.getRequest().getCookie("JSESSIONID") == null
+                                    && !exchange.getRequest()
+                                            .getHeader("X-Requested-With")
+                                            .equals("XMLHttpRequest")) {
                                 exchange.getResponse().addHeader("WWW-Authenticate", "Basic");
                             }
                             exchange.getResponse().setStatus(getResponseCode());
@@ -165,7 +171,8 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
             }
 
             @Override
-            protected void completeBearerAuthentication(KeycloakPrincipal<RefreshableKeycloakSecurityContext> principal, String method) {
+            protected void completeBearerAuthentication(
+                    KeycloakPrincipal<RefreshableKeycloakSecurityContext> principal, String method) {
                 // Stores the token in the session
                 completeOAuthAuthentication(principal);
             }

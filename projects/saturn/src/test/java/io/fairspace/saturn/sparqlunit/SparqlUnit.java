@@ -1,11 +1,11 @@
 package io.fairspace.saturn.sparqlunit;
 
+import java.util.function.Consumer;
+
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
-
-import java.util.function.Consumer;
 
 import static org.junit.Assert.assertTrue;
 
@@ -19,9 +19,9 @@ public class SparqlUnit {
         this.dataset = dataset;
     }
 
-    static public SparqlUnit given() {
+    public static SparqlUnit given() {
         return given(DatasetFactory.create());
-   }
+    }
 
     public static SparqlUnit given(Model model) {
         return given(DatasetFactory.create(model));
@@ -32,7 +32,8 @@ public class SparqlUnit {
     }
 
     public SparqlUnit update(String updateQuery) {
-        UpdateExecutionFactory.create(UpdateFactory.create(updateQuery), dataset).execute();
+        UpdateExecutionFactory.create(UpdateFactory.create(updateQuery), dataset)
+                .execute();
         return this;
     }
 

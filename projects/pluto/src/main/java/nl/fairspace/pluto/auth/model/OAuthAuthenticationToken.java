@@ -1,13 +1,13 @@
 package nl.fairspace.pluto.auth.model;
 
-import lombok.*;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -33,9 +33,9 @@ public class OAuthAuthenticationToken implements Serializable {
     private final String refreshToken;
     private final String idToken;
 
-    private final Map<String,Object> claimsSet;
+    private final Map<String, Object> claimsSet;
 
-    public OAuthAuthenticationToken(String accessToken, Map<String,Object> claimsSet) {
+    public OAuthAuthenticationToken(String accessToken, Map<String, Object> claimsSet) {
         this(accessToken, null, null, claimsSet);
     }
 
@@ -44,14 +44,14 @@ public class OAuthAuthenticationToken implements Serializable {
     }
 
     public String getStringClaim(String claim) {
-        if(claimsSet == null) {
+        if (claimsSet == null) {
             log.warn("No claimsset provided in OAuth token");
             return "";
         }
 
         Object claimValue = claimsSet.get(claim);
 
-        if(claimValue == null) {
+        if (claimValue == null) {
             log.warn("Claim {} not found in claimsset", claim);
             return "";
         }
@@ -76,14 +76,14 @@ public class OAuthAuthenticationToken implements Serializable {
     }
 
     public Set<String> getAuthorities() {
-        if(claimsSet == null) {
+        if (claimsSet == null) {
             log.warn("No claimsset provided in OAuth token");
             return Set.of();
         }
 
         Object authorities = claimsSet.get(AUTHORITIES_CLAIM);
 
-        if(authorities == null) {
+        if (authorities == null) {
             log.trace("No authorities provided in OAuth token");
             return null;
         }

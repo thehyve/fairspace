@@ -1,7 +1,9 @@
 package nl.fairspace.pluto.auth.filters;
 
-import nl.fairspace.pluto.auth.JwtTokenValidator;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,11 +14,11 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doReturn;
@@ -32,7 +34,7 @@ public class HeaderAuthenticationFilterTest {
     @Mock
     GatewayFilterChain filterChain;
 
-    Map<String,Object> claims;
+    Map<String, Object> claims;
 
     ServerWebExchange exchange;
 
@@ -55,19 +57,17 @@ public class HeaderAuthenticationFilterTest {
 
         assertEquals(
                 claims,
-                ((OAuthAuthenticationToken) exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE)).getClaimsSet()
-        );
+                ((OAuthAuthenticationToken) exchange.getAttributes().get(AUTHORIZATION_REQUEST_ATTRIBUTE))
+                        .getClaimsSet());
     }
 
     @Test
     public void testTokenAlreadyExists() {
         OAuthAuthenticationToken token = new OAuthAuthenticationToken("token", "refresh", "id");
-        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        MockServerHttpRequest request =
+                MockServerHttpRequest.get("http://localhost").build();
         exchange = MockServerWebExchange.from(request);
-        exchange.getAttributes().put(
-                AUTHORIZATION_REQUEST_ATTRIBUTE,
-                token
-        );
+        exchange.getAttributes().put(AUTHORIZATION_REQUEST_ATTRIBUTE, token);
         int originalAttributesSize = exchange.getAttributes().size();
 
         filter.filter(exchange, filterChain);

@@ -1,7 +1,5 @@
 package io.fairspace.saturn.vocabulary;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Model;
@@ -23,10 +21,8 @@ public class VocabulariesTest {
 
     private final Dataset ds = DatasetFactory.create();
 
-
     @Before
-    public void setUp() {
-    }
+    public void setUp() {}
 
     @Test
     public void validateVocabulary() {

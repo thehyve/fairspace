@@ -1,7 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.services.BaseApp;
 import lombok.extern.slf4j.Slf4j;
+
+import io.fairspace.saturn.services.BaseApp;
 
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;

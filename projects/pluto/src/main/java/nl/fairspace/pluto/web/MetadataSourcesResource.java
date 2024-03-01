@@ -1,16 +1,16 @@
 package nl.fairspace.pluto.web;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.config.dto.PlutoConfig;
-import nl.fairspace.pluto.web.dto.MetadataSourceInfo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
+import nl.fairspace.pluto.web.dto.MetadataSourceInfo;
 
 import static nl.fairspace.pluto.config.Urls.METADATA_SOURCES_PATH;
 
@@ -33,8 +33,7 @@ public class MetadataSourcesResource {
                 .map(source -> new MetadataSourceInfo(
                         source.getName(),
                         source.getLabel(),
-                        String.format("/api/metadata-sources/%s", source.getName())
-                ))
+                        String.format("/api/metadata-sources/%s", source.getName())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(metadataSources);
     }

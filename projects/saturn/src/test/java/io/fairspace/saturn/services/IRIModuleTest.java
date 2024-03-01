@@ -1,11 +1,11 @@
 package io.fairspace.saturn.services;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.apache.jena.graph.Node;
 import org.junit.Test;
-
-import java.io.IOException;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.junit.Assert.assertEquals;
@@ -29,7 +29,6 @@ public class IRIModuleTest {
         assertEquals("{\"iri\":null}", s);
         assertEquals(obj, mapper.readValue(s, Entity.class));
     }
-
 
     @Data
     public static class Entity {

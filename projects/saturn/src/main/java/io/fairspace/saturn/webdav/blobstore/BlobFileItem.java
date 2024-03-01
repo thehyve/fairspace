@@ -1,11 +1,11 @@
 package io.fairspace.saturn.webdav.blobstore;
 
-import io.milton.http.FileItem;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
+
+import io.milton.http.FileItem;
 
 public class BlobFileItem implements FileItem {
     private final BlobInfo blob;

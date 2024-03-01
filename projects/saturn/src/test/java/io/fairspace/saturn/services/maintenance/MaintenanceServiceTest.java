@@ -1,5 +1,10 @@
 package io.fairspace.saturn.services.maintenance;
 
+import org.apache.jena.query.Dataset;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.ConflictException;
 import io.fairspace.saturn.services.NotAvailableException;
@@ -7,13 +12,10 @@ import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
-import org.apache.jena.query.Dataset;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import static io.fairspace.saturn.services.maintenance.MaintenanceService.REINDEXING_IS_ALREADY_IN_PROGRESS;
 import static io.fairspace.saturn.services.maintenance.MaintenanceService.SERVICE_NOT_AVAILABLE;
+
 import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -29,7 +31,8 @@ public class MaintenanceServiceTest {
     private final Dataset dataset = mock(Dataset.class);
     private final ViewStoreClientFactory viewStoreClientFactory = mock(ViewStoreClientFactory.class);
     private final ViewService viewService = mock(ViewService.class);
-    private final MaintenanceService sut = spy(new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService));
+    private final MaintenanceService sut =
+            spy(new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService));
 
     @Test
     public void testReindexingIsNotAllowedForNotAdmins() {
@@ -86,6 +89,4 @@ public class MaintenanceServiceTest {
         verify(sut).recreateIndex();
         verify(viewService).refreshCaches();
     }
-
-
 }

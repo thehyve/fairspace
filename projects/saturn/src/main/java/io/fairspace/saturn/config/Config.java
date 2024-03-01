@@ -1,5 +1,12 @@
 package io.fairspace.saturn.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -19,14 +26,6 @@ import lombok.NoArgsConstructor;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
@@ -78,6 +77,7 @@ public class Config {
         public String clientId = "workspace-client";
         public boolean enableBasicAuth;
         public String superAdminUser = "organisation-admin";
+
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public final Set<String> defaultUserRoles = new HashSet<>();
     }
@@ -85,6 +85,7 @@ public class Config {
     public static class WebDAV {
         public String blobStorePath = "data/blobs";
     }
+
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -102,9 +103,9 @@ public class Config {
     public static class Search {
         public long pageRequestTimeout = 10_000;
         public long countRequestTimeout = 100_1000;
-        public int maxJoinItems = 50; // used to limit number of joined entries (from the join view) to decrease the response size
+        /** maxJoinItems is used to limit number of joined entries (from the join view) to decrease the response size */
+        public int maxJoinItems = 50;
     }
-
 
     public static class ViewDatabase {
         public boolean enabled = false;
@@ -118,6 +119,7 @@ public class Config {
 
     public static class ExtraStorage {
         public String blobStorePath = "data/extra-blobs";
+
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public final Set<String> defaultRootCollections = new HashSet<>(List.of("analysis-export"));
     }

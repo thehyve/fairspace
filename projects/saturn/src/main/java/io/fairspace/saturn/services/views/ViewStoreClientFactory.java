@@ -1,20 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.vocabulary.FS;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -25,6 +10,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
@@ -50,15 +51,13 @@ public class ViewStoreClientFactory {
         };
     }
 
-    public static final Set<String> protectedResources = Set.of(
-            FS.COLLECTION_URI,
-            FS.DIRECTORY_URI,
-            FS.FILE_URI);
+    public static final Set<String> protectedResources = Set.of(FS.COLLECTION_URI, FS.DIRECTORY_URI, FS.FILE_URI);
 
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, Config.Search search) throws SQLException {
+    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, Config.Search search)
+            throws SQLException {
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
         databaseConfig.setJdbcUrl(viewDatabase.url);
@@ -74,11 +73,9 @@ public class ViewStoreClientFactory {
             log.debug("Database connection: {}", connection.getMetaData().getDatabaseProductName());
         }
 
-        createOrUpdateTable(new Table("label",
-                List.of(
-                        idColumn(),
-                        valueColumn("type", ColumnType.Text),
-                        valueColumn("label", ColumnType.Text))));
+        createOrUpdateTable(new Table(
+                "label",
+                List.of(idColumn(), valueColumn("type", ColumnType.Text), valueColumn("label", ColumnType.Text))));
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
         for (View view : viewsConfig.views) {
@@ -154,7 +151,8 @@ public class ViewStoreClientFactory {
         if (!newColumns.isEmpty()) {
             connection.setAutoCommit(true);
             var command = newColumns.stream()
-                    .map(column -> String.format("alter table %s add column %s %s",
+                    .map(column -> String.format(
+                            "alter table %s add column %s %s",
                             table.name, column.name, databaseTypeForColumnType(column.type)))
                     .collect(Collectors.joining("; "));
             log.debug(command);
@@ -175,8 +173,8 @@ public class ViewStoreClientFactory {
                 .filter(column -> column.type == ColumnType.Identifier)
                 .map(column -> column.name)
                 .collect(Collectors.joining(", "));
-        var command = String.format("create table %s ( %s, primary key ( %s ) )", table.name, columnSpecification,
-                keys);
+        var command =
+                String.format("create table %s ( %s, primary key ( %s ) )", table.name, columnSpecification, keys);
         log.debug(command);
         connection.createStatement().execute(command);
         connection.setAutoCommit(false);
@@ -206,22 +204,19 @@ public class ViewStoreClientFactory {
 
     void validateViewConfig(ViewsConfig.View view) {
         if (view.columns.stream().anyMatch(column -> "id".equalsIgnoreCase(column.name))) {
-            throw new IllegalArgumentException(
-                    "Forbidden to override the built-in column 'id' of view " + view.name);
+            throw new IllegalArgumentException("Forbidden to override the built-in column 'id' of view " + view.name);
         }
         if (view.columns.stream().anyMatch(column -> "label".equalsIgnoreCase(column.name))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'label' of view " + view.name);
         }
-        if (view.name.equalsIgnoreCase("resource") &&
-                view.columns.stream().anyMatch(column -> "collection".equalsIgnoreCase(column.name))) {
+        if (view.name.equalsIgnoreCase("resource")
+                && view.columns.stream().anyMatch(column -> "collection".equalsIgnoreCase(column.name))) {
             throw new IllegalArgumentException(
                     "Forbidden to override the built-in column 'collection' of view " + view.name);
         }
-        if (!view.name.equalsIgnoreCase("resource") &&
-                view.types.stream().anyMatch(protectedResources::contains)) {
-            throw new IllegalArgumentException(
-                    "Forbidden built-in type specified for view " + view.name);
+        if (!view.name.equalsIgnoreCase("resource") && view.types.stream().anyMatch(protectedResources::contains)) {
+            throw new IllegalArgumentException("Forbidden built-in type specified for view " + view.name);
         }
     }
 
@@ -244,7 +239,8 @@ public class ViewStoreClientFactory {
         createOrUpdateTable(table);
         configuration.viewTables.put(view.name, table);
         // Add property tables
-        var setColumns = view.columns.stream().filter(column -> column.type.isSet()).toList();
+        var setColumns =
+                view.columns.stream().filter(column -> column.type.isSet()).toList();
         for (ViewsConfig.View.Column column : setColumns) {
             var propertyTableColumns = new ArrayList<Table.ColumnDefinition>();
             propertyTableColumns.add(idColumn(view.name));
@@ -264,7 +260,6 @@ public class ViewStoreClientFactory {
                 configuration.joinTables.get(view.name).put(join.view, joinTable);
                 var joinView = configuration.viewConfig.get(join.view);
             }
-
         }
     }
 
@@ -272,9 +267,7 @@ public class ViewStoreClientFactory {
         String left = join.reverse ? join.view : view.name;
         String right = join.reverse ? view.name : join.view;
         var name = String.format("%s_%s", left.toLowerCase(), right.toLowerCase());
-        return new Table(name, Arrays.asList(
-                idColumn(left),
-                idColumn(right)));
+        return new Table(name, Arrays.asList(idColumn(left), idColumn(right)));
     }
 
     @Data

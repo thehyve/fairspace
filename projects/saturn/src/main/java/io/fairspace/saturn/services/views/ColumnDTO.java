@@ -1,7 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
 import lombok.Value;
+
+import io.fairspace.saturn.config.*;
 
 @Value
 public class ColumnDTO {

@@ -1,12 +1,13 @@
 package io.fairspace.saturn.rdf.dao;
 
+import java.time.Instant;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.graph.Node;
 
-import java.time.Instant;
-
 import static io.fairspace.saturn.vocabulary.FS.*;
+
 import static lombok.AccessLevel.PACKAGE;
 
 /**

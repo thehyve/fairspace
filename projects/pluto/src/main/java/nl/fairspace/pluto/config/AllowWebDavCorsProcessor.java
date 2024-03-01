@@ -1,5 +1,10 @@
 package nl.fairspace.pluto.config;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
@@ -9,11 +14,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.DefaultCorsProcessor;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD;
 
@@ -27,9 +27,11 @@ import static org.springframework.http.HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD
  * the methods specified in the configuration.
  */
 @Slf4j
-public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO remove if not needed
+public class AllowWebDavCorsProcessor extends DefaultCorsProcessor { // TODO remove if not needed
     @Override
-    protected boolean handleInternal(ServerHttpRequest request, ServerHttpResponse response, CorsConfiguration config, boolean preFlightRequest) throws IOException {
+    protected boolean handleInternal(
+            ServerHttpRequest request, ServerHttpResponse response, CorsConfiguration config, boolean preFlightRequest)
+            throws IOException {
         log.trace("Handle cors request for {} {}", request.getMethod(), request.getURI());
 
         String requestOrigin = request.getHeaders().getOrigin();
@@ -61,7 +63,9 @@ public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO re
         responseHeaders.setAccessControlAllowOrigin(allowOrigin);
 
         if (preFlightRequest) {
-            responseHeaders.set(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, StringUtils.collectionToCommaDelimitedString(allowMethods));
+            responseHeaders.set(
+                    HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS,
+                    StringUtils.collectionToCommaDelimitedString(allowMethods));
         }
 
         if (preFlightRequest && !allowHeaders.isEmpty()) {
@@ -89,7 +93,6 @@ public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO re
         return (isPreFlight ? headers.getAccessControlRequestHeaders() : new ArrayList<>(headers.keySet()));
     }
 
-
     /**
      * Check the HTTP method and determine the methods for the response of a
      * pre-flight request. The default implementation simply delegates to
@@ -97,7 +100,7 @@ public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO re
      */
     @Nullable
     protected List<String> checkMethods(CorsConfiguration config, @Nullable ExtendedHttpMethod requestMethod) {
-        if(requestMethod == null) {
+        if (requestMethod == null) {
             return null;
         }
 
@@ -106,7 +109,9 @@ public class AllowWebDavCorsProcessor extends DefaultCorsProcessor {  // TODO re
 
     @Nullable
     private ExtendedHttpMethod getMethodToUse(ServerHttpRequest request, boolean isPreFlight) {
-        return ExtendedHttpMethod.valueOf((isPreFlight ? request.getHeaders().getFirst(ACCESS_CONTROL_REQUEST_METHOD) : request.getMethod().name()));
+        return ExtendedHttpMethod.valueOf(
+                (isPreFlight
+                        ? request.getHeaders().getFirst(ACCESS_CONTROL_REQUEST_METHOD)
+                        : request.getMethod().name()));
     }
-
 }

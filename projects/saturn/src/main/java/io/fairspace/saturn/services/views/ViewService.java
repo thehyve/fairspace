@@ -1,14 +1,15 @@
 package io.fairspace.saturn.services.views;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
-import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -20,15 +21,16 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
+
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -38,7 +40,8 @@ import static org.apache.jena.system.Txn.calculateRead;
 @Log4j2
 public class ViewService {
 
-    private static final Query VALUES_QUERY = QueryFactory.create(String.format("""
+    private static final Query VALUES_QUERY = QueryFactory.create(String.format(
+            """
             PREFIX fs: <%s>
             PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
@@ -51,9 +54,11 @@ public class ViewService {
                }
                FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
             } ORDER BY ?label
-            """, FS.NS));
+            """,
+            FS.NS));
 
-    private static final Query RESOURCE_TYPE_VALUES_QUERY = QueryFactory.create(String.format("""
+    private static final Query RESOURCE_TYPE_VALUES_QUERY = QueryFactory.create(String.format(
+            """
             PREFIX fs: <%s>
             SELECT ?value ?label
             WHERE {
@@ -63,9 +68,11 @@ public class ViewService {
                   (fs:File "File")
                }
             }
-            """, FS.NS));
+            """,
+            FS.NS));
 
-    private static final Query BOUNDS_QUERY = QueryFactory.create(String.format("""
+    private static final Query BOUNDS_QUERY = QueryFactory.create(String.format(
+            """
             PREFIX fs: <%s>
 
             SELECT (MIN(?value) AS ?min) (MAX(?value) AS ?max)
@@ -73,17 +80,21 @@ public class ViewService {
                ?subject ?predicate ?value
                FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
             }
-            """, FS.NS));
+            """,
+            FS.NS));
 
-    private static final Query BOOLEAN_VALUE_QUERY = QueryFactory.create(String.format("""
+    private static final Query BOOLEAN_VALUE_QUERY = QueryFactory.create(String.format(
+            """
             PREFIX fs: <%s>
             SELECT ?booleanValue
             WHERE {
                ?subject ?predicate ?booleanValue
                FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
             }
-            """, FS.NS));
-    public static final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS = "User does not have permissions to read facets";
+            """,
+            FS.NS));
+    public static final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS =
+            "User does not have permissions to read facets";
 
     private final Config.Search searchConfig;
     private final ViewsConfig viewsConfig;
@@ -93,11 +104,12 @@ public class ViewService {
     private final LoadingCache<Boolean, List<FacetDTO>> facetsCache;
     private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
 
-    public ViewService(Config config,
-                       ViewsConfig viewsConfig,
-                       Dataset ds,
-                       ViewStoreClientFactory viewStoreClientFactory,
-                       MetadataPermissions metadataPermissions) {
+    public ViewService(
+            Config config,
+            ViewsConfig viewsConfig,
+            Dataset ds,
+            ViewStoreClientFactory viewStoreClientFactory,
+            MetadataPermissions metadataPermissions) {
         this.searchConfig = config.search;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
@@ -150,17 +162,25 @@ public class ViewService {
                     // if you want a column before this label, assign a negative displayIndex value in views.yaml
                     final int ENTITY_LABEL_INDEX = 0;
 
-                    columns.add(new ColumnDTO(v.name, v.itemName == null ? v.name : v.itemName, ColumnType.Identifier, ENTITY_LABEL_INDEX));
+                    columns.add(new ColumnDTO(
+                            v.name,
+                            v.itemName == null ? v.name : v.itemName,
+                            ColumnType.Identifier,
+                            ENTITY_LABEL_INDEX));
                     for (var c : v.columns) {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
                     for (var j : v.join) {
-                        var joinView = viewsConfig.views.stream().filter(view -> view.name.equalsIgnoreCase(j.view)).findFirst().orElse(null);
+                        var joinView = viewsConfig.views.stream()
+                                .filter(view -> view.name.equalsIgnoreCase(j.view))
+                                .findFirst()
+                                .orElse(null);
                         if (joinView == null) {
                             continue;
                         }
                         if (j.include.contains("id")) {
-                            columns.add(new ColumnDTO(joinView.name, joinView.title, ColumnType.Identifier, j.displayIndex));
+                            columns.add(new ColumnDTO(
+                                    joinView.name, joinView.title, ColumnType.Identifier, j.displayIndex));
                         }
                         for (var c : joinView.columns) {
                             if (!j.include.contains(c.name)) {
@@ -175,17 +195,13 @@ public class ViewService {
     }
 
     protected List<FacetDTO> fetchFacets() {
-        return calculateRead(ds, () -> viewsConfig.views
-                .stream()
-                .flatMap(view ->
-                        view.columns.stream()
-                                .map(column -> getFacetInfo(view, column))
-                                .filter(f -> (
-                                        f.getMin() != null || f.getMax() != null
-                                                || (f.getValues() != null && f.getValues().size() > 1)
-                                                || f.getBooleanValue() != null
-                                ))
-                )
+        return calculateRead(ds, () -> viewsConfig.views.stream()
+                .flatMap(view -> view.columns.stream()
+                        .map(column -> getFacetInfo(view, column))
+                        .filter(f -> (f.getMin() != null
+                                || f.getMax() != null
+                                || (f.getValues() != null && f.getValues().size() > 1)
+                                || f.getBooleanValue() != null)))
                 .collect(toList()));
     }
 
@@ -241,8 +257,14 @@ public class ViewService {
 
                     try (var execution = QueryExecutionFactory.create(BOUNDS_QUERY, ds, binding)) {
                         var row = execution.execSelect().next();
-                        min = ofNullable(row.getLiteral("min")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
-                        max = ofNullable(row.getLiteral("max")).map(Literal::getValue).map(this::convertLiteralValue).orElse(null);
+                        min = ofNullable(row.getLiteral("min"))
+                                .map(Literal::getValue)
+                                .map(this::convertLiteralValue)
+                                .orElse(null);
+                        max = ofNullable(row.getLiteral("max"))
+                                .map(Literal::getValue)
+                                .map(this::convertLiteralValue)
+                                .orElse(null);
                     }
                 }
             }
@@ -268,7 +290,8 @@ public class ViewService {
         }
     }
 
-    private <T> LoadingCache<Boolean, List<T>> buildCache(Supplier<List<T>> fetchSupplier, Config.CacheConfig cacheConfig) {
+    private <T> LoadingCache<Boolean, List<T>> buildCache(
+            Supplier<List<T>> fetchSupplier, Config.CacheConfig cacheConfig) {
         var cacheBuilder = CacheBuilder.newBuilder();
         if (cacheConfig.autoRefreshEnabled) {
             cacheBuilder.refreshAfterWrite(cacheConfig.refreshFrequencyInHours, TimeUnit.HOURS);
@@ -277,11 +300,13 @@ public class ViewService {
             @Override
             public List<T> load(Boolean key) {
                 var cachedObjects = fetchSupplier.get();
-                log.info("List of {} has been cached, {} {} in total",
-                        cacheConfig.name, cachedObjects.size(), cacheConfig.name);
+                log.info(
+                        "List of {} has been cached, {} {} in total",
+                        cacheConfig.name,
+                        cachedObjects.size(),
+                        cacheConfig.name);
                 return cachedObjects;
             }
         });
     }
-
 }

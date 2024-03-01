@@ -1,11 +1,12 @@
 package io.fairspace.saturn.services.search;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.List;
-
-@Value @Builder
+@Value
+@Builder
 public class SearchResultsDTO {
     List<SearchResultDTO> results;
     String query;

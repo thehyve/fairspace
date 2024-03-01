@@ -1,5 +1,29 @@
 package io.fairspace.saturn.services.views;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.MakeCollectionableResource;
+import io.milton.resource.PutableResource;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.util.Context;
+import org.eclipse.jetty.server.Authentication;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ConfigLoader;
@@ -22,35 +46,13 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.milton.http.ResourceFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.MakeCollectionableResource;
-import io.milton.resource.PutableResource;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.util.Context;
-import org.eclipse.jetty.server.Authentication;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.loadViewsConfig;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.lenient;
@@ -66,10 +68,13 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
 
     @Mock
     BlobStore store;
+
     @Mock
     UserService userService;
+
     @Mock
     private MetadataPermissions permissions;
+
     WorkspaceService workspaceService;
     MetadataService api;
     QueryService sut;
@@ -94,7 +99,8 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
     }
 
     @Before
-    public void before() throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
+    public void before()
+            throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var viewDatabase = new Config.ViewDatabase();
         viewDatabase.url = postgres.getJdbcUrl();
         viewDatabase.username = postgres.getUsername();
@@ -143,7 +149,8 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var taxonomies = model.read("test-taxonomies.ttl");
         api.put(taxonomies, Boolean.TRUE);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
+        var workspace = workspaceService.createWorkspace(
+                Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), workspaceManager.getIri(), WorkspaceRole.Manager);
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 
@@ -176,11 +183,32 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row = page.getRows().get(0);
-        Assert.assertEquals(Set.of("Sample", "Sample_nature", "Sample_parentIsOfNature", "Sample_origin", "Sample_topography", "Sample_tumorCellularity"), row.keySet());
-        Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals(45.2f, ((Number) row.get("Sample_tumorCellularity").stream().findFirst().orElseThrow().getValue()).floatValue(), 0.01);
+        Assert.assertEquals(
+                Set.of(
+                        "Sample",
+                        "Sample_nature",
+                        "Sample_parentIsOfNature",
+                        "Sample_origin",
+                        "Sample_topography",
+                        "Sample_tumorCellularity"),
+                row.keySet());
+        Assert.assertEquals(
+                "Sample A for subject 1",
+                row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Blood",
+                row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Liver",
+                row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                45.2f,
+                ((Number) row.get("Sample_tumorCellularity").stream()
+                                .findFirst()
+                                .orElseThrow()
+                                .getValue())
+                        .floatValue(),
+                0.01);
     }
 
     @Test
@@ -193,11 +221,32 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row = page.getRows().get(0);
-        Assert.assertEquals(Set.of("Sample", "Sample_nature", "Sample_parentIsOfNature", "Sample_origin", "Sample_topography", "Sample_tumorCellularity"), row.keySet());
-        Assert.assertEquals("Sample A for subject 1", row.get("Sample").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals("Blood", row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals("Liver", row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
-        Assert.assertEquals(45.2f, ((Number) row.get("Sample_tumorCellularity").stream().findFirst().orElseThrow().getValue()).floatValue(), 0.01);
+        Assert.assertEquals(
+                Set.of(
+                        "Sample",
+                        "Sample_nature",
+                        "Sample_parentIsOfNature",
+                        "Sample_origin",
+                        "Sample_topography",
+                        "Sample_tumorCellularity"),
+                row.keySet());
+        Assert.assertEquals(
+                "Sample A for subject 1",
+                row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Blood",
+                row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Liver",
+                row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                45.2f,
+                ((Number) row.get("Sample_tumorCellularity").stream()
+                                .findFirst()
+                                .orElseThrow()
+                                .getValue())
+                        .floatValue(),
+                0.01);
     }
 
     @Test
@@ -206,12 +255,10 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("Sample_nature")
-                        .values(Collections.singletonList(SAMPLE_NATURE_BLOOD))
-                        .build()
-        ));
+        request.setFilters(Collections.singletonList(ViewFilter.builder()
+                .field("Sample_nature")
+                .values(Collections.singletonList(SAMPLE_NATURE_BLOOD))
+                .build()));
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(1, page.getRows().size());
     }
@@ -222,12 +269,10 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("Resource_analysisType")
-                        .values(Collections.singletonList(ANALYSIS_TYPE_RNA_SEQ))
-                        .build()
-        ));
+        request.setFilters(Collections.singletonList(ViewFilter.builder()
+                .field("Resource_analysisType")
+                .values(Collections.singletonList(ANALYSIS_TYPE_RNA_SEQ))
+                .build()));
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(1, page.getRows().size());
     }
@@ -238,12 +283,10 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setView("Sample");
         request.setPage(1);
         request.setSize(10);
-        request.setFilters(Collections.singletonList(
-                ViewFilter.builder()
-                        .field("Resource_analysisType")
-                        .values(Collections.singletonList(ANALYSIS_TYPE_IMAGING))
-                        .build()
-        ));
+        request.setFilters(Collections.singletonList(ViewFilter.builder()
+                .field("Resource_analysisType")
+                .values(Collections.singletonList(ANALYSIS_TYPE_IMAGING))
+                .build()));
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(0, page.getRows().size());
     }
@@ -258,13 +301,19 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row1 = page.getRows().get(0);
-        Assert.assertEquals("Sample A for subject 1", row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Sample A for subject 1",
+                row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals(1, row1.get("Subject").size());
         var row2 = page.getRows().get(1);
-        Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Sample B for subject 2",
+                row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals(
                 Set.of("RNA-seq", "Whole genome sequencing"),
-                row2.get("Resource_analysisType").stream().map(ValueDTO::getLabel).collect(Collectors.toSet()));
+                row2.get("Resource_analysisType").stream()
+                        .map(ValueDTO::getLabel)
+                        .collect(Collectors.toSet()));
     }
 
     @Test
@@ -278,13 +327,19 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
         var row1 = page.getRows().get(0);
-        Assert.assertEquals("Sample A for subject 1", row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Sample A for subject 1",
+                row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals(1, row1.get("Subject").size());
         var row2 = page.getRows().get(1);
-        Assert.assertEquals("Sample B for subject 2", row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+        Assert.assertEquals(
+                "Sample B for subject 2",
+                row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
         Assert.assertEquals(
                 Set.of("RNA-seq", "Whole genome sequencing"),
-                row2.get("Resource_analysisType").stream().map(ValueDTO::getLabel).collect(Collectors.toSet()));
+                row2.get("Resource_analysisType").stream()
+                        .map(ValueDTO::getLabel)
+                        .collect(Collectors.toSet()));
     }
 
     @Test
@@ -359,7 +414,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         // There is one file named sample-s2-b-rna.fastq with a description
         request.setQuery("corona");
 
-        //request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
+        // request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
         var results = sut.searchFiles(request);
         Assert.assertEquals(1, results.size());
     }

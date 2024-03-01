@@ -22,5 +22,4 @@ public enum Access {
     public boolean canManage() {
         return compareTo(Manage) >= 0;
     }
-
 }

@@ -1,5 +1,10 @@
 package nl.fairspace.pluto.auth;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import com.nimbusds.oauth2.sdk.*;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
@@ -12,16 +17,12 @@ import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.nimbusds.openid.connect.sdk.OIDCScopeValue;
 import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.config.OidcConfig;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
+import nl.fairspace.pluto.auth.config.OidcConfig;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 @Component
 @Slf4j
@@ -41,27 +42,38 @@ public class OAuthFlow {
 
         // Build the request
         return new AuthorizationRequest.Builder(
-                new ResponseType(ResponseType.Value.CODE), new ClientID(configuration.getClientId()))
+                        new ResponseType(ResponseType.Value.CODE), new ClientID(configuration.getClientId()))
                 .scope(new Scope(configuration.getScope()))
                 .state(state)
                 .redirectionURI(callback)
                 .endpointURI(configuration.getAuthUrl())
-                .build().toURI();
+                .build()
+                .toURI();
     }
 
-    public OAuthAuthenticationToken retrieveToken(String code, ServerHttpRequest request) throws IOException, ParseException, URISyntaxException {
-        return retrieveToken(new AuthorizationCodeGrant(new AuthorizationCode(code), getAuthorizeUri(request)), getClientAuthentication());
+    public OAuthAuthenticationToken retrieveToken(String code, ServerHttpRequest request)
+            throws IOException, ParseException, URISyntaxException {
+        return retrieveToken(
+                new AuthorizationCodeGrant(new AuthorizationCode(code), getAuthorizeUri(request)),
+                getClientAuthentication());
     }
 
-    public OAuthAuthenticationToken retrieveTokenBasicAuth(String username, String password) throws IOException, ParseException {
-        return retrieveToken(new ResourceOwnerPasswordCredentialsGrant(username, new Secret(password)), getClientAuthenticationPost());
+    public OAuthAuthenticationToken retrieveTokenBasicAuth(String username, String password)
+            throws IOException, ParseException {
+        return retrieveToken(
+                new ResourceOwnerPasswordCredentialsGrant(username, new Secret(password)),
+                getClientAuthenticationPost());
     }
 
-    private OAuthAuthenticationToken retrieveToken(AuthorizationGrant authorizationGrant, ClientAuthentication clientAuthentication) throws IOException, ParseException {
+    private OAuthAuthenticationToken retrieveToken(
+            AuthorizationGrant authorizationGrant, ClientAuthentication clientAuthentication)
+            throws IOException, ParseException {
         // Make the token request
         Scope scope = new Scope(OIDCScopeValue.OPENID, OIDCScopeValue.EMAIL, OIDCScopeValue.PROFILE);
-        TokenRequest request = new TokenRequest(configuration.getTokenUrl(), clientAuthentication, authorizationGrant, scope);
-        OIDCTokenResponse response = OIDCTokenResponse.parse(request.toHTTPRequest().send());
+        TokenRequest request =
+                new TokenRequest(configuration.getTokenUrl(), clientAuthentication, authorizationGrant, scope);
+        OIDCTokenResponse response =
+                OIDCTokenResponse.parse(request.toHTTPRequest().send());
 
         // On failure, tell the user
         if (!response.indicatesSuccess()) {
@@ -84,7 +96,7 @@ public class OAuthFlow {
         // Retrieve JWT claimsset
         Map<String, Object> claims = accessTokenValidator.parseAndValidate(accessToken.getValue());
 
-        if(claims == null) {
+        if (claims == null) {
             log.warn("Access token provided by the token endpoint is invalid");
             log.debug("Access token {}", accessToken.getValue());
             return null;
@@ -100,8 +112,10 @@ public class OAuthFlow {
         AuthorizationGrant refreshTokenGrant = new RefreshTokenGrant(refreshToken);
 
         // Make the token request
-        TokenRequest request = new TokenRequest(configuration.getTokenUrl(), getClientAuthentication(), refreshTokenGrant);
-        OIDCTokenResponse response = OIDCTokenResponse.parse(request.toHTTPRequest().send());
+        TokenRequest request =
+                new TokenRequest(configuration.getTokenUrl(), getClientAuthentication(), refreshTokenGrant);
+        OIDCTokenResponse response =
+                OIDCTokenResponse.parse(request.toHTTPRequest().send());
 
         if (response.indicatesSuccess()) {
             OIDCTokenResponse successResponse = response.toSuccessResponse();
@@ -109,8 +123,7 @@ public class OAuthFlow {
             return new OAuthAuthenticationToken(
                     successResponse.getTokens().getAccessToken().getValue(),
                     successResponse.getTokens().getRefreshToken().getValue(),
-                    successResponse.getOIDCTokens().getIDTokenString()
-            );
+                    successResponse.getOIDCTokens().getIDTokenString());
         } else {
             // We got an error response...
             ErrorObject errorObject = response.toErrorResponse().getErrorObject();
@@ -141,10 +154,12 @@ public class OAuthFlow {
     }
 
     public ClientAuthentication getClientAuthentication() {
-        return new ClientSecretBasic(new ClientID(configuration.getClientId()), new Secret(configuration.getClientSecret()));
+        return new ClientSecretBasic(
+                new ClientID(configuration.getClientId()), new Secret(configuration.getClientSecret()));
     }
 
     public ClientAuthentication getClientAuthenticationPost() {
-        return new ClientSecretPost(new ClientID(configuration.getClientId()), new Secret(configuration.getClientSecret()));
+        return new ClientSecretPost(
+                new ClientID(configuration.getClientId()), new Secret(configuration.getClientSecret()));
     }
 }

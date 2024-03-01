@@ -1,18 +1,19 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.config.ViewsConfig.*;
-import io.fairspace.saturn.services.views.Table.*;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.*;
-import org.apache.commons.lang3.tuple.*;
-
 import java.sql.*;
 import java.time.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
+
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.*;
+import org.apache.commons.lang3.tuple.*;
+
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.config.ViewsConfig.*;
+import io.fairspace.saturn.services.views.Table.*;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
@@ -51,13 +52,16 @@ public class ViewStoreClient implements AutoCloseable {
     }
 
     private final Connection connection;
+
     @Getter
     private final ViewStoreConfiguration configuration;
+
     private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient(
             Connection connection,
-            ViewStoreConfiguration configuration, MaterializedViewService materializedViewService) {
+            ViewStoreConfiguration configuration,
+            MaterializedViewService materializedViewService) {
         this.connection = connection;
         this.configuration = configuration;
         this.materializedViewService = materializedViewService;
@@ -66,7 +70,6 @@ public class ViewStoreClient implements AutoCloseable {
     @Override
     public void close() throws SQLException {
         connection.close();
-
     }
 
     public void commit() throws SQLException {
@@ -76,8 +79,7 @@ public class ViewStoreClient implements AutoCloseable {
 
     public void deleteRow(String view, String uri) throws SQLException {
         var viewTable = configuration.viewTables.get(view);
-        try (var query = connection.prepareStatement(
-                "delete from " + viewTable.name + " where id = ?")) {
+        try (var query = connection.prepareStatement("delete from " + viewTable.name + " where id = ?")) {
             query.setString(1, uri);
             var deletedCount = query.executeUpdate();
             log.debug("Deleted {} rows from view {}", deletedCount, view);
@@ -86,9 +88,7 @@ public class ViewStoreClient implements AutoCloseable {
 
     Set<String> retrieveValues(String joinTable, String view, String id, ColumnDefinition column) throws SQLException {
         try (var query = connection.prepareStatement(
-                "select " + column.name + " from " + joinTable +
-                        " where " + idColumn(view).name + " = ?"
-        )) {
+                "select " + column.name + " from " + joinTable + " where " + idColumn(view).name + " = ?")) {
             query.setString(1, id);
             var result = query.executeQuery();
             var links = new HashSet<String>();
@@ -100,14 +100,10 @@ public class ViewStoreClient implements AutoCloseable {
     }
 
     int deleteValues(
-            Table table,
-            ColumnDefinition idColumn,
-            String id,
-            ColumnDefinition valueColumn,
-            Collection<String> values) throws SQLException {
-        var deleteSql = "delete from " + table.name +
-                " where " + idColumn.name + " = ? " +
-                " and " + valueColumn.name + " = ?";
+            Table table, ColumnDefinition idColumn, String id, ColumnDefinition valueColumn, Collection<String> values)
+            throws SQLException {
+        var deleteSql =
+                "delete from " + table.name + " where " + idColumn.name + " = ? " + " and " + valueColumn.name + " = ?";
         try (var delete = connection.prepareStatement(deleteSql)) {
             for (String value : values) {
                 delete.setString(1, id);
@@ -122,9 +118,10 @@ public class ViewStoreClient implements AutoCloseable {
             Table table,
             ColumnDefinition idColumn,
             ColumnDefinition valueColumn,
-            Collection<Pair<String, String>> values) throws SQLException {
-        var insertSql = "insert into " + table.name + " ( " +
-                idColumn.name + ", " + valueColumn.name + " ) values ( ?, ? )";
+            Collection<Pair<String, String>> values)
+            throws SQLException {
+        var insertSql =
+                "insert into " + table.name + " ( " + idColumn.name + ", " + valueColumn.name + " ) values ( ?, ? )";
         try (var insert = connection.prepareStatement(insertSql)) {
             for (var value : values) {
                 insert.setString(1, value.getKey());
@@ -151,7 +148,8 @@ public class ViewStoreClient implements AutoCloseable {
                 propertyTable,
                 idColumn(view),
                 valueColumn,
-                values.stream().filter(value -> !existing.contains(value))
+                values.stream()
+                        .filter(value -> !existing.contains(value))
                         .map(value -> Pair.of(id, value))
                         .collect(Collectors.toList()));
 
@@ -182,9 +180,7 @@ public class ViewStoreClient implements AutoCloseable {
     }
 
     boolean rowExists(String table, String id) throws SQLException {
-        try (var query = connection.prepareStatement(
-                "select exists ( select 1 from " + table + " where id = ? )"
-        )) {
+        try (var query = connection.prepareStatement("select exists ( select 1 from " + table + " where id = ? )")) {
             query.setString(1, id);
             var result = query.executeQuery();
             result.next();
@@ -213,26 +209,23 @@ public class ViewStoreClient implements AutoCloseable {
                         .filter(entry -> entry.getValue() != null)
                         .map(Map.Entry::getKey))
                 .distinct()
-                .filter(columnName -> config.columns.stream().noneMatch(column ->
-                        // Skip value set columns
-                        column.name.equalsIgnoreCase(columnName) && column.type.isSet()))
+                .filter(columnName -> config.columns.stream()
+                        .noneMatch(column ->
+                                // Skip value set columns
+                                column.name.equalsIgnoreCase(columnName) && column.type.isSet()))
                 .collect(Collectors.toList());
         if (columnNames.isEmpty()) {
             return 0;
         }
-        var updateSql = "update " + viewTable.name + " set " +
-                columnNames.stream()
-                        .map(column -> column + " = ?")
-                        .collect(Collectors.joining(", ")) +
-                " where id = ?";
-        var insertSql = "insert into " + viewTable.name + " ( " +
-                String.join(", ", columnNames) + " ) values ( " +
-                columnNames.stream()
-                        .map(column -> "?")
-                        .collect(Collectors.joining(", ")) + " )";
+        var updateSql = "update " + viewTable.name + " set "
+                + columnNames.stream().map(column -> column + " = ?").collect(Collectors.joining(", "))
+                + " where id = ?";
+        var insertSql = "insert into " + viewTable.name + " ( " + String.join(", ", columnNames)
+                + " ) values ( " + columnNames.stream().map(column -> "?").collect(Collectors.joining(", "))
+                + " )";
         try (var insert = connection.prepareStatement(insertSql);
-             var update = connection.prepareStatement(updateSql)) {
-            for (var row: rows) {
+                var update = connection.prepareStatement(updateSql)) {
+            for (var row : rows) {
                 var values = columnNames.stream()
                         .map(columnName -> row.getOrDefault(columnName, null))
                         .collect(Collectors.toList());
@@ -268,14 +261,22 @@ public class ViewStoreClient implements AutoCloseable {
     public void truncateViewTables(String view) throws SQLException {
         var tables = new ArrayList<Table>();
         tables.add(configuration.viewTables.get(view));
-        tables.addAll(configuration.propertyTables.getOrDefault(view, Collections.emptyMap()).values());
+        tables.addAll(configuration
+                .propertyTables
+                .getOrDefault(view, Collections.emptyMap())
+                .values());
         var joins = configuration.viewConfig.get(view).join;
         if (joins != null) {
-            joins.stream().filter(joinView -> !joinView.reverse)
-                    .forEach(joinView -> tables.add(configuration.joinTables.get(view).get(joinView.view)));
+            joins.stream()
+                    .filter(joinView -> !joinView.reverse)
+                    .forEach(joinView ->
+                            tables.add(configuration.joinTables.get(view).get(joinView.view)));
         }
-        log.debug("Truncating tables for view {}: {}", view, tables.stream().map(Table::getName).collect(Collectors.toList()));
-        for (var table: tables) {
+        log.debug(
+                "Truncating tables for view {}: {}",
+                view,
+                tables.stream().map(Table::getName).collect(Collectors.toList()));
+        for (var table : tables) {
             var query = "truncate table " + table.name;
             try (var statement = connection.prepareStatement(query)) {
                 statement.executeUpdate();

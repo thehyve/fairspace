@@ -1,5 +1,9 @@
 package nl.fairspace.pluto.auth;
 
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -9,10 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -25,7 +25,8 @@ public class JwtTokenValidatorTest {
     @Mock
     JWTProcessor<?> jwtProcessor;
 
-    String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    String token =
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     Map<String, Object> claims = new HashMap<>();
 
     JwtTokenValidator tokenValidator;
@@ -39,7 +40,8 @@ public class JwtTokenValidatorTest {
 
     @Test
     void testTokenValidationReturnsClaims() throws ParseException, JOSEException, BadJOSEException {
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("firstclaim", "value").build();
+        JWTClaimsSet claimsSet =
+                new JWTClaimsSet.Builder().claim("firstclaim", "value").build();
         when(jwtProcessor.process(eq(token), any())).thenReturn(claimsSet);
 
         Map<String, Object> returnedClaims = tokenValidator.parseAndValidate(token);
@@ -49,7 +51,8 @@ public class JwtTokenValidatorTest {
 
     @Test
     void testTokenValidationReturnsNullOnException() throws ParseException, JOSEException, BadJOSEException {
-        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().claim("firstclaim", "value").build();
+        JWTClaimsSet claimsSet =
+                new JWTClaimsSet.Builder().claim("firstclaim", "value").build();
         when(jwtProcessor.process(eq(token), any())).thenThrow(new RuntimeException("Test"));
 
         Map<String, Object> returnedClaims = tokenValidator.parseAndValidate(token);

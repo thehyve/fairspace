@@ -1,9 +1,10 @@
 package io.fairspace.saturn.webdav.resources;
 
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.Access;
-import io.fairspace.saturn.webdav.DavFactory;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.stream.Stream;
+import javax.xml.namespace.QName;
+
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Request;
@@ -20,10 +21,10 @@ import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import javax.xml.namespace.QName;
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.stream.Stream;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
@@ -32,6 +33,7 @@ import static io.fairspace.saturn.rdf.SparqlUtils.parseXSDDateTimeLiteral;
 import static io.fairspace.saturn.vocabulary.Vocabularies.USER_VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.WebDAVServlet.*;
+
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static io.milton.property.PropertySource.PropertyAccessibility.READ_ONLY;
 import static io.milton.property.PropertySource.PropertyAccessibility.WRITABLE;
@@ -40,7 +42,13 @@ import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptor;
 import static org.apache.commons.beanutils.PropertyUtils.getPropertyDescriptors;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
-public abstract class BaseResource implements PropFindableResource, DeletableResource, MoveableResource, CopyableResource, MultiNamespaceCustomPropertyResource, PostableResource {
+public abstract class BaseResource
+        implements PropFindableResource,
+                DeletableResource,
+                MoveableResource,
+                CopyableResource,
+                MultiNamespaceCustomPropertyResource,
+                PostableResource {
     protected final DavFactory factory;
     public final Resource subject;
     protected final Access access;
@@ -72,7 +80,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
 
     @Override
     public boolean authorise(Request request, Request.Method method, Auth auth) {
-        // for POST requests performAction *must* implement action-specific checks and throw NotAuthorizedException if necessary
+        // for POST requests performAction *must* implement action-specific checks and throw NotAuthorizedException if
+        // necessary
 
         return (!method.isWrite && access.canList()) || (method.isWrite && access.canWrite());
     }
@@ -97,7 +106,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
         boolean purge;
         if (factory.isExtraStoreResource()) {
             if (subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
-                throw new NotAuthorizedException("Not authorized to purge the extra store root directory.", this, SC_FORBIDDEN);
+                throw new NotAuthorizedException(
+                        "Not authorized to purge the extra store root directory.", this, SC_FORBIDDEN);
             }
             if (subject.hasProperty(RDF.type, FS.File)) {
                 ((FileResource) factory.getResource(subject)).deleteContent();
@@ -133,8 +143,7 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
             throw new BadRequestException("The name is empty.");
         }
         if (name.contains("\\")) {
-            throw new BadRequestException(
-                    "The name contains an illegal character (\\)");
+            throw new BadRequestException("The name contains an illegal character (\\)");
         }
         var existing = parent.child(name);
         if (existing != null) {
@@ -163,25 +172,26 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
                 .filterDrop(stmt -> stmt.getPredicate().equals(RDFS.label))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.versions))
-                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .toSet() // convert to set, to prevent updating a model while iterating over its elements
                 .forEach(stmt -> newSubject.addProperty(stmt.getPredicate(), stmt.getObject()));
 
         var versions = getListProperty(subject, FS.versions);
 
         if (versions != null) {
-            var newVersions = subject.getModel().createList(versions.iterator()
-                    .mapWith(RDFNode::asResource)
-                    .mapWith(BaseResource::copyVersion));
+            var newVersions = subject.getModel()
+                    .createList(versions.iterator().mapWith(RDFNode::asResource).mapWith(BaseResource::copyVersion));
             newSubject.addProperty(FS.versions, newVersions);
         }
 
-        subject.getModel().listSubjectsWithProperty(FS.belongsTo, subject)
-                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+        subject.getModel()
+                .listSubjectsWithProperty(FS.belongsTo, subject)
+                .toSet() // convert to set, to prevent updating a model while iterating over its elements
                 .forEach(r -> move(r, newSubject, getStringProperty(r, RDFS.label), false));
 
-        subject.getModel().listStatements(null, null, subject)
+        subject.getModel()
+                .listStatements(null, null, subject)
                 .filterDrop(stmt -> stmt.getPredicate().equals(FS.belongsTo))
-                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .toSet() // convert to set, to prevent updating a model while iterating over its elements
                 .forEach(stmt -> stmt.getSubject().addProperty(stmt.getPredicate(), newSubject));
 
         subject.getModel().removeAll(subject, null, null).removeAll(null, null, subject);
@@ -196,7 +206,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
 
     private static Resource copyVersion(Resource ver) {
         var newVer = ver.getModel().createResource();
-        copyProperties(ver.asResource(), newVer, RDF.type, FS.dateModified, FS.deletedBy, FS.fileSize, FS.blobId, FS.md5);
+        copyProperties(
+                ver.asResource(), newVer, RDF.type, FS.dateModified, FS.deletedBy, FS.fileSize, FS.blobId, FS.md5);
         return newVer;
     }
 
@@ -216,7 +227,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
         var newSubject = childSubject(parent, name);
         newSubject.removeProperties();
         newSubject.addProperty(FS.belongsTo, parent);
-        newSubject.addProperty(RDFS.label, name)
+        newSubject
+                .addProperty(RDFS.label, name)
                 .addProperty(FS.dateCreated, date)
                 .addProperty(FS.createdBy, user);
 
@@ -225,19 +237,22 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
         if (subject.hasProperty(FS.versions)) {
             var src = getListProperty(subject, FS.versions).getHead().asResource();
 
-            var ver = newSubject.getModel().createResource()
+            var ver = newSubject
+                    .getModel()
+                    .createResource()
                     .addProperty(RDF.type, FS.FileVersion)
                     .addProperty(FS.modifiedBy, user)
                     .addProperty(FS.dateModified, date);
 
             copyProperties(src, ver, FS.blobId, FS.fileSize, FS.md5);
 
-            newSubject.addLiteral(FS.currentVersion, 1)
+            newSubject
+                    .addLiteral(FS.currentVersion, 1)
                     .addProperty(FS.versions, newSubject.getModel().createList(ver));
         }
         subject.getModel()
                 .listSubjectsWithProperty(FS.belongsTo, subject)
-                .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                .toSet() // convert to set, to prevent updating a model while iterating over its elements
                 .forEach(r -> copy(r, newSubject, getStringProperty(r, RDFS.label), user, date));
 
         updateParents(subject);
@@ -266,9 +281,7 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
     @Override
     public void setProperty(QName name, Object value) throws PropertySetException, NotAuthorizedException {
         try {
-            getPropertyDescriptor(this, name.getLocalPart())
-                    .getWriteMethod()
-                    .invoke(this, value);
+            getPropertyDescriptor(this, name.getLocalPart()).getWriteMethod().invoke(this, value);
         } catch (IllegalAccessException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
@@ -306,19 +319,22 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
 
     @io.fairspace.saturn.webdav.Property
     public String getMetadataLinks() {
-        if(includeMetadataLinks()) {
+        if (includeMetadataLinks()) {
             return String.join(",", metadataLinks());
         }
         return null;
     }
 
     public Set<String> metadataLinks() {
-        var userVocabularyPaths = USER_VOCABULARY.listStatements()
-                .filterKeep(stmt -> stmt.getObject().isResource() && stmt.getPredicate().getURI().equals(SHACL.path.getURI()))
+        var userVocabularyPaths = USER_VOCABULARY
+                .listStatements()
+                .filterKeep(stmt -> stmt.getObject().isResource()
+                        && stmt.getPredicate().getURI().equals(SHACL.path.getURI()))
                 .mapWith(stmt -> stmt.getObject().asResource().getURI())
                 .toSet();
         return subject.listProperties()
-                .filterKeep(stmt -> stmt.getObject().isResource() && userVocabularyPaths.contains(stmt.getPredicate().getURI()))
+                .filterKeep(stmt -> stmt.getObject().isResource()
+                        && userVocabularyPaths.contains(stmt.getPredicate().getURI()))
                 .mapWith(Statement::getResource)
                 .mapWith(Resource::getURI)
                 .toSet();
@@ -353,8 +369,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
     protected static void updateParents(Resource subject) {
         var now = timestampLiteral();
         for (var s = subject.getPropertyResourceValue(FS.belongsTo);
-             s != null && !s.hasProperty(RDF.type, FS.Workspace);
-             s = s.getPropertyResourceValue(FS.belongsTo)) {
+                s != null && !s.hasProperty(RDF.type, FS.Workspace);
+                s = s.getPropertyResourceValue(FS.belongsTo)) {
             s.removeAll(FS.dateModified)
                     .removeAll(FS.modifiedBy)
                     .addProperty(FS.dateModified, now)
@@ -370,7 +386,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
     }
 
     @Override
-    public String processForm(Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+    public String processForm(Map<String, String> parameters, Map<String, FileItem> files)
+            throws BadRequestException, NotAuthorizedException, ConflictException {
         var action = parameters.get("action");
         if (action == null) {
             throw new BadRequestException(this, "No action specified");
@@ -379,7 +396,8 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
         return null;
     }
 
-    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files)
+            throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "undelete" -> undelete();
             default -> throw new BadRequestException(this, "Unrecognized action " + action);
@@ -409,7 +427,7 @@ public abstract class BaseResource implements PropFindableResource, DeletableRes
 
             resource.getModel()
                     .listSubjectsWithProperty(FS.belongsTo, resource)
-                    .toSet()  // convert to set, to prevent updating a model while iterating over its elements
+                    .toSet() // convert to set, to prevent updating a model while iterating over its elements
                     .forEach(r -> undelete(r, date, user));
         }
     }

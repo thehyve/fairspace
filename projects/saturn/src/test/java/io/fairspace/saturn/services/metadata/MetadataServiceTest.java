@@ -1,12 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -22,9 +15,18 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.FS.NS;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
@@ -56,7 +58,9 @@ public class MetadataServiceTest {
 
     @Spy
     private Transactions txn = new SimpleTransactions(ds);
+
     private MetadataService api;
+
     @Mock
     private MetadataPermissions permissions;
 
@@ -77,14 +81,12 @@ public class MetadataServiceTest {
     @Test
     public void testGetWillNotReturnsDeleted() {
         var statement = createStatement(S2, createProperty("https://institut-curie.org/ontology#sample"), S1);
-        txn.executeWrite(m -> m
-                .add(statement)
-                .add(S1, RDF.type, createResource( "https://institut-curie.org/ontology#BiologicalSample"))
+        txn.executeWrite(m -> m.add(statement)
+                .add(S1, RDF.type, createResource("https://institut-curie.org/ontology#BiologicalSample"))
                 .add(S1, RDFS.label, "Sample 1")
                 .add(S2, RDF.type, FS.File)
                 .add(S2, RDFS.label, "File 1")
-                .add(S2, FS.dateDeleted, "2021-07-06")
-        );
+                .add(S2, FS.dateDeleted, "2021-07-06"));
         assertFalse(api.get(S1.getURI(), false).contains(statement));
     }
 
@@ -108,7 +110,6 @@ public class MetadataServiceTest {
         assertTrue(ds.getDefaultModel().contains(STMT1.getSubject(), FS.dateModified));
     }
 
-
     @Test
     public void testPutWillNotRemoveExistingStatements() {
         // Prepopulate the model
@@ -122,7 +123,8 @@ public class MetadataServiceTest {
 
         // Now ensure that the existing triples are still there
         // and the new ones are added
-        txn.executeRead(model -> { ;
+        txn.executeRead(model -> {
+            ;
             assertTrue(model.contains(EXISTING1));
             assertTrue(model.contains(EXISTING2));
             assertTrue(model.contains(STMT1));
@@ -212,72 +214,79 @@ public class MetadataServiceTest {
 
     @Test
     public void putMultiple() {
-        api.put(modelOf(
-                createStatement(S1, RDF.type, FS.Workspace),
-                createStatement(S1, RDFS.label, createStringLiteral("Test 1"))
-        ), Boolean.FALSE);
-        api.put(modelOf(
-                createStatement(S2, RDF.type, FS.Workspace),
-                createStatement(S2, RDFS.label, createStringLiteral("Test 2"))
-        ), Boolean.FALSE);
+        api.put(
+                modelOf(
+                        createStatement(S1, RDF.type, FS.Workspace),
+                        createStatement(S1, RDFS.label, createStringLiteral("Test 1"))),
+                Boolean.FALSE);
+        api.put(
+                modelOf(
+                        createStatement(S2, RDF.type, FS.Workspace),
+                        createStatement(S2, RDFS.label, createStringLiteral("Test 2"))),
+                Boolean.FALSE);
     }
 
     @Test(expected = ValidationException.class)
     public void putDuplicateLabelFails() {
-        api.put(modelOf(
-                createStatement(S1, RDF.type, FS.Workspace),
-                createStatement(S1, RDFS.label, createStringLiteral("Test"))
-                ), Boolean.FALSE);
-        api.put(modelOf(
-                createStatement(S2, RDF.type, FS.Workspace),
-                createStatement(S2, RDFS.label, createStringLiteral("Test"))
-        ), Boolean.FALSE);
+        api.put(
+                modelOf(
+                        createStatement(S1, RDF.type, FS.Workspace),
+                        createStatement(S1, RDFS.label, createStringLiteral("Test"))),
+                Boolean.FALSE);
+        api.put(
+                modelOf(
+                        createStatement(S2, RDF.type, FS.Workspace),
+                        createStatement(S2, RDFS.label, createStringLiteral("Test"))),
+                Boolean.FALSE);
     }
 
     @Test(expected = ValidationException.class)
     public void patchDuplicateLabelFails() {
-        txn.executeWrite(m -> m
-                .add(S1, RDF.type, FS.Workspace)
+        txn.executeWrite(m -> m.add(S1, RDF.type, FS.Workspace)
                 .add(S1, RDFS.label, "Test 1")
                 .add(S2, RDF.type, FS.Workspace)
-                .add(S2, RDFS.label, "Test 2")
-        );
+                .add(S2, RDFS.label, "Test 2"));
 
         api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral("Test 2 "))), Boolean.FALSE);
     }
 
     @Test(expected = ValidationException.class)
     public void patchDuplicateLabelWithWhitespaceFails() {
-        txn.executeWrite(m -> m
-                .add(S1, RDF.type, FS.Workspace)
+        txn.executeWrite(m -> m.add(S1, RDF.type, FS.Workspace)
                 .add(S1, RDFS.label, "Test 1")
                 .add(S2, RDF.type, FS.Workspace)
-                .add(S2, RDFS.label, "Test 2")
-        );
+                .add(S2, RDFS.label, "Test 2"));
 
         api.patch(modelOf(createStatement(S1, RDFS.label, createStringLiteral(" Test 2  "))), Boolean.FALSE);
     }
 
     @Test
     public void putSameLabelDifferentType() {
-        api.put(modelOf(
-                createStatement(S1, RDF.type, FS.Workspace),
-                createStatement(S1, RDFS.label, createStringLiteral("Test"))
-        ), Boolean.FALSE);
-        api.put(modelOf(
-                createStatement(S2, RDF.type, createResource(NS + "Sample")),
-                createStatement(S2, RDFS.label, createStringLiteral("Test"))
-        ), Boolean.FALSE);
+        api.put(
+                modelOf(
+                        createStatement(S1, RDF.type, FS.Workspace),
+                        createStatement(S1, RDFS.label, createStringLiteral("Test"))),
+                Boolean.FALSE);
+        api.put(
+                modelOf(
+                        createStatement(S2, RDF.type, createResource(NS + "Sample")),
+                        createStatement(S2, RDFS.label, createStringLiteral("Test"))),
+                Boolean.FALSE);
     }
 
     @Test
     public void putLabelTrimmed() {
-        api.put(modelOf(
-                createStatement(S1, RDF.type, FS.Workspace),
-                createStatement(S1, RDFS.label, createStringLiteral(" Label with whitespace  "))
-        ), Boolean.FALSE);
-        assertNotEquals(" Label with whitespace  ", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
-        assertEquals("Label with whitespace", ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
+        api.put(
+                modelOf(
+                        createStatement(S1, RDF.type, FS.Workspace),
+                        createStatement(S1, RDFS.label, createStringLiteral(" Label with whitespace  "))),
+                Boolean.FALSE);
+        assertNotEquals(
+                " Label with whitespace  ",
+                ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
+        assertEquals(
+                "Label with whitespace",
+                ds.getDefaultModel().getProperty(S1, RDFS.label).getString());
     }
 
     @Test

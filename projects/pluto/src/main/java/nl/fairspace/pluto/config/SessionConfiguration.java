@@ -1,6 +1,7 @@
 package nl.fairspace.pluto.config;
 
-import nl.fairspace.pluto.config.dto.PlutoConfig;
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,7 @@ import org.springframework.session.config.annotation.web.http.EnableSpringHttpSe
 import org.springframework.session.web.http.CookieSerializer;
 import org.springframework.session.web.http.DefaultCookieSerializer;
 
-import java.util.HashMap;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
 
 @Configuration
 @EnableSpringHttpSession

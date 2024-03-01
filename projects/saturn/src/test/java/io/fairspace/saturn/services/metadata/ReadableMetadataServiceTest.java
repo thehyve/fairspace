@@ -1,8 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
@@ -16,7 +13,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
@@ -40,6 +42,7 @@ public class ReadableMetadataServiceTest {
     private Transactions txn = new SimpleTransactions(createTxnMem());
     private MetadataService api;
     private Model vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel());
+
     @Mock
     MetadataPermissions permissions;
 
@@ -63,9 +66,7 @@ public class ReadableMetadataServiceTest {
 
     @Test
     public void getWithImportantPropertiesWorksWithoutImportantProperties() {
-        txn.executeWrite(m -> m
-                .add(STMT1)
-                .add(LBL_STMT1));
+        txn.executeWrite(m -> m.add(STMT1).add(LBL_STMT1));
 
         assertTrue(api.get(S1.getURI(), true).contains(LBL_STMT1));
     }
@@ -76,11 +77,11 @@ public class ReadableMetadataServiceTest {
         var importantProperty = createProperty("http://ex.com/important");
         var unimportantProperty = createProperty("http://ex.com/unimportant");
 
-
         var clazz = createResource("http://ex.com/Class");
         var clazzShape = createResource("http://ex.com/ClassShape");
         var importantPropertyShape = createResource("http://ex.com/importantShape");
-        var unimportantPropertyShape = createResource("http://ex.com/unimportantShape");;
+        var unimportantPropertyShape = createResource("http://ex.com/unimportantShape");
+        ;
 
         txn.executeWrite(m -> {
             setupImportantProperties();
@@ -93,13 +94,11 @@ public class ReadableMetadataServiceTest {
                     .add(clazzShape, SHACLM.property, unimportantPropertyShape)
                     .add(unimportantPropertyShape, SHACLM.path, unimportantProperty);
 
-            m
-                    .add(S1, someProperty, S2)
+            m.add(S1, someProperty, S2)
                     .add(S2, RDF.type, clazz)
                     .add(S2, unimportantProperty, S3)
                     .add(S2, importantProperty, S3);
         });
-
 
         var result = api.get(S1.getURI(), true);
 
@@ -114,7 +113,8 @@ public class ReadableMetadataServiceTest {
         Resource createdByShape = createResource("http://createdByShape");
         Resource md5Shape = createResource("http://md5Shape");
 
-        vocabulary.add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE))
+        vocabulary
+                .add(labelShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE))
                 .add(labelShape, SHACLM.path, RDFS.label)
                 .add(createdByShape, FS.importantProperty, createTypedLiteral(Boolean.TRUE))
                 .add(createdByShape, SHACLM.path, FS.createdBy)
