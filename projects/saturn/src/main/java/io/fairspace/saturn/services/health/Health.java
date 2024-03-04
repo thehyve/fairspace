@@ -2,10 +2,10 @@ package io.fairspace.saturn.services.health;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

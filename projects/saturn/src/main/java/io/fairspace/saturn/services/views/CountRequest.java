@@ -1,8 +1,8 @@
 package io.fairspace.saturn.services.views;
 
 import java.util.List;
-import javax.validation.constraints.NotBlank;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 

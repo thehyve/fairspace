@@ -1,11 +1,11 @@
 package io.fairspace.saturn.config;
 
 import java.util.*;
-import javax.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.dataformat.yaml.*;
+import jakarta.validation.constraints.*;
 
 public class ViewsConfig {
     public static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
