@@ -1,3 +1,4 @@
+// @flow
 import type {User} from "./UsersAPI";
 import type {WorkspaceUserRole} from "../workspaces/WorkspacesAPI";
 

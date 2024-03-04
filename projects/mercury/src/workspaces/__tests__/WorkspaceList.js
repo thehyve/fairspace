@@ -2,9 +2,9 @@ import React from 'react';
 import {render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {MemoryRouter} from 'react-router-dom';
+import {ThemeProvider} from "@mui/material/styles";
 import WorkspaceList from '../WorkspaceList';
 import type {Workspace} from '../WorkspacesAPI';
-import {ThemeProvider} from "@mui/material/styles";
 import theme from "../../App.theme";
 
 const wrap = (element) => (

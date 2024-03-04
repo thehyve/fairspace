@@ -185,7 +185,7 @@ describe('Metadata Utils', () => {
             expect(url2iri('http://example.com:1234/some/path')).toEqual('http://example.com/some/path');
         });
 
-        it('handles urls with query and fragment ', () => {
+        it('handles urls with query and fragment', () => {
             expect(url2iri('scheme://example.com/some/path/?query#some-fragment')).toEqual('http://example.com/some/path/?query#some-fragment');
         });
 

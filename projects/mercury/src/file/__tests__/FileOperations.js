@@ -78,26 +78,23 @@ describe('FileOperations', () => {
             });
     });
 
-    it('should clear selection and refresh files after all successful file operations', () => {
-        const createDir = () => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir");
-        const paste = () => clickHandler('Paste')({stopPropagation: () => {}});
-        const deleteFile = () => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")();
+    async function performOperation(operation) {
+        refreshFiles.mockReset();
+        clearSelection.mockReset();
 
-        return Promise.all(
-            [createDir, deleteFile, paste].map(op => {
-                refreshFiles.mockReset();
-                clearSelection.mockReset();
+        try {
+            await operation();
+            expect(refreshFiles).toHaveBeenCalled();
+            expect(clearSelection).toHaveBeenCalled();
+        } catch (error) {
+            throw new Error(`Operation failed: ${error}`);
+        }
+    }
 
-                return op()
-                    .then(() => {
-                        expect(refreshFiles).toHaveBeenCalled();
-                        expect(clearSelection).toHaveBeenCalled();
-                    })
-                    .catch(() => {
-                        throw Error("Operation failed: ", op.name);
-                    });
-            })
-        );
+    it('should clear selection and refresh files after all successful file operations', async () => {
+        await performOperation(() => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir"));
+        await performOperation(() => clickHandler('Paste')({stopPropagation: () => {}}));
+        await performOperation(() => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")());
     });
 
     describe('paste button', () => {

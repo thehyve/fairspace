@@ -2,12 +2,11 @@
 import React from 'react';
 import {cleanup, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {configure, shallow} from "enzyme";
+import {configure} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {ThemeProvider} from '@mui/material/styles';
 import {ExternalStorageBrowser} from "../ExternalStorageBrowser";
 import type {ExternalStorage} from "../ExternalStoragesContext";
-import LoadingInlay from "../../common/components/LoadingInlay";
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.

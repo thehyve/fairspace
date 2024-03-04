@@ -2,8 +2,8 @@ import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {configure, mount} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import WorkspaceDialog from '../WorkspaceDialog';
 import {ThemeProvider} from '@mui/material/styles';
+import WorkspaceDialog from '../WorkspaceDialog';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.

@@ -31,7 +31,7 @@ describe('WorkspacesAPI', () => {
         );
     });
 
-    it('Failure to create a workspace is handled correctly', (done) => {
+    it('Failure to create a workspace is handled correctly', () => {
         const workspaceData: Workspace = {
             code: 'workspace1'
         };
@@ -40,15 +40,11 @@ describe('WorkspacesAPI', () => {
             headers: {'content-type': 'application/json'}
         };
         const errorResponse: AxiosError = {response: conflictResponse};
-        mockAxios.put.mockImplementationOnce(() => Promise.reject(errorResponse));
-        workspacesAPI.createWorkspace(workspaceData)
-            .then(() => {
-                done.fail('API call expected to fail');
-            })
-            .catch((error) => {
-                expect(error.message).toEqual('Failure while creating a workspace');
-                done();
-            });
+        mockAxios.put.mockRejectedValueOnce(errorResponse); // Mock the axios.put function to return a rejected promise
+
+        // Using async/await for cleaner asynchronous code
+        return expect(workspacesAPI.createWorkspace(workspaceData))
+            .rejects.toThrow('Failure while creating a workspace');
     });
 
     it('Deletes a new workspace', async () => {
