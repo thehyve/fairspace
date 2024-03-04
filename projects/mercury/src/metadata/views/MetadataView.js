@@ -245,7 +245,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     <MetadataViewInformationDrawer
                         handleCloseCard={() => setIsClosedPanel(true)}
                         entity={selected}
-                        viewIcon=<Assignment />
+                        viewIcon={<Assignment />}
                         textFilterLink={getPrefilteringRedirectionLink(selected)}
                     />
                 </Grid>

@@ -3,10 +3,10 @@ import React from 'react';
 import {configure} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 // eslint-disable-next-line import/no-extraneous-dependencies
-import LinkedDataLink from "../LinkedDataLink";
 import {fireEvent, render} from "@testing-library/react";
-import theme from "../../../App.theme";
 import {ThemeProvider} from "@mui/material/styles";
+import LinkedDataLink from "../LinkedDataLink";
+import theme from "../../../App.theme";
 import UserContext from '../../../users/UserContext';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -16,7 +16,7 @@ jest.mock('../LinkedDataEntityPage', () => () => <div>Mocked Metadata Page</div>
 
 describe('LinkedDataLink', () => {
     it('renders LinkedDataLink without crashing', () => {
-        const { getByText } = render(
+        const {getByText} = render(
             <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
                 <ThemeProvider theme={theme}>
                     <LinkedDataLink uri="testUri">Test Content</LinkedDataLink>
@@ -27,7 +27,7 @@ describe('LinkedDataLink', () => {
     });
 
     it('shows the modal when clicked', () => {
-        const { getByText, queryByText } = render(
+        const {getByText, queryByText} = render(
             <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
                 <ThemeProvider theme={theme}>
                     <LinkedDataLink uri="testUri">Test Content</LinkedDataLink>
@@ -41,7 +41,7 @@ describe('LinkedDataLink', () => {
     });
 
     it('closes the modal when close icon is clicked', () => {
-        const { getByText, getByTestId, queryByText } = render(
+        const {getByText, getByTestId, queryByText} = render(
             <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
                 <ThemeProvider theme={theme}>
                     <LinkedDataLink uri="testUri">Test Content</LinkedDataLink>

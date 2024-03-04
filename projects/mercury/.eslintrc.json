@@ -5,6 +5,7 @@
     "jest/globals": true
   },
   "plugins": [
+    "ft-flow",
     "react-hooks",
     "jest"
   ],
@@ -12,13 +13,14 @@
     "airbnb",
     "plugin:jest/recommended"
   ],
-  "parser": "@babel/eslint-parser",
+  "parser": "hermes-eslint",
   "parserOptions": {
     "requireConfigFile": false
   },
   "rules": {
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
+    "ft-flow/define-flow-type": 1,
     "linebreak-style": 0,
     "indent": [
       "error",
@@ -85,6 +87,7 @@
     "react/require-default-props": 0,
     "react/forbid-prop-types": 0,
     "import/prefer-default-export": 0,
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
     "prefer-template": 0,
     "react/state-in-constructor": 0,
     "react/jsx-props-no-spreading": 0,

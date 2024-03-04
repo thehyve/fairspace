@@ -5,14 +5,14 @@ import {Checkbox, Slider} from "@mui/material";
 import FormLabel from "@mui/material/FormLabel";
 import Input from "@mui/material/Input";
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {ThemeProvider} from '@mui/material/styles';
 import Facet from "../MetadataViewFacetFactory";
 import TextSelectionFacet from "../facets/TextSelectionFacet";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockFacets} from "../__mocks__/MetadataViewAPI";
 import NumericalRangeSelectionFacet from "../facets/NumericalRangeSelectionFacet";
 import DateSelectionFacet from "../facets/DateSelectionFacet";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -24,13 +24,14 @@ describe('MetadataViewFacetFactory', () => {
         const wrapper = mount(
             <ThemeProvider theme={theme}>
                 <Facet
-                title="Facet1"
-                options={[]}
-                type="unknown_type"
-                onChange={() => {}}
-                activeFilterValues={[]}
+                    title="Facet1"
+                    options={[]}
+                    type="unknown_type"
+                    onChange={() => {}}
+                    activeFilterValues={[]}
                 />
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
         expect(wrapper.find(FormLabel).length).toEqual(0);
     });
@@ -41,13 +42,14 @@ describe('MetadataViewFacetFactory', () => {
         const wrapper = mount(
             <ThemeProvider theme={theme}>
                 <Facet
-                title={title}
-                options={options}
-                type="Term"
-                onChange={() => {}}
-                activeFilterValues={[]}
+                    title={title}
+                    options={options}
+                    type="Term"
+                    onChange={() => {}}
+                    activeFilterValues={[]}
                 />
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
         const textSelectionFacet = wrapper.find(TextSelectionFacet);
         expect(textSelectionFacet.length).toEqual(1);
@@ -72,7 +74,8 @@ describe('MetadataViewFacetFactory', () => {
                     onChange={() => {}}
                     activeFilterValues={[]}
                 />
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
         const numericalRangeSelectionFacet = wrapper.find(NumericalRangeSelectionFacet);
         expect(numericalRangeSelectionFacet.length).toEqual(1);
@@ -93,15 +96,16 @@ describe('MetadataViewFacetFactory', () => {
         const title = "Birth date";
         const mockFacet = mockFacets("Subject").find(v => v.title === title);
         const wrapper = mount(
-        <ThemeProvider theme={theme}>
-            <Facet
-            title={title}
-            options={[mockFacet.min, mockFacet.max]}
-            type="Date"
-            onChange={() => {}}
-            activeFilterValues={[]}
-            />
-        </ThemeProvider>);
+            <ThemeProvider theme={theme}>
+                <Facet
+                    title={title}
+                    options={[mockFacet.min, mockFacet.max]}
+                    type="Date"
+                    onChange={() => {}}
+                    activeFilterValues={[]}
+                />
+            </ThemeProvider>
+        );
 
         const dateSelectionFacet = wrapper.find(DateSelectionFacet);
         expect(dateSelectionFacet.length).toEqual(1);

@@ -3,12 +3,12 @@ import {createRoot} from 'react-dom/client';
 import {configure, mount} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {MemoryRouter} from "react-router-dom"; // for elements wrapped in 'withRouter'
+import {ThemeProvider} from '@mui/material/styles';
 import UserContext from "../../users/UserContext";
 import Layout from "../Layout";
 import MenuDrawer from "../MenuDrawer";
 import StatusAlert from "../../status/StatusAlert";
 import StatusContext from "../../status/StatusContext";
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.

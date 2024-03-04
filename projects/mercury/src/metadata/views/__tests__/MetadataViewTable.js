@@ -1,12 +1,12 @@
 import {render, screen} from "@testing-library/react";
-import userEvent from "@testing-library/user-event"
+import userEvent from "@testing-library/user-event";
 import React from "react";
 import '@testing-library/jest-dom/extend-expect';
+import {ThemeProvider} from '@mui/material/styles';
 import {MetadataViewTable} from "../MetadataViewTable";
 // eslint-disable-next-line jest/no-mocks-import
 import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";
 import {RESOURCES_VIEW} from "../metadataViewUtils";
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../../App.theme';
 
 describe('MetadataViewTable', () => {
@@ -90,8 +90,8 @@ describe('MetadataViewTable', () => {
         expect(queryByText('Tongue')).not.toBeInTheDocument();
     });
 
-    it('should redirect when opening collection entry', async() => {
-        const user = userEvent.setup()
+    it('should redirect when opening collection entry', async () => {
+        const user = userEvent.setup();
         const view = RESOURCES_VIEW;
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
@@ -113,7 +113,8 @@ describe('MetadataViewTable', () => {
                     checkboxes={{}}
                     setCheckboxState={() => {}}
                 />
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
         const tableRows = screen.queryAllByRole("row");
         expect(tableRows.length).toEqual(2);
