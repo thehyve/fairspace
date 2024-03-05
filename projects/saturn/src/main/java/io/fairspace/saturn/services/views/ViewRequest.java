@@ -1,7 +1,6 @@
 package io.fairspace.saturn.services.views;
 
-import javax.validation.constraints.Min;
-
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -4,11 +4,11 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;
 import javax.servlet.ServletException;
-import javax.ws.rs.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import jakarta.ws.rs.NotFoundException;
 import lombok.extern.log4j.*;
 import org.apache.commons.lang3.*;
 import org.apache.jena.graph.Node;
