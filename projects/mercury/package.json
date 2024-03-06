@@ -9,15 +9,16 @@
     "localdevelopment": "cd ../../local-development && docker compose up",
     "saturn": "wait-on http://localhost:5100/ && wait-on tcp:9432 && cd ../saturn/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew run",
     "pluto": "wait-on http://localhost:8090/api/health/ && cd ../pluto/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew bootRun --args='--spring.profiles.active=local'",
-    "start": "react-app-rewired start",
-    "build": "eslint ./src && react-app-rewired build",
-    "test": "react-app-rewired test --env=jsdom",
-    "test:coverage": "react-app-rewired test --env=jsdom --coverage --watchAll=false",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test --env=jsdom",
+    "test:coverage": "craco test --env=jsdom --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint ./src",
     "flow": "flow"
   },
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "@date-io/date-fns": "^2.13.1",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -45,7 +46,6 @@
     "qs": "^6.9.4",
     "query-string": "^7.1.1",
     "react": "^18.2.0",
-    "react-app-rewired": "^2.2.1",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-is-mounted-hook": "^1.1.2",
@@ -68,11 +68,10 @@
     "enzyme": "^3.11.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-ft-flow": "^3.0.7",
-    "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^27.2.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.16.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "express-session": "^1.17.1",
     "flow-bin": "^0.117.0",
@@ -99,9 +98,6 @@
     },
     "transformIgnorePatterns": [
       "\\.pnp\\.[^\\/]+$"
-    ],
-    "setupFilesAfterEnv": [
-      "./jest-setup.js"
     ]
   }
 }
