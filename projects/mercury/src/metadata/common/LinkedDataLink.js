@@ -36,12 +36,12 @@ const LinkedDataLink = ({classes, uri, children}) => {
     const {currentUser} = useContext(UserContext);
     if (currentUser && currentUser.canViewPublicMetadata) {
         return (
-            <div>
-                <div onClick={handleOpen} className={classes.clickableDiv}>
+            <span>
+                <span onClick={handleOpen} className={classes.clickableDiv}>
                     {children}
-                </div>
+                </span>
                 {renderModal(classes, open, handleClose, uri)}
-            </div>
+            </span>
         );
     }
     return children;

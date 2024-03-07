@@ -156,7 +156,9 @@ const MetadataCard = (props) => {
     const {getRootProps, getInputProps, open, isDragActive, isDragAccept, isDragReject} = useDropzone({
         noClick: true,
         noKeyboard: true,
-        accept: ".csv,text/csv",
+        accept: {
+            'text/csv': ['.csv']
+        },
         onDropAccepted: (files) => {
             if (files.length === 1) {
                 uploadMetadata(files[0]);
@@ -188,7 +190,7 @@ const MetadataCard = (props) => {
                             ? <CircularProgress size={10} />
                             : (
                                 <Tooltip
-                                    interactive
+                                    interactive="true"
                                     title={(
                                         <>
                                             <div>Upload metadata in CSV format.</div>
