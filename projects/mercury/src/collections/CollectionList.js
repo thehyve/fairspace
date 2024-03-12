@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Link,
     ListItemText,
@@ -11,55 +11,55 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import styles from './CollectionList.styles';
-import MessageDisplay from "../common/components/MessageDisplay";
-import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import {currentWorkspace} from '../workspaces/workspaces';
-import {accessLevelForCollection, collectionAccessIcon} from './collectionUtils';
-import ColumnFilterInput from "../common/components/ColumnFilterInput";
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import MessageDisplay from '../common/components/MessageDisplay';
+import { camelCaseToWords, formatDateTime } from '../common/utils/genericUtils';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
+import { currentWorkspace } from '../workspaces/workspaces';
+import { accessLevelForCollection, collectionAccessIcon } from './collectionUtils';
+import ColumnFilterInput from '../common/components/ColumnFilterInput';
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 const baseColumns = {
     name: {
         valueExtractor: 'name',
-        label: 'Name'
+        label: 'Name',
     },
     workspace: {
         valueExtractor: 'ownerWorkspaceCode',
-        label: 'Workspace'
+        label: 'Workspace',
     },
     status: {
         valueExtractor: 'status',
-        label: 'Status'
+        label: 'Status',
     },
     viewMode: {
         valueExtractor: 'accessMode',
-        label: 'Public access'
+        label: 'Public access',
     },
     access: {
         valueExtractor: 'access',
-        label: 'Access'
+        label: 'Access',
     },
     created: {
         valueExtractor: 'dateCreated',
-        label: 'Created'
+        label: 'Created',
     },
     creator: {
         valueExtractor: 'creatorDisplayName',
-        label: 'Creator'
-    }
+        label: 'Creator',
+    },
 };
 
 const allColumns = {
     ...baseColumns,
     dateDeleted: {
         valueExtractor: 'dateDeleted',
-        label: 'Deleted'
-    }
+        label: 'Deleted',
+    },
 };
 
 const CollectionList = ({
@@ -68,17 +68,17 @@ const CollectionList = ({
     showDeleted,
     onCollectionClick,
     onCollectionDoubleClick,
-    classes
+    classes,
 }) => {
-    const columns = {...baseColumns};
+    const columns = { ...baseColumns };
     if (currentWorkspace()) {
         delete columns.workspace;
     }
 
-    const [filterValue, setFilterValue] = useState("");
+    const [filterValue, setFilterValue] = useState('');
     const [filteredCollections, setFilteredCollections] = useState(collections);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredCollections, allColumns, 'name');
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const { orderedItems, orderAscending, orderBy, toggleSort } = useSorting(filteredCollections, allColumns, 'name');
+    const { page, setPage, rowsPerPage, setRowsPerPage, pagedItems } = usePagination(orderedItems);
 
     useEffect(() => {
         if (collections && collections.length > 0) {
@@ -127,7 +127,7 @@ const CollectionList = ({
                                         >
                                             {column.label}
                                         </TableSortLabel>
-                                        {(key === "name") && renderCollectionFilter()}
+                                        {(key === 'name') && renderCollectionFilter()}
                                     </TableCell>
                                 ))
                             }
@@ -158,22 +158,22 @@ const CollectionList = ({
                                     selected={selected}
                                     className={collection.dateDeleted && classes.deletedCollectionRow}
                                 >
-                                    <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
+                                    <TableCell style={{ overflowWrap: 'break-word', maxWidth: 160 }} scope="row">
                                         <ListItemText
-                                            style={{margin: 0}}
+                                            style={{ margin: 0 }}
                                             primary={(
                                                 <Link
                                                     component="button"
-                                                    onClick={(e) => {e.stopPropagation(); onCollectionDoubleClick(collection);}}
+                                                    onClick={(e) => { e.stopPropagation(); onCollectionDoubleClick(collection); }}
                                                     color="inherit"
                                                     variant="body2"
-                                                    style={{textAlign: "left"}}
+                                                    style={{ textAlign: 'left' }}
                                                 >
                                                     {collection.name}
                                                 </Link>
                                             )}
                                             secondary={collection.description}
-                                            secondaryTypographyProps={{noWrap: true}}
+                                            secondaryTypographyProps={{ noWrap: true }}
                                         />
                                     </TableCell>
                                     { currentWorkspace() ? null : (
@@ -181,14 +181,14 @@ const CollectionList = ({
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis',
                                             whiteSpace: 'nowrap',
-                                            maxWidth: 160
+                                            maxWidth: 160,
                                         }}
                                         >
                                             {collection.ownerWorkspaceCode}
                                         </TableCell>
                                     ) }
                                     <TableCell>
-                                        {camelCaseToWords(collection.status, "-")}
+                                        {camelCaseToWords(collection.status, '-')}
                                     </TableCell>
                                     <TableCell>
                                         {camelCaseToWords(collection.accessMode)}
@@ -220,7 +220,7 @@ const CollectionList = ({
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{ overflowX: 'hidden' }}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
@@ -228,4 +228,4 @@ const CollectionList = ({
     );
 };
 
-export default withStyles(styles, {withTheme: true})(CollectionList);
+export default withStyles(styles, { withTheme: true })(CollectionList);

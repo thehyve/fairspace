@@ -1,4 +1,4 @@
-import {useEffect, useRef} from "react";
+import { useEffect, useRef } from 'react';
 
 /**
  * A hook to set up an interval and clear it after the component unmounts

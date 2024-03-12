@@ -1,5 +1,5 @@
-import * as constants from "../../constants";
-import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
+import * as constants from '../../constants';
+import { getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue } from './jsonLdUtils';
 
 const TYPE_PROPERTY = {
     key: '@type',
@@ -72,7 +72,7 @@ export const getNamespaces = (vocabulary, namespaceFilter = () => true) => vocab
         label: getFirstPredicateValue(namespace, constants.SHACL_NAME),
         prefix: getFirstPredicateValue(namespace, constants.SHACL_PREFIX),
         namespace: getFirstPredicateId(namespace, constants.SHACL_NAMESPACE),
-        isDefault: getFirstPredicateValue(namespace, constants.DEFAULT_NAMESPACE_URI, false)
+        isDefault: getFirstPredicateValue(namespace, constants.DEFAULT_NAMESPACE_URI, false),
     }));
 
 /**
@@ -134,7 +134,7 @@ export const typeShapeWithProperties = (vocabulary, typeUris) => {
  */
 export const determineShapeForProperty = (vocabulary, propertyUri) => vocabulary.find(
     entry => getFirstPredicateId(entry, constants.SHACL_PATH) === propertyUri
-        && getFirstPredicateValue(entry, constants.SHACL_NAME)
+        && getFirstPredicateValue(entry, constants.SHACL_NAME),
 );
 
 /**
@@ -211,7 +211,7 @@ const generatePropertyEntry = (vocabulary, predicate, shape) => {
         isExternalLink: isExternalLink(shape),
         allowAdditionOfEntities: false,
         isRelationShape: shapeIsRelationShape,
-        importantPropertyShapes
+        importantPropertyShapes,
     };
 };
 

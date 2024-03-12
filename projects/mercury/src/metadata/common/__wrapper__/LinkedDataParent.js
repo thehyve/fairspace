@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
-import {MemoryRouter, useHistory} from "react-router-dom";
-import {useLinkedDataNoContext} from "../UseLinkedData";
+import React, { useEffect } from 'react';
+import { MemoryRouter, useHistory } from 'react-router-dom';
+import { useLinkedDataNoContext } from '../UseLinkedData';
 
-const WrapperWithPushToHistory = ({children}) => {
+const WrapperWithPushToHistory = ({ children }) => {
     const history = useHistory();
 
     useEffect(() => history.push(), [history]);
@@ -11,7 +11,7 @@ const WrapperWithPushToHistory = ({children}) => {
 };
 
 const LinkedDataParent = (props) => {
-    const {iri, context} = props;
+    const { iri, context } = props;
     context.result = useLinkedDataNoContext(iri, context);
 
     return (
@@ -21,4 +21,4 @@ const LinkedDataParent = (props) => {
     );
 };
 
-export {LinkedDataParent};
+export { LinkedDataParent };

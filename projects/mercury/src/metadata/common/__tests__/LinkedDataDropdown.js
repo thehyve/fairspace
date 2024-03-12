@@ -1,12 +1,12 @@
 import React from 'react';
-import {shallow} from 'enzyme';
+import { shallow } from 'enzyme';
 
-import {LinkedDataDropdown} from '../LinkedDataDropdown';
+import { LinkedDataDropdown } from '../LinkedDataDropdown';
 import Dropdown from '../values/Dropdown';
 
 describe('LinkedDataDropdown', () => {
     it('calls fetchItems with the given types', () => {
-        const mockFetchItems = jest.fn(() => Promise.resolve({items: []}));
+        const mockFetchItems = jest.fn(() => Promise.resolve({ items: [] }));
 
         const wrapper = shallow(<LinkedDataDropdown
             property={{}}
@@ -17,12 +17,12 @@ describe('LinkedDataDropdown', () => {
 
         const dropdown = wrapper.find(Dropdown);
 
-        return dropdown.prop("loadOptions")()
+        return dropdown.prop('loadOptions')()
             .then(() => {
                 expect(mockFetchItems).toHaveBeenCalledTimes(1);
                 expect(mockFetchItems)
                     .toHaveBeenCalledWith(expect.objectContaining({
-                        type: 'http://workspace.ci.fairway.app/vocabulary/PersonConsent'
+                        type: 'http://workspace.ci.fairway.app/vocabulary/PersonConsent',
                     }));
             });
     });

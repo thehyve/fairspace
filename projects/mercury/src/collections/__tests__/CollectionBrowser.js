@@ -1,25 +1,25 @@
 import React from 'react';
-import {configure, mount, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {MemoryRouter} from "react-router-dom";
+import { configure, mount, shallow } from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { MemoryRouter } from 'react-router-dom';
 
-import {ThemeProvider} from '@mui/material/styles';
-import CollectionsContext from "../CollectionsContext";
-import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import LoadingInlay from "../../common/components/LoadingInlay";
+import { ThemeProvider } from '@mui/material/styles';
+import CollectionsContext from '../CollectionsContext';
+import ContextualCollectionBrowser, { CollectionBrowser } from '../CollectionBrowser';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import LoadingInlay from '../../common/components/LoadingInlay';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({adapter: new Adapter()});
+configure({ adapter: new Adapter() });
 
 let collectionBrowser;
 
 const collectionsContextMock = {
     addCollection: jest.fn(),
     collections: [],
-    setShowDeleted: () => {}
+    setShowDeleted: () => {},
 };
 
 beforeEach(() => {
@@ -36,8 +36,8 @@ beforeEach(() => {
 
     Object.defineProperty(window, 'location', {
         value: {
-            pathname: '/workspace'
-        }
+            pathname: '/workspace',
+        },
     });
 });
 
@@ -50,7 +50,7 @@ describe('<CollectionBrowser />', () => {
 
         const nameField = wrapper.find('input#name').first();
         nameField.simulate('focus');
-        nameField.simulate('change', {target: {value: 'New collection'}});
+        nameField.simulate('change', { target: { value: 'New collection' } });
 
         const saveButton = wrapper.find('button[aria-label="Save"]').first();
 

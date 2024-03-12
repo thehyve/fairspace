@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react';
 
 /**
  * Custom state hook to use either the initial value from the session storage or a default value.
@@ -11,7 +11,7 @@ import {useEffect, useState} from "react";
  */
 const useStateWithSessionStorage = (sessionStorageKey, defaultValue) => {
     const [value, setValue] = useState(
-        JSON.parse(sessionStorage.getItem(sessionStorageKey)) || defaultValue
+        JSON.parse(sessionStorage.getItem(sessionStorageKey)) || defaultValue,
     );
 
     useEffect(() => {

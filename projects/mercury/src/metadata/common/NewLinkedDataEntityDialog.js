@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
     Button,
@@ -7,22 +7,22 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    Typography
-} from "@mui/material";
+    Typography,
+} from '@mui/material';
 
-import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUtils";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import * as consts from "../../constants";
-import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
+import { generateUuid, getLabel, isValidLinkedDataIdentifier } from './metadataUtils';
+import { getFirstPredicateId, getFirstPredicateValue } from './jsonLdUtils';
+import * as consts from '../../constants';
+import LinkedDataIdentifierField from './LinkedDataIdentifierField';
 import useFormData from './UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
-import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "./UseFormSubmission";
-import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import {getPropertiesForNodeShape} from "./vocabularyUtils";
-import ConfirmationDialog from "../../common/components/ConfirmationDialog";
+import LinkedDataContext from '../LinkedDataContext';
+import useFormSubmission from './UseFormSubmission';
+import useNavigationBlocker from '../../common/hooks/UseNavigationBlocker';
+import { getPropertiesForNodeShape } from './vocabularyUtils';
+import ConfirmationDialog from '../../common/components/ConfirmationDialog';
 
-const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
+const NewLinkedDataEntityDialog = ({ shape, requireIdentifier = true, onClose, onCreate = () => {} }) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
@@ -41,27 +41,27 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
         return encodeURI(namespace.value + localPart);
     };
 
-    const {shapes, extendProperties, createLinkedDataEntity} = useContext(LinkedDataContext);
+    const { shapes, extendProperties, createLinkedDataEntity } = useContext(LinkedDataContext);
     const properties = getPropertiesForNodeShape(shapes, shape);
     const type = getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'];
 
     // Apply context-specific logic to the properties and filter on visibility
-    const extendedProperties = extendProperties({properties, isEntityEditable: true});
+    const extendedProperties = extendProperties({ properties, isEntityEditable: true });
 
-    const {addValue, updateValue, deleteValue,
+    const { addValue, updateValue, deleteValue,
         getUpdates, valuesWithUpdates,
         validateAll, validationErrors, isValid,
-        hasFormUpdates, clearForm} = useFormData({}, extendedProperties);
-    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(!formSubmitted && hasFormUpdates);
+        hasFormUpdates, clearForm } = useFormData({}, extendedProperties);
+    const { confirmationShown, hideConfirmation, showConfirmation } = useNavigationBlocker(!formSubmitted && hasFormUpdates);
 
-    const {isUpdating, submitForm} = useFormSubmission(
+    const { isUpdating, submitForm } = useFormSubmission(
         () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
             .then(result => {
                 clearForm();
                 setFormSubmitted(true);
                 onCreate(result);
             }),
-        getIdentifier()
+        getIdentifier(),
     );
 
     const typeLabel = getLabel(shape);
@@ -135,7 +135,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     <Typography variant="h5">{typeLabel}</Typography>
                     <Typography variant="subtitle1">{typeDescription}</Typography>
                 </DialogTitle>
-                <DialogContent style={{overflowX: 'hidden'}}>
+                <DialogContent style={{ overflowX: 'hidden' }}>
                     {renderDialogContent()}
                 </DialogContent>
                 <DialogActions>
@@ -149,7 +149,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                         disabled={!canCreate() || isUpdating || !isValid}
                     >
                         {`Create ${typeLabel}`}
-                        {isUpdating && <CircularProgress style={{marginLeft: 4}} size={24} />}
+                        {isUpdating && <CircularProgress style={{ marginLeft: 4 }} size={24} />}
                     </Button>
                     <Button onClick={handleCloseDialog} disabled={isUpdating}>
                         Cancel
@@ -173,7 +173,7 @@ NewLinkedDataEntityDialog.propTypes = {
     shape: PropTypes.object,
     onCreate: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    requireIdentifier: PropTypes.bool
+    requireIdentifier: PropTypes.bool,
 };
 
 export default NewLinkedDataEntityDialog;

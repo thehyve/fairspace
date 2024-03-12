@@ -1,26 +1,26 @@
-import React, {useContext, useState} from 'react';
-import {Badge, IconButton, ListItemText} from "@mui/material";
+import React, { useContext, useState } from 'react';
+import { Badge, IconButton, ListItemText } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@mui/icons-material';
-import ContentCopy from "mdi-material-ui/ContentCopy";
-import ContentCut from "mdi-material-ui/ContentCut";
-import ContentPaste from "mdi-material-ui/ContentPaste";
-import Download from "mdi-material-ui/Download";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
-import Divider from "@mui/material/Divider";
-import ErrorDialog from "../common/components/ErrorDialog";
+import { BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash } from '@mui/icons-material';
+import ContentCopy from 'mdi-material-ui/ContentCopy';
+import ContentCut from 'mdi-material-ui/ContentCut';
+import ContentPaste from 'mdi-material-ui/ContentPaste';
+import Download from 'mdi-material-ui/Download';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import Divider from '@mui/material/Divider';
+import ErrorDialog from '../common/components/ErrorDialog';
 
-import {getParentPath, isListOnlyFile, joinPaths} from "./fileUtils";
-import {COPY, CUT} from '../constants';
-import FileOperationsGroup from "./FileOperationsGroup";
+import { getParentPath, isListOnlyFile, joinPaths } from './fileUtils';
+import { COPY, CUT } from '../constants';
+import FileOperationsGroup from './FileOperationsGroup';
 import ClipboardContext from '../common/contexts/ClipboardContext';
-import ConfirmationButton from "../common/components/ConfirmationButton";
-import CreateDirectoryButton from "./buttons/CreateDirectoryButton";
-import ProgressButton from "../common/components/ProgressButton";
-import RenameButton from "./buttons/RenameButton";
-import ShowFileVersionsButton from "./buttons/ShowFileVersionsButton";
-import styles from "./FileOperations.styles";
+import ConfirmationButton from '../common/components/ConfirmationButton';
+import CreateDirectoryButton from './buttons/CreateDirectoryButton';
+import ProgressButton from '../common/components/ProgressButton';
+import RenameButton from './buttons/RenameButton';
+import ShowFileVersionsButton from './buttons/ShowFileVersionsButton';
+import styles from './FileOperations.styles';
 
 export const Operations = {
     PASTE: 'PASTE',
@@ -28,7 +28,7 @@ export const Operations = {
     RENAME: 'RENAME',
     DELETE: 'DELETE',
     UNDELETE: 'UNDELETE',
-    REVERT: 'REVERT'
+    REVERT: 'REVERT',
 };
 Object.freeze(Operations);
 
@@ -46,7 +46,7 @@ export const FileOperations = ({
     uploadFolder,
     uploadFile,
     maxFileSize,
-    clipboard
+    clipboard,
 }) => {
     const [activeOperation, setActiveOperation] = useState();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -104,7 +104,7 @@ export const FileOperations = ({
         if (operation) {
             return fileOperation(Operations.PASTE, operation)
                 .then(clipboard.clear)
-                .catch(err => ErrorDialog.showError("An error occurred while pasting your contents", err));
+                .catch(err => ErrorDialog.showError('An error occurred while pasting your contents', err));
         }
 
         return Promise.resolve();
@@ -116,23 +116,23 @@ export const FileOperations = ({
                 ErrorDialog.showError(
                     'Directory name must be unique',
                     'Directory with this name already exists and was marked as deleted.\n'
-                    + 'Please delete the existing directory permanently or choose a unique name.'
+                    + 'Please delete the existing directory permanently or choose a unique name.',
                 );
                 return true;
             }
-            ErrorDialog.showError("An error occurred while creating directory", err, () => handleCreateDirectory(name));
+            ErrorDialog.showError('An error occurred while creating directory', err, () => handleCreateDirectory(name));
             return true;
         });
 
     const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while renaming file or directory", err, () => handlePathRename(path, newName));
+            ErrorDialog.showError('An error occurred while renaming file or directory', err, () => handlePathRename(path, newName));
             return false;
         });
 
     const handleRevert = (versionToRevert) => fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem, versionToRevert))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while reverting a file to a previous version", err, () => handleRevert(versionToRevert));
+            ErrorDialog.showError('An error occurred while reverting a file to a previous version', err, () => handleRevert(versionToRevert));
             return false;
         });
 
@@ -167,7 +167,7 @@ export const FileOperations = ({
 
     const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while deleting file or directory", err, () => handleDelete());
+            ErrorDialog.showError('An error occurred while deleting file or directory', err, () => handleDelete());
         });
 
     const getDeletionConfirmationMessage = () => {
@@ -184,7 +184,7 @@ export const FileOperations = ({
 
     const handleUndelete = () => fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths))
         .catch((err) => {
-            ErrorDialog.showError("An error occurred while undeleting file or directory", err, () => handleUndelete());
+            ErrorDialog.showError('An error occurred while undeleting file or directory', err, () => handleUndelete());
         });
 
     return (

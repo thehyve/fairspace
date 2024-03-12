@@ -1,15 +1,15 @@
-import React, {useContext} from "react";
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import {Grid, TextField} from "@mui/material";
+import { Grid, TextField } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import BaseInputValue from "./BaseInputValue";
-import LinkedDataContext from "../../LinkedDataContext";
+import BaseInputValue from './BaseInputValue';
+import LinkedDataContext from '../../LinkedDataContext';
 
 export const noNamespace = {
     id: '',
     label: '(no namespace)',
-    value: ''
+    value: '',
 };
 
 export const IriValue = React.forwardRef(({
@@ -17,7 +17,7 @@ export const IriValue = React.forwardRef(({
     namespaces = [],
     localPart = '',
     onNamespaceChange = () => {},
-    onLocalPartChange = () => {}
+    onLocalPartChange = () => {},
 }, ref) => {
     const namespaceOptions = [
         noNamespace,
@@ -25,8 +25,8 @@ export const IriValue = React.forwardRef(({
             id: n.id,
             label: n.label,
             value: n.namespace,
-            isDefault: n.isDefault
-        }))
+            isDefault: n.isDefault,
+        })),
     ];
 
     const defaultNamespace = namespaceOptions.find(n => n.isDefault) || noNamespace;
@@ -49,10 +49,10 @@ export const IriValue = React.forwardRef(({
                     renderInput={(props) => <TextField ref={ref} fullWidth {...props} />}
                 />
             </Grid>
-            <Grid item xs={8} style={{paddingTop: 8, paddingBottom: 0}}>
+            <Grid item xs={8} style={{ paddingTop: 8, paddingBottom: 0 }}>
                 <BaseInputValue
                     property={{}}
-                    entry={{value: localPart}}
+                    entry={{ value: localPart }}
                     onChange={e => onLocalPartChange(e.value)}
                     type="url"
                 />
@@ -70,12 +70,12 @@ IriValue.propTypes = {
         PropTypes.shape({
             label: PropTypes.string,
             prefix: PropTypes.string,
-            namespace: PropTypes.string
-        })
-    )
+            namespace: PropTypes.string,
+        }),
+    ),
 };
 
 export default React.forwardRef((props, ref) => {
-    const {namespaces} = useContext(LinkedDataContext);
+    const { namespaces } = useContext(LinkedDataContext);
     return <IriValue ref={ref} namespaces={namespaces} {...props} />;
 });

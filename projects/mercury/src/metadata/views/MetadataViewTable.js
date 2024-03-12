@@ -1,18 +1,18 @@
-import React, {useCallback, useEffect} from 'react';
-import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@mui/material';
+import React, { useCallback, useEffect } from 'react';
+import { Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import {Link as RouterLink} from "react-router-dom";
+import { Link as RouterLink } from 'react-router-dom';
 import qs from 'qs';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
-import {TextualValueTypes} from "./MetadataViewAPI";
-import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import {RESOURCES_VIEW} from "./metadataViewUtils";
-import {formatDate} from "../../common/utils/genericUtils";
-import type {Collection} from "../../collections/CollectionAPI";
-import {collectionAccessIcon} from "../../collections/collectionUtils";
-import {getPathFromIri, redirectLink} from "../../file/fileUtils";
-import ColumnFilterInput from "../../common/components/ColumnFilterInput";
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import type { MetadataViewColumn, MetadataViewData } from './MetadataViewAPI';
+import { TextualValueTypes } from './MetadataViewAPI';
+import type { MetadataViewEntity, MetadataViewEntityWithLinkedFiles } from './metadataViewUtils';
+import { RESOURCES_VIEW } from './metadataViewUtils';
+import { formatDate } from '../../common/utils/genericUtils';
+import type { Collection } from '../../collections/CollectionAPI';
+import { collectionAccessIcon } from '../../collections/collectionUtils';
+import { getPathFromIri, redirectLink } from '../../file/fileUtils';
+import ColumnFilterInput from '../../common/components/ColumnFilterInput';
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;
@@ -41,21 +41,21 @@ const useStyles = makeStyles(() => ({
         maxWidth: '40em',
         overflow: 'hidden',
         overflowWrap: 'break-word',
-        textOverflow: 'ellipsis'
-    }
+        textOverflow: 'ellipsis',
+    },
 }));
 
 const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
 const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} = props;
+    const { columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections } = props;
     const classes = useStyles();
-    const {textFiltersObject, setTextFiltersObject} = props;
+    const { textFiltersObject, setTextFiltersObject } = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
     const dataLinkColumn = columns.find(c => c.type === 'dataLink');
     const isResourcesView = view === RESOURCES_VIEW;
-    const {checkboxes, setCheckboxState} = props;
+    const { checkboxes, setCheckboxState } = props;
 
     const isCustomResourceColumn = (column: MetadataViewColumn) => (
         isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
@@ -68,7 +68,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const getIdColumnFilterFromSearchParams = () => {
         const idColumnName = idColumn.name.toLowerCase();
-        return qs.parse(window.location.search, {ignoreQueryPrefix: true})[idColumnName];
+        return qs.parse(window.location.search, { ignoreQueryPrefix: true })[idColumnName];
     };
 
     const getResourceType = (row: Map<string, any>) => (
@@ -79,14 +79,14 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         if (selected && selected.iri === iri) {
             toggleRow();
         } else {
-            toggleRow({label, iri, linkedFiles: linkedFiles || []});
+            toggleRow({ label, iri, linkedFiles: linkedFiles || [] });
         }
     };
     useEffect(() => {
         if (!textFiltersObject || !textFiltersObject.keys || !textFiltersObject.keys.includes(idColumn)) {
             const idColumnTextFilter = getIdColumnFilterFromSearchParams();
             if (idColumnTextFilter) {
-                setTextFiltersObject({...textFiltersObject, [idColumn.name]: idColumnTextFilter});
+                setTextFiltersObject({ ...textFiltersObject, [idColumn.name]: idColumnTextFilter });
             }
         }
     // eslint-disable-next-line
@@ -156,7 +156,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = textFiltersObject[columnName];
-        const setFilterValue = value => setTextFiltersObject({...textFiltersObject, [columnName]: value});
+        const setFilterValue = value => setTextFiltersObject({ ...textFiltersObject, [columnName]: value });
         return (
             <ColumnFilterInput placeholder="Filter" filterValue={filterValue} setFilterValue={setFilterValue} useApplyButton />
         );
@@ -188,7 +188,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         <Table data-testid="results-table" size="small" stickyHeader={!loading}>
             <TableHead>
                 <TableRow>
-                    <TableCell style={{padding: 0}}>
+                    <TableCell style={{ padding: 0 }}>
                         <Checkbox id="checkAll" key={'checkall-key-' + checkedCount} onChange={handleCheckallChange} defaultChecked={rowCount > 0 && checkedCount === rowCount} />
                     </TableCell>
                     {visibleColumns.map(column => (
@@ -208,7 +208,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                         selected={selected && selected.iri === row[idColumn.name][0].value}
                         onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
                     >
-                        <TableCell style={{padding: 0}}>
+                        <TableCell style={{ padding: 0 }}>
                             <Checkbox
                                 id={row[idColumn.name][0].value}
                                 key={Math.random()}
@@ -219,7 +219,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                         {visibleColumns.map(column => renderTableCell(row, column, () => handleResultSingleClick(
                             row[idColumn.name][0].value,
                             row[idColumn.name][0].label,
-                            dataLinkColumn ? row[dataLinkColumn.name] : []
+                            dataLinkColumn ? row[dataLinkColumn.name] : [],
                         )))}
                     </TableRow>
                 ))}

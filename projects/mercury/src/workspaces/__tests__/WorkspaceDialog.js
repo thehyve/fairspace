@@ -1,14 +1,14 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {ThemeProvider} from '@mui/material/styles';
+import { configure, mount } from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { ThemeProvider } from '@mui/material/styles';
 import WorkspaceDialog from '../WorkspaceDialog';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({adapter: new Adapter()});
+configure({ adapter: new Adapter() });
 
 let onSubmit;
 let onClose;
@@ -18,7 +18,7 @@ let wrapper;
 const enterValue = (value) => {
     const nameField = wrapper.find('input#code').first();
     nameField.simulate('focus');
-    nameField.simulate('change', {target: {value}});
+    nameField.simulate('change', { target: { value } });
 };
 
 beforeEach(() => {
@@ -30,7 +30,7 @@ beforeEach(() => {
                 onSubmit={onSubmit}
                 onClose={onClose}
                 creating={false}
-                workspaces={[{code: "w1"}]}
+                workspaces={[{ code: 'w1' }]}
             />
         </ThemeProvider>
     );
@@ -49,7 +49,7 @@ describe('WorkspaceDialog', () => {
         const submitButton = wrapper.find('button').first();
         submitButton.simulate('click');
         expect(onSubmit).toHaveBeenCalledTimes(1);
-        expect(onSubmit).toHaveBeenCalledWith({code: 'a'});
+        expect(onSubmit).toHaveBeenCalledWith({ code: 'a' });
     });
 
     it('should require unique workspace code', () => {

@@ -1,21 +1,21 @@
-import React, {useContext, useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography} from "@mui/material";
+import React, { useContext, useState } from 'react';
+import { Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from "@mui/icons-material";
-import LinearProgress from "@mui/material/LinearProgress";
-import classnames from "classnames";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
+import { ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined } from '@mui/icons-material';
+import LinearProgress from '@mui/material/LinearProgress';
+import classnames from 'classnames';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 import UploadsContext, {
     UPLOAD_STATUS_ERROR,
     UPLOAD_STATUS_FINISHED,
     UPLOAD_STATUS_IN_PROGRESS,
-    UPLOAD_STATUS_INITIAL
-} from "./UploadsContext";
-import {splitPathIntoArray} from "./fileUtils";
-import {PATH_SEPARATOR} from "../constants";
+    UPLOAD_STATUS_INITIAL,
+} from './UploadsContext';
+import { splitPathIntoArray } from './fileUtils';
+import { PATH_SEPARATOR } from '../constants';
 
 const styles = theme => ({
     expand: {
@@ -30,12 +30,12 @@ const styles = theme => ({
     },
     wrapIcon: {
         verticalAlign: 'middle',
-        display: 'inline-flex'
-    }
+        display: 'inline-flex',
+    },
 });
 
-export const UploadProgressComponent = ({classes}) => {
-    const {uploads, removeUpload} = useContext(UploadsContext);
+export const UploadProgressComponent = ({ classes }) => {
+    const { uploads, removeUpload } = useContext(UploadsContext);
     const [expanded, setExpanded] = useState(true);
 
     if (!uploads || uploads.length === 0) {
@@ -47,15 +47,15 @@ export const UploadProgressComponent = ({classes}) => {
     const progress = upload => {
         switch (upload.status) {
             case UPLOAD_STATUS_INITIAL:
-                return "Upload pending";
+                return 'Upload pending';
             case UPLOAD_STATUS_IN_PROGRESS:
                 return <LinearProgress variant="determinate" value={upload.progress} />;
             case UPLOAD_STATUS_FINISHED:
-                return "Finished";
+                return 'Finished';
             case UPLOAD_STATUS_ERROR:
                 return <Typography variant="body2" color="error">Error uploading</Typography>;
             default:
-                return "";
+                return '';
         }
     };
 
@@ -104,7 +104,7 @@ export const UploadProgressComponent = ({classes}) => {
     };
 
     const renderUploadList = () => (
-        <div style={{overflowX: 'auto'}}>
+        <div style={{ overflowX: 'auto' }}>
             {uploads.length > 0 && (
                 <Table>
                     <TableHead>
@@ -139,11 +139,11 @@ export const UploadProgressComponent = ({classes}) => {
         <Card>
             <CardHeader
                 action={cardHeaderAction}
-                titleTypographyProps={{variant: 'h6'}}
+                titleTypographyProps={{ variant: 'h6' }}
                 title="Uploads"
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent style={{paddingTop: 0}}>
+                <CardContent style={{ paddingTop: 0 }}>
                     {renderUploadList()}
                 </CardContent>
             </Collapse>

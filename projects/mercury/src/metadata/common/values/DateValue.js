@@ -1,17 +1,17 @@
 import React from 'react';
-import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {DatePicker} from "@mui/x-date-pickers/DatePicker";
-import {TextField} from "@mui/material";
-import {format} from 'date-fns';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TextField } from '@mui/material';
+import { format } from 'date-fns';
 
-import {DATE_FORMAT} from '../../../constants';
+import { DATE_FORMAT } from '../../../constants';
 
 class DateValue extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {value: props.entry.value || null};
+        this.state = { value: props.entry.value || null };
     }
 
     componentDidUpdate(prevProps) {
@@ -22,12 +22,12 @@ class DateValue extends React.Component {
 
     handleChange = (date) => {
         // Formatting is required because the backend expect the date with no time
-        const value = date && format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
-        this.props.onChange({value});
+        const value = date && format(date, 'yyyy-MM-dd', { awareOfUnicodeTokens: true });
+        this.props.onChange({ value });
     };
 
     updateState = () => {
-        this.setState({value: this.props.entry.value});
+        this.setState({ value: this.props.entry.value });
     };
 
     render() {
@@ -46,7 +46,7 @@ class DateValue extends React.Component {
 }
 
 DateValue.defaultProps = {
-    entry: {value: undefined},
+    entry: { value: undefined },
 };
 
 export default DateValue;

@@ -1,22 +1,22 @@
 import React from 'react';
-import type {MetadataViewFilter} from "./MetadataViewAPI";
-import MetadataViewAPI from "./MetadataViewAPI";
-import useAsync from "../../common/hooks/UseAsync";
-import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import type { MetadataViewFilter } from './MetadataViewAPI';
+import MetadataViewAPI from './MetadataViewAPI';
+import useAsync from '../../common/hooks/UseAsync';
+import useStateWithSessionStorage from '../../common/hooks/UseSessionStorage';
+import { isNonEmptyValue } from '../../common/utils/genericUtils';
 
 const MetadataViewContext = React.createContext({});
 
 const SESSION_STORAGE_METADATA_FILTERS_KEY = 'FAIRSPACE_METADATA_FILTERS';
 
-export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAPI, sourceName = ""}) => {
-    const {data = {}, error, loading, refresh} = useAsync(
+export const MetadataViewProvider = ({ children, metadataViewAPI = MetadataViewAPI, sourceName = '' }) => {
+    const { data = {}, error, loading, refresh } = useAsync(
         () => metadataViewAPI.getViews(),
-        []
+        [],
     );
 
     const [filters: MetadataViewFilter[], setFilters] = useStateWithSessionStorage(
-        `${SESSION_STORAGE_METADATA_FILTERS_KEY}_${sourceName}`, []
+        `${SESSION_STORAGE_METADATA_FILTERS_KEY}_${sourceName}`, [],
     );
 
     const clearFilter = (facetName: string) => {
@@ -32,7 +32,7 @@ export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAP
             ...filters.filter(f => !filterCandidates.some(u => u.field === f.field)),
             ...filterCandidates.filter(f => (
                 (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max) || f.prefix != null || f.booleanValue != null
-            ))
+            )),
         ]);
     };
 
@@ -46,7 +46,7 @@ export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAP
                 clearFilter,
                 error,
                 loading,
-                refresh
+                refresh,
             }}
         >
             {children}

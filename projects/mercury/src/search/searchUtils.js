@@ -1,15 +1,15 @@
 import queryString from 'query-string';
 import React from 'react';
-import {handleAuthError} from "../common/utils/httpUtils";
+import { handleAuthError } from '../common/utils/httpUtils';
 import Iri from '../common/components/Iri';
-import {getPathFromIri} from "../file/fileUtils";
-import type {ExternalStorage} from "../external-storage/externalStorageUtils";
-import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
-import {isEmptyObject} from "../common/utils/genericUtils";
+import { getPathFromIri } from '../file/fileUtils';
+import type { ExternalStorage } from '../external-storage/externalStorageUtils';
+import { getExternalStoragePathPrefix } from '../external-storage/externalStorageUtils';
+import { isEmptyObject } from '../common/utils/genericUtils';
 
 export const handleTextSearchRedirect = (history: History, value: string, context: string = '', storage: ExternalStorage = {}) => {
     if (value) {
-        const queryParams = {q: value, context};
+        const queryParams = { q: value, context };
         if (!isEmptyObject(storage)) {
             queryParams.storage = storage.name;
         }
@@ -21,19 +21,19 @@ export const handleTextSearchRedirect = (history: History, value: string, contex
     }
 };
 
-export const getSearchPathSegments = (context, storageName = "") => {
+export const getSearchPathSegments = (context, storageName = '') => {
     const segments = ((context && getPathFromIri(context)) || '').split('/');
     const result = [];
     if (segments[0] === '') {
-        result.push({label: 'Search results', href: ''});
+        result.push({ label: 'Search results', href: '' });
         return result;
     }
     let href = storageName ? getExternalStoragePathPrefix(storageName) : '/collections';
     segments.forEach(segment => {
         href += '/' + segment;
-        result.push({label: segment, href});
+        result.push({ label: segment, href });
     });
-    result.push({label: 'Search results', href: ''});
+    result.push({ label: 'Search results', href: '' });
     return result;
 };
 
@@ -53,7 +53,7 @@ export const handleSearchError = (e) => {
         case 403:
             handleAuthError(e.status);
             break;
-        default: throw new Error("Error retrieving search results");
+        default: throw new Error('Error retrieving search results');
     }
 };
 
@@ -78,5 +78,5 @@ export const renderSearchResultProperty = (item, property) => {
     // eslint-disable-next-line no-unused-vars
     const [key, value] = highlights;
     // eslint-disable-next-line react/no-danger
-    return <span dangerouslySetInnerHTML={{__html: value}} />;
+    return <span dangerouslySetInnerHTML={{ __html: value }} />;
 };

@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from "react";
-import {useHistory} from "react-router-dom";
+import { useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const UseNavigationBlocker = (shouldBlock) => {
     const history = useHistory();
@@ -39,7 +39,7 @@ const UseNavigationBlocker = (shouldBlock) => {
         }
 
         if (shouldBlock) {
-            unblockRef.current = history.block(({pathname, search}) => {
+            unblockRef.current = history.block(({ pathname, search }) => {
                 // If the confirmation is already shown and another navigation is fired then it should be allowed
                 // The 2nd navigation can only be comming from the 'Navigate' confrimation button.
                 if (showCloseConfirmation) {

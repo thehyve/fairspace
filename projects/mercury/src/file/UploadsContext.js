@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {LocalFileAPI} from "./FileAPI";
-import ErrorDialog from "../common/components/ErrorDialog";
-import {isValidFileName} from './fileUtils';
-import {PATH_SEPARATOR} from '../constants';
-import {ConfigResponse, getServerConfig} from "../status/StatusAPI";
+import React, { useEffect, useState } from 'react';
+import { LocalFileAPI } from './FileAPI';
+import ErrorDialog from '../common/components/ErrorDialog';
+import { isValidFileName } from './fileUtils';
+import { PATH_SEPARATOR } from '../constants';
+import { ConfigResponse, getServerConfig } from '../status/StatusAPI';
 
 export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
@@ -26,17 +26,17 @@ export type FileUpload = {
 
 export const showCannotOverwriteDeletedError = (filesLength: number) => {
     const errorMessage = filesLength === 1 ? (
-        "File or folder with this name already exists and was marked as deleted.\n"
-        + "Please delete the existing one permanently, undelete it first\n"
-        + "to be able to overwrite it or choose a unique name."
+        'File or folder with this name already exists and was marked as deleted.\n'
+        + 'Please delete the existing one permanently, undelete it first\n'
+        + 'to be able to overwrite it or choose a unique name.'
     ) : (
-        "Some of the uploaded files or folders already exist and were marked as deleted.\n"
-        + "Please delete the existing ones permanently, undelete them first \n"
-        + "to be able to overwrite them or choose unique names."
+        'Some of the uploaded files or folders already exist and were marked as deleted.\n'
+        + 'Please delete the existing ones permanently, undelete them first \n'
+        + 'to be able to overwrite them or choose unique names.'
     );
     ErrorDialog.showError(
-        "Cannot overwrite deleted file or folder",
-        errorMessage
+        'Cannot overwrite deleted file or folder',
+        errorMessage,
     );
 };
 
@@ -45,7 +45,7 @@ export const showInvalidFilenames = (invalidFilenames) => {
         'Invalid file name',
         <span>
             Invalid file {invalidFilenames.length === 1 ? 'name' : 'names'}: <em>{invalidFilenames.join(', ')}</em>.<br />
-        </span>
+        </span>,
     );
 };
 
@@ -54,13 +54,13 @@ export const showFileTooLarge = (size: string) => {
         'File too large',
         <span>
             File or folder exceeds the upload size limit: {size}.<br />
-        </span>
+        </span>,
     );
 };
 
 export const UploadsContext = React.createContext({});
 
-export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
+export const UploadsProvider = ({ children, fileApi = LocalFileAPI }) => {
     const [uploads, setUploads] = useState([]);
     const [maxFileSize, setMaxFileSize] = useState();
     const [maxFileSizeBytes, setMaxFileSizeBytes] = useState();
@@ -91,29 +91,29 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
             }
 
             return upload;
-        })
+        }),
     );
 
     const setStateForUpload = (selected, newState) => updateSpecificUpload(
         selected,
-        upload => ({...upload, status: newState})
+        upload => ({ ...upload, status: newState }),
     );
 
     const removeUpload = upload => setUploads(
         currentUploads => [
-            ...currentUploads.filter(u => u.id !== upload.id)
-        ]
+            ...currentUploads.filter(u => u.id !== upload.id),
+        ],
     );
 
     const enqueueUploads = newUpload => setUploads(
         currentUploads => [
             ...currentUploads,
-            newUpload
-        ]
+            newUpload,
+        ],
     );
 
     const startUpload = (upload: FileUpload) => {
-        const newUpload = {...upload, status: UPLOAD_STATUS_INITIAL, progress: 0};
+        const newUpload = { ...upload, status: UPLOAD_STATUS_INITIAL, progress: 0 };
         enqueueUploads(newUpload);
         const invalidFilenames = upload.files
             .map(file => {
@@ -134,7 +134,7 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
         }
         const onUploadProgress = progressEvent => updateSpecificUpload(
             newUpload,
-            u => ({...u, progress: (progressEvent.loaded * 100) / progressEvent.total})
+            u => ({ ...u, progress: (progressEvent.loaded * 100) / progressEvent.total }),
         );
         setStateForUpload(newUpload, UPLOAD_STATUS_IN_PROGRESS);
         return fileApi.uploadMulti(newUpload.destinationPath, newUpload.files, maxFileSizeBytes, onUploadProgress)
@@ -143,10 +143,10 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
                 setTimeout(() => removeUpload(newUpload), 5000);
             })
             .catch((err) => {
-                if (err && err.message && err.message.includes("Conflict")) {
+                if (err && err.message && err.message.includes('Conflict')) {
                     showCannotOverwriteDeletedError(newUpload.files.length);
                 }
-                if (err && err.message && err.message.includes("Payload too large")) {
+                if (err && err.message && err.message.includes('Payload too large')) {
                     showFileTooLarge(maxFileSize);
                 }
                 setStateForUpload(newUpload, UPLOAD_STATUS_ERROR);
@@ -159,7 +159,7 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
                 uploads,
                 startUpload,
                 removeUpload,
-                maxFileSize
+                maxFileSize,
             }}
         >
             {children}

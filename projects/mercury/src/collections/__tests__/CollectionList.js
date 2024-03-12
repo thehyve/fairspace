@@ -1,20 +1,20 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {render} from '@testing-library/react';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {TableRow} from "@mui/material";
-import {ThemeProvider} from '@mui/material/styles';
-import CollectionList from "../CollectionList";
+import { render } from '@testing-library/react';
+import { configure, mount } from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { TableRow } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import CollectionList from '../CollectionList';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({adapter: new Adapter()});
+configure({ adapter: new Adapter() });
 
 describe('CollectionList', () => {
     it('shows warning message when no collections available', () => {
-        const {getByText} = render(<ThemeProvider theme={theme}><CollectionList /></ThemeProvider>);
+        const { getByText } = render(<ThemeProvider theme={theme}><CollectionList /></ThemeProvider>);
         expect(getByText(/No collections available/i)).toBeInTheDocument();
     });
 
@@ -25,11 +25,11 @@ describe('CollectionList', () => {
             dateCreated: new Date().toUTCString(),
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceCode: 'ws1'
+            ownerWorkspaceCode: 'ws1',
         }];
 
-        const {queryByText} = render(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted={false} /></ThemeProvider>
+        const { queryByText } = render(
+            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted={false} /></ThemeProvider>,
         );
 
         expect(queryByText('Name')).toBeInTheDocument();
@@ -50,11 +50,11 @@ describe('CollectionList', () => {
             iri: 'http://example.com/0',
             ownerWorkspace: 'http://example.com/ws1',
             ownerWorkspaceCode: 'ws1',
-            dateDeleted: new Date().toUTCString()
+            dateDeleted: new Date().toUTCString(),
         }];
 
-        const {getByText} = render(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted /></ThemeProvider>
+        const { getByText } = render(
+            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted /></ThemeProvider>,
         );
 
         expect(getByText('Name')).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe('CollectionList', () => {
                 iri: 'http://example.com/0',
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
-                dateDeleted: new Date().toUTCString()
+                dateDeleted: new Date().toUTCString(),
             },
             {
                 name: 'Secret collection',
@@ -85,17 +85,17 @@ describe('CollectionList', () => {
                 iri: 'http://example.com/1',
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
-                dateDeleted: new Date().toUTCString()
+                dateDeleted: new Date().toUTCString(),
             }];
 
         const wrapper = mount(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
+            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>,
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 
         const nameField = wrapper.find('input#filter').first();
         nameField.simulate('focus');
-        nameField.simulate('change', {target: {value: 'SECRET'}});
+        nameField.simulate('change', { target: { value: 'SECRET' } });
 
         expect(wrapper.find(TableRow).length).toBe(2);
     });
@@ -110,7 +110,7 @@ describe('CollectionList', () => {
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString(),
-                description: "This one is not a secret"
+                description: 'This one is not a secret',
             },
             {
                 name: 'Secret collection',
@@ -119,17 +119,17 @@ describe('CollectionList', () => {
                 iri: 'http://example.com/1',
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
-                dateDeleted: new Date().toUTCString()
+                dateDeleted: new Date().toUTCString(),
             }];
 
         const wrapper = mount(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
+            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>,
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 
         const nameField = wrapper.find('input#filter').first();
         nameField.simulate('focus');
-        nameField.simulate('change', {target: {value: 'Sec'}});
+        nameField.simulate('change', { target: { value: 'Sec' } });
 
         expect(wrapper.find(TableRow).length).toBe(3);
     });

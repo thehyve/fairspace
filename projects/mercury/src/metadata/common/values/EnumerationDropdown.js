@@ -1,9 +1,9 @@
 import React from 'react';
 
-import Dropdown from "./Dropdown";
-import {getLabel, valuesContainsValueOrId} from "../metadataUtils";
+import Dropdown from './Dropdown';
+import { getLabel, valuesContainsValueOrId } from '../metadataUtils';
 
-function EnumerationDropdown({property, currentValues, ...otherProps}) {
+function EnumerationDropdown({ property, currentValues, ...otherProps }) {
     const options = property.allowedValues.map((entity) => {
         const id = entity['@id'];
         const value = entity['@value'];
@@ -14,7 +14,7 @@ function EnumerationDropdown({property, currentValues, ...otherProps}) {
             disabled,
             label,
             id,
-            value
+            value,
         };
     });
 
@@ -22,7 +22,7 @@ function EnumerationDropdown({property, currentValues, ...otherProps}) {
         <Dropdown
             clearTextOnSelection
             options={options}
-            isOptionDisabled={({disabled}) => disabled}
+            isOptionDisabled={({ disabled }) => disabled}
             {...otherProps}
         />
     );

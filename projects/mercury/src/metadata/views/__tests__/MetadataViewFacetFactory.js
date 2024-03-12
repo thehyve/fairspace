@@ -1,23 +1,23 @@
-import {configure, mount} from "enzyme";
-import React from "react";
+import { configure, mount } from 'enzyme';
+import React from 'react';
 // eslint-disable-next-line jest/no-mocks-import
-import {Checkbox, Slider} from "@mui/material";
-import FormLabel from "@mui/material/FormLabel";
-import Input from "@mui/material/Input";
-import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {ThemeProvider} from '@mui/material/styles';
-import Facet from "../MetadataViewFacetFactory";
-import TextSelectionFacet from "../facets/TextSelectionFacet";
+import { Checkbox, Slider } from '@mui/material';
+import FormLabel from '@mui/material/FormLabel';
+import Input from '@mui/material/Input';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { ThemeProvider } from '@mui/material/styles';
+import Facet from '../MetadataViewFacetFactory';
+import TextSelectionFacet from '../facets/TextSelectionFacet';
 // eslint-disable-next-line jest/no-mocks-import
-import {mockFacets} from "../__mocks__/MetadataViewAPI";
-import NumericalRangeSelectionFacet from "../facets/NumericalRangeSelectionFacet";
-import DateSelectionFacet from "../facets/DateSelectionFacet";
+import { mockFacets } from '../__mocks__/MetadataViewAPI';
+import NumericalRangeSelectionFacet from '../facets/NumericalRangeSelectionFacet';
+import DateSelectionFacet from '../facets/DateSelectionFacet';
 import theme from '../../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({adapter: new Adapter()});
+configure({ adapter: new Adapter() });
 
 describe('MetadataViewFacetFactory', () => {
     it('should properly handle invalid facet type', () => {
@@ -30,15 +30,15 @@ describe('MetadataViewFacetFactory', () => {
                     onChange={() => {}}
                     activeFilterValues={[]}
                 />
-            </ThemeProvider>
+            </ThemeProvider>,
         );
 
         expect(wrapper.find(FormLabel).length).toEqual(0);
     });
 
     it('should render a text selection facet', () => {
-        const title = "Gender";
-        const options = mockFacets("Subject").find(v => v.title === title).values;
+        const title = 'Gender';
+        const options = mockFacets('Subject').find(v => v.title === title).values;
         const wrapper = mount(
             <ThemeProvider theme={theme}>
                 <Facet
@@ -48,7 +48,7 @@ describe('MetadataViewFacetFactory', () => {
                     onChange={() => {}}
                     activeFilterValues={[]}
                 />
-            </ThemeProvider>
+            </ThemeProvider>,
         );
 
         const textSelectionFacet = wrapper.find(TextSelectionFacet);
@@ -63,8 +63,8 @@ describe('MetadataViewFacetFactory', () => {
     });
 
     it('should render a numerical range selection facet', () => {
-        const title = "Tumor cellularity";
-        const mockFacet = mockFacets("Sample").find(v => v.title === title);
+        const title = 'Tumor cellularity';
+        const mockFacet = mockFacets('Sample').find(v => v.title === title);
         const wrapper = mount(
             <ThemeProvider theme={theme}>
                 <Facet
@@ -74,7 +74,7 @@ describe('MetadataViewFacetFactory', () => {
                     onChange={() => {}}
                     activeFilterValues={[]}
                 />
-            </ThemeProvider>
+            </ThemeProvider>,
         );
 
         const numericalRangeSelectionFacet = wrapper.find(NumericalRangeSelectionFacet);
@@ -93,8 +93,8 @@ describe('MetadataViewFacetFactory', () => {
     });
 
     it('should render a date selection facet', () => {
-        const title = "Birth date";
-        const mockFacet = mockFacets("Subject").find(v => v.title === title);
+        const title = 'Birth date';
+        const mockFacet = mockFacets('Subject').find(v => v.title === title);
         const wrapper = mount(
             <ThemeProvider theme={theme}>
                 <Facet
@@ -104,7 +104,7 @@ describe('MetadataViewFacetFactory', () => {
                     onChange={() => {}}
                     activeFilterValues={[]}
                 />
-            </ThemeProvider>
+            </ThemeProvider>,
         );
 
         const dateSelectionFacet = wrapper.find(DateSelectionFacet);

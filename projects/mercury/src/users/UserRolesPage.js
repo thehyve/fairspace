@@ -1,5 +1,5 @@
-import React, {useContext, useEffect, useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
+import React, { useContext, useEffect, useState } from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 import {
     Table,
@@ -9,60 +9,60 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 
-import Checkbox from "@mui/material/Checkbox";
-import TableContainer from "@mui/material/TableContainer";
-import Paper from "@mui/material/Paper";
-import UsersContext from "./UsersContext";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import {setUserRole} from "./UsersAPI";
-import ErrorDialog from "../common/components/ErrorDialog";
-import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
-import ColumnFilterInput from "../common/components/ColumnFilterInput";
-import TablePaginationActions from "../common/components/TablePaginationActions";
-import UserContext from "./UserContext";
+import Checkbox from '@mui/material/Checkbox';
+import TableContainer from '@mui/material/TableContainer';
+import Paper from '@mui/material/Paper';
+import UsersContext from './UsersContext';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import { setUserRole } from './UsersAPI';
+import ErrorDialog from '../common/components/ErrorDialog';
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
+import ColumnFilterInput from '../common/components/ColumnFilterInput';
+import TablePaginationActions from '../common/components/TablePaginationActions';
+import UserContext from './UserContext';
 
 const columns = {
     name: {
         valueExtractor: 'name',
-        label: 'Name'
+        label: 'Name',
     },
     username: {
         valueExtractor: 'username',
-        label: 'Username'
+        label: 'Username',
     },
     email: {
         valueExtractor: 'email',
-        label: 'Email'
+        label: 'Email',
     },
     isSuperadmin: {
         valueExtractor: 'isSuperadmin',
-        label: 'Superadmin'
+        label: 'Superadmin',
     },
     isAdmin: {
         valueExtractor: 'isAdmin',
-        label: 'Admin'
+        label: 'Admin',
     },
     canViewPublicData: {
         valueExtractor: 'canViewPublicData',
-        label: 'View public data'
+        label: 'View public data',
     },
     canViewPublicMetadata: {
         valueExtractor: 'canViewPublicMetadata',
-        label: 'View public metadata'
+        label: 'View public metadata',
     },
     canQueryMetadata: {
         valueExtractor: 'canQueryMetadata',
-        label: 'Query metadata'
+        label: 'Query metadata',
     },
     canAddSharedMetadata: {
         valueExtractor: 'canAddSharedMetadata',
-        label: 'Add shared metadata'
-    }
+        label: 'Add shared metadata',
+    },
 };
 
 const roleSelectionColumns = [
@@ -71,19 +71,19 @@ const roleSelectionColumns = [
     columns.canViewPublicData,
     columns.canViewPublicMetadata,
     columns.canQueryMetadata,
-    columns.canAddSharedMetadata
+    columns.canAddSharedMetadata,
 ];
 
 const UserRolesPage = () => {
-    usePageTitleUpdater("Users");
+    usePageTitleUpdater('Users');
 
-    const {currentUser} = useContext(UserContext);
-    const {users = [], usersLoading, usersError, refresh} = useContext(UsersContext);
+    const { currentUser } = useContext(UserContext);
+    const { users = [], usersLoading, usersError, refresh } = useContext(UsersContext);
     const [filteredUser, setFilteredUsers] = useState(users);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredUser, columns, 'name');
+    const { orderedItems, orderAscending, orderBy, toggleSort } = useSorting(filteredUser, columns, 'name');
     const [filtersObject, setFiltersObject] = useState({});
 
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const { page, setPage, rowsPerPage, setRowsPerPage, pagedItems } = usePagination(orderedItems);
 
     const isValueMatchingFilterValue: boolean = (value: string, filterValue: string) => (
         !filterValue || (value && value.toLowerCase().includes(filterValue.toLowerCase()))
@@ -91,7 +91,7 @@ const UserRolesPage = () => {
 
     const updateFilteredUsers = () => {
         if (users && users.length > 0) {
-            if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === "")) {
+            if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === '')) {
                 setFilteredUsers(users);
             } else {
                 setFilteredUsers(users.filter(u => (
@@ -123,12 +123,12 @@ const UserRolesPage = () => {
         .then(refresh)
         .catch(e => {
             const message = Object.prototype.hasOwnProperty.call(e, 'message') ? e.message : null;
-            ErrorDialog.showError("Error assigning role", message);
+            ErrorDialog.showError('Error assigning role', message);
         });
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = filtersObject[columnName];
-        const setFilterValue = value => setFiltersObject({...filtersObject, [columnName]: value});
+        const setFilterValue = value => setFiltersObject({ ...filtersObject, [columnName]: value });
         return (
             <ColumnFilterInput placeholder={`Filter by ${columnName}`} filterValue={filterValue} setFilterValue={setFilterValue} />
         );
@@ -148,7 +148,7 @@ const UserRolesPage = () => {
     );
 
     return (
-        <Paper style={{marginTop: 16}}>
+        <Paper style={{ marginTop: 16 }}>
             <TableContainer>
                 <Table>
                     <TableHead>
@@ -179,49 +179,49 @@ const UserRolesPage = () => {
                                 key={u.iri}
                                 hover
                             >
-                                <TableCell style={{minWidth: 220}} component="th" scope="row">
+                                <TableCell style={{ minWidth: 220 }} component="th" scope="row">
                                     {u.name}
                                 </TableCell>
-                                <TableCell style={{minWidth: 160}} component="th" scope="row">
+                                <TableCell style={{ minWidth: 160 }} component="th" scope="row">
                                     {u.username}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 180}} component="th" scope="row">
+                                <TableCell style={{ maxWidth: 180 }} component="th" scope="row">
                                     {u.email}
                                 </TableCell>
-                                <TableCell style={{width: 80}}>
+                                <TableCell style={{ width: 80 }}>
                                     <Checkbox
                                         checked={u.isSuperadmin}
                                         disabled
                                     />
                                 </TableCell>
-                                <TableCell style={{width: 80}}>
+                                <TableCell style={{ width: 80 }}>
                                     <Checkbox
                                         checked={u.isAdmin}
                                         onChange={(e) => toggleRole(u.id, 'isAdmin', e.target.checked)}
                                         disabled={u.isSuperadmin || u.iri === currentUser.iri}
                                     />
                                 </TableCell>
-                                <TableCell style={{width: 80}}>
+                                <TableCell style={{ width: 80 }}>
                                     <Checkbox
                                         checked={u.canViewPublicData}
                                         onChange={(e) => toggleRole(u.id, 'canViewPublicData', e.target.checked)}
                                         disabled={u.isAdmin}
                                     />
                                 </TableCell>
-                                <TableCell style={{width: 80}}>
+                                <TableCell style={{ width: 80 }}>
                                     <Checkbox
                                         checked={u.canViewPublicMetadata}
                                         onChange={(e) => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
                                         disabled={u.canViewPublicData || u.canQueryMetadata}
                                     />
                                 </TableCell>
-                                <TableCell style={{width: 80}}>
+                                <TableCell style={{ width: 80 }}>
                                     <Checkbox
                                         checked={u.canQueryMetadata}
                                         onChange={(e) => toggleRole(u.id, 'canQueryMetadata', e.target.checked)}
                                     />
                                 </TableCell>
-                                <TableCell style={{width: 80}}>
+                                <TableCell style={{ width: 80 }}>
                                     <Checkbox
                                         checked={u.canAddSharedMetadata}
                                         onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
@@ -239,7 +239,7 @@ const UserRolesPage = () => {
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{ overflowX: 'hidden' }}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>

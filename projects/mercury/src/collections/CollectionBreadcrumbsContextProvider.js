@@ -1,15 +1,15 @@
-import React from "react";
-import {Folder} from "@mui/icons-material";
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
+import React from 'react';
+import { Folder } from '@mui/icons-material';
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 
-export default ({children}) => (
-    <BreadcrumbsContext.Provider value={{segments: [
+export default ({ children }) => (
+    <BreadcrumbsContext.Provider value={{ segments: [
         {
             label: 'Collections',
             icon: <Folder />,
-            href: '/collections'
-        }
-    ]}}
+            href: '/collections',
+        },
+    ] }}
     >
         {children}
     </BreadcrumbsContext.Provider>

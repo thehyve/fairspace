@@ -1,17 +1,17 @@
-import React, {useContext, useEffect, useState} from "react";
-import PropTypes from "prop-types";
-import {Button, CircularProgress, Grid, IconButton} from "@mui/material";
-import {Edit} from '@mui/icons-material';
+import React, { useContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Button, CircularProgress, Grid, IconButton } from '@mui/material';
+import { Edit } from '@mui/icons-material';
 
-import LinkedDataEntityForm from "./LinkedDataEntityForm";
+import LinkedDataEntityForm from './LinkedDataEntityForm';
 import useFormData from './UseFormData';
-import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "./UseFormSubmission";
-import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import useLinkedData from "./UseLinkedData";
-import {DATE_DELETED_URI} from "../../constants";
-import ConfirmationDialog from "../../common/components/ConfirmationDialog";
-import {UpdatePageTitleEditingMark} from '../../common/hooks/UsePageTitleUpdater';
+import LinkedDataContext from '../LinkedDataContext';
+import useFormSubmission from './UseFormSubmission';
+import useNavigationBlocker from '../../common/hooks/UseNavigationBlocker';
+import useLinkedData from './UseLinkedData';
+import { DATE_DELETED_URI } from '../../constants';
+import ConfirmationDialog from '../../common/components/ConfirmationDialog';
+import { UpdatePageTitleEditingMark } from '../../common/hooks/UsePageTitleUpdater';
 
 const LinkedDataEntityFormContainer = ({
     subject, typeInfo, hasEditRight = true, showEditButtons = false, fullpage = false,
@@ -20,11 +20,11 @@ const LinkedDataEntityFormContainer = ({
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
     const [editingEnabled, setEditingEnabled] = useState(hasEditRight && !showEditButtons && !isDeleted);
-    const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
+    const { submitLinkedDataChanges, extendProperties } = useContext(LinkedDataContext);
 
     const {
         addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
-        validateAll, validationErrors, isValid
+        validateAll, validationErrors, isValid,
     } = useFormData(values, properties);
 
     useEffect(() => setHasUpdates(hasFormUpdates), [hasFormUpdates, setHasUpdates]);
@@ -33,24 +33,24 @@ const LinkedDataEntityFormContainer = ({
         setEditingEnabled(hasEditRight && !showEditButtons && !isDeleted);
     }, [hasEditRight, isDeleted, showEditButtons]);
 
-    const {isUpdating, submitForm} = useFormSubmission(
+    const { isUpdating, submitForm } = useFormSubmission(
         () => submitLinkedDataChanges(subject, getUpdates())
             .then(() => {
                 setEditingEnabled(false);
                 clearForm();
                 updateLinkedData();
             }),
-        subject
+        subject,
     );
 
     const {
-        confirmationShown, hideConfirmation, executeNavigation
+        confirmationShown, hideConfirmation, executeNavigation,
     } = useNavigationBlocker(hasFormUpdates && editingEnabled);
 
     UpdatePageTitleEditingMark(hasFormUpdates && editingEnabled);
 
     // Apply context-specific logic to the properties and filter on visibility
-    const extendedProperties = extendProperties({properties, subject, isEntityEditable: editingEnabled});
+    const extendedProperties = extendProperties({ properties, subject, isEntityEditable: editingEnabled });
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
 
@@ -147,9 +147,9 @@ LinkedDataEntityFormContainer.propTypes = {
 };
 
 export const LinkedDataEntityFormWithLinkedData = (
-    {subject, hasEditRight, setHasCollectionMetadataUpdates}
+    { subject, hasEditRight, setHasCollectionMetadataUpdates },
 ) => {
-    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
+    const { typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData } = useLinkedData(subject);
 
     return (
         <LinkedDataEntityFormContainer

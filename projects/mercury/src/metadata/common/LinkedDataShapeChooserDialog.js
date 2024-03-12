@@ -7,15 +7,15 @@ import {
     DialogTitle,
     List,
     ListItem,
-    ListItemText
-} from "@mui/material";
-import * as PropTypes from "prop-types";
+    ListItemText,
+} from '@mui/material';
+import * as PropTypes from 'prop-types';
 
-import {getLabel} from "./metadataUtils";
-import {getFirstPredicateValue} from "./jsonLdUtils";
-import * as consts from "../../constants";
-import {compareBy} from "../../common/utils/genericUtils";
-import LoadingInlay from "../../common/components/LoadingInlay";
+import { getLabel } from './metadataUtils';
+import { getFirstPredicateValue } from './jsonLdUtils';
+import * as consts from '../../constants';
+import { compareBy } from '../../common/utils/genericUtils';
+import LoadingInlay from '../../common/components/LoadingInlay';
 
 const LinkedDataShapeChooserDialog = props => {
     const closeDialog = (e) => {
@@ -69,7 +69,7 @@ const LinkedDataShapeChooserDialog = props => {
 LinkedDataShapeChooserDialog.propTypes = {
     onChooseShape: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
-    shapes: PropTypes.array
+    shapes: PropTypes.array,
 };
 
 export default LinkedDataShapeChooserDialog;

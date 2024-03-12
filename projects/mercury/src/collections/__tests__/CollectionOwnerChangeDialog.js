@@ -1,6 +1,6 @@
 import React from 'react';
-import {render, screen} from '@testing-library/react';
-import CollectionOwnerChangeDialog from "../CollectionOwnerChangeDialog";
+import { render, screen } from '@testing-library/react';
+import CollectionOwnerChangeDialog from '../CollectionOwnerChangeDialog';
 
 describe('CollectionOwnerChangeDialog', () => {
     const mockSetOwnedByFn = jest.fn();
@@ -12,9 +12,9 @@ describe('CollectionOwnerChangeDialog', () => {
     };
 
     const mockWorkspaces = [
-        {label: "w1", iri: 'http://localhost/iri/w1'},
-        {label: "w2", iri: 'http://localhost/iri/w2'},
-        {label: "w3", iri: 'http://localhost/iri/w3'}
+        { label: 'w1', iri: 'http://localhost/iri/w1' },
+        { label: 'w2', iri: 'http://localhost/iri/w2' },
+        { label: 'w3', iri: 'http://localhost/iri/w3' },
     ];
 
     it('should render initial state of the dialog correctly', () => {
@@ -27,14 +27,14 @@ describe('CollectionOwnerChangeDialog', () => {
 
         // expect(screen.getByRole("table")).toBeInTheDocument();
         // render available values
-        const buttons = screen.queryAllByRole("button");
+        const buttons = screen.queryAllByRole('button');
 
         expect(buttons).toHaveLength(3);
 
         // render cancel and submit buttons
-        expect(buttons[0].title).toEqual("Open");
-        expect(buttons[1].textContent).toEqual("Save");
-        expect(buttons[2].textContent).toEqual("Cancel");
+        expect(buttons[0].title).toEqual('Open');
+        expect(buttons[1].textContent).toEqual('Save');
+        expect(buttons[2].textContent).toEqual('Cancel');
         expect(buttons[0].disabled).toBeFalsy();
         expect(buttons[1].disabled).toBeTruthy();
         expect(buttons[2].disabled).toBeFalsy();

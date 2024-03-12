@@ -1,34 +1,34 @@
 import React from 'react';
-import {render} from "@testing-library/react";
-import {renderHook} from "@testing-library/react-hooks";
-import {LinkedDataParent} from "../__wrapper__/LinkedDataParent";
-import {COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS} from '../../../constants';
-import {useLinkedDataNoContext} from "../UseLinkedData";
+import { render } from '@testing-library/react';
+import { renderHook } from '@testing-library/react-hooks';
+import { LinkedDataParent } from '../__wrapper__/LinkedDataParent';
+import { COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS } from '../../../constants';
+import { useLinkedDataNoContext } from '../UseLinkedData';
 
 describe('useLinkedData', () => {
     const defaultJsonLd = [{
         '@id': 'http://subject',
         '@type': ['http://type'],
-        'http://prop1': [{'@value': 'v'}]
+        'http://prop1': [{ '@value': 'v' }],
     }];
 
     const defaultContext = {
         fetchLinkedDataForSubject: () => Promise.resolve([]),
-        result: {}
+        result: {},
     };
 
     it('should fetch linked data when first loaded', () => {
         const context = {
             fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([])),
-            shapes: [{aShapeKey: 'aValue'}],
-            result: {}
+            shapes: [{ aShapeKey: 'aValue' }],
+            result: {},
         };
 
         render(
             <LinkedDataParent
                 iri={COLLECTION_URI}
                 context={context}
-            />
+            />,
         );
 
         expect(context.fetchLinkedDataForSubject).toHaveBeenCalledTimes(1);
@@ -39,7 +39,7 @@ describe('useLinkedData', () => {
             <LinkedDataParent
                 iri="my-subject"
                 context={defaultContext}
-            />
+            />,
         );
 
         expect(defaultContext.result.properties).toEqual([]);
@@ -53,7 +53,7 @@ describe('useLinkedData', () => {
                 <LinkedDataParent
                     iri="my-subject"
                     context={defaultContext}
-                />
+                />,
             );
 
             expect(defaultContext.result.linkedDataLoading).toBe(false);
@@ -63,15 +63,15 @@ describe('useLinkedData', () => {
             const context = {
                 ...defaultContext,
                 shapesLoading: true,
-                shapes: [{aShapeKey: 'aValue'}],
-                fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([]))
+                shapes: [{ aShapeKey: 'aValue' }],
+                fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([])),
             };
 
             render(
                 <LinkedDataParent
                     iri="my-subject"
                     context={context}
-                />
+                />,
             );
 
             expect(context.fetchLinkedDataForSubject).toHaveBeenCalled();
@@ -86,14 +86,14 @@ describe('useLinkedData', () => {
                 fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([])),
                 shapes: [],
                 shapesLoading: false,
-                result: {}
+                result: {},
             };
 
             await render(
                 <LinkedDataParent
                     iri="my-subject"
                     context={context}
-                />
+                />,
             );
 
             expect(context.result.linkedDataError).toMatch(/no metadata found/i);
@@ -103,14 +103,14 @@ describe('useLinkedData', () => {
             const context = {
                 ...defaultContext,
                 shapesError: true,
-                result: {}
+                result: {},
             };
 
             render(
                 <LinkedDataParent
                     iri="my-subject"
                     context={context}
-                />
+                />,
             );
 
             expect(context.result.linkedDataError).toBeTruthy();
@@ -121,35 +121,35 @@ describe('useLinkedData', () => {
         const context = {
             shapes: [
                 {
-                    [SHACL_TARGET_CLASS]: [{'@id': 'http://specific-type'}],
-                    [SHACL_PROPERTY]: [{'@id': 'http://labelShape'}, {'@id': 'http://commentShape'}]
+                    [SHACL_TARGET_CLASS]: [{ '@id': 'http://specific-type' }],
+                    [SHACL_PROPERTY]: [{ '@id': 'http://labelShape' }, { '@id': 'http://commentShape' }],
                 },
                 {
                     '@id': 'http://labelShape',
-                    [SHACL_PATH]: [{'@id': LABEL_URI}]
+                    [SHACL_PATH]: [{ '@id': LABEL_URI }],
                 },
                 {
                     '@id': 'http://commentShape',
-                    [SHACL_PATH]: [{'@id': COMMENT_URI}]
+                    [SHACL_PATH]: [{ '@id': COMMENT_URI }],
                 },
                 {
                     '@id': 'http://otherShape',
-                    [SHACL_PATH]: [{'@id': COLLECTION_URI}]
-                }
+                    [SHACL_PATH]: [{ '@id': COLLECTION_URI }],
+                },
 
             ],
             fetchLinkedDataForSubject: () => Promise.resolve([{
                 ...defaultJsonLd[0],
-                '@type': ['http://specific-type']
+                '@type': ['http://specific-type'],
             }]),
-            result: {}
+            result: {},
         };
 
         render(
             <LinkedDataParent
                 iri="http://subject"
                 context={context}
-            />
+            />,
         );
 
         // await waitForNextUpdate();
@@ -161,10 +161,10 @@ describe('useLinkedData', () => {
     it.skip('should return type info from linked data', async () => {
         const context = {
             fetchLinkedDataForSubject: () => Promise.resolve(defaultJsonLd),
-            shapes: [{[SHACL_TARGET_CLASS]: [{"@id": "http://type"}]}]
+            shapes: [{ [SHACL_TARGET_CLASS]: [{ '@id': 'http://type' }] }],
         };
 
-        const {result, waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('http://subject', context));
+        const { result, waitForNextUpdate } = renderHook(() => useLinkedDataNoContext('http://subject', context));
 
         await waitForNextUpdate();
 

@@ -5,17 +5,17 @@ const styles = theme => ({
     leftPanel: {
         marginTop: 8,
         paddingBottom: 10,
-        minWidth: 282
+        minWidth: 282,
     },
     overallPanel: {
         width: CENTRAL_PANEL_WIDTH,
-        overflowX: 'auto'
+        overflowX: 'auto',
     },
     overallPanelFullWidth: {
-        width: '100%'
+        width: '100%',
     },
     rightPanel: {
-        width: RIGHT_PANEL_WIDTH
+        width: RIGHT_PANEL_WIDTH,
     },
     centralPanel: {
         overflowX: 'auto',
@@ -24,14 +24,14 @@ const styles = theme => ({
         maxHeight: 'calc(100vh - 150px)',
     },
     clearAllButtonContainer: {
-        textAlign: 'end'
+        textAlign: 'end',
     },
     clearAllButton: {
-        color: theme.palette.error.main
+        color: theme.palette.error.main,
     },
     activeFilters: {
-        marginBottom: 10
-    }
+        marginBottom: 10,
+    },
 });
 
 export default styles;

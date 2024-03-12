@@ -1,7 +1,7 @@
 // @flow
 import axios from 'axios';
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
-import {joinPathsAvoidEmpty} from "../file/fileUtils";
+import { extractJsonData, handleHttpError } from '../common/utils/httpUtils';
+import { joinPathsAvoidEmpty } from '../file/fileUtils';
 
 export type SearchResult = {|
     id: string;
@@ -10,7 +10,7 @@ export type SearchResult = {|
     comment?: string;
 |}
 
-export const HEADERS = {'Content-Type': 'application/json', 'Accept': 'application/json'};
+export const HEADERS = { 'Content-Type': 'application/json', Accept: 'application/json' };
 
 /**
  * Search for resources based on name or description, given query as a simple text.
@@ -21,8 +21,8 @@ class SearchAPI {
     }
 
     search(path: string, body): Promise<SearchResult[]> {
-        return axios.post(joinPathsAvoidEmpty(this.remoteURL, path), body, {headers: HEADERS})
-            .catch(handleHttpError("Error while performing search"))
+        return axios.post(joinPathsAvoidEmpty(this.remoteURL, path), body, { headers: HEADERS })
+            .catch(handleHttpError('Error while performing search'))
             .then(extractJsonData)
             .then(data => data.results);
     }
@@ -34,7 +34,7 @@ class SearchAPI {
      * @returns {Q.Promise<SearchResult[]>}
      */
     lookupSearch(query: string, type: string): Promise<SearchResult[]> {
-        return this.search("lookup", JSON.stringify({query, resourceType: type}));
+        return this.search('lookup', JSON.stringify({ query, resourceType: type }));
     }
 
     /**
@@ -44,7 +44,7 @@ class SearchAPI {
      * @returns {Q.Promise<SearchResult[]>}
      */
     searchForFiles(query: string, parentIRI: string): Promise<SearchResult[]> {
-        return this.search("files", JSON.stringify({query, parentIRI}));
+        return this.search('files', JSON.stringify({ query, parentIRI }));
     }
 }
 

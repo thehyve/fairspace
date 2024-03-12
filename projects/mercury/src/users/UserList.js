@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import {
     Paper,
     Table,
@@ -8,50 +8,50 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 
-import IconButton from "@mui/material/IconButton";
-import {HighlightOffSharp} from "@mui/icons-material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Checkbox from "@mui/material/Checkbox";
-import TableContainer from "@mui/material/TableContainer";
-import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
-import type {Workspace} from "../workspaces/WorkspacesAPI";
-import type {User} from "./UsersAPI";
-import UsersContext from "./UsersContext";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import ConfirmationButton from "../common/components/ConfirmationButton";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import UserContext from "./UserContext";
-import {getWorkspaceUsersWithRoles, isAdmin} from "./userUtils";
-import ErrorDialog from "../common/components/ErrorDialog";
-import {canAlterPermission} from "../collections/collectionUtils";
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import IconButton from '@mui/material/IconButton';
+import { HighlightOffSharp } from '@mui/icons-material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Checkbox from '@mui/material/Checkbox';
+import TableContainer from '@mui/material/TableContainer';
+import PermissionCandidateSelect from '../permissions/PermissionCandidateSelect';
+import type { Workspace } from '../workspaces/WorkspacesAPI';
+import type { User } from './UsersAPI';
+import UsersContext from './UsersContext';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
+import ConfirmationButton from '../common/components/ConfirmationButton';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import WorkspaceUserRolesContext, { WorkspaceUserRolesProvider } from '../workspaces/WorkspaceUserRolesContext';
+import UserContext from './UserContext';
+import { getWorkspaceUsersWithRoles, isAdmin } from './userUtils';
+import ErrorDialog from '../common/components/ErrorDialog';
+import { canAlterPermission } from '../collections/collectionUtils';
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 const columns = {
     name: {
         valueExtractor: 'name',
-        label: 'Name'
+        label: 'Name',
     },
     username: {
         valueExtractor: 'username',
-        label: 'Username'
+        label: 'Username',
     },
     email: {
         valueExtractor: 'email',
-        label: 'Email'
+        label: 'Email',
     },
     access: {
         valueExtractor: 'access',
-        label: 'Manager'
-    }
+        label: 'Manager',
+    },
 };
 
 type UserListProps = {
@@ -64,12 +64,12 @@ type UserListProps = {
 }
 
 const UserList = (props: UserListProps) => {
-    const {currentUser, workspace, workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole} = props;
-    const {canManage} = workspace;
-    const {users} = useContext(UsersContext);
+    const { currentUser, workspace, workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole } = props;
+    const { canManage } = workspace;
+    const { users } = useContext(UsersContext);
     const workspaceUsersWithRoles = getWorkspaceUsersWithRoles(users, workspaceRoles);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsersWithRoles, columns, 'name');
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
+    const { orderedItems, orderAscending, orderBy, toggleSort } = useSorting(workspaceUsersWithRoles, columns, 'name');
+    const { page, setPage, rowsPerPage, setRowsPerPage, pagedItems } = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
 
@@ -82,7 +82,7 @@ const UserList = (props: UserListProps) => {
     const grantUserRole = (userIri, role) => {
         setWorkspaceRole(userIri, role)
             .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while updating a workspace users";
+                const message = err && err.message ? err.message : 'An error occurred while updating a workspace users';
                 ErrorDialog.showError(message);
             })
             .finally(() => setShowAddUserDialog(false));
@@ -124,7 +124,7 @@ const UserList = (props: UserListProps) => {
 
     const renderAddUserButton = () => (
         <Button
-            style={{marginTop: 8}}
+            style={{ marginTop: 8 }}
             color="primary"
             variant="contained"
             aria-label="Add"
@@ -139,7 +139,7 @@ const UserList = (props: UserListProps) => {
     );
 
     const renderUserList = () => (
-        <Paper style={{marginTop: 16}}>
+        <Paper style={{ marginTop: 16 }}>
             <TableContainer>
                 <Table>
                     <TableHead>
@@ -166,28 +166,28 @@ const UserList = (props: UserListProps) => {
                                 key={u.iri}
                                 hover
                             >
-                                <TableCell style={{maxWidth: 220}} component="th" scope="row">
+                                <TableCell style={{ maxWidth: 220 }} component="th" scope="row">
                                     {u.name}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 120}} component="th" scope="row">
+                                <TableCell style={{ maxWidth: 120 }} component="th" scope="row">
                                     {u.username}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 180}} component="th" scope="row">
+                                <TableCell style={{ maxWidth: 180 }} component="th" scope="row">
                                     {u.email}
                                 </TableCell>
-                                <TableCell style={{width: 120}}>
+                                <TableCell style={{ width: 120 }}>
                                     <Checkbox
                                         checked={u.role === 'Manager'}
                                         onChange={(event) => (
                                             event.target.checked
-                                                ? grantUserRole(u.iri, "Manager")
-                                                : grantUserRole(u.iri, "Member")
+                                                ? grantUserRole(u.iri, 'Manager')
+                                                : grantUserRole(u.iri, 'Member')
                                         )}
                                         disabled={!canAlterPermission(canManage, u, currentUser)}
                                         disableRipple
                                     />
                                 </TableCell>
-                                <TableCell style={{width: 32}}>
+                                <TableCell style={{ width: 32 }}>
                                     <ConfirmationButton
                                         onClick={() => grantUserRole(u.iri, 'None')}
                                         disabled={!canAlterPermission(canManage, u, currentUser)}
@@ -212,7 +212,7 @@ const UserList = (props: UserListProps) => {
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{ overflowX: 'hidden' }}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
@@ -229,9 +229,9 @@ const UserList = (props: UserListProps) => {
 };
 
 const ContextualUserList = (props) => {
-    const {workspace} = props;
-    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
-    const {usersLoading, usersError} = useContext(UsersContext);
+    const { workspace } = props;
+    const { currentUser, currentUserLoading, currentUserError } = useContext(UserContext);
+    const { usersLoading, usersError } = useContext(UsersContext);
 
     if (currentUserError || usersError) {
         return (<MessageDisplay message="An error occurred loading users" />);
@@ -242,7 +242,7 @@ const ContextualUserList = (props) => {
     return (
         <WorkspaceUserRolesProvider iri={workspace.iri}>
             <WorkspaceUserRolesContext.Consumer>
-                {({workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole}) => (
+                {({ workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole }) => (
                     <UserList
                         currentUser={currentUser}
                         workspace={workspace}

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react';
 
 /**
  * Custom state hook to use either the initial value from the local storage or a default value.
@@ -11,7 +11,7 @@ import {useEffect, useState} from "react";
  */
 const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
     const [value, setValue] = useState(
-        JSON.parse(localStorage.getItem(localStorageKey)) || defaultValue
+        JSON.parse(localStorage.getItem(localStorageKey)) || defaultValue,
     );
 
     useEffect(() => {

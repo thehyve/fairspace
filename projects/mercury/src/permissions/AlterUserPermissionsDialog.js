@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -6,60 +6,60 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import withStyles from '@mui/styles/withStyles';
-import {Typography} from "@mui/material";
-import Divider from "@mui/material/Divider";
-import PermissionCandidateSelect from "./PermissionCandidateSelect";
-import type {Permission} from "../collections/CollectionAPI";
-import UserPermissionsTable from "./UserPermissionsTable";
+import { Typography } from '@mui/material';
+import Divider from '@mui/material/Divider';
+import PermissionCandidateSelect from './PermissionCandidateSelect';
+import type { Permission } from '../collections/CollectionAPI';
+import UserPermissionsTable from './UserPermissionsTable';
 
 export const styles = {
     dialog: {
-        width: 650
+        width: 650,
     },
     root: {
         display: 'block',
-        paddingBottom: 40
+        paddingBottom: 40,
     },
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
     autocomplete: {
-        width: '100%'
+        width: '100%',
     },
     accessLevelControl: {
-        marginTop: 10
+        marginTop: 10,
     },
     emptySelection: {
         fontStyle: 'italic',
-        margin: 10
+        margin: 10,
     },
     divider: {
         marginTop: 15,
-        marginBottom: 15
+        marginBottom: 15,
     },
     table: {
-        padding: 0
+        padding: 0,
     },
     tableBody: {
-        display: "block",
-        overflow: "auto",
-        maxHeight: 150
+        display: 'block',
+        overflow: 'auto',
+        maxHeight: 150,
     },
     tableRow: {
-        display: "table",
-        width: "100%",
-        height: 48
+        display: 'table',
+        width: '100%',
+        height: 48,
     },
     nameCell: {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
-    }
+        whiteSpace: 'nowrap',
+    },
 };
 
-export const AlterUserPermissionsDialog = ({collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
-    open = false, onClose, classes}) => {
+export const AlterUserPermissionsDialog = ({ collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
+    open = false, onClose, classes }) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleClose = () => {
@@ -113,7 +113,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
-            onChange={p => handleAddSelectedPermission({...p, access: "Read"})}
+            onChange={p => handleAddSelectedPermission({ ...p, access: 'Read' })}
             filter={p => ((!currentUser || p.iri !== currentUser.iri) && !selectedPermissions.some(sp => sp.iri === p.iri))}
             label="Select user"
             autoFocus
@@ -161,7 +161,7 @@ AlterUserPermissionsDialog.propTypes = {
     collection: PropTypes.object,
     permissionCandidates: PropTypes.array,
     workspaceUsers: PropTypes.array,
-    currentUser: PropTypes.object
+    currentUser: PropTypes.object,
 };
 
 export default withStyles(styles)(AlterUserPermissionsDialog);

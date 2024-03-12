@@ -1,19 +1,19 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {withRouter} from "react-router-dom";
-import Button from "@mui/material/Button";
+import React, { useContext, useEffect, useState } from 'react';
+import { withRouter } from 'react-router-dom';
+import Button from '@mui/material/Button';
 import CollectionEditor from './CollectionEditor';
-import CollectionList from "./CollectionList";
-import CollectionsContext from "./CollectionsContext";
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import UserContext from "../users/UserContext";
-import UsersContext from "../users/UsersContext";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import {getDisplayName} from "../users/userUtils";
-import type {User} from "../users/UsersAPI";
-import type {Collection} from "./CollectionAPI";
-import {getCollectionAbsolutePath} from "./collectionUtils";
-import type {Workspace} from '../workspaces/WorkspacesAPI';
+import CollectionList from './CollectionList';
+import CollectionsContext from './CollectionsContext';
+import WorkspaceContext from '../workspaces/WorkspaceContext';
+import UserContext from '../users/UserContext';
+import UsersContext from '../users/UsersContext';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import { getDisplayName } from '../users/userUtils';
+import type { User } from '../users/UsersAPI';
+import type { Collection } from './CollectionAPI';
+import { getCollectionAbsolutePath } from './collectionUtils';
+import type { Workspace } from '../workspaces/WorkspacesAPI';
 
 type ContextualCollectionBrowserProperties = {
     history: History;
@@ -42,7 +42,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
         users = [],
         canAddCollection = true,
         setBusy = () => {},
-        showDeleted, history, error, workspace
+        showDeleted, history, error, workspace,
     } = props;
 
     const [addingNewCollection, setAddingNewCollection] = useState(false);
@@ -92,7 +92,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
                 canAddCollection
                 && (
                     <Button
-                        style={{marginTop: 8}}
+                        style={{ marginTop: 8 }}
                         color="primary"
                         variant="contained"
                         aria-label="Add"
@@ -108,12 +108,12 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
 };
 
 const ContextualCollectionBrowser = (props: ContextualCollectionBrowserProperties) => {
-    const {currentUserError, currentUserLoading} = useContext(UserContext);
-    const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} = useContext(CollectionsContext);
-    const {workspacesLoading, workspacesError, workspaces} = useContext(WorkspaceContext);
+    const { currentUserError, currentUserLoading } = useContext(UserContext);
+    const { users, usersLoading, usersError } = useContext(UsersContext);
+    const { collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted } = useContext(CollectionsContext);
+    const { workspacesLoading, workspacesError, workspaces } = useContext(WorkspaceContext);
     const workspace = props.workspaceIri ? workspaces.find(w => w.iri === props.workspaceIri) : {};
-    const {showDeletedCollections} = props;
+    const { showDeletedCollections } = props;
 
     const canAdd = window.location.pathname === '/workspace' && workspace.canCollaborate;
 

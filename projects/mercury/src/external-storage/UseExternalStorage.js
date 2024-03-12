@@ -1,16 +1,16 @@
-import useAsync from "../common/hooks/UseAsync";
-import FileAPI from "../file/FileAPI";
+import useAsync from '../common/hooks/UseAsync';
+import FileAPI from '../file/FileAPI';
 
 /**
  * This hook contains logic about files for a certain external storage.
  */
 export const useExternalStorage = (path: string, storageURL: string, fileApi = new FileAPI(storageURL)) => {
-    const {loading, error, data = [], refresh} = useAsync(
+    const { loading, error, data = [], refresh } = useAsync(
         () => fileApi.list(path),
-        [path, storageURL]
+        [path, storageURL],
     );
 
-    const {getDownloadLink, open} = fileApi;
+    const { getDownloadLink, open } = fileApi;
 
     return {
         loading,
@@ -19,7 +19,7 @@ export const useExternalStorage = (path: string, storageURL: string, fileApi = n
         refresh,
         fileActions: {
             getDownloadLink,
-            open
-        }
+            open,
+        },
     };
 };

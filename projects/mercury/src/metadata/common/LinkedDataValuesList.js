@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
-import {Divider, Grid, IconButton, Tooltip, Typography} from '@mui/material';
+import React, { useState } from 'react';
+import { Divider, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {Add, Clear} from '@mui/icons-material';
-import {FixedSizeList as List} from 'react-window';
+import { Add, Clear } from '@mui/icons-material';
+import { FixedSizeList as List } from 'react-window';
 
-import {LABEL_URI, MAX_LIST_LENGTH, STRING_URI} from '../../constants';
+import { LABEL_URI, MAX_LIST_LENGTH, STRING_URI } from '../../constants';
 import styles from './LinkedDataValuesTable.styles';
 import StringValue from './values/StringValue';
 
@@ -19,11 +19,11 @@ type AddValueToListProps = {
 };
 
 const AddValueToList = (props: AddValueToListProps) => {
-    const {serialNumber, classes, property, values, onAdd, labelId, addComponent: AddComponent} = props;
+    const { serialNumber, classes, property, values, onAdd, labelId, addComponent: AddComponent } = props;
     const [newValue, setNewValue] = useState('');
     const isStringValue = (AddComponent === StringValue);
     return (
-        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={"" + labelId}>
+        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={'' + labelId}>
             <Grid item xs={isStringValue ? 10 : 12}>
                 <AddComponent
                     data-testid="add-value-input"
@@ -96,7 +96,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
         },
         rowDecorator = (entry, children) => children,
         canEdit = true, showHeader = true,
-        labelId, addComponent: AddComponent
+        labelId, addComponent: AddComponent,
     } = props;
 
     const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -116,7 +116,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
 
     const renderListItem = (entry, index) => rowDecorator(entry, (
         <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
-            <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
+            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {
                     columnDefinition.id === LABEL_URI
                         ? <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>
@@ -161,7 +161,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                                 onDelete(index);
                                 incrementSerialNumber();
                             }}
-                            style={{opacity: hoveredIndex === index ? 1 : 0}}
+                            style={{ opacity: hoveredIndex === index ? 1 : 0 }}
                             aria-label="Delete"
                             size="medium"
                         >
@@ -173,7 +173,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
         </Grid>
     ));
 
-    const renderValueWindowed = ({index, style}) => (<div style={style}>{renderValue(values[index], index)}</div>);
+    const renderValueWindowed = ({ index, style }) => (<div style={style}>{renderValue(values[index], index)}</div>);
 
     const renderValues = () => {
         if (values.length > 20) {

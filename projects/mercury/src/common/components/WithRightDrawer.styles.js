@@ -1,7 +1,7 @@
 const drawerWidth = 360;
 const styles = theme => ({
     drawerContents: {
-        marginTop: 50
+        marginTop: 50,
     },
     content: {
         flexGrow: 1,
@@ -10,7 +10,7 @@ const styles = theme => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginRight: 0
+        marginRight: 0,
     },
 
     contentShift: {
@@ -19,19 +19,19 @@ const styles = theme => ({
             duration: theme.transitions.duration.enteringScreen,
         }),
         marginRight: drawerWidth + 3 * theme.spacing(1),
-        minWidth: drawerWidth
+        minWidth: drawerWidth,
     },
 
     infoDrawerPaper: {
         width: drawerWidth,
-        padding: theme.spacing(3)
+        padding: theme.spacing(3),
     },
     closeButton: {
         position: 'absolute',
         right: theme.spacing(1),
-        top: theme.mixins.toolbar.minHeight + 3 * theme.spacing(1)
+        top: theme.mixins.toolbar.minHeight + 3 * theme.spacing(1),
     },
-    toolbar: theme.mixins.toolbar
+    toolbar: theme.mixins.toolbar,
 });
 
 export default styles;

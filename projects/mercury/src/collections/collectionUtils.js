@@ -1,5 +1,5 @@
-import React from "react";
-import {Create, MenuBook, Settings, Toc} from "@mui/icons-material";
+import React from 'react';
+import { Create, MenuBook, Settings, Toc } from '@mui/icons-material';
 // eslint-disable-next-line import/no-cycle
 import type {
     AccessLevel,
@@ -8,17 +8,17 @@ import type {
     CollectionPermissions,
     Permission,
     PrincipalPermission,
-    Status
-} from "./CollectionAPI";
+    Status,
+} from './CollectionAPI';
 // eslint-disable-next-line import/no-cycle
-import {accessLevels} from "./CollectionAPI";
-import {compareBy, comparing} from "../common/utils/genericUtils";
+import { accessLevels } from './CollectionAPI';
+import { compareBy, comparing } from '../common/utils/genericUtils';
 // eslint-disable-next-line import/no-cycle
-import {encodePath} from "../file/fileUtils";
-import {isAdmin} from "../users/userUtils";
+import { encodePath } from '../file/fileUtils';
+import { isAdmin } from '../users/userUtils';
 
 export const isCollectionPage = () => {
-    const {pathname} = new URL(window.location);
+    const { pathname } = new URL(window.location);
     const parts = pathname.split('/');
     if (parts.length > 0 && parts[0] === '') {
         parts.splice(0, 1);
@@ -66,7 +66,7 @@ export const sortPermissions = (permissions) => {
     }
     return permissions.sort(comparing(
         compareBy(permissionLevel, false),
-        compareBy('name')
+        compareBy('name'),
     ));
 };
 
@@ -83,7 +83,7 @@ export const canAlterPermission = (canManage, user, currentLoggedUser) => {
 export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
     iri: principalProperties.iri,
     name: principalProperties.code ? principalProperties.code : principalProperties.name,
-    access
+    access,
 });
 
 export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principals, permissions: Permission[]) => {
@@ -99,19 +99,19 @@ export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principal
 
 export const descriptionForAccessMode = (accessMode: AccessMode) => {
     switch (accessMode) {
-        case "Restricted":
-            return "Data and metadata not public available, users need explicitly granted access.";
-        case "MetadataPublished":
-            return "All users can see collection metadata.";
-        case "DataPublished":
-            return "For read-only collections, all users can see collection data and metadata.";
+        case 'Restricted':
+            return 'Data and metadata not public available, users need explicitly granted access.';
+        case 'MetadataPublished':
+            return 'All users can see collection metadata.';
+        case 'DataPublished':
+            return 'For read-only collections, all users can see collection data and metadata.';
         default:
-            return "";
+            return '';
     }
 };
 
 const parsePermissions = (value) => ((typeof value !== 'string')
-    ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
+    ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({ iri, access }));
 
 const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(','));
 
@@ -138,18 +138,18 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     availableAccessModes: parseToArray(properties.availableAccessModes),
     availableStatuses: parseToArray(properties.availableStatuses),
     userPermissions: parsePermissions(properties.userPermissions),
-    workspacePermissions: parsePermissions(properties.workspacePermissions)
+    workspacePermissions: parsePermissions(properties.workspacePermissions),
 });
 
 export const descriptionForStatus = (status: Status) => {
     switch (status) {
-        case "Active":
-            return "Editing data and metadata enabled.";
-        case "ReadOnly":
-            return "Data immutable, available only for reading.";
-        case "Archived":
-            return "Data not available for reading.";
+        case 'Active':
+            return 'Editing data and metadata enabled.';
+        case 'ReadOnly':
+            return 'Data immutable, available only for reading.';
+        case 'Archived':
+            return 'Data not available for reading.';
         default:
-            return "";
+            return '';
     }
 };

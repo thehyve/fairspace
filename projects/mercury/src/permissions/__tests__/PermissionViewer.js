@@ -1,14 +1,14 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
-import {configure, shallow} from "enzyme";
+import { configure, shallow } from 'enzyme';
 
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {PermissionViewer} from "../PermissionViewer";
-import UserPermissionsComponent from "../UserPermissionsComponent";
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { PermissionViewer } from '../PermissionViewer';
+import UserPermissionsComponent from '../UserPermissionsComponent';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({adapter: new Adapter()});
+configure({ adapter: new Adapter() });
 
 const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
     const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
@@ -18,7 +18,7 @@ const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
 const testOrderingOfCollaborators = (wrapper) => {
     const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
     expect(permissionsListProps.permissions.map(p => p.iri)).toEqual(
-        ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id']
+        ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id'],
     );
 };
 
@@ -27,23 +27,23 @@ describe('PermissionViewer', () => {
         {
             iri: 'http://localhost/iri/user2-id',
             access: 'Read',
-            name: 'Michael Jackson'
+            name: 'Michael Jackson',
         },
         {
             iri: 'http://localhost/iri/user3-id',
             access: 'Read',
-            name: 'Bruno Mars'
+            name: 'Bruno Mars',
         },
         {
             iri: 'http://localhost/iri/user1-id',
             access: 'Manage',
-            name: 'Mariah Carey'
+            name: 'Mariah Carey',
         },
         {
             iri: 'http://localhost/iri/user4-id',
             access: 'Manage',
-            name: 'Kurt Cobain'
-        }
+            name: 'Kurt Cobain',
+        },
     ];
     const mockCurrentUserCanManage = mockUsers[3];
     const mockCurrentUserCannotManage = mockUsers[1];
@@ -57,21 +57,21 @@ describe('PermissionViewer', () => {
             mockUsers[3],
             mockUsers[2],
             mockUsers[1],
-            mockUsers[0]
+            mockUsers[0],
         ],
-        workspacePermissions: []
+        workspacePermissions: [],
     };
     const mockWorkspaceUsers = [
         mockUsers[3],
         mockUsers[1],
-        mockUsers[0]
+        mockUsers[0],
     ];
     const mockCollaborators = [
         mockUsers[1],
-        mockUsers[3]
+        mockUsers[3],
     ];
-    const mockOwnerWorkspace = {iri: 'http://localhost/iri/w1'};
-    const mockWorkspaces = [mockOwnerWorkspace, {iri: 'http://localhost/iri/w2'}];
+    const mockOwnerWorkspace = { iri: 'http://localhost/iri/w1' };
+    const mockWorkspaces = [mockOwnerWorkspace, { iri: 'http://localhost/iri/w2' }];
 
     describe('Use Case 1: Current user can manage collection', () => {
         let wrapper;
@@ -86,7 +86,7 @@ describe('PermissionViewer', () => {
                     setPermission={mockSetPermissionFn}
                     error={false}
                     loading={false}
-                />
+                />,
             );
         });
 
@@ -112,7 +112,7 @@ describe('PermissionViewer', () => {
                     setPermission={mockSetPermissionFn}
                     error={false}
                     loading={false}
-                />
+                />,
             );
         });
 
@@ -139,7 +139,7 @@ describe('PermissionViewer', () => {
                     setPermission={mockSetPermissionFn}
                     error={false}
                     loading={false}
-                />
+                />,
             );
         });
 
@@ -156,13 +156,13 @@ describe('PermissionViewer', () => {
                     currentUser={mockCurrentUserCannotManage}
                     collection={mockCollection}
                     collaboratingUsers={[...mockCollaborators, mockOwnerWorkspace]}
-                    collaboratingWorkspaces={[{iri: 'http://localhost/iri/w2'}]}
+                    collaboratingWorkspaces={[{ iri: 'http://localhost/iri/w2' }]}
                     workspaceUsers={mockWorkspaceUsers}
                     users={mockUsers}
                     setPermission={mockSetPermissionFn}
                     error={false}
                     loading={false}
-                />
+                />,
             );
         });
 

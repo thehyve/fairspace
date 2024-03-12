@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import IriValueContainer from "./IriValueContainer";
+import IriValueContainer from './IriValueContainer';
 
 class ResourceValue extends React.Component {
     state = {
-        namespace: undefined
+        namespace: undefined,
     };
 
     handleLocalPartChange = (value) => this.props.onChange({
-        id: this.state.namespace ? this.state.namespace.value + value : value
+        id: this.state.namespace ? this.state.namespace.value + value : value,
     });
 
-    handleNamespaceChange = namespace => this.setState({namespace});
+    handleNamespaceChange = namespace => this.setState({ namespace });
 
     render() {
-        const {entry, onChange, ...otherProps} = this.props;
+        const { entry, onChange, ...otherProps } = this.props;
 
         return (
             <IriValueContainer
@@ -31,7 +31,7 @@ class ResourceValue extends React.Component {
 
 ResourceValue.propTypes = {
     entry: PropTypes.object,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
 };
 
 ResourceValue.defaultProps = {

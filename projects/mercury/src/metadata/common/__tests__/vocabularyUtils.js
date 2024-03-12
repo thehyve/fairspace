@@ -13,9 +13,9 @@ import {
     isRelationShape, typeShapeWithProperties,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from './test.vocabulary.json';
-import * as constants from "../../../constants";
-import {getFirstPredicateId} from "../jsonLdUtils";
-import {SHACL_NAME, SHACL_PATH, SHACL_PROPERTY} from '../../../constants';
+import * as constants from '../../../constants';
+import { getFirstPredicateId } from '../jsonLdUtils';
+import { SHACL_NAME, SHACL_PATH, SHACL_PROPERTY } from '../../../constants';
 
 describe('getLabelForType', () => {
     it('returns the label for a known type', () => {
@@ -40,7 +40,7 @@ describe('typeShapeWithProperties', () => {
         expect(researchProjectShape[SHACL_PROPERTY].map(property => property[SHACL_NAME][0]['@value'])).toEqual([
             'Label',
             'Project type',
-            'Grant type'
+            'Grant type',
         ]);
     });
 });
@@ -71,11 +71,11 @@ describe('vocabulary contains', () => {
 
 describe('isRdfList', () => {
     const rdfListShape = {
-        [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
+        [constants.SHACL_NODE]: [{ '@id': constants.DASH_LIST_SHAPE }],
     };
 
     const nonRdfListShape = {
-        [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}]
+        [constants.SHACL_DATATYPE]: [{ '@id': constants.STRING_URI }],
     };
 
     it('should return true if the given shape is an rdf list', () => expect(isRdfList(rdfListShape)).toBe(true));
@@ -85,13 +85,13 @@ describe('isRdfList', () => {
 
 describe('getMaxCount', () => {
     const rdfListShape = {
-        [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}],
-        [constants.SHACL_MAX_COUNT]: [{'@value': 1}]
+        [constants.SHACL_NODE]: [{ '@id': constants.DASH_LIST_SHAPE }],
+        [constants.SHACL_MAX_COUNT]: [{ '@value': 1 }],
     };
 
     const nonRdfListShape = {
-        [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
-        [constants.SHACL_MAX_COUNT]: [{'@value': 10}]
+        [constants.SHACL_DATATYPE]: [{ '@id': constants.STRING_URI }],
+        [constants.SHACL_MAX_COUNT]: [{ '@value': 10 }],
     };
 
     it('should return the max count value for a non list property', () => expect(getMaxCount(nonRdfListShape)).toEqual(10));
@@ -100,11 +100,11 @@ describe('getMaxCount', () => {
 
 describe('isGenericResourceIri', () => {
     const genericResourceShape = {
-        [constants.SHACL_NODEKIND]: [{'@id': constants.SHACL_IRI}]
+        [constants.SHACL_NODEKIND]: [{ '@id': constants.SHACL_IRI }],
     };
 
     const nonGenericResourceShape = {
-        [constants.SHACL_NODEKIND]: [{'@id': constants.STRING_URI}]
+        [constants.SHACL_NODEKIND]: [{ '@id': constants.STRING_URI }],
     };
 
     it('should return true if the given shape represents a generic iri resource', () => expect(isGenericIriResource(genericResourceShape)).toBe(true));
@@ -114,10 +114,10 @@ describe('isGenericResourceIri', () => {
 
 describe('isRelationShape', () => {
     it('should return true for relation shapes', () => {
-        expect(isRelationShape({[constants.SHACL_CLASS]: [{'@value': 'SomeClass'}]})).toBe(true);
+        expect(isRelationShape({ [constants.SHACL_CLASS]: [{ '@value': 'SomeClass' }] })).toBe(true);
     });
     it('should return false for other types of shapes', () => {
-        expect(isRelationShape({[constants.SHACL_DATATYPE]: ['http://ex.com/type']})).toBe(false);
+        expect(isRelationShape({ [constants.SHACL_DATATYPE]: ['http://ex.com/type'] })).toBe(false);
         expect(isRelationShape({})).toBe(false);
     });
 });
@@ -162,7 +162,7 @@ describe('Class hierarchy (subclasses and descendants)', () => {
             const classHierarchy = getDescendants(vocabularyJsonLd, type);
 
             expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subSubClasess]));
-            expect(classHierarchy).not.toEqual(expect.arrayContaining(["https://fairspace.nl/ontology#File"]));
+            expect(classHierarchy).not.toEqual(expect.arrayContaining(['https://fairspace.nl/ontology#File']));
         });
     });
 });
@@ -173,19 +173,19 @@ describe('getNamespaces', () => {
 
         expect(namespaces.length).toEqual(2);
         expect(namespaces[0]).toEqual({
-            id: "_:Namespace1",
-            label: "Namespace1",
-            prefix: "ns1",
-            namespace: "http://namespace1#",
-            isDefault: true
+            id: '_:Namespace1',
+            label: 'Namespace1',
+            prefix: 'ns1',
+            namespace: 'http://namespace1#',
+            isDefault: true,
         });
         expect(namespaces[1].isDefault).toBe(false);
     });
     it('should apply a filter to the namespaces if given', () => {
-        const namespaces = getNamespaces(vocabularyJsonLd, n => n[constants.SHACL_NAME][0]["@value"] === "Namespace2");
+        const namespaces = getNamespaces(vocabularyJsonLd, n => n[constants.SHACL_NAME][0]['@value'] === 'Namespace2');
 
         expect(namespaces.length).toEqual(1);
-        expect(namespaces[0].label).toEqual("Namespace2");
+        expect(namespaces[0].label).toEqual('Namespace2');
     });
 });
 
@@ -196,7 +196,7 @@ describe('getProperties', () => {
 
         expect(result.length).toBeGreaterThan(propertyShapes.length);
         expect(result.map(entry => entry.key)).toEqual(
-            expect.arrayContaining(propertyShapes.map(propertyShape => getFirstPredicateId(propertyShape, constants.SHACL_PATH)))
+            expect.arrayContaining(propertyShapes.map(propertyShape => getFirstPredicateId(propertyShape, constants.SHACL_PATH))),
         );
     });
 
@@ -212,15 +212,15 @@ describe('getProperties', () => {
     it('should use dash:singleLine to determine multiLine status', () => {
         const propertyShapes = [
             {
-                [constants.SHACL_PATH]: [{'@id': constants.LABEL_URI}],
-                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
-                [constants.DASH_SINGLE_LINE]: [{'@value': true}]
+                [constants.SHACL_PATH]: [{ '@id': constants.LABEL_URI }],
+                [constants.SHACL_DATATYPE]: [{ '@id': constants.STRING_URI }],
+                [constants.DASH_SINGLE_LINE]: [{ '@value': true }],
             },
             {
-                [constants.SHACL_PATH]: [{'@id': constants.COMMENT_URI}],
-                [constants.SHACL_DATATYPE]: [{'@id': constants.STRING_URI}],
-                [constants.DASH_SINGLE_LINE]: [{'@value': false}]
-            }
+                [constants.SHACL_PATH]: [{ '@id': constants.COMMENT_URI }],
+                [constants.SHACL_DATATYPE]: [{ '@id': constants.STRING_URI }],
+                [constants.DASH_SINGLE_LINE]: [{ '@value': false }],
+            },
         ];
 
         const result = getProperties(vocabularyJsonLd, propertyShapes);

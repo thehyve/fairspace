@@ -1,8 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const BreadcrumbsContext = React.createContext({
-    segments: []
+    segments: [],
 });
 
 BreadcrumbsContext.Provider.propTypes = {
@@ -11,10 +11,10 @@ BreadcrumbsContext.Provider.propTypes = {
             PropTypes.shape({
                 icon: PropTypes.element,
                 href: PropTypes.string.isRequired,
-                label: PropTypes.string.isRequired
-            })
-        )
-    })
+                label: PropTypes.string.isRequired,
+            }),
+        ),
+    }),
 };
 
 export default BreadcrumbsContext;

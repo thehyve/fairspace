@@ -1,14 +1,14 @@
 // @flow
 import React from 'react';
-import {Card, CardContent, CardHeader, IconButton} from '@mui/material';
-import {withRouter} from 'react-router-dom';
+import { Card, CardContent, CardHeader, IconButton } from '@mui/material';
+import { withRouter } from 'react-router-dom';
 
-import {Close} from '@mui/icons-material';
+import { Close } from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import EmptyInformationDrawer from "../../common/components/EmptyInformationDrawer";
-import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
-import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import CopyButton from "../../common/components/CopyButton";
+import EmptyInformationDrawer from '../../common/components/EmptyInformationDrawer';
+import { LinkedDataEntityFormWithLinkedData } from '../common/LinkedDataEntityFormContainer';
+import type { MetadataViewEntityWithLinkedFiles } from './metadataViewUtils';
+import CopyButton from '../../common/components/CopyButton';
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
@@ -17,15 +17,15 @@ const useStyles = makeStyles(() => ({
     card: {
         marginTop: 10,
         flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        transitionBorder: ".24s",
-        easeInOut: true
+        display: 'flex',
+        flexDirection: 'column',
+        outline: 'none',
+        transitionBorder: '.24s',
+        easeInOut: true,
     },
     emptyLinkedFiles: {
-        fontStyle: 'italic'
-    }
+        fontStyle: 'italic',
+    },
 }));
 
 type MetadataViewInformationDrawerProps = {
@@ -36,7 +36,7 @@ type MetadataViewInformationDrawerProps = {
 };
 
 const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps) => {
-    const {entity, viewIcon, textFilterLink, handleCloseCard} = props;
+    const { entity, viewIcon, textFilterLink, handleCloseCard } = props;
     const classes = useStyles();
 
     if (!entity) {
@@ -46,19 +46,19 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
     return (
         <Card className={classes.card}>
             <CardHeader
-                titleTypographyProps={{variant: 'h6'}}
+                titleTypographyProps={{ variant: 'h6' }}
                 title={(
                     <div>
                         Metadata for {entity.label}
                         <CopyButton
-                            style={{marginLeft: 10}}
+                            style={{ marginLeft: 10 }}
                             value={textFilterLink}
                             labelPreCopy="Copy the link"
                         />
                     </div>
                 )}
                 avatar={viewIcon}
-                style={{wordBreak: 'break-word'}}
+                style={{ wordBreak: 'break-word' }}
                 action={(
                     <IconButton
                         title="Close"

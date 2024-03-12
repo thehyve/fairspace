@@ -1,25 +1,25 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Grid from '@mui/material/Grid';
-import FormControlLabel from "@mui/material/FormControlLabel";
-import {Divider, Switch} from "@mui/material";
+import FormControlLabel from '@mui/material/FormControlLabel';
+import { Divider, Switch } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import Button from "@mui/material/Button";
-import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
+import Button from '@mui/material/Button';
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 
-import CollectionBreadcrumbsContextProvider from "./CollectionBreadcrumbsContextProvider";
-import CollectionBrowser from "./CollectionBrowser";
+import CollectionBreadcrumbsContextProvider from './CollectionBreadcrumbsContextProvider';
+import CollectionBrowser from './CollectionBrowser';
 import CollectionInformationDrawer from './CollectionInformationDrawer';
-import {useSingleSelection} from "../file/UseSelection";
-import LoadingOverlay from "../common/components/LoadingOverlay";
-import SearchBar from "../search/SearchBar";
-import BreadCrumbs from "../common/components/BreadCrumbs";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import styles from "./CollectionsPage.styles";
+import { useSingleSelection } from '../file/UseSelection';
+import LoadingOverlay from '../common/components/LoadingOverlay';
+import SearchBar from '../search/SearchBar';
+import BreadCrumbs from '../common/components/BreadCrumbs';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import styles from './CollectionsPage.styles';
 import CollectionsContext from './CollectionsContext';
-import {getMetadataViewsPath, RESOURCES_VIEW} from "../metadata/views/metadataViewUtils";
-import MetadataViewContext from "../metadata/views/MetadataViewContext";
-import UserContext from "../users/UserContext";
-import {handleTextSearchRedirect} from "../search/searchUtils";
+import { getMetadataViewsPath, RESOURCES_VIEW } from '../metadata/views/metadataViewUtils';
+import MetadataViewContext from '../metadata/views/MetadataViewContext';
+import UserContext from '../users/UserContext';
+import { handleTextSearchRedirect } from '../search/searchUtils';
 
 type CollectionsPageProperties = {
     history: History;
@@ -30,19 +30,19 @@ type CollectionsPageProperties = {
 }
 
 const CollectionsPage = (props: CollectionsPageProperties) => {
-    const {showBreadCrumbs = false, history, workspaceIri, documentTitle, classes} = props;
+    const { showBreadCrumbs = false, history, workspaceIri, documentTitle, classes } = props;
 
-    usePageTitleUpdater(documentTitle || "Collections");
+    usePageTitleUpdater(documentTitle || 'Collections');
 
-    const {collections, collectionsLoading, collectionsError} = useContext(CollectionsContext);
-    const {views} = useContext(MetadataViewContext);
-    const {currentUser} = useContext(UserContext);
+    const { collections, collectionsLoading, collectionsError } = useContext(CollectionsContext);
+    const { views } = useContext(MetadataViewContext);
+    const { currentUser } = useContext(UserContext);
 
     const [busy, setBusy] = useState(false);
     const [showDeletedCollections, setShowDeletedCollections] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [hasCollectionMetadataUpdates, setHasCollectionMetadataUpdates] = useState(false);
-    const {isSelected, toggle, selected} = useSingleSelection();
+    const { isSelected, toggle, selected } = useSingleSelection();
     const [preselectedCollectionIri, setPreselectedCollectionIri] = useState(false);
 
     const handleSearch = (value) => {

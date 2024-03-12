@@ -1,18 +1,18 @@
 import React from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
-import {Chip, Divider, Grid, Tooltip, Typography} from "@mui/material";
+import { Chip, Divider, Grid, Tooltip, Typography } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import IriTooltip from "../../common/components/IriTooltip";
-import CollectionBrowserLink from "./CollectionBrowserLink";
+import IriTooltip from '../../common/components/IriTooltip';
+import CollectionBrowserLink from './CollectionBrowserLink';
 import {
     COLLECTION_URI, DATE_DELETED_URI,
     DIRECTORY_URI,
     FILE_PATH_URI,
     FILE_URI,
-} from "../../constants";
-import DeleteEntityButton from "./DeleteEntityButton";
-import CopyButton from "../../common/components/CopyButton";
+} from '../../constants';
+import DeleteEntityButton from './DeleteEntityButton';
+import CopyButton from '../../common/components/CopyButton';
 import UseNamespacedIri from '../../common/hooks/UseNamespacedIri';
 
 const styles = {
@@ -20,17 +20,17 @@ const styles = {
         maxWidth: '570px',
         whiteSpace: 'nowrap',
         overflow: 'hidden',
-        textOverflow: 'ellipsis'
+        textOverflow: 'ellipsis',
     },
 
     deletedIri: {
-        textDecoration: 'line-through'
+        textDecoration: 'line-through',
     },
 
     deleteText: {
         color: 'red',
-        fontSize: '0.7em'
-    }
+        fontSize: '0.7em',
+    },
 };
 
 const PROTECTED_ENTITY_TYPES = [COLLECTION_URI, FILE_URI, DIRECTORY_URI];
@@ -43,7 +43,7 @@ const LinkedDataEntityHeader = ({
     values = {},
     typeInfo = {},
     updateLinkedData,
-    enableDelete = false
+    enableDelete = false,
 }) => {
     const isProtectedEntity = PROTECTED_ENTITY_TYPES.includes(values['@type'] && values['@type'][0] && values['@type'][0].id);
     const namespacedIri = UseNamespacedIri(subject);
@@ -51,17 +51,17 @@ const LinkedDataEntityHeader = ({
 
     return !linkedDataError && !linkedDataLoading && (
         <>
-            <Grid container justifyContent="space-between" style={{alignItems: "center"}}>
-                <Grid item style={{display: "flex", alignItems: "center"}}>
+            <Grid container justifyContent="space-between" style={{ alignItems: 'center' }}>
+                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
                     <Typography variant="h5" className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}>
                         <IriTooltip title={subject}>
                             <span>{namespacedIri}</span>
                         </IriTooltip>
                     </Typography>
 
-                    <CopyButton style={{marginLeft: 10}} value={subject} />
+                    <CopyButton style={{ marginLeft: 10 }} value={subject} />
                 </Grid>
-                <Grid item style={{display: "flex", alignItems: "center"}}>
+                <Grid item style={{ display: 'flex', alignItems: 'center' }}>
                     {enableDelete && (
                         <DeleteEntityButton
                             subject={subject}
@@ -81,7 +81,7 @@ const LinkedDataEntityHeader = ({
                                 <Typography
                                     variant="caption"
                                     color="inherit"
-                                    style={{whiteSpace: 'pre-line'}}
+                                    style={{ whiteSpace: 'pre-line' }}
                                 >
                                     {typeInfo.description}
                                 </Typography>
@@ -96,14 +96,14 @@ const LinkedDataEntityHeader = ({
 
             {isDeleted ? <span className={classes.deleteText}>This entity has been deleted</span> : ''}
 
-            <Divider style={{marginTop: 16}} />
+            <Divider style={{ marginTop: 16 }} />
         </>
     );
 };
 
 LinkedDataEntityHeader.propTypes = {
     subject: PropTypes.string.isRequired,
-    enableDelete: PropTypes.bool
+    enableDelete: PropTypes.bool,
 };
 
 export default withStyles(styles)(LinkedDataEntityHeader);

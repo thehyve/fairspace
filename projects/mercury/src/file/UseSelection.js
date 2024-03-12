@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from 'react';
 
 /**
  * This hook contains logic about selections.
@@ -25,7 +25,7 @@ const useSelection = (allowMultiple) => {
         deselectAll,
         isSelected,
         toggle,
-        selected: allowMultiple ? selected : selected[0]
+        selected: allowMultiple ? selected : selected[0],
     };
 };
 

@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
-import onLogout from "../routes/logout";
-import {getUser} from './UsersAPI';
+import onLogout from '../routes/logout';
+import { getUser } from './UsersAPI';
 
 const UserContext = React.createContext({});
 
-export const UserProvider = ({children}) => {
-    const [currentUser, setCurrentUser] = useState({authorizations: []});
+export const UserProvider = ({ children }) => {
+    const [currentUser, setCurrentUser] = useState({ authorizations: [] });
     const [currentUserLoading, setCurrentUserLoading] = useState(false);
     const [currentUserError, setCurrentUserError] = useState(null);
 
@@ -33,7 +33,7 @@ export const UserProvider = ({children}) => {
                 currentUserLoading,
                 currentUserError,
                 refreshUser,
-                onLogout: () => onLogout({})
+                onLogout: () => onLogout({}),
             }}
         >
             {children}

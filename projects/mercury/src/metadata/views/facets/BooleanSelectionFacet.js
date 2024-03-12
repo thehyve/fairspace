@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import {ToggleButton, ToggleButtonGroup} from "@mui/material";
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import React, { useState } from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import type { MetadataViewFacetProperties } from '../MetadataViewFacetFactory';
 
 const BooleanSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {onChange = () => {}, activeFilterValues = [], classes} = props;
+    const { onChange = () => {}, activeFilterValues = [], classes } = props;
     const [booleanFilterValue, setBooleanFilterValue] = useState();
 
     useDeepCompareEffect(() => {

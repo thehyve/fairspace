@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {List, ListItem} from '@mui/material';
+import { List, ListItem } from '@mui/material';
 
-import LinkedDataProperty from "./LinkedDataProperty";
-import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";
+import LinkedDataProperty from './LinkedDataProperty';
+import { hasValue, shouldPropertyBeHidden } from './metadataUtils';
 import {
     COMMENT_URI,
     CONTENT_TYPE_URI,
@@ -11,11 +11,11 @@ import {
     DATE_CREATED_URI,
     DATE_MODIFIED_URI,
     LABEL_URI,
-    MODIFIED_BY_URI
+    MODIFIED_BY_URI,
 } from '../../constants';
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import {compareBy, comparing} from "../../common/utils/genericUtils";
+import LoadingInlay from '../../common/components/LoadingInlay';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import { compareBy, comparing } from '../../common/utils/genericUtils';
 
 type PropertyType = {
     key: string;
@@ -63,7 +63,7 @@ export const LinkedDataEntityForm = ({
     onAdd = () => {},
     onDelete = () => {},
     editable = true,
-    typeIri
+    typeIri,
 }) => {
     if (loading) {
         return <LoadingInlay />;
@@ -98,13 +98,13 @@ export const LinkedDataEntityForm = ({
                             descriptionFirst,
                             systemPropertiesLast,
                             compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
-                            compareBy('label')
+                            compareBy('label'),
                         ))
                         .map(p => (
                             <ListItem
                                 key={p.key}
                                 disableGutters
-                                style={{display: 'block'}}
+                                style={{ display: 'block' }}
                             >
                                 <LinkedDataProperty
                                     formEditable={editable}
@@ -135,7 +135,7 @@ LinkedDataEntityForm.propTypes = {
     properties: PropTypes.array,
     values: PropTypes.object,
     validationErrors: PropTypes.object,
-    editable: PropTypes.bool
+    editable: PropTypes.bool,
 };
 
 export default LinkedDataEntityForm;

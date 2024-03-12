@@ -1,8 +1,8 @@
 import React from 'react';
-import {Chip, Grid, Typography} from '@mui/material';
-import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
-import {ofBooleanValueType, ofRangeValueType} from "./metadataViewUtils";
-import {formatDate, isNonEmptyValue} from "../../common/utils/genericUtils";
+import { Chip, Grid, Typography } from '@mui/material';
+import type { MetadataViewFacet, MetadataViewFilter } from './MetadataViewAPI';
+import { ofBooleanValueType, ofRangeValueType } from './metadataViewUtils';
+import { formatDate, isNonEmptyValue } from '../../common/utils/genericUtils';
 
 type MetadataViewActiveFacetFiltersProperties = {
     facets: MetadataViewFacet[];
@@ -11,7 +11,7 @@ type MetadataViewActiveFacetFiltersProperties = {
 };
 
 export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFiltersProperties) => {
-    const {facets, filters, setFilters} = props;
+    const { facets, filters, setFilters } = props;
 
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
@@ -37,7 +37,7 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                     className={facet.backgroundColor}
                     key={`chip-${facet.name}`}
                     label={label}
-                    style={{marginLeft: 5}}
+                    style={{ marginLeft: 5 }}
                     onDelete={() => {
                         const index = filters.indexOf(filter);
                         delete filters[index];
@@ -52,7 +52,7 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                     className={facet.backgroundColor}
                     key={`chip-${facet.name}`}
                     label={filter.booleanValue}
-                    style={{marginLeft: 5}}
+                    style={{ marginLeft: 5 }}
                     onDelete={() => {
                         const index = filters.indexOf(filter);
                         delete filters[index];
@@ -69,7 +69,7 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                         className={facet.backgroundColor}
                         key={value.value}
                         label={value.label}
-                        style={{marginLeft: 5}}
+                        style={{ marginLeft: 5 }}
                         onDelete={() => {
                             const index = filters.indexOf(filter);
                             filters[index].values = [...filter.values.filter(v => v !== value.value)];

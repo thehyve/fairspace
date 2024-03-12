@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useCallback, useContext, useEffect, useState} from "react";
-import axios from "axios";
-import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
-import {MetadataViewAPI} from "./MetadataViewAPI";
-import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
+import { useCallback, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
+import type { MetadataViewData, MetadataViewFilter } from './MetadataViewAPI';
+import { MetadataViewAPI } from './MetadataViewAPI';
+import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
 
 const LOCATION_FILTER_FIELD = 'location';
 
@@ -23,7 +23,7 @@ export type ViewData = {
 };
 
 const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
-    const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
+    const { path: metadataAPIPath } = useContext(MetadataAPIPathContext);
     const metadataViewAPI = new MetadataViewAPI(metadataAPIPath);
     const [data, setData] = useState({});
     const [count, setCount] = useState({});
@@ -35,14 +35,14 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
     const locationFilter: MetadataViewFilter = {
         field: LOCATION_FILTER_FIELD,
-        values: [locationContext]
+        values: [locationContext],
     };
 
     const textFilters: MetadataViewFilter[] = Object.entries(textFiltersObject)
-        .filter(([field, value]) => field !== null && value !== "")
+        .filter(([field, value]) => field !== null && value !== '')
         .map(([field, value]) => ({
             field,
-            prefix: value
+            prefix: value,
         }));
 
     const allFilters = !locationContext ? (
@@ -52,10 +52,10 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
     );
 
     const fetchCount = () => {
-        setCount({count: -1});
+        setCount({ count: -1 });
         setLoadingCount(true);
         if (countRequestCancelToken) {
-            countRequestCancelToken.cancel("Fetching count operation canceled due to new request.");
+            countRequestCancelToken.cancel('Fetching count operation canceled due to new request.');
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
@@ -72,7 +72,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
     const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
         if (viewDataRequestCancelToken) {
-            viewDataRequestCancelToken.cancel("Fetching data operation canceled due to new request.");
+            viewDataRequestCancelToken.cancel('Fetching data operation canceled due to new request.');
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
@@ -81,16 +81,16 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
     const refreshAll = useCallback(() => {
         setLoading(true);
-        setCount({count: -1});
+        setCount({ count: -1 });
         fetchViewData(0, rowsPerPage)
             .then((d: MetadataViewData) => {
                 setData(d);
                 if (d) {
                     if (!d.hasNext) {
                         if (viewDataRequestCancelToken) {
-                            viewDataRequestCancelToken.cancel("Fetching count operation canceled due to new data.");
+                            viewDataRequestCancelToken.cancel('Fetching count operation canceled due to new data.');
                         }
-                        setCount({count: d.rows.length, timeout: false});
+                        setCount({ count: d.rows.length, timeout: false });
                         setLoadingCount(false);
                     } else {
                         fetchCount();
@@ -118,7 +118,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters, locationContext, textFiltersObject]);
+    useEffect(() => { refreshAll(); }, [view, filters, locationContext, textFiltersObject]);
 
     return {
         data,
@@ -126,7 +126,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         loading,
         loadingCount,
         error,
-        refreshDataOnly
+        refreshDataOnly,
     };
 };
 

@@ -1,16 +1,16 @@
-import React, {useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import Grid from "@mui/material/Grid";
-import Input from "@mui/material/Input";
-import Slider from "@mui/material/Slider";
-import {Typography} from "@mui/material";
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
-import {isNonEmptyValue} from "../../../common/utils/genericUtils";
+import React, { useState } from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import Grid from '@mui/material/Grid';
+import Input from '@mui/material/Input';
+import Slider from '@mui/material/Slider';
+import { Typography } from '@mui/material';
+import type { MetadataViewFacetProperties } from '../MetadataViewFacetFactory';
+import { isNonEmptyValue } from '../../../common/utils/genericUtils';
 
 const nonEmptyNumber = (value, alternative) => (isNonEmptyValue(value) ? Number(value) : alternative);
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
+    const { options = [], onChange = () => {}, activeFilterValues, classes } = props;
     const minValue = nonEmptyNumber(options[0], null);
     const maxValue = nonEmptyNumber(options[1], null);
 
@@ -43,11 +43,11 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         setValue([newMinValue, value[1]]);
         if (isNonEmptyValue(newMinValue)) {
             if (Number.isNaN(newMinValue)) {
-                setValidationError("Min value has to be a number.");
+                setValidationError('Min value has to be a number.');
             } else if (minValue !== null && Number(newMinValue) < minValue) {
                 setValidationError(`Min value cannot be lower than ${minValue}.`);
             } else if (isNonEmptyValue(value[1]) && Number(newMinValue) > value[1]) {
-                setValidationError("Min value cannot be higher than max value.");
+                setValidationError('Min value cannot be higher than max value.');
             } else if (maxValue !== null && Number(newMinValue) > maxValue) {
                 setValidationError(`Min value cannot be higher than ${maxValue}.`);
             } else {
@@ -63,11 +63,11 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         setValue([value[0], newMaxValue]);
         if (isNonEmptyValue(event.target.value)) {
             if (Number.isNaN(newMaxValue)) {
-                setValidationError("Max value has to be a number.");
+                setValidationError('Max value has to be a number.');
             } else if (maxValue !== null && Number(newMaxValue) > maxValue) {
                 setValidationError(`Max value cannot be higher than ${maxValue}.`);
             } else if (isNonEmptyValue(value[0]) && Number(newMaxValue) < value[0]) {
-                setValidationError("Max value cannot be lower than min value.");
+                setValidationError('Max value cannot be lower than min value.');
             } else if (minValue !== null && Number(newMaxValue) < minValue) {
                 setValidationError(`Min value cannot be lower than ${minValue}.`);
             } else {
@@ -101,18 +101,18 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     const renderInput = (inputValue, onInputChange, placeholder) => (
         <Input
-            value={nonEmptyNumber(inputValue, "")}
+            value={nonEmptyNumber(inputValue, '')}
             margin="dense"
             onChange={onInputChange}
             onBlur={handleBlur}
             error={!!validationError}
             inputProps={{
-                'step': 1,
-                'min': minValue,
-                'max': maxValue,
-                'type': 'number',
+                step: 1,
+                min: minValue,
+                max: maxValue,
+                type: 'number',
                 'aria-labelledby': 'input-slider',
-                'placeholder': placeholder
+                placeholder,
             }}
         />
     );
@@ -147,7 +147,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         <div>
             {minValue !== null && maxValue !== null ? (
                 <Grid container alignItems="center" className={classes.numericalContent}>
-                    <Grid item xs={12} style={{marginLeft: 8, marginRight: 8}}>
+                    <Grid item xs={12} style={{ marginLeft: 8, marginRight: 8 }}>
                         {renderSlider()}
                     </Grid>
                     <Grid item xs={5}>

@@ -1,12 +1,12 @@
-import React from "react";
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {CollectionEditor, isInputValid} from '../CollectionEditor';
-import type {CollectionProperties} from '../CollectionAPI';
+import React from 'react';
+import { configure, shallow } from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import { CollectionEditor, isInputValid } from '../CollectionEditor';
+import type { CollectionProperties } from '../CollectionAPI';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({adapter: new Adapter()});
+configure({ adapter: new Adapter() });
 
 let collectionEditor;
 let wrapper;
@@ -21,7 +21,7 @@ beforeEach(() => {
 const collection: CollectionProperties = {
     name: 'Collection',
     description: 'description',
-    ownerWorkspace: "http://owner"
+    ownerWorkspace: 'http://owner',
 };
 
 const longName = 'aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrrssssstttttuuuuuuvvvvvvwwwwwwxxxxxyyyyyzzzzz';
@@ -33,11 +33,11 @@ describe('CollectionEditor', () => {
         });
 
         it('marks input as invalid if name is empty', () => {
-            expect(isInputValid({name: ''})).toBe(false);
+            expect(isInputValid({ name: '' })).toBe(false);
         });
 
         it('marks input as invalid if name is too long', () => {
-            expect(isInputValid({name: longName})).toBe(false);
+            expect(isInputValid({ name: longName })).toBe(false);
         });
     });
 
@@ -51,7 +51,7 @@ describe('CollectionEditor', () => {
                 <CollectionEditor
                     editing
                     title="title"
-                    workspace={{name: ownerWorkspace}}
+                    workspace={{ name: ownerWorkspace }}
                     addCollection={saveCallback}
                     collection={collection}
                     onClose={closeCallback}
@@ -81,7 +81,7 @@ describe('CollectionEditor', () => {
             jest.runAllTimers();
 
             expect(saveCallback).toHaveBeenCalledTimes(1);
-            expect(saveCallback).toHaveBeenCalledWith({name, description, ownerWorkspace});
+            expect(saveCallback).toHaveBeenCalledWith({ name, description, ownerWorkspace });
         });
 
         it('does not invoke the save callback when no name is present', () => {

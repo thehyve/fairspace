@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     Checkbox,
     Link,
@@ -11,54 +11,54 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {FolderOpen, NoteOutlined} from "@mui/icons-material";
+import { FolderOpen, NoteOutlined } from '@mui/icons-material';
 import filesize from 'filesize';
 
 import styles from './FileList.styles';
-import {compareBy, formatDateTime, stableSort} from "../common/utils/genericUtils";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import ColumnFilterInput from "../common/components/ColumnFilterInput";
-import MessageDisplay from "../common/components/MessageDisplay";
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import { compareBy, formatDateTime, stableSort } from '../common/utils/genericUtils';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
+import ColumnFilterInput from '../common/components/ColumnFilterInput';
+import MessageDisplay from '../common/components/MessageDisplay';
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 const FileList = ({
     classes, files, onPathCheckboxClick, onPathDoubleClick,
     selectionEnabled, onAllSelection, onPathHighlight,
-    showDeleted, preselectedFile
+    showDeleted, preselectedFile,
 }) => {
     const [hoveredFileName, setHoveredFileName] = useState('');
 
     const columns = {
         name: {
             valueExtractor: f => f.basename,
-            label: 'Name'
+            label: 'Name',
         },
         size: {
             valueExtractor: f => f.size,
-            label: 'Size'
+            label: 'Size',
         },
         lastmodified: {
             valueExtractor: f => f.lastmod,
-            label: 'Last modified'
+            label: 'Last modified',
         },
         dateDeleted: {
             valueExtractor: f => f.dateDeleted,
-            label: 'Deleted'
-        }
+            label: 'Deleted',
+        },
     };
 
-    const [filterValue, setFilterValue] = useState("");
+    const [filterValue, setFilterValue] = useState('');
     const [filteredFiles, setFilteredFiles] = useState(files);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredFiles, columns, 'name');
+    const { orderedItems, orderAscending, orderBy, toggleSort } = useSorting(filteredFiles, columns, 'name');
     const directoriesBeforeFiles = useMemo(
         () => stableSort(orderedItems, compareBy('type')),
-        [orderedItems]
+        [orderedItems],
     );
 
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
+    const { page, setPage, rowsPerPage, setRowsPerPage, pagedItems } = usePagination(directoriesBeforeFiles);
 
     useEffect(() => {
         if (!filterValue) {
@@ -103,7 +103,7 @@ const FileList = ({
         const numOfSelected = files.filter(f => f.selected).length;
         const allItemsSelected = files.length === numOfSelected;
         checkboxHeader = (
-            <TableCell padding="none" style={{verticalAlign: "bottom"}}>
+            <TableCell padding="none" style={{ verticalAlign: 'bottom' }}>
                 <Checkbox
                     indeterminate={numOfSelected > 0 && numOfSelected < files.length}
                     checked={allItemsSelected}
@@ -187,23 +187,23 @@ const FileList = ({
                                                 data-testid="checkbox-cell"
                                                 padding="none"
                                                 onDoubleClick={(e) => e.stopPropagation()}
-                                                onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(file);}}
+                                                onClick={(e) => { e.stopPropagation(); onPathCheckboxClick(file); }}
                                             >
                                                 <Checkbox
-                                                    style={{visibility: checkboxVisibility}}
+                                                    style={{ visibility: checkboxVisibility }}
                                                     checked={file.selected}
                                                 />
                                             </TableCell>
                                         ) : null
                                     }
 
-                                    <TableCell style={{padding: 5}} align="left">
+                                    <TableCell style={{ padding: 5 }} align="left">
                                         {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
                                     </TableCell>
                                     <TableCell>
                                         {file.type === 'directory' ? (
                                             <Link
-                                                onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
+                                                onClick={(e) => { e.stopPropagation(); onPathDoubleClick(file); }}
                                                 color="inherit"
                                                 variant="body2"
                                                 component="button"
@@ -216,7 +216,7 @@ const FileList = ({
                                         )}
                                     </TableCell>
                                     <TableCell align="right">
-                                        {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}
+                                        {file.type === 'file' ? filesize(file.size, { base: 10 }) : ''}
                                     </TableCell>
                                     <TableCell align="right">
                                         {file.lastmod ? formatDateTime(file.lastmod) : null}
@@ -239,7 +239,7 @@ const FileList = ({
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{ overflowX: 'hidden' }}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>

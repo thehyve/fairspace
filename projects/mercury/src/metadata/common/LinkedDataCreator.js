@@ -1,15 +1,15 @@
-import React, {useState} from "react";
-import PropTypes from "prop-types";
-import {Button} from "@mui/material";
-import useIsMounted from "react-is-mounted-hook";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { Button } from '@mui/material';
+import useIsMounted from 'react-is-mounted-hook';
 
-import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
+import LinkedDataShapeChooserDialog from './LinkedDataShapeChooserDialog';
+import NewLinkedDataEntityDialog from './NewLinkedDataEntityDialog';
 
 const CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
 const CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
 
-const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requireIdentifier, onCreate}) => {
+const LinkedDataCreator = ({ children, shapesLoading, shapesError, shapes, requireIdentifier, onCreate }) => {
     const [shape, setShape] = useState();
     const [creationState, setCreationState] = useState();
     const isMounted = useIsMounted();
@@ -56,7 +56,7 @@ const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requir
                 aria-label="Add"
                 title="Create a new metadata entity"
                 onClick={startCreating}
-                style={{margin: '10px 0'}}
+                style={{ margin: '10px 0' }}
                 disabled={shapesLoading || !!shapesError || !shapes || shapes.length === 0}
             >
                 Create
@@ -68,12 +68,12 @@ const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requir
 LinkedDataCreator.propTypes = {
     shapes: PropTypes.array,
     requireIdentifier: PropTypes.bool,
-    onCreate: PropTypes.func
+    onCreate: PropTypes.func,
 };
 
 LinkedDataCreator.defaultProps = {
     requireIdentifier: true,
-    onCreate: () => {}
+    onCreate: () => {},
 };
 
 export default LinkedDataCreator;

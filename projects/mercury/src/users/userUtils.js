@@ -1,6 +1,6 @@
 // @flow
-import type {User} from "./UsersAPI";
-import type {WorkspaceUserRole} from "../workspaces/WorkspacesAPI";
+import type { User } from './UsersAPI';
+import type { WorkspaceUserRole } from '../workspaces/WorkspacesAPI';
 
 export function getDisplayName(user: User) {
     return (user && user.name) || '';
@@ -19,7 +19,7 @@ export const getWorkspaceUsersWithRoles = (users: User[], workspaceRoles: Worksp
     users.forEach(u => {
         const workspaceUser = workspaceRoles.find(wu => wu.iri === u.iri);
         if (workspaceUser) {
-            members.push({...u, role: workspaceUser.role});
+            members.push({ ...u, role: workspaceUser.role });
         }
     });
     return members;

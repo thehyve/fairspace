@@ -1,10 +1,10 @@
 import axios from 'axios';
-import LinkedDataAPI from "./LinkedDataAPI";
-import {toJsonLd} from "./jsonLdConverter";
-import {handleHttpError} from "../../common/utils/httpUtils";
+import LinkedDataAPI from './LinkedDataAPI';
+import { toJsonLd } from './jsonLdConverter';
+import { handleHttpError } from '../../common/utils/httpUtils';
 
 export class MetadataAPI extends LinkedDataAPI {
-    constructor(remoteURLPrefix = "/api") {
+    constructor(remoteURLPrefix = '/api') {
         super('metadata', remoteURLPrefix);
     }
 
@@ -23,16 +23,16 @@ export class MetadataAPI extends LinkedDataAPI {
      */
     updateEntity(subject, properties, vocabulary, type = null) {
         if (!subject || !properties) {
-            return Promise.reject(Error("No subject or properties given"));
+            return Promise.reject(Error('No subject or properties given'));
         }
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
         if (type) {
-            jsonLd.push({'@id': subject, '@type': type});
+            jsonLd.push({ '@id': subject, '@type': type });
         }
 
         return this.patch(jsonLd)
-            .catch(handleHttpError("Failure when updating entity"));
+            .catch(handleHttpError('Failure when updating entity'));
     }
 
     /**
@@ -42,7 +42,7 @@ export class MetadataAPI extends LinkedDataAPI {
      */
     patch(jsonLd) {
         return axios.patch(this.getStatementsUrl(), JSON.stringify(jsonLd), {
-            headers: {'Content-type': 'application/ld+json'}
+            headers: { 'Content-type': 'application/ld+json' },
         });
     }
 
@@ -52,8 +52,8 @@ export class MetadataAPI extends LinkedDataAPI {
      * @returns {Promise<Response>}
      */
     delete(subject) {
-        return axios.delete(this.getStatementsUrl() + "?subject=" + encodeURIComponent(subject))
-            .catch(handleHttpError("Failure when deleting subject"));
+        return axios.delete(this.getStatementsUrl() + '?subject=' + encodeURIComponent(subject))
+            .catch(handleHttpError('Failure when deleting subject'));
     }
 }
 

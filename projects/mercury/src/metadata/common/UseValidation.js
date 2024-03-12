@@ -1,5 +1,5 @@
-import {useState} from "react";
-import {validateValuesAgainstShape} from "./validationUtils";
+import { useState } from 'react';
+import { validateValuesAgainstShape } from './validationUtils';
 
 export const hasValidationError = errors => errors && Array.isArray(errors) && errors.length > 0;
 
@@ -18,12 +18,12 @@ const useValidation = () => {
             shape: property.shape,
             datatype: property.datatype,
             isGenericIriResource: property.isGenericIriResource,
-            values: newValue
+            values: newValue,
         });
 
         setErrors(currentErrors => ({
             ...currentErrors,
-            [property.key]: propertyErrors
+            [property.key]: propertyErrors,
         }));
 
         return propertyErrors.length > 0;
@@ -33,7 +33,7 @@ const useValidation = () => {
         validateProperty,
 
         validationErrors: errors,
-        isValid: !Object.values(errors).find(hasValidationError)
+        isValid: !Object.values(errors).find(hasValidationError),
     };
 };
 

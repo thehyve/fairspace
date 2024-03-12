@@ -1,9 +1,9 @@
-import React, {useContext} from 'react';
-import * as PropTypes from "prop-types";
-import {Box, Modal, Tooltip} from '@mui/material';
+import React, { useContext } from 'react';
+import * as PropTypes from 'prop-types';
+import { Box, Modal, Tooltip } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import CloseIcon from '@mui/icons-material/Close';
-import LinkedDataEntityPage from "./LinkedDataEntityPage";
+import LinkedDataEntityPage from './LinkedDataEntityPage';
 import UserContext from '../../users/UserContext';
 import styles from './LinkedDataLink.styles';
 /**
@@ -28,12 +28,12 @@ const renderModal = (classes, open, handleClose, uri) => (
     </Modal>
 );
 
-const LinkedDataLink = ({classes, uri, children}) => {
+const LinkedDataLink = ({ classes, uri, children }) => {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
-    const {currentUser} = useContext(UserContext);
+    const { currentUser } = useContext(UserContext);
     if (currentUser && currentUser.canViewPublicMetadata) {
         return (
             <span>
@@ -49,7 +49,7 @@ const LinkedDataLink = ({classes, uri, children}) => {
 
 LinkedDataLink.propTypes = {
     uri: PropTypes.string.isRequired,
-    children: PropTypes.any.isRequired
+    children: PropTypes.any.isRequired,
 };
 
 export default withStyles(styles)(LinkedDataLink);

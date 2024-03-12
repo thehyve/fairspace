@@ -1,20 +1,20 @@
-import React, {useContext} from 'react';
-import PropTypes from "prop-types";
+import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 
-import {FormControl, FormGroup, FormHelperText, FormLabel} from '@mui/material';
-import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
-import LinkedDataRelationTable from "./LinkedDataRelationTable";
-import {LABEL_URI, MAX_LIST_LENGTH, TOOLTIP_ENTER_DELAY} from "../../constants";
-import GenericTooltip from "../../common/components/GenericTooltip";
-import Iri from "../../common/components/Iri";
-import LinkedDataContext from "../LinkedDataContext";
+import { FormControl, FormGroup, FormHelperText, FormLabel } from '@mui/material';
+import LinkedDataInputFieldsTable from './LinkedDataInputFieldsTable';
+import LinkedDataRelationTable from './LinkedDataRelationTable';
+import { LABEL_URI, MAX_LIST_LENGTH, TOOLTIP_ENTER_DELAY } from '../../constants';
+import GenericTooltip from '../../common/components/GenericTooltip';
+import Iri from '../../common/components/Iri';
+import LinkedDataContext from '../LinkedDataContext';
 
 const LinkedDataProperty = (
-    {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete}
+    { formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete },
 ) => {
-    const {editorPath, valueComponentFactory} = useContext(LinkedDataContext);
+    const { editorPath, valueComponentFactory } = useContext(LinkedDataContext);
 
-    const {key, machineOnly, minValuesCount, label, description, path} = property;
+    const { key, machineOnly, minValuesCount, label, description, path } = property;
     const hasErrors = validationErrors && validationErrors.length > 0;
 
     // Do not show an add component if no multiples are allowed
@@ -33,7 +33,7 @@ const LinkedDataProperty = (
         || property.allowedValues
     );
 
-    const getCount = () => "(" + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + "+" : values.length) + ")";
+    const getCount = () => '(' + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + '+' : values.length) + ')';
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
@@ -42,7 +42,7 @@ const LinkedDataProperty = (
     const editInputComponent = disableEditing ? valueComponentFactory.readOnlyComponent() : valueComponentFactory.editComponent(property);
     const addInputComponent = valueComponentFactory.addComponent(property);
 
-    const labelTooltip = <><Iri iri={path} /><div style={{marginTop: 4}}>{description}</div></>;
+    const labelTooltip = <><Iri iri={path} /><div style={{ marginTop: 4 }}>{description}</div></>;
     return (
         <FormControl
             required={formEditable && minValuesCount > 0}
@@ -104,7 +104,7 @@ LinkedDataProperty.propTypes = {
 };
 
 LinkedDataProperty.defaultProps = {
-    onChange: () => {}
+    onChange: () => {},
 };
 
 export default LinkedDataProperty;

@@ -1,22 +1,22 @@
-import {TextField} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {alpha} from "@mui/material/styles";
+import { TextField } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { alpha } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const useStyles = makeStyles((theme) => ({
     search: {
-        'position': 'relative',
-        'flex': 0.8,
-        'borderRadius': theme.shape.borderRadius,
-        'backgroundColor': alpha(theme.palette.common.white, 0.15),
+        position: 'relative',
+        flex: 0.8,
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: alpha(theme.palette.common.white, 0.15),
         '&:hover': {
             backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
-        'marginLeft': 0,
-        'width': '100%',
+        marginLeft: 0,
+        width: '100%',
         [theme.breakpoints.up('sm')]: {
             width: 'auto',
         },
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         fontSize: '0.9rem',
         minWidth: 180,
-        maxWidth: 350
+        maxWidth: 350,
     },
     inputInput: {
         paddingTop: theme.spacing(1),
@@ -34,20 +34,20 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(1),
         paddingLeft: theme.spacing(1),
         transition: theme.transitions.create('width'),
-        width: '100%'
+        width: '100%',
     },
     adornedEnd: {
-        paddingRight: theme.spacing(1)
+        paddingRight: theme.spacing(1),
     },
     adornedEndNoPadding: {
-        paddingRight: 0
+        paddingRight: 0,
     },
     adornedEndIcon: {
-        padding: 0
-    }
+        padding: 0,
+    },
 }));
 
-const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useApplyButton = false}) => {
+const ColumnFilterInput = ({ setFilterValue, filterValue = '', placeholder, useApplyButton = false }) => {
     const classes = useStyles();
     const [value, setValue] = useState(filterValue);
 
@@ -90,7 +90,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useAp
                 InputProps={{
                     classes: {
                         input: classes.inputInput,
-                        adornedEnd: useApplyButton ? classes.adornedEnd : classes.adornedEndNoPadding
+                        adornedEnd: useApplyButton ? classes.adornedEnd : classes.adornedEndNoPadding,
                     },
                     endAdornment: (
                         <InputAdornment position="end">
@@ -106,7 +106,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useAp
                                 </IconButton>
                             )}
                         </InputAdornment>
-                    )
+                    ),
                 }}
             />
         </div>

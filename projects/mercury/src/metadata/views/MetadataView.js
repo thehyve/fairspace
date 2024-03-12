@@ -1,32 +1,32 @@
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
-import {useHistory} from "react-router-dom";
-import {Button, Grid, Typography} from '@mui/material';
+import { useHistory } from 'react-router-dom';
+import { Button, Grid, Typography } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {Assignment, Close} from "@mui/icons-material";
-import queryString from "query-string";
+import { Assignment, Close } from '@mui/icons-material';
+import queryString from 'query-string';
 
-import styles from "./MetadataView.styles";
-import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import styles from './MetadataView.styles';
+import type { MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType } from './MetadataViewAPI';
 import BreadCrumbs from '../../common/components/BreadCrumbs';
-import MetadataViewContext from "./MetadataViewContext";
-import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
-import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
-import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, ofNumericValueType, RESOURCES_VIEW} from "./metadataViewUtils";
-import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
-import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
-import {useSingleSelection} from "../../file/UseSelection";
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import MetadataViewFacets from "./MetadataViewFacets";
-import MetadataViewTabs from "./MetadataViewTabs";
+import MetadataViewContext from './MetadataViewContext';
+import BreadcrumbsContext from '../../common/contexts/BreadcrumbsContext';
+import { getLocationContextFromString, getMetadataViewNameFromString } from '../../search/searchUtils';
+import type { MetadataViewEntity } from './metadataViewUtils';
+import { getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, ofNumericValueType, RESOURCES_VIEW } from './metadataViewUtils';
+import MetadataViewActiveFacetFilters from './MetadataViewActiveFacetFilters';
+import MetadataViewInformationDrawer from './MetadataViewInformationDrawer';
+import { useSingleSelection } from '../../file/UseSelection';
+import LoadingInlay from '../../common/components/LoadingInlay';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import MetadataViewFacets from './MetadataViewFacets';
+import MetadataViewTabs from './MetadataViewTabs';
 
-import CollectionsContext from "../../collections/CollectionsContext";
-import {getParentPath, getPathFromIri} from "../../file/fileUtils";
-import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
-import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
-import {accessLevelForCollection} from "../../collections/collectionUtils";
+import CollectionsContext from '../../collections/CollectionsContext';
+import { getParentPath, getPathFromIri } from '../../file/fileUtils';
+import usePageTitleUpdater from '../../common/hooks/UsePageTitleUpdater';
+import MetadataViewFacetsContext from './MetadataViewFacetsContext';
+import { accessLevelForCollection } from '../../collections/collectionUtils';
 
 type ContextualMetadataViewProperties = {
     classes: any;
@@ -43,14 +43,14 @@ type MetadataViewProperties = ContextualMetadataViewProperties & {
 }
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix} = props;
+    const { views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix } = props;
 
-    usePageTitleUpdater("Metadata");
+    usePageTitleUpdater('Metadata');
 
-    const {collections} = useContext(CollectionsContext);
-    const {toggle, selected} = useSingleSelection();
+    const { collections } = useContext(CollectionsContext);
+    const { toggle, selected } = useSingleSelection();
 
-    const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
+    const { updateFilters, clearFilter, clearAllFilters } = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
     const [isClosedPanel, setIsClosedPanel] = useState(true);
@@ -110,7 +110,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             setFilterCandidates(updatedFilters);
         } else if (newValues) {
             const newFilter: MetadataViewFilter = {
-                field: facet.name
+                field: facet.name,
             };
             setFilterValues(facet.type, newFilter, newValues);
             setFilterCandidates([...filterCandidates, newFilter]);
@@ -134,16 +134,16 @@ export const MetadataView = (props: MetadataViewProperties) => {
         () => (
             !locationContext && collections && {
                 name: 'location',
-                title: "Collection",
+                title: 'Collection',
                 type: 'Term',
-                values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
+                values: collections.map(c => ({ value: c.iri, label: c.name, access: accessLevelForCollection(c) })),
             }),
-        [locationContext, collections]
+        [locationContext, collections],
     );
 
     const facetsEx = useMemo(
         () => (collectionsFacet ? [...facets, collectionsFacet] : facets),
-        [collectionsFacet, facets]
+        [collectionsFacet, facets],
     );
 
     const getPathSegments = () => {
@@ -156,7 +156,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         const prefix = getMetadataViewsPath(RESOURCES_VIEW) + '&context=';
         let path = locationContext;
         segments.reverse().forEach(segment => {
-            result.push({label: segment, href: (prefix + encodeURIComponent(path))});
+            result.push({ label: segment, href: (prefix + encodeURIComponent(path)) });
             path = getParentPath(path);
         });
         return result.reverse();
@@ -164,28 +164,28 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const areFacetFiltersNonEmpty = useMemo(
         () => (filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field))),
-        [filters, facetsEx]
+        [filters, facetsEx],
     );
     const areTextFiltersNonEmpty = useMemo(
         () => (textFiltersObject && Object.keys(textFiltersObject).length > 0),
-        [textFiltersObject]
+        [textFiltersObject],
     );
 
     const getPrefilteringRedirectionLink = () => {
         if (!selected) {
-            return "";
+            return '';
         }
         const metadataURL = window.location.host + getMetadataViewsPath(currentView.name, pathPrefix);
         const prefilteringQueryString = queryString.stringify({
             view: currentView.name,
-            [currentViewIdColumn.name.toLowerCase()]: selected.label
+            [currentViewIdColumn.name.toLowerCase()]: selected.label,
         });
-        return metadataURL + "?" + prefilteringQueryString;
+        return metadataURL + '?' + prefilteringQueryString;
     };
 
     return (
         <BreadcrumbsContext.Provider value={{
-            segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name, pathPrefix), icon: <Assignment />}]
+            segments: [{ label: 'Metadata', href: getMetadataViewsPath(currentView.name, pathPrefix), icon: <Assignment /> }],
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />
@@ -255,14 +255,14 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], filters, loading, error} = useContext(MetadataViewContext);
-    const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
+    const { views = [], filters, loading, error } = useContext(MetadataViewContext);
+    const { facets = [], facetsLoading, facetsError, initialLoad } = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {initialLoad();}, []);
+    useEffect(() => { initialLoad(); }, []);
 
     if ((error && error.message)) {
         return <MessageDisplay message={error.message} />;

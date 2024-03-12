@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import Grid from "@mui/material/Grid";
-import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
-import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
-import {DatePicker} from '@mui/x-date-pickers/DatePicker';
-import {format} from 'date-fns';
+import React, { useState } from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import Grid from '@mui/material/Grid';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { format } from 'date-fns';
 import TextField from '@mui/material/TextField';
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
-import {DATE_FORMAT} from "../../../constants";
+import type { MetadataViewFacetProperties } from '../MetadataViewFacetFactory';
+import { DATE_FORMAT } from '../../../constants';
 
 const getRangeLimit = (val: any, end: boolean = false): Date => {
     if (!val) {
@@ -20,7 +20,7 @@ const getRangeLimit = (val: any, end: boolean = false): Date => {
 };
 
 const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
-    const {options = [], onChange = () => {}, classes, activeFilterValues} = props;
+    const { options = [], onChange = () => {}, classes, activeFilterValues } = props;
     const [value, setValue] = useState([null, null]);
     const [minDateOption, maxDateOption] = options;
     const minDate = getRangeLimit(minDateOption);
@@ -107,10 +107,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                     'aria-label': 'change date',
                 }}
                 InputLabelProps={{
-                    shrink: true
+                    shrink: true,
                 }}
                 InputProps={{
-                    className: classes.input
+                    className: classes.input,
                 }}
                 renderInput={(params) => <TextField {...params} />}
             />
@@ -120,10 +120,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <Grid container>
             <Grid item>
-                {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1], minDate)}
+                {renderDatePicker(value[0], handleMinDateChange, 'Start date', minDate, value[1], minDate)}
             </Grid>
             <Grid item>
-                {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate, maxDate)}
+                {renderDatePicker(value[1], handleMaxDateChange, 'End date', value[0], maxDate, maxDate)}
             </Grid>
         </Grid>
 

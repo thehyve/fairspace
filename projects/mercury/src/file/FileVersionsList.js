@@ -1,33 +1,33 @@
-import React, {useState} from 'react';
-import {Column, InfiniteLoader, Table} from 'react-virtualized';
+import React, { useState } from 'react';
+import { Column, InfiniteLoader, Table } from 'react-virtualized';
 import 'react-virtualized/styles.css';
-import {IconButton} from "@mui/material";
+import { IconButton } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {SettingsBackupRestore} from "@mui/icons-material";
-import TableCell from "@mui/material/TableCell";
-import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
-import filesize from "filesize";
-import Download from "mdi-material-ui/Download";
-import useAsync from "../common/hooks/UseAsync";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import {formatDateTime} from '../common/utils/genericUtils';
-import {LocalFileAPI} from "./FileAPI";
+import { SettingsBackupRestore } from '@mui/icons-material';
+import TableCell from '@mui/material/TableCell';
+import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
+import filesize from 'filesize';
+import Download from 'mdi-material-ui/Download';
+import useAsync from '../common/hooks/UseAsync';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import { formatDateTime } from '../common/utils/genericUtils';
+import { LocalFileAPI } from './FileAPI';
 
 const styles = (theme) => ({
     fileVersionDialog: {
-        'height': 300,
-        'width': 500,
+        height: 300,
+        width: 500,
         '& .ReactVirtualized__Table__headerRow': {
             flip: false,
             paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined,
         },
         '& .ReactVirtualized__Table__row': {
-            outline: 0
+            outline: 0,
         },
         '& .ReactVirtualized__Table__Grid': {
-            outline: 0
+            outline: 0,
         },
     },
     flexContainer: {
@@ -48,36 +48,36 @@ const styles = (theme) => ({
     },
     tableActionCell: {
         margin: 0,
-        padding: 0
+        padding: 0,
     },
     tableHeaderRow: {
-        'text-transform': 'none'
-    }
+        'text-transform': 'none',
+    },
 });
 
 const columns = [
     {
         width: 70,
         label: 'Version',
-        dataKey: 'version'
+        dataKey: 'version',
     },
     {
         width: 300,
         label: 'Modified',
         dataKey: 'lastmod',
-        renderValue: (value) => (value ? formatDateTime(value) : '')
+        renderValue: (value) => (value ? formatDateTime(value) : ''),
     },
     {
         width: 100,
         label: 'Size',
         dataKey: 'size',
-        renderValue: (value) => (value ? filesize(value, {base: 10}) : '')
-    }
+        renderValue: (value) => (value ? filesize(value, { base: 10 }) : ''),
+    },
 ];
 
-const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, classes}) => {
-    const {data: selectedFileDetails, error, loading} = useAsync(
-        () => LocalFileAPI.stat(selectedFile.filename, false)
+const FileVersionsList = ({ selectedFile, onRevertVersion, isWritingEnabled, classes }) => {
+    const { data: selectedFileDetails, error, loading } = useAsync(
+        () => LocalFileAPI.stat(selectedFile.filename, false),
     );
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
@@ -171,7 +171,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
         </TableCell>
     );
 
-    const renderHeader = ({label}) => (
+    const renderHeader = ({ label }) => (
         <TableCell
             component="div"
             className={`${classes.tableCell} ${classes.tableHeaderRow}`}
@@ -182,13 +182,13 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
         </TableCell>
     );
 
-    const getRowClassName = ({index}) => ([classes.tableRow, classes.flexContainer, {
-        [classes.tableRowHover]: index !== -1
+    const getRowClassName = ({ index }) => ([classes.tableRow, classes.flexContainer, {
+        [classes.tableRowHover]: index !== -1,
     }]);
 
-    const isRowLoaded = ({index}) => !!loadedData[index];
+    const isRowLoaded = ({ index }) => !!loadedData[index];
 
-    const loadMoreRows = ({startIndex, stopIndex}) => {
+    const loadMoreRows = ({ startIndex, stopIndex }) => {
         const fromVersion = startIndex === 1 ? startIndex : startIndex + 1;
         const toVersion = stopIndex + 1;
         LocalFileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion)
@@ -202,14 +202,14 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
     return (
         <div className={classes.fileVersionDialog}>
             <AutoSizer>
-                {({height, width}) => (
+                {({ height, width }) => (
                     <InfiniteLoader
                         isRowLoaded={isRowLoaded}
                         loadMoreRows={loadMoreRows}
                         rowCount={selectedFileVersion}
                         minimumBatchSize={1}
                     >
-                        {({onRowsRendered, registerChild}) => (
+                        {({ onRowsRendered, registerChild }) => (
                             <Table
                                 ref={registerChild}
                                 rowHeight={50}
@@ -217,10 +217,10 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                 width={width}
                                 height={height}
                                 headerHeight={35}
-                                rowGetter={({index}) => loadedData[index]}
+                                rowGetter={({ index }) => loadedData[index]}
                                 onRowsRendered={onRowsRendered}
                                 rowClassName={getRowClassName}
-                                onRowDoubleClick={({index}) => handleOpenVersion(loadedData[index].version)}
+                                onRowDoubleClick={({ index }) => handleOpenVersion(loadedData[index].version)}
                             >
                                 {columns.map((col) => (
                                     <Column
@@ -229,7 +229,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                         dataKey={col.dataKey}
                                         headerRenderer={renderHeader}
                                         className={classes.flexContainer}
-                                        cellRenderer={({cellData}) => renderCell(cellData, col)}
+                                        cellRenderer={({ cellData }) => renderCell(cellData, col)}
                                         width={col.width}
                                         align="left"
                                     />
@@ -239,7 +239,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                     dataKey="download"
                                     headerRenderer={renderHeader}
                                     className={classes.flexContainer}
-                                    cellRenderer={({rowIndex}) => renderDownloadActionCell(rowIndex)}
+                                    cellRenderer={({ rowIndex }) => renderDownloadActionCell(rowIndex)}
                                     width={80}
                                 />
                                 {isWritingEnabled && (
@@ -248,7 +248,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                         dataKey="revert"
                                         headerRenderer={renderHeader}
                                         className={classes.flexContainer}
-                                        cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
+                                        cellRenderer={({ rowIndex }) => renderRevertActionCell(rowIndex)}
                                         width={80}
                                     />
                                 )}

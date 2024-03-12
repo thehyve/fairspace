@@ -1,10 +1,10 @@
-import React, {useContext, useState} from "react";
-import useIsMounted from "react-is-mounted-hook";
-import {getNamespacedIri, partitionErrors} from "./metadataUtils";
-import ValidationErrorsDisplay from "./ValidationErrorsDisplay";
-import ErrorDialog from "../../common/components/ErrorDialog";
-import VocabularyContext from "../vocabulary/VocabularyContext";
-import {getNamespaces} from "./vocabularyUtils";
+import React, { useContext, useState } from 'react';
+import useIsMounted from 'react-is-mounted-hook';
+import { getNamespacedIri, partitionErrors } from './metadataUtils';
+import ValidationErrorsDisplay from './ValidationErrorsDisplay';
+import ErrorDialog from '../../common/components/ErrorDialog';
+import VocabularyContext from '../vocabulary/VocabularyContext';
+import { getNamespaces } from './vocabularyUtils';
 
 export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog = ErrorDialog) => {
     const [isUpdating, setUpdating] = useState(false);
@@ -16,7 +16,7 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
     const withNamespacedProperties = (error) => ({
         ...error,
         subject: toNamespaced(error.subject),
-        predicate: toNamespaced(error.predicate)
+        predicate: toNamespaced(error.predicate),
     });
 
     const onFormSubmissionError = (entityType: string) => (error) => {
@@ -25,13 +25,13 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
                 if (entityType === 'Workspace') {
                     errorDialog.showError(
                         `${entityType} code must be unique`,
-                        `${entityType} code is already in use. Please choose a unique code.`
+                        `${entityType} code is already in use. Please choose a unique code.`,
                     );
                     return;
                 }
                 errorDialog.showError(
                     `${entityType} label must be unique`,
-                    `${entityType} label is already in use. Please choose a unique label.`
+                    `${entityType} label is already in use. Please choose a unique label.`,
                 );
                 return;
             }
@@ -53,11 +53,11 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
             .then(() => isMounted() && setUpdating(false));
     };
 
-    return {isUpdating, submitForm};
+    return { isUpdating, submitForm };
 };
 
 const useStatefulFormSubmission = (submitFunc, subject) => {
-    const {vocabulary} = useContext(VocabularyContext);
+    const { vocabulary } = useContext(VocabularyContext);
     return useFormSubmission(submitFunc, subject, getNamespaces(vocabulary));
 };
 

@@ -1,13 +1,13 @@
 // @flow
-import React, {useContext, useState} from 'react';
-import {useHistory} from 'react-router-dom';
-import {IconButton, Menu, MenuItem} from '@mui/material';
-import {MoreVert} from '@mui/icons-material';
-import type {Workspace} from './WorkspacesAPI';
+import React, { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { IconButton, Menu, MenuItem } from '@mui/material';
+import { MoreVert } from '@mui/icons-material';
+import type { Workspace } from './WorkspacesAPI';
 import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import ErrorDialog from '../common/components/ErrorDialog';
 import WorkspaceContext from './WorkspaceContext';
-import {currentWorkspace} from './workspaces';
+import { currentWorkspace } from './workspaces';
 
 type WorkspaceActionMenuProps = {
     workspace: Workspace;
@@ -15,9 +15,9 @@ type WorkspaceActionMenuProps = {
 }
 
 const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
-    const {workspace, small} = props;
+    const { workspace, small } = props;
     const history = useHistory();
-    const {deleteWorkspace} = useContext(WorkspaceContext);
+    const { deleteWorkspace } = useContext(WorkspaceContext);
 
     const isWorkspaceEmpty = workspace.summary.totalCollectionCount === 0;
 
@@ -51,9 +51,9 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
                 }
             })
             .catch(err => ErrorDialog.showError(
-                "An error occurred while deleting a workspace",
+                'An error occurred while deleting a workspace',
                 err,
-                () => handleDeleteWorkspace(workspace)
+                () => handleDeleteWorkspace(workspace),
             ));
     };
 
@@ -103,7 +103,7 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
 };
 
 WorkspaceActionMenu.defaultProps = {
-    small: false
+    small: false,
 };
 
 export default WorkspaceActionMenu;

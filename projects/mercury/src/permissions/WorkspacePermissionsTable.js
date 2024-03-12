@@ -1,38 +1,38 @@
 // @flow
 import React from 'react';
-import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
+import { IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {Close, Widgets} from "@mui/icons-material";
-import PropTypes from "prop-types";
+import { Close, Widgets } from '@mui/icons-material';
+import PropTypes from 'prop-types';
 
 const styles = {
     table: {
-        padding: 0
+        padding: 0,
     },
     tableBody: {
         display: 'block',
         maxHeight: 150,
         overflow: 'auto',
-        width: '100%'
+        width: '100%',
     },
     tableRow: {
         display: 'block',
         height: 49,
-        width: '100%'
+        width: '100%',
     },
     iconCell: {
         padding: '0 0 0 8px',
-        textAlign: 'right'
+        textAlign: 'right',
     },
     emptyPermissions: {
         margin: 15,
         width: 350,
-        fontStyle: 'italic'
-    }
+        fontStyle: 'italic',
+    },
 };
 
-export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermissionsText, handleDeleteSelectedPermission,
-    canManage, classes}) => {
+export const WorkspacePermissionsTable = ({ selectedPermissions = [], emptyPermissionsText, handleDeleteSelectedPermission,
+    canManage, classes }) => {
     if (selectedPermissions.length === 0) {
         return (
             <Typography variant="body2" className={classes.emptyPermissions}>
@@ -52,7 +52,7 @@ export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermis
                             </TableCell>
                             <TableCell width="100%" data-testid="permission">
                                 <Tooltip title={p.name} placement="left-start" arrow>
-                                    <Typography variant="body2" noWrap style={{width: '100%'}}>
+                                    <Typography variant="body2" noWrap style={{ width: '100%' }}>
                                         {p.name}
                                     </Typography>
                                 </Tooltip>
@@ -77,7 +77,7 @@ WorkspacePermissionsTable.propTypes = {
     selectedPermissions: PropTypes.array,
     emptyPermissionsText: PropTypes.string,
     handleDeleteSelectedPermission: PropTypes.func.isRequired,
-    canManage: PropTypes.bool
+    canManage: PropTypes.bool,
 };
 
 export default withStyles(styles)(WorkspacePermissionsTable);

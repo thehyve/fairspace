@@ -1,5 +1,5 @@
 // Use of proxy middleware for local development, assumption is it only listens to port 3000 (confirm reference?)
-const {createProxyMiddleware} = require('http-proxy-middleware');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const Keycloak = require('keycloak-connect');
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -14,25 +14,25 @@ module.exports = (app) => {
         saveUninitialized: true,
         // Uncomment to limit the session lifetime to 1 minute
         // cookie: {maxAge: 60 * 1000 },
-        store
+        store,
     }));
 
     const keycloak = new Keycloak(
         {
-            store
+            store,
         },
         {
             authServerUrl: 'http://localhost:5100/',
             realm: 'fairspace',
             clientId: 'workspace-client',
-            secret: '**********'
-        }
+            secret: '**********',
+        },
     );
 
     // Return 401 Unauthorized for API requests
     keycloak.redirectToLogin = (request) => !(request.baseUrl.startsWith('/api/'));
 
-    app.use(keycloak.middleware({logout: '/logout'}));
+    app.use(keycloak.middleware({ logout: '/logout' }));
 
     // The next statement enables debugging and setting breakpoints in Intellij and VSCode. Not fully understand it but don't remove :)
     app.use('/dev', keycloak.protect());
@@ -41,10 +41,10 @@ module.exports = (app) => {
 
     app.use(createProxyMiddleware('/api', {
         target: 'http://localhost:8080/',
-        onProxyReq: addToken
+        onProxyReq: addToken,
     }));
 
     app.use(createProxyMiddleware('/actuator/health', {
-        target: 'http://localhost:8080/'
+        target: 'http://localhost:8080/',
     }));
 };

@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
-import useIsMounted from "react-is-mounted-hook";
-import FileVersionsDialog from "../FileVersionsDialog";
+import React, { useState } from 'react';
+import useIsMounted from 'react-is-mounted-hook';
+import FileVersionsDialog from '../FileVersionsDialog';
 
-const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert, isWritingEnabled}) => {
+const ShowFileVersionsButton = ({ children, disabled, selectedFile, onRevert, isWritingEnabled }) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
@@ -23,7 +23,7 @@ const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert, isW
 
     return (
         <>
-            <span style={{display: 'inherit'}} onClick={e => !disabled && openDialog(e)}>
+            <span style={{ display: 'inherit' }} onClick={e => !disabled && openDialog(e)}>
                 {children}
             </span>
             {opened ? (

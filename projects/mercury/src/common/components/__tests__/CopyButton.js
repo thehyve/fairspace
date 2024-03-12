@@ -1,10 +1,10 @@
 import React from 'react';
-import {act} from 'react-dom/test-utils';
-import {fireEvent, render, screen} from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 // eslint-disable-next-line jest/no-mocks-import
 import '../__mocks__/clipboard.mock';
-import CopyButton from "../CopyButton";
+import CopyButton from '../CopyButton';
 
 describe('<CopyButton />', () => {
     beforeEach(() => {
@@ -29,7 +29,7 @@ describe('<CopyButton />', () => {
     });
 
     it('changes restores the original icon icon after some timeout', () => {
-        const {getByTestId} = render(<CopyButton timeout={50} />);
+        const { getByTestId } = render(<CopyButton timeout={50} />);
 
         fireEvent.click(getByTestId('tooltip'));
 

@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
-import useIsMounted from "react-is-mounted-hook";
-import FileNameDialog from "./FileNameDialog";
-import {useFormField} from "../../common/hooks/UseFormField";
-import {isValidFileName} from "../fileUtils";
+import React, { useState } from 'react';
+import useIsMounted from 'react-is-mounted-hook';
+import FileNameDialog from './FileNameDialog';
+import { useFormField } from '../../common/hooks/UseFormField';
+import { isValidFileName } from '../fileUtils';
 
-const CreateDirectoryButton = ({children, disabled, onCreate}) => {
+const CreateDirectoryButton = ({ children, disabled, onCreate }) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
@@ -31,7 +31,7 @@ const CreateDirectoryButton = ({children, disabled, onCreate}) => {
 
     return (
         <>
-            <span style={{display: 'inherit'}} onClick={e => !disabled && openDialog(e)}>
+            <span style={{ display: 'inherit' }} onClick={e => !disabled && openDialog(e)}>
                 {children}
             </span>
             {opened ? (

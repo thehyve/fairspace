@@ -1,55 +1,55 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
-import {withRouter} from "react-router-dom";
-import {useDropzone} from "react-dropzone";
-import {Typography} from "@mui/material";
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { withRouter } from 'react-router-dom';
+import { useDropzone } from 'react-dropzone';
+import { Typography } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import FileList from "./FileList";
-import FileOperations from "./FileOperations";
-import {useFiles} from "./UseFiles";
-import LoadingInlay from "../common/components/LoadingInlay";
-import MessageDisplay from "../common/components/MessageDisplay";
-import {encodePath, splitPathIntoArray} from "./fileUtils";
-import UploadProgressComponent from "./UploadProgressComponent";
-import UploadsContext, {showCannotOverwriteDeletedError} from "./UploadsContext";
-import {generateUuid} from "../metadata/common/metadataUtils";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import type {Collection} from "../collections/CollectionAPI";
+import FileList from './FileList';
+import FileOperations from './FileOperations';
+import { useFiles } from './UseFiles';
+import LoadingInlay from '../common/components/LoadingInlay';
+import MessageDisplay from '../common/components/MessageDisplay';
+import { encodePath, splitPathIntoArray } from './fileUtils';
+import UploadProgressComponent from './UploadProgressComponent';
+import UploadsContext, { showCannotOverwriteDeletedError } from './UploadsContext';
+import { generateUuid } from '../metadata/common/metadataUtils';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import type { Collection } from '../collections/CollectionAPI';
 
 const styles = (theme) => ({
     container: {
-        height: "100%"
+        height: '100%',
     },
     uploadProgress: {
-        marginTop: 20
+        marginTop: 20,
     },
     dropzone: {
         flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        transitionBorder: ".24s",
-        easeInOut: true
+        display: 'flex',
+        flexDirection: 'column',
+        outline: 'none',
+        transitionBorder: '.24s',
+        easeInOut: true,
     },
     activeStyle: {
         borderColor: theme.palette.info.main,
         borderWidth: 2,
         borderRadius: 2,
-        borderStyle: "dashed",
-        opacity: 0.4
+        borderStyle: 'dashed',
+        opacity: 0.4,
     },
     acceptStyle: {
-        borderColor: theme.palette.success.main
+        borderColor: theme.palette.success.main,
     },
     rejectStyle: {
-        borderColor: theme.palette.error.main
-    }
+        borderColor: theme.palette.error.main,
+    },
 });
 
 const getConflictingFolders: string[] = (newFiles, existingFolderNames) => {
     const droppedFolderNames = new Set(
         newFiles
             .filter(f => splitPathIntoArray(f.path).length > 1)
-            .map(f => splitPathIntoArray(f.path)[0])
+            .map(f => splitPathIntoArray(f.path)[0]),
     );
     return Array.from(droppedFolderNames).filter(f => existingFolderNames.includes(f));
 };
@@ -80,7 +80,7 @@ type FileBrowserProperties = ContextualFileBrowserProperties & {
 export const FileBrowser = (props: FileBrowserProperties) => {
     const {
         openedCollection = {},
-        openedPath = "",
+        openedPath = '',
         isOpenedPathDeleted = false,
         files = [],
         showDeleted = false,
@@ -89,19 +89,19 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         selection = {},
         preselectedFile = {},
         classes = {},
-        history
+        history,
     } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
 
-    const existingFileNames = files ? files.filter(file => file.type === "file").map(file => file.basename) : [];
-    const existingFolderNames = files ? files.filter(file => file.type === "directory").map(file => file.basename) : [];
+    const existingFileNames = files ? files.filter(file => file.type === 'file').map(file => file.basename) : [];
+    const existingFolderNames = files ? files.filter(file => file.type === 'directory').map(file => file.basename) : [];
 
     const isOverwriteCandidateDeleted = (filenames: string[]) => {
         const fileCandidates = files ? files.filter(file => filenames.some(name => name === file.basename)) : [];
         return fileCandidates.length > 0 && fileCandidates.some(f => f.dateDeleted);
     };
 
-    const {startUpload, maxFileSize} = useContext(UploadsContext);
+    const { startUpload, maxFileSize } = useContext(UploadsContext);
     const [showOverwriteConfirmation, setShowOverwriteConfirmation] = useState(false);
     const [showCannotOverwriteWarning, setShowCannotOverwriteWarning] = useState(false);
     const [overwriteFileCandidateNames, setOverwriteFileCandidateNames] = useState([]);
@@ -134,7 +134,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
             } else {
                 startUpload(newUpload).then(refreshFiles);
             }
-        }
+        },
     });
 
     const fileDropzoneProperties = useFairspaceDropzone();
@@ -261,7 +261,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     );
 
     const renderFileOperations = () => (
-        <div style={{marginTop: 8}}>
+        <div style={{ marginTop: 8 }}>
             <FileOperations
                 selectedPaths={selection.selected}
                 files={files}
@@ -286,11 +286,11 @@ export const FileBrowser = (props: FileBrowserProperties) => {
             >
                 {/* Since dropzone doesn't support a native folder picker we need to create an input element for both folders and files
                 https://github.com/react-dropzone/react-dropzone/discussions/1157 */}
-                <input {...fileDropzoneProperties.getInputProps({webkitdirectory: undefined})} />
-                <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ""})} />
+                <input {...fileDropzoneProperties.getInputProps({ webkitdirectory: undefined })} />
+                <input {...folderDropzoneProperties.getInputProps({ webkitdirectory: '' })} />
                 <FileList
                     selectionEnabled={openedCollection.canRead}
-                    files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                    files={files.map(item => ({ ...item, selected: selection.isSelected(item.filename) }))}
                     onPathCheckboxClick={path => selection.toggle(path.filename)}
                     onPathHighlight={handlePathHighlight}
                     onPathDoubleClick={handlePathDoubleClick}
@@ -309,8 +309,8 @@ export const FileBrowser = (props: FileBrowserProperties) => {
 };
 
 const ContextualFileBrowser = (props: ContextualFileBrowserProperties) => {
-    const {openedPath, showDeleted, loading, error} = props;
-    const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
+    const { openedPath, showDeleted, loading, error } = props;
+    const { files, loading: filesLoading, error: filesError, refresh, fileActions } = useFiles(openedPath, showDeleted);
 
     if (error || filesError) {
         return (<MessageDisplay message="An error occurred while loading files" />);
