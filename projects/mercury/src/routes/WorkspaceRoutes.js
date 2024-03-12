@@ -16,7 +16,7 @@ import UserContext from "../users/UserContext";
 import UserRolesPage from "../users/UserRolesPage";
 import MetadataView from '../metadata/views/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
-import {ExternalStoragePage} from "../external-storage/ExternalStoragePage";
+import ExternalStoragePage from "../external-storage/ExternalStoragePage";
 import ExternalMetadataSourcesView from "../metadata/external-sources/ExternalMetadataSourceView";
 import {METADATA_VIEW_MENU_LABEL} from "../constants";
 

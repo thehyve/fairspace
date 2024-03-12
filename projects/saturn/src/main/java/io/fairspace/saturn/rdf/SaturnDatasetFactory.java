@@ -30,7 +30,7 @@ public class SaturnDatasetFactory {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams)
+        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams, null)
                 .getDatasetGraph();
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());

@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.views;
 
 import java.util.*;
-import javax.validation.constraints.*;
 
 import com.fasterxml.jackson.annotation.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Data

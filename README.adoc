@@ -2460,7 +2460,7 @@ Requires:
 
 * yarn
 * docker
-* Java 17
+* Java 21
 
 On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
 Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
