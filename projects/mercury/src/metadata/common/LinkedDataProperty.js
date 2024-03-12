@@ -56,7 +56,7 @@ const LinkedDataProperty = (
             {
                 canEdit || key !== LABEL_URI
                     ? (
-                        <GenericTooltip interactive leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
+                        <GenericTooltip interactive="true" leaveDelay={100} title={labelTooltip} enterDelay={TOOLTIP_ENTER_DELAY}>
                             <FormLabel component="legend">
                                 {label} {values.length > 1 && getCount()}
                             </FormLabel>

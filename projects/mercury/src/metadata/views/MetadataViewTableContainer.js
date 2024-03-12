@@ -377,7 +377,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     </Tooltip>
                     {exportToAnalysisEnabled && (
                         <ProgressButton active={exportToAnalysisLoading}>
-                            <Tooltip title="Export to Jupiter Analysis" className={classes.exportButton}>
+                            <Tooltip title="Export to Jupiter Analysis" className={classes.exportButton} component="span">
                                 <span>
                                     <IconButton
                                         aria-label="Export to Jupiter Analysis"

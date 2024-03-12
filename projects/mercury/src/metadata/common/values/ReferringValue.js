@@ -13,9 +13,9 @@ export const ReferringValue = ({property, entry}) => {
             return value;
         }
         return (
-            <div style={{whiteSpace: 'pre-line'}}>
+            <span style={{whiteSpace: 'pre-line'}}>
                 {value}
-            </div>
+            </span>
         );
     }
     function extractDisplayValue(value) {
@@ -23,7 +23,7 @@ export const ReferringValue = ({property, entry}) => {
             case DATETIME_URI:
                 return formatDateTime(value.value);
             case BOOLEAN_URI:
-                return <Switch checked={value.value} readOnly />;
+                return <Switch checked={!!value.value} readOnly />;
             case MARKDOWN_URI:
                 return <ReactMarkdown>{value.value}</ReactMarkdown>;
             default:

@@ -52,12 +52,14 @@ const DashboardPage = (props) => {
                             <DomainInfo
                                 domainName={METADATA_VIEW_MENU_LABEL}
                                 domainLink="/metadata-views"
+                                key="metadata-views"
                             />
                         )}
                         {canViewMetadata && externalMetadataSources.map((source) => (
                             <DomainInfo
                                 domainName={source.label}
                                 domainLink={'/metadata-sources/' + source.name}
+                                key={source.name}
                             />
                         ))}
                     </Grid>

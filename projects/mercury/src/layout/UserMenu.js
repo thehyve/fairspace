@@ -101,7 +101,7 @@ const UserMenu = ({classes}) => {
                                 <MenuList className={classes.menu}>
                                     <MenuItem
                                         className={classes.userMenu}
-                                        disablefocusonhover
+                                        disablefocusonhover="true"
                                     >
                                         <Card sx={{minWidth: 275}}>
                                             <CardContent>
