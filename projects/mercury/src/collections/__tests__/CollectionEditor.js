@@ -1,6 +1,6 @@
-import React from "react";
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import React from 'react';
+import {configure, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {CollectionEditor, isInputValid} from '../CollectionEditor';
 import type {CollectionProperties} from '../CollectionAPI';
 
@@ -21,7 +21,7 @@ beforeEach(() => {
 const collection: CollectionProperties = {
     name: 'Collection',
     description: 'description',
-    ownerWorkspace: "http://owner"
+    ownerWorkspace: 'http://owner'
 };
 
 const longName = 'aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrrssssstttttuuuuuuvvvvvvwwwwwwxxxxxyyyyyzzzzz';

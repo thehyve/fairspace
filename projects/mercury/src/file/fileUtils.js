@@ -1,9 +1,9 @@
 /* eslint-disable import/no-cycle */
-import {File} from "./FileAPI";
-import {FILE_URI, PATH_SEPARATOR} from "../constants";
-import {getCollectionAbsolutePath} from "../collections/collectionUtils";
-import {getExternalStorageAbsolutePath} from "../external-storage/externalStorageUtils";
-import type {ExternalStorage} from "../external-storage/externalStorageUtils";
+import {File} from './FileAPI';
+import {FILE_URI, PATH_SEPARATOR} from '../constants';
+import {getCollectionAbsolutePath} from '../collections/collectionUtils';
+import {getExternalStorageAbsolutePath} from '../external-storage/externalStorageUtils';
+import type {ExternalStorage} from '../external-storage/externalStorageUtils';
 
 const NON_SAFE_FILE_NAME_CHARACTERS = ['/', '\\'];
 const NON_SAFE_FILE_NAMES = ['.', '..'];
@@ -42,9 +42,9 @@ export const getParentPath = (path: string) => {
     return (pos > 1) ? path.substring(0, pos) : '';
 };
 
-export const getPathFromIri = (iri: string, pathPrefix = "") => {
+export const getPathFromIri = (iri: string, pathPrefix = '') => {
     const url = new URL(iri);
-    const path = iri.replace(pathPrefix || url.origin + "/api/webdav/", '');
+    const path = iri.replace(pathPrefix || url.origin + '/api/webdav/', '');
     const strippedPath = getStrippedPath(path);
     return decodeURIComponent(strippedPath);
 };
@@ -80,7 +80,7 @@ const decodeIfPossible = segment => {
     }
 };
 
-export const getAbsolutePath = (path: string, storageName: string = "") => {
+export const getAbsolutePath = (path: string, storageName: string = '') => {
     if (storageName) {
         return getExternalStorageAbsolutePath(path, storageName);
     }
@@ -160,4 +160,4 @@ export const isValidFileName = (fileName) => {
         && !isUnsafeFileName(name);
 };
 
-export const isListOnlyFile = (file: File) => file && file.type === 'file' && file.access === "List";
+export const isListOnlyFile = (file: File) => file && file.type === 'file' && file.access === 'List';

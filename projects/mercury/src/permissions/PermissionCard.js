@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {ExpandMore} from "@mui/icons-material";
+import {ExpandMore} from '@mui/icons-material';
 import {
     Avatar,
     Box,
@@ -18,23 +18,23 @@ import {
     MenuItem,
     TextField,
     Typography,
-} from "@mui/material";
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import classnames from "classnames";
+import classnames from 'classnames';
 
-import PermissionViewer from "./PermissionViewer";
-import {camelCaseToWords} from "../common/utils/genericUtils";
-import CollectionsContext from "../collections/CollectionsContext";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import ErrorDialog from "../common/components/ErrorDialog";
+import PermissionViewer from './PermissionViewer';
+import {camelCaseToWords} from '../common/utils/genericUtils';
+import CollectionsContext from '../collections/CollectionsContext';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import ErrorDialog from '../common/components/ErrorDialog';
 import type {AccessLevel, AccessMode} from '../collections/CollectionAPI';
-import {accessLevels, accessModes, Collection} from "../collections/CollectionAPI";
+import {accessLevels, accessModes, Collection} from '../collections/CollectionAPI';
 import {
     accessLevelForCollection,
     collectionAccessIcon,
     descriptionForAccessMode,
     getPrincipalsWithCollectionAccess
-} from "../collections/collectionUtils";
+} from '../collections/collectionUtils';
 import type {User} from '../users/UsersAPI';
 import type {Workspace} from '../workspaces/WorkspacesAPI';
 
@@ -98,7 +98,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
     const [selectedAccessMode, setSelectedAccessMode] = useState(collection.accessMode);
 
     const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace)
-        ? collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace).access : "None";
+        ? collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace).access : 'None';
     const [changingOwnerWorkspaceAccess, setChangingOwnerWorkspaceAccess] = useState(false);
     const [selectedOwnerWorkspaceAccess, setSelectedOwnerWorkspaceAccess] = useState(ownerWorkspaceAccess);
     const {setAccessMode, setPermission} = useContext(CollectionsContext);
@@ -107,7 +107,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
     const collaboratingUsers = getPrincipalsWithCollectionAccess(users, collection.userPermissions);
     const collaboratingWorkspaces = getPrincipalsWithCollectionAccess(workspaces, collection.workspacePermissions);
 
-    const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== "List");
+    const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== 'List');
 
     const handleSetAccessMode = (event) => {
         if (collection.canManage) {
@@ -125,7 +125,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         setAccessMode(collection.name, selectedAccessMode)
             .then(handleCancelSetAccessMode)
             .catch(() => ErrorDialog.showError(
-                "An error occurred while setting an access mode",
+                'An error occurred while setting an access mode',
                 () => handleConfirmSetAccessMode()
             ))
             .finally(setBusy(false));
@@ -147,7 +147,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         setPermission(collection.name, collection.ownerWorkspace, selectedOwnerWorkspaceAccess)
             .then(handleCancelSetOwnerWorkspaceAccess)
             .catch(() => ErrorDialog.showError(
-                "An error occurred while setting an access level",
+                'An error occurred while setting an access level',
                 () => handleConfirmSetOwnerWorkspaceAccess()
             ))
             .finally(setBusy(false));
@@ -225,7 +225,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         <ListItemText
             primary={camelCaseToWords(collection.accessMode)}
             secondary={descriptionForAccessMode(collection.accessMode)}
-            style={{whiteSpace: "normal"}}
+            style={{whiteSpace: 'normal'}}
         />
     );
     const showMultipleAccessModes = () => (
@@ -242,7 +242,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                         <ListItemText
                             primary={camelCaseToWords(mode)}
                             secondary={descriptionForAccessMode(mode)}
-                            style={{whiteSpace: "normal"}}
+                            style={{whiteSpace: 'normal'}}
                         />
                     </MenuItem>
                 ))}
@@ -251,7 +251,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     .map(unavailableMode => (
                         <MenuItem key={unavailableMode} value={unavailableMode} disabled>
                             <ListItemText
-                                style={{whiteSpace: "normal"}}
+                                style={{whiteSpace: 'normal'}}
                                 primary={camelCaseToWords(unavailableMode)}
                                 secondary={descriptionForAccessMode(unavailableMode)}
                             />
@@ -354,7 +354,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>
-                    <div style={{overflowX: "auto"}}>
+                    <div style={{overflowX: 'auto'}}>
                         <List>
                             <ListItem disableGutters>
                                 {renderAccessMode()}

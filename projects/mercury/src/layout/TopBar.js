@@ -1,10 +1,10 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
-import {AppBar, Toolbar} from "@mui/material";
+import {withRouter} from 'react-router-dom';
+import {AppBar, Toolbar} from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
 
-import UserMenu from "./UserMenu";
+import UserMenu from './UserMenu';
 
 const styles = theme => ({
     root: {

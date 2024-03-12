@@ -16,23 +16,23 @@ import withStyles from '@mui/styles/withStyles';
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
-import useAsync from "../common/hooks/UseAsync";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
+import useAsync from '../common/hooks/UseAsync';
 import {
     getLocationContextFromString, getSearchPathSegments,
     getSearchQueryFromString,
     getStorageFromString,
     handleSearchError, handleTextSearchRedirect
-} from "./searchUtils";
-import SearchBar from "./SearchBar";
-import LoadingInlay from "../common/components/LoadingInlay";
-import MessageDisplay from "../common/components/MessageDisplay";
+} from './searchUtils';
+import SearchBar from './SearchBar';
+import LoadingInlay from '../common/components/LoadingInlay';
+import MessageDisplay from '../common/components/MessageDisplay';
 import BreadCrumbs from '../common/components/BreadCrumbs';
-import SearchAPI, {LocalSearchAPI} from "./SearchAPI";
-import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
-import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
-import ExternalStorageBreadcrumbsContextProvider from "../external-storage/ExternalStorageBreadcrumbsContextProvider";
-import {getPathFromIri, redirectLink} from "../file/fileUtils";
+import SearchAPI, {LocalSearchAPI} from './SearchAPI';
+import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
+import CollectionBreadcrumbsContextProvider from '../collections/CollectionBreadcrumbsContextProvider';
+import ExternalStorageBreadcrumbsContextProvider from '../external-storage/ExternalStorageBreadcrumbsContextProvider';
+import {getPathFromIri, redirectLink} from '../file/fileUtils';
 import ShortText from './ShortText';
 
 const styles = {
@@ -62,15 +62,15 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
         switch (item.type) {
             case COLLECTION_URI:
                 avatar = <Folder />;
-                typeLabel = "Collection";
+                typeLabel = 'Collection';
                 break;
             case DIRECTORY_URI:
                 avatar = <FolderOpenOutlined />;
-                typeLabel = "Directory";
+                typeLabel = 'Directory';
                 break;
             case FILE_URI:
                 avatar = <InsertDriveFileOutlined />;
-                typeLabel = "File";
+                typeLabel = 'File';
                 break;
             default:
                 avatar = null;

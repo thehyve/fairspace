@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState} from 'react';
 
 /**
  * This hook contains logic about selections.

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import StringValue from "./common/values/StringValue";
+import StringValue from './common/values/StringValue';
 
 const LinkedDataContext = React.createContext({
     valueComponentFactory: {

@@ -1,5 +1,5 @@
-import React from "react";
-import {Create, MenuBook, Settings, Toc} from "@mui/icons-material";
+import React from 'react';
+import {Create, MenuBook, Settings, Toc} from '@mui/icons-material';
 // eslint-disable-next-line import/no-cycle
 import type {
     AccessLevel,
@@ -9,13 +9,13 @@ import type {
     Permission,
     PrincipalPermission,
     Status
-} from "./CollectionAPI";
+} from './CollectionAPI';
 // eslint-disable-next-line import/no-cycle
-import {accessLevels} from "./CollectionAPI";
-import {compareBy, comparing} from "../common/utils/genericUtils";
+import {accessLevels} from './CollectionAPI';
+import {compareBy, comparing} from '../common/utils/genericUtils';
 // eslint-disable-next-line import/no-cycle
-import {encodePath} from "../file/fileUtils";
-import {isAdmin} from "../users/userUtils";
+import {encodePath} from '../file/fileUtils';
+import {isAdmin} from '../users/userUtils';
 
 export const isCollectionPage = () => {
     const {pathname} = new URL(window.location);
@@ -99,14 +99,14 @@ export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principal
 
 export const descriptionForAccessMode = (accessMode: AccessMode) => {
     switch (accessMode) {
-        case "Restricted":
-            return "Data and metadata not public available, users need explicitly granted access.";
-        case "MetadataPublished":
-            return "All users can see collection metadata.";
-        case "DataPublished":
-            return "For read-only collections, all users can see collection data and metadata.";
+        case 'Restricted':
+            return 'Data and metadata not public available, users need explicitly granted access.';
+        case 'MetadataPublished':
+            return 'All users can see collection metadata.';
+        case 'DataPublished':
+            return 'For read-only collections, all users can see collection data and metadata.';
         default:
-            return "";
+            return '';
     }
 };
 
@@ -143,13 +143,13 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
 
 export const descriptionForStatus = (status: Status) => {
     switch (status) {
-        case "Active":
-            return "Editing data and metadata enabled.";
-        case "ReadOnly":
-            return "Data immutable, available only for reading.";
-        case "Archived":
-            return "Data not available for reading.";
+        case 'Active':
+            return 'Editing data and metadata enabled.';
+        case 'ReadOnly':
+            return 'Data immutable, available only for reading.';
+        case 'Archived':
+            return 'Data not available for reading.';
         default:
-            return "";
+            return '';
     }
 };

@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from "@mui/material";
-import FileVersionsList from "./FileVersionsList";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle} from '@mui/material';
+import FileVersionsList from './FileVersionsList';
 
 const FileVersionsDialog = ({onClose, selectedFile, isWritingEnabled, onRevertVersion = () => {}}) => (
     <Dialog onClose={onClose} aria-labelledby="file-version-dialog" open>

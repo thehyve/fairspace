@@ -1,9 +1,9 @@
 import React, {useRef} from 'react';
 import {PropTypes} from 'prop-types';
 
-import {valuesContainsValueOrId} from "./metadataUtils";
+import {valuesContainsValueOrId} from './metadataUtils';
 import Dropdown from './values/Dropdown';
-import {LocalSearchAPI} from "../../search/SearchAPI";
+import {LocalSearchAPI} from '../../search/SearchAPI';
 
 export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);

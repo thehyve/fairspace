@@ -10,32 +10,32 @@ import {
     Typography,
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {useHistory} from "react-router-dom";
-import {Addchart, ViewColumn, Check} from "@mui/icons-material";
-import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
-import Popover from "@mui/material/Popover";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import GetAppIcon from "@mui/icons-material/GetApp";
-import FormGroup from "@mui/material/FormGroup";
-import useDeepCompareEffect from "use-deep-compare-effect";
+import {useHistory} from 'react-router-dom';
+import {Addchart, ViewColumn, Check} from '@mui/icons-material';
+import Checkbox from '@mui/material/Checkbox';
+import FormControl from '@mui/material/FormControl';
+import Popover from '@mui/material/Popover';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import FormGroup from '@mui/material/FormGroup';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
-import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import useViewData from "./UseViewData";
-import MetadataViewTable from "./MetadataViewTable";
-import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
-import {Collection} from "../../collections/CollectionAPI";
+import type {MetadataViewColumn, MetadataViewFilter} from './MetadataViewAPI';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import type {MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
+import useViewData from './UseViewData';
+import MetadataViewTable from './MetadataViewTable';
+import useStateWithLocalStorage from '../../common/hooks/UseLocalStorage';
+import {Collection} from '../../collections/CollectionAPI';
 import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
-import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
-import TablePaginationActions from "../../common/components/TablePaginationActions";
-import FeaturesContext from "../../common/contexts/FeaturesContext";
-import ProgressButton from "../../common/components/ProgressButton";
-import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
-import ErrorDialog from "../../common/components/ErrorDialog";
+import {isNonEmptyValue} from '../../common/utils/genericUtils';
+import MetadataViewActiveTextFilters from './MetadataViewActiveTextFilters';
+import TablePaginationActions from '../../common/components/TablePaginationActions';
+import FeaturesContext from '../../common/contexts/FeaturesContext';
+import ProgressButton from '../../common/components/ProgressButton';
+import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from '../../file/FileAPI';
+import ErrorDialog from '../../common/components/ErrorDialog';
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -68,12 +68,12 @@ const styles = () => ({
         padding: 2
     },
     tableContents: {
-        "minHeight": '200px',
-        "maxHeight": 'calc(100vh - 310px)',
-        "overflowY": 'auto',
-        "overflowX": 'auto',
+        minHeight: '200px',
+        maxHeight: 'calc(100vh - 310px)',
+        overflowY: 'auto',
+        overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {
-            backgroundColor: "white"
+            backgroundColor: 'white'
         }
     },
     tableFooter: {
@@ -162,11 +162,11 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     };
 
     const getCsvHeader = () => {
-        let header = "id";
+        let header = 'id';
 
         if (data && data.rows) {
-            header += ";";
-            header += visibleColumnNames.join(";");
+            header += ';';
+            header += visibleColumnNames.join(';');
         }
 
         return header;
@@ -175,22 +175,22 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
     const getCsvValuesForAttribute = (row, attribute) => {
         if (row[attribute] === undefined) {
-            return "-";
+            return '-';
         }
         return Object.values(row[attribute])
-            .map(value => ((value && value.label) ?? "-").replaceAll(";", ".,"))
-            .join(",");
+            .map(value => ((value && value.label) ?? '-').replaceAll(';', '.,'))
+            .join(',');
     };
 
     const getCsvValues = () => {
-        let values = "";
+        let values = '';
         if (Object.keys(rowCheckboxes).length > 0) {
             data.rows.forEach(row => {
                 const rowKey = row[idColumn.name][0].value;
                 if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
                     values += '\n' + rowKey;
                     visibleColumnNames.forEach(attribute => {
-                        values += ";" + getCsvValuesForAttribute(row, attribute);
+                        values += ';' + getCsvValuesForAttribute(row, attribute);
                     });
                 }
             });
@@ -206,14 +206,14 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const exportTable = () => {
         const blob = createCsvBlob();
-        const fileName = "fairspace_export.csv";
-        const link = document.createElement("a");
+        const fileName = 'fairspace_export.csv';
+        const link = document.createElement('a');
         if (link.download !== undefined) { // feature detection
             // Browsers that support HTML5 download attribute
             const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            link.style = "visibility:hidden";
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style = 'visibility:hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -294,8 +294,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const labelDisplayedRows = ({from, to, count: totalCount, countIsLoading}) => (
         <span>
             <Typography variant="body2" component="span" display="inline">{from}-{to} of </Typography>
-            <Typography variant="body2" component="span" display="inline" style={{fontWeight: "bold"}}>
-                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
+            <Typography variant="body2" component="span" display="inline" style={{fontWeight: 'bold'}}>
+                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : ('more than ' + to)}
                 {countIsLoading && <CircularProgress size={14} style={{marginLeft: 3}} />}
             </Typography>
         </span>

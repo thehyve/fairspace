@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 import PropTypes from 'prop-types';
-import {TextField} from "@mui/material";
-import MenuItem from "@mui/material/MenuItem";
+import {TextField} from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
 
 /**
  * This component is an input field that is aware of it's touched (blur) state and will only error if it's touched

@@ -1,5 +1,5 @@
-import {isValid} from "date-fns";
-import {enGB} from "date-fns/locale";
+import {isValid} from 'date-fns';
+import {enGB} from 'date-fns/locale';
 
 //* *********************************
 //* ARRAYS
@@ -58,11 +58,11 @@ export const groupBy = (array, key) => array.reduce((objectsMap, obj) => {
  * @param {*} y
  */
 export function comparePrimitives(x, y) {
-    if (typeof x === "undefined" || typeof y === "undefined") {
-        if (typeof x === "undefined" && typeof y === "undefined") {
+    if (typeof x === 'undefined' || typeof y === 'undefined') {
+        if (typeof x === 'undefined' && typeof y === 'undefined') {
             return 0;
         }
-        if (typeof x === "undefined") {
+        if (typeof x === 'undefined') {
             return -1;
         }
         return 1;
@@ -166,7 +166,7 @@ export const formatDateTime = (value) => {
  * @param separator whitespace by default
  * @returns {string} separated string
  */
-export const camelCaseToWords = (value, separator = " ") => ((typeof value !== 'string')
+export const camelCaseToWords = (value, separator = ' ') => ((typeof value !== 'string')
     ? '' : value.replace(/([a-z0-9])([A-Z])/g, `$1${separator}$2`)
         .replace(/.*/, (v) => v.charAt(0) + v.slice(1).toLowerCase())
 );

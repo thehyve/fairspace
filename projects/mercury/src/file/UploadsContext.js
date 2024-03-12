@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {LocalFileAPI} from "./FileAPI";
-import ErrorDialog from "../common/components/ErrorDialog";
+import {LocalFileAPI} from './FileAPI';
+import ErrorDialog from '../common/components/ErrorDialog';
 import {isValidFileName} from './fileUtils';
 import {PATH_SEPARATOR} from '../constants';
-import {ConfigResponse, getServerConfig} from "../status/StatusAPI";
+import {ConfigResponse, getServerConfig} from '../status/StatusAPI';
 
 export const UPLOAD_STATUS_INITIAL = 'INITIAL';
 export const UPLOAD_STATUS_IN_PROGRESS = 'IN_PROGRESS';
@@ -26,16 +26,16 @@ export type FileUpload = {
 
 export const showCannotOverwriteDeletedError = (filesLength: number) => {
     const errorMessage = filesLength === 1 ? (
-        "File or folder with this name already exists and was marked as deleted.\n"
-        + "Please delete the existing one permanently, undelete it first\n"
-        + "to be able to overwrite it or choose a unique name."
+        'File or folder with this name already exists and was marked as deleted.\n'
+        + 'Please delete the existing one permanently, undelete it first\n'
+        + 'to be able to overwrite it or choose a unique name.'
     ) : (
-        "Some of the uploaded files or folders already exist and were marked as deleted.\n"
-        + "Please delete the existing ones permanently, undelete them first \n"
-        + "to be able to overwrite them or choose unique names."
+        'Some of the uploaded files or folders already exist and were marked as deleted.\n'
+        + 'Please delete the existing ones permanently, undelete them first \n'
+        + 'to be able to overwrite them or choose unique names.'
     );
     ErrorDialog.showError(
-        "Cannot overwrite deleted file or folder",
+        'Cannot overwrite deleted file or folder',
         errorMessage
     );
 };
@@ -143,10 +143,10 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
                 setTimeout(() => removeUpload(newUpload), 5000);
             })
             .catch((err) => {
-                if (err && err.message && err.message.includes("Conflict")) {
+                if (err && err.message && err.message.includes('Conflict')) {
                     showCannotOverwriteDeletedError(newUpload.files.length);
                 }
-                if (err && err.message && err.message.includes("Payload too large")) {
+                if (err && err.message && err.message.includes('Payload too large')) {
                     showFileTooLarge(maxFileSize);
                 }
                 setStateForUpload(newUpload, UPLOAD_STATUS_ERROR);

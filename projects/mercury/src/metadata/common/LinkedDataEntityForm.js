@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {List, ListItem} from '@mui/material';
 
-import LinkedDataProperty from "./LinkedDataProperty";
-import {hasValue, shouldPropertyBeHidden} from "./metadataUtils";
+import LinkedDataProperty from './LinkedDataProperty';
+import {hasValue, shouldPropertyBeHidden} from './metadataUtils';
 import {
     COMMENT_URI,
     CONTENT_TYPE_URI,
@@ -13,9 +13,9 @@ import {
     LABEL_URI,
     MODIFIED_BY_URI
 } from '../../constants';
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import {compareBy, comparing} from "../../common/utils/genericUtils";
+import LoadingInlay from '../../common/components/LoadingInlay';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import {compareBy, comparing} from '../../common/utils/genericUtils';
 
 type PropertyType = {
     key: string;

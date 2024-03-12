@@ -4,29 +4,29 @@ import {cleanup, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {ThemeProvider} from '@mui/material/styles';
 import {FileBrowser} from '../FileBrowser';
-import {UploadsProvider} from "../UploadsContext";
+import {UploadsProvider} from '../UploadsContext';
 import theme from '../../App.theme';
 
 afterEach(cleanup);
 
 const openedCollection = {
-    iri: "http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0",
-    dateCreated: "2019-09-12T10:34:53.585Z",
-    createdBy: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-    dateModified: "2019-09-12T10:34:53.585Z",
-    modifiedBy: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
+    iri: 'http://localhost/iri/86a2f097-adf9-4733-a7b4-53da7a01d9f0',
+    dateCreated: '2019-09-12T10:34:53.585Z',
+    createdBy: 'http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3',
+    dateModified: '2019-09-12T10:34:53.585Z',
+    modifiedBy: 'http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3',
     dateDeleted: null,
     deletedBy: null,
-    name: "asd",
-    description: "",
-    access: "Manage",
+    name: 'asd',
+    description: '',
+    access: 'Manage',
     canRead: true,
     canWrite: true,
     canManage: true,
     creatorObj: {
-        iri: "http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3",
-        name: "John Snow",
-        email: "user@example.com"
+        iri: 'http://localhost/iri/6e6cde34-45bc-42d8-8cdb-b6e9faf890d3',
+        name: 'John Snow',
+        email: 'user@example.com'
     }
 };
 

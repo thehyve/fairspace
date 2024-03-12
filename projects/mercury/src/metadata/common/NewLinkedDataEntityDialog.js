@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
 import {
     Button,
@@ -8,19 +8,19 @@ import {
     DialogContent,
     DialogTitle,
     Typography
-} from "@mui/material";
+} from '@mui/material';
 
-import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUtils";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import * as consts from "../../constants";
-import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
+import {generateUuid, getLabel, isValidLinkedDataIdentifier} from './metadataUtils';
+import {getFirstPredicateId, getFirstPredicateValue} from './jsonLdUtils';
+import * as consts from '../../constants';
+import LinkedDataIdentifierField from './LinkedDataIdentifierField';
 import useFormData from './UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
-import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "./UseFormSubmission";
-import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import {getPropertiesForNodeShape} from "./vocabularyUtils";
-import ConfirmationDialog from "../../common/components/ConfirmationDialog";
+import LinkedDataContext from '../LinkedDataContext';
+import useFormSubmission from './UseFormSubmission';
+import useNavigationBlocker from '../../common/hooks/UseNavigationBlocker';
+import {getPropertiesForNodeShape} from './vocabularyUtils';
+import ConfirmationDialog from '../../common/components/ConfirmationDialog';
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');

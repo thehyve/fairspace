@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from 'react-markdown';
 
-import BaseInputValue from "./BaseInputValue";
+import BaseInputValue from './BaseInputValue';
 
 const MarkdownValue = (props) => {
     // Show the editor if the user chose to edit

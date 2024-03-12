@@ -11,11 +11,11 @@ import {
     ListItemText,
     Radio,
     RadioGroup,
-} from "@mui/material";
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {camelCaseToWords} from "../common/utils/genericUtils";
-import ConfirmationButton from "../common/components/ConfirmationButton";
-import {descriptionForStatus} from "./collectionUtils";
+import {camelCaseToWords} from '../common/utils/genericUtils';
+import ConfirmationButton from '../common/components/ConfirmationButton';
+import {descriptionForStatus} from './collectionUtils';
 import {statuses} from './CollectionAPI';
 import type {Status} from './CollectionAPI';
 
@@ -106,7 +106,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                                         control={<Radio />}
                                         label={(
                                             <ListItemText
-                                                primary={camelCaseToWords(status, "-")}
+                                                primary={camelCaseToWords(status, '-')}
                                                 secondary={descriptionForStatus(status)}
                                             />
                                         )}

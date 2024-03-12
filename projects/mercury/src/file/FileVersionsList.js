@@ -1,24 +1,24 @@
 import React, {useState} from 'react';
 import {Column, InfiniteLoader, Table} from 'react-virtualized';
 import 'react-virtualized/styles.css';
-import {IconButton} from "@mui/material";
+import {IconButton} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {SettingsBackupRestore} from "@mui/icons-material";
-import TableCell from "@mui/material/TableCell";
-import AutoSizer from "react-virtualized/dist/commonjs/AutoSizer";
-import filesize from "filesize";
-import Download from "mdi-material-ui/Download";
-import useAsync from "../common/hooks/UseAsync";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
+import {SettingsBackupRestore} from '@mui/icons-material';
+import TableCell from '@mui/material/TableCell';
+import AutoSizer from 'react-virtualized/dist/commonjs/AutoSizer';
+import filesize from 'filesize';
+import Download from 'mdi-material-ui/Download';
+import useAsync from '../common/hooks/UseAsync';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import {formatDateTime} from '../common/utils/genericUtils';
-import {LocalFileAPI} from "./FileAPI";
+import {LocalFileAPI} from './FileAPI';
 
 const styles = (theme) => ({
     fileVersionDialog: {
-        'height': 300,
-        'width': 500,
+        height: 300,
+        width: 500,
         '& .ReactVirtualized__Table__headerRow': {
             flip: false,
             paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined,

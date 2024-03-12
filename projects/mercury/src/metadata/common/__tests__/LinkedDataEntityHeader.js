@@ -1,11 +1,11 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, mount} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import {ThemeProvider} from '@mui/material/styles';
-import LinkedDataEntityHeader from "../LinkedDataEntityHeader";
-import DeleteEntityButton from "../DeleteEntityButton";
+import LinkedDataEntityHeader from '../LinkedDataEntityHeader';
+import DeleteEntityButton from '../DeleteEntityButton';
 import {
     COLLECTION_URI,
     CREATED_BY_URI,
@@ -13,7 +13,7 @@ import {
     DELETED_BY_URI,
     DIRECTORY_URI,
     FILE_URI,
-} from "../../../constants";
+} from '../../../constants';
 import VocabularyContext from '../../vocabulary/VocabularyContext';
 import theme from '../../../App.theme';
 
@@ -50,20 +50,20 @@ describe('LinkedDataEntityHeader', () => {
                 expect(button.length).toBe(0);
             } else {
                 expect(button.length).toBe(1);
-                expect(button.prop("isDeletable")).toBe(expectedState === 'Enabled');
+                expect(button.prop('isDeletable')).toBe(expectedState === 'Enabled');
             }
         };
 
         it('should show a delete button for regular entities', () => {
             testDeleteButtonDeletableState({
                 '@type': [{id: 'http://random-type'}],
-                [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}]
+                [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}]
             }, 'Enabled');
         });
 
         it('should show a disabled delete button for deleted entities', () => {
             testDeleteButtonDeletableState({
-                [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}],
+                [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
                 [DELETED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
                 [DATE_DELETED_URI]: [{value: '2000-01-01'}]
             }, 'Disabled');
@@ -78,7 +78,7 @@ describe('LinkedDataEntityHeader', () => {
         it('should not show a delete button when editing is disabled', () => {
             testDeleteButtonDeletableState({
                 '@type': [{id: 'http://random-type'}],
-                [CREATED_BY_URI]: [{id: "http://some-person", label: "John"}]
+                [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}]
             }, 'NotPresent', false);
         });
     });

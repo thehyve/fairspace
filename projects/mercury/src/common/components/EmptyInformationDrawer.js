@@ -25,7 +25,7 @@ const EmptyInformationDrawer = (props) => {
 };
 
 EmptyInformationDrawer.defaultProps = {
-    message: "Select an element to display its metadata"
+    message: 'Select an element to display its metadata'
 };
 
 export default EmptyInformationDrawer;

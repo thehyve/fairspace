@@ -23,7 +23,7 @@ const AddValueToList = (props: AddValueToListProps) => {
     const [newValue, setNewValue] = useState('');
     const isStringValue = (AddComponent === StringValue);
     return (
-        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={"" + labelId}>
+        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={'' + labelId}>
             <Grid item xs={isStringValue ? 10 : 12}>
                 <AddComponent
                     data-testid="add-value-input"
@@ -116,7 +116,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
 
     const renderListItem = (entry, index) => rowDecorator(entry, (
         <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
-            <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
+            <div style={{overflow: 'hidden', textOverflow: 'ellipsis'}}>
                 {
                     columnDefinition.id === LABEL_URI
                         ? <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>

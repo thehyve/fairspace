@@ -1,10 +1,10 @@
 const styles = theme => ({
     values: {
-        "cursor": 'default',
-        "marginTop": 3,
-        "fontSize": '0.875rem',
-        "lineHeight": 1.43,
-        "letterSpacing": '0.01071em',
+        cursor: 'default',
+        marginTop: 3,
+        fontSize: '0.875rem',
+        lineHeight: 1.43,
+        letterSpacing: '0.01071em',
         '& input': {
             fontSize: '0.875rem',
             lineHeight: 1.43,

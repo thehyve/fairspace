@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, mount} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {ThemeProvider} from '@mui/material/styles';
 import WorkspaceDialog from '../WorkspaceDialog';
 import theme from '../../App.theme';
@@ -30,7 +30,7 @@ beforeEach(() => {
                 onSubmit={onSubmit}
                 onClose={onClose}
                 creating={false}
-                workspaces={[{code: "w1"}]}
+                workspaces={[{code: 'w1'}]}
             />
         </ThemeProvider>
     );

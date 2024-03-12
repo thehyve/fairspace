@@ -1,9 +1,9 @@
 import React from 'react';
-import {render} from "@testing-library/react";
-import {renderHook} from "@testing-library/react-hooks";
-import {LinkedDataParent} from "../__wrapper__/LinkedDataParent";
+import {render} from '@testing-library/react';
+import {renderHook} from '@testing-library/react-hooks';
+import {LinkedDataParent} from '../__wrapper__/LinkedDataParent';
 import {COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS} from '../../../constants';
-import {useLinkedDataNoContext} from "../UseLinkedData";
+import {useLinkedDataNoContext} from '../UseLinkedData';
 
 describe('useLinkedData', () => {
     const defaultJsonLd = [{
@@ -161,7 +161,7 @@ describe('useLinkedData', () => {
     it.skip('should return type info from linked data', async () => {
         const context = {
             fetchLinkedDataForSubject: () => Promise.resolve(defaultJsonLd),
-            shapes: [{[SHACL_TARGET_CLASS]: [{"@id": "http://type"}]}]
+            shapes: [{[SHACL_TARGET_CLASS]: [{'@id': 'http://type'}]}]
         };
 
         const {result, waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('http://subject', context));

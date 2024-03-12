@@ -2,10 +2,10 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import {withStyles} from '@mui/styles';
-import Drawer from "@mui/material/Drawer/Drawer";
-import IconButton from "@mui/material/IconButton";
-import {Close} from "@mui/icons-material";
-import styles from "./WithRightDrawer.styles";
+import Drawer from '@mui/material/Drawer/Drawer';
+import IconButton from '@mui/material/IconButton';
+import {Close} from '@mui/icons-material';
+import styles from './WithRightDrawer.styles';
 
 function WithRightDrawer({
     classes, mainContents, drawerContents, collapsible, drawerOpened, onCloseDrawer

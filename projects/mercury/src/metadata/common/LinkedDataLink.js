@@ -1,9 +1,9 @@
 import React, {useContext} from 'react';
-import * as PropTypes from "prop-types";
+import * as PropTypes from 'prop-types';
 import {Box, Modal, Tooltip} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import CloseIcon from '@mui/icons-material/Close';
-import LinkedDataEntityPage from "./LinkedDataEntityPage";
+import LinkedDataEntityPage from './LinkedDataEntityPage';
 import UserContext from '../../users/UserContext';
 import styles from './LinkedDataLink.styles';
 /**

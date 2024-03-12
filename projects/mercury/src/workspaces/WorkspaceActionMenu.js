@@ -51,7 +51,7 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
                 }
             })
             .catch(err => ErrorDialog.showError(
-                "An error occurred while deleting a workspace",
+                'An error occurred while deleting a workspace',
                 err,
                 () => handleDeleteWorkspace(workspace)
             ));

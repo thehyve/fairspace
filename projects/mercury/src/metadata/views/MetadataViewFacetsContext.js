@@ -1,6 +1,6 @@
 import React, {useContext, useState} from 'react';
-import {MetadataViewAPI} from "./MetadataViewAPI";
-import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
+import {MetadataViewAPI} from './MetadataViewAPI';
+import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
 
 /**
  * This context provides a lazy-loaded data to the child objects.

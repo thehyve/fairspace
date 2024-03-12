@@ -31,7 +31,7 @@ class DateTimeValue extends React.Component {
                 showTodayButton
                 openTo="year"
                 format={`${DATE_FORMAT} HH:mm`}
-                views={["year", "month", "date", "hours", "minutes"]}
+                views={['year', 'month', 'date', 'hours', 'minutes']}
                 {...otherProps}
                 value={this.state.value}
                 onChange={this.handleChange}

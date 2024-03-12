@@ -1,10 +1,10 @@
 import React from 'react';
-import Typography from "@mui/material/Typography";
+import Typography from '@mui/material/Typography';
 import {ErrorOutline, InfoOutlined} from '@mui/icons-material';
 
 const MessageDisplay = ({
     message, isError = true, withIcon = true,
-    small = false, variant = "body2",
+    small = false, variant = 'body2',
     color = 'inherit', messageColor = 'inherit', noWrap = true
 }) => {
     const style = small

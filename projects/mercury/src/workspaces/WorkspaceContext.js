@@ -1,7 +1,7 @@
 import React from 'react';
 import type {Workspace} from './WorkspacesAPI';
 import WorkspacesAPI from './WorkspacesAPI';
-import useAsync from "../common/hooks/UseAsync";
+import useAsync from '../common/hooks/UseAsync';
 
 const WorkspaceContext = React.createContext({});
 

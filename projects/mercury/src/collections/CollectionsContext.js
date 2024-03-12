@@ -1,10 +1,10 @@
 import React, {useContext, useState} from 'react';
 import type {AccessLevel, AccessMode, Collection, CollectionProperties, Status} from './CollectionAPI';
-import CollectionAPI from "./CollectionAPI";
-import useAsync from "../common/hooks/UseAsync";
-import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
-import UserContext from "../users/UserContext";
-import WorkspaceContext from "../workspaces/WorkspaceContext";
+import CollectionAPI from './CollectionAPI';
+import useAsync from '../common/hooks/UseAsync';
+import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
+import UserContext from '../users/UserContext';
+import WorkspaceContext from '../workspaces/WorkspaceContext';
 
 const CollectionsContext = React.createContext({});
 

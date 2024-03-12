@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
+import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 import {createMetadataIri} from '../metadata/common/metadataUtils';
 
 export type User = {

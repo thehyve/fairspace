@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
-import {MemoryRouter, useHistory} from "react-router-dom";
-import {useLinkedDataNoContext} from "../UseLinkedData";
+import {MemoryRouter, useHistory} from 'react-router-dom';
+import {useLinkedDataNoContext} from '../UseLinkedData';
 
 const WrapperWithPushToHistory = ({children}) => {
     const history = useHistory();

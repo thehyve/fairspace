@@ -9,7 +9,7 @@ import {
     TableHead,
     TableRow,
     Typography
-} from "@mui/material";
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default ({entityErrors, otherErrors}) => {

@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from "axios";
-import {extractJsonData, handleHttpError} from "../../common/utils/httpUtils";
-import useAsync from "../../common/hooks/UseAsync";
+import axios from 'axios';
+import {extractJsonData, handleHttpError} from '../../common/utils/httpUtils';
+import useAsync from '../../common/hooks/UseAsync';
 
 const ExternalMetadataSourceContext = React.createContext({});
 

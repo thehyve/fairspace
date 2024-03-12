@@ -1,7 +1,7 @@
-import CollectionAPI from "../CollectionAPI";
-import {LocalFileAPI} from "../../file/FileAPI";
-import MetadataAPI from "../../metadata/common/MetadataAPI";
-import {RDFS_NS} from "../../constants";
+import CollectionAPI from '../CollectionAPI';
+import {LocalFileAPI} from '../../file/FileAPI';
+import MetadataAPI from '../../metadata/common/MetadataAPI';
+import {RDFS_NS} from '../../constants';
 
 afterEach(() => {
     jest.clearAllMocks();

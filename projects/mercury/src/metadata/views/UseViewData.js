@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import {useCallback, useContext, useEffect, useState} from "react";
-import axios from "axios";
-import type {MetadataViewData, MetadataViewFilter} from "./MetadataViewAPI";
-import {MetadataViewAPI} from "./MetadataViewAPI";
-import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
+import {useCallback, useContext, useEffect, useState} from 'react';
+import axios from 'axios';
+import type {MetadataViewData, MetadataViewFilter} from './MetadataViewAPI';
+import {MetadataViewAPI} from './MetadataViewAPI';
+import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
 
 const LOCATION_FILTER_FIELD = 'location';
 
@@ -39,7 +39,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
     };
 
     const textFilters: MetadataViewFilter[] = Object.entries(textFiltersObject)
-        .filter(([field, value]) => field !== null && value !== "")
+        .filter(([field, value]) => field !== null && value !== '')
         .map(([field, value]) => ({
             field,
             prefix: value
@@ -55,7 +55,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
         setCount({count: -1});
         setLoadingCount(true);
         if (countRequestCancelToken) {
-            countRequestCancelToken.cancel("Fetching count operation canceled due to new request.");
+            countRequestCancelToken.cancel('Fetching count operation canceled due to new request.');
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
@@ -72,7 +72,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
     const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
         if (viewDataRequestCancelToken) {
-            viewDataRequestCancelToken.cancel("Fetching data operation canceled due to new request.");
+            viewDataRequestCancelToken.cancel('Fetching data operation canceled due to new request.');
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
@@ -88,7 +88,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
                 if (d) {
                     if (!d.hasNext) {
                         if (viewDataRequestCancelToken) {
-                            viewDataRequestCancelToken.cancel("Fetching count operation canceled due to new data.");
+                            viewDataRequestCancelToken.cancel('Fetching count operation canceled due to new data.');
                         }
                         setCount({count: d.rows.length, timeout: false});
                         setLoadingCount(false);

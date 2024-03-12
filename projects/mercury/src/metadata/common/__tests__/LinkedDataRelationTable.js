@@ -1,10 +1,10 @@
 import React from 'react';
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
-import {STRING_URI} from "../../../constants";
-import LinkedDataValuesTable from "../LinkedDataValuesList";
-import {LinkedDataRelationTable} from "../LinkedDataRelationTable";
+import {STRING_URI} from '../../../constants';
+import LinkedDataValuesTable from '../LinkedDataValuesList';
+import {LinkedDataRelationTable} from '../LinkedDataRelationTable';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
@@ -30,7 +30,7 @@ describe('LinkedDataRelationTable elements', () => {
 
         expect(table.length).toEqual(1);
 
-        table.prop("onOpen")({id: 'http://id'});
+        table.prop('onOpen')({id: 'http://id'});
 
         expect(historyMock.push).toHaveBeenCalledTimes(1);
         expect(historyMock.push).toHaveBeenCalledWith('/metadata?iri=http%3A%2F%2Fid');

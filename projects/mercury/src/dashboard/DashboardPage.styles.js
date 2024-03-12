@@ -1,4 +1,4 @@
-import * as consts from "../constants";
+import * as consts from '../constants';
 
 const styles = (theme) => ({
     mainPage: {
@@ -16,7 +16,7 @@ const styles = (theme) => ({
         minHeight: '250px'
     },
     customFont: {
-        fontFamily: "sans-serif",
+        fontFamily: 'sans-serif',
     },
 });
 

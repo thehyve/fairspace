@@ -26,8 +26,8 @@ describe('WorkspacesAPI', () => {
         expect(mockAxios.put).toHaveBeenCalledTimes(1);
         expect(mockAxios.put).toHaveBeenCalledWith(
             '/api/workspaces/',
-            "{\"code\":\"workspace1\"}",
-            {headers: {'Accept': 'application/json', 'Content-type': 'application/json'}}
+            '{"code":"workspace1"}',
+            {headers: {Accept: 'application/json', 'Content-type': 'application/json'}}
         );
     });
 

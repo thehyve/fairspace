@@ -1,11 +1,11 @@
 import React from 'react';
 
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, mount} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
-import {act} from "@testing-library/react";
-import UploadsContext, {UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UploadsProvider} from "../UploadsContext";
-import {LocalFileAPI} from "../FileAPI";
+import {act} from '@testing-library/react';
+import UploadsContext, {UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UploadsProvider} from '../UploadsContext';
+import {LocalFileAPI} from '../FileAPI';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
@@ -40,7 +40,7 @@ describe('UploadsProvider', () => {
         context = getContext();
         expect(context.uploads.length).toEqual(0);
 
-        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: "upload1", destinationPath: "/"};
+        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: 'upload1', destinationPath: '/'};
         const uploadPromise = act(() => context.startUpload(upload));
 
         context = getContext();

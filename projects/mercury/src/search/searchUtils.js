@@ -1,11 +1,11 @@
 import queryString from 'query-string';
 import React from 'react';
-import {handleAuthError} from "../common/utils/httpUtils";
+import {handleAuthError} from '../common/utils/httpUtils';
 import Iri from '../common/components/Iri';
-import {getPathFromIri} from "../file/fileUtils";
-import type {ExternalStorage} from "../external-storage/externalStorageUtils";
-import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
-import {isEmptyObject} from "../common/utils/genericUtils";
+import {getPathFromIri} from '../file/fileUtils';
+import type {ExternalStorage} from '../external-storage/externalStorageUtils';
+import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
+import {isEmptyObject} from '../common/utils/genericUtils';
 
 export const handleTextSearchRedirect = (history: History, value: string, context: string = '', storage: ExternalStorage = {}) => {
     if (value) {
@@ -21,7 +21,7 @@ export const handleTextSearchRedirect = (history: History, value: string, contex
     }
 };
 
-export const getSearchPathSegments = (context, storageName = "") => {
+export const getSearchPathSegments = (context, storageName = '') => {
     const segments = ((context && getPathFromIri(context)) || '').split('/');
     const result = [];
     if (segments[0] === '') {
@@ -53,7 +53,7 @@ export const handleSearchError = (e) => {
         case 403:
             handleAuthError(e.status);
             break;
-        default: throw new Error("Error retrieving search results");
+        default: throw new Error('Error retrieving search results');
     }
 };
 

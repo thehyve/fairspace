@@ -1,32 +1,32 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import _ from 'lodash';
-import {useHistory} from "react-router-dom";
+import {useHistory} from 'react-router-dom';
 import {Button, Grid, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {Assignment, Close} from "@mui/icons-material";
-import queryString from "query-string";
+import {Assignment, Close} from '@mui/icons-material';
+import queryString from 'query-string';
 
-import styles from "./MetadataView.styles";
-import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import styles from './MetadataView.styles';
+import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from './MetadataViewAPI';
 import BreadCrumbs from '../../common/components/BreadCrumbs';
-import MetadataViewContext from "./MetadataViewContext";
-import BreadcrumbsContext from "../../common/contexts/BreadcrumbsContext";
-import {getLocationContextFromString, getMetadataViewNameFromString} from "../../search/searchUtils";
-import type {MetadataViewEntity} from "./metadataViewUtils";
-import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, ofNumericValueType, RESOURCES_VIEW} from "./metadataViewUtils";
-import MetadataViewActiveFacetFilters from "./MetadataViewActiveFacetFilters";
-import MetadataViewInformationDrawer from "./MetadataViewInformationDrawer";
-import {useSingleSelection} from "../../file/UseSelection";
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import MetadataViewFacets from "./MetadataViewFacets";
-import MetadataViewTabs from "./MetadataViewTabs";
+import MetadataViewContext from './MetadataViewContext';
+import BreadcrumbsContext from '../../common/contexts/BreadcrumbsContext';
+import {getLocationContextFromString, getMetadataViewNameFromString} from '../../search/searchUtils';
+import type {MetadataViewEntity} from './metadataViewUtils';
+import {getMetadataViewsPath, ofBooleanValueType, ofRangeValueType, ofNumericValueType, RESOURCES_VIEW} from './metadataViewUtils';
+import MetadataViewActiveFacetFilters from './MetadataViewActiveFacetFilters';
+import MetadataViewInformationDrawer from './MetadataViewInformationDrawer';
+import {useSingleSelection} from '../../file/UseSelection';
+import LoadingInlay from '../../common/components/LoadingInlay';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import MetadataViewFacets from './MetadataViewFacets';
+import MetadataViewTabs from './MetadataViewTabs';
 
-import CollectionsContext from "../../collections/CollectionsContext";
-import {getParentPath, getPathFromIri} from "../../file/fileUtils";
-import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
-import MetadataViewFacetsContext from "./MetadataViewFacetsContext";
-import {accessLevelForCollection} from "../../collections/collectionUtils";
+import CollectionsContext from '../../collections/CollectionsContext';
+import {getParentPath, getPathFromIri} from '../../file/fileUtils';
+import usePageTitleUpdater from '../../common/hooks/UsePageTitleUpdater';
+import MetadataViewFacetsContext from './MetadataViewFacetsContext';
+import {accessLevelForCollection} from '../../collections/collectionUtils';
 
 type ContextualMetadataViewProperties = {
     classes: any;
@@ -45,7 +45,7 @@ type MetadataViewProperties = ContextualMetadataViewProperties & {
 export const MetadataView = (props: MetadataViewProperties) => {
     const {views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix} = props;
 
-    usePageTitleUpdater("Metadata");
+    usePageTitleUpdater('Metadata');
 
     const {collections} = useContext(CollectionsContext);
     const {toggle, selected} = useSingleSelection();
@@ -134,7 +134,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         () => (
             !locationContext && collections && {
                 name: 'location',
-                title: "Collection",
+                title: 'Collection',
                 type: 'Term',
                 values: collections.map(c => ({value: c.iri, label: c.name, access: accessLevelForCollection(c)}))
             }),
@@ -173,19 +173,19 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const getPrefilteringRedirectionLink = () => {
         if (!selected) {
-            return "";
+            return '';
         }
         const metadataURL = window.location.host + getMetadataViewsPath(currentView.name, pathPrefix);
         const prefilteringQueryString = queryString.stringify({
             view: currentView.name,
             [currentViewIdColumn.name.toLowerCase()]: selected.label
         });
-        return metadataURL + "?" + prefilteringQueryString;
+        return metadataURL + '?' + prefilteringQueryString;
     };
 
     return (
         <BreadcrumbsContext.Provider value={{
-            segments: [{label: "Metadata", href: getMetadataViewsPath(currentView.name, pathPrefix), icon: <Assignment />}]
+            segments: [{label: 'Metadata', href: getMetadataViewsPath(currentView.name, pathPrefix), icon: <Assignment />}]
         }}
         >
             <BreadCrumbs additionalSegments={getPathSegments(locationContext)} />

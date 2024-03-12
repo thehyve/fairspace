@@ -1,8 +1,8 @@
 const styles = () => ({
     root: {
-        "width": '100%',
-        'maxHeight': 'inherit',
-        "overflowX": 'auto',
+        width: '100%',
+        maxHeight: 'inherit',
+        overflowX: 'auto',
         '-webkit-touch-callout': 'none', /* iOS Safari */
         '-webkit-user-select': 'none', /* Safari */
         '-khtml-user-select': 'none', /* Konqueror HTML */
@@ -12,10 +12,10 @@ const styles = () => ({
     },
     headerCell: {
         paddingBottom: 8,
-        verticalAlign: "top"
+        verticalAlign: 'top'
     },
     deletedCollectionRow: {
-        opacity: "0.4"
+        opacity: '0.4'
     }
 });
 

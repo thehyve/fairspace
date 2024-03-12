@@ -1,16 +1,16 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import Button from "@mui/material/Button";
-import {useHistory, withRouter} from "react-router-dom";
+import Button from '@mui/material/Button';
+import {useHistory, withRouter} from 'react-router-dom';
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
 import type {Workspace} from './WorkspacesAPI';
-import {isAdmin} from "../users/userUtils";
-import UserContext from "../users/UserContext";
-import ErrorDialog from "../common/components/ErrorDialog";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import WorkspaceDialog from "./WorkspaceDialog";
+import {isAdmin} from '../users/userUtils';
+import UserContext from '../users/UserContext';
+import ErrorDialog from '../common/components/ErrorDialog';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import WorkspaceDialog from './WorkspaceDialog';
 
 const WorkspaceBrowser = () => {
     const history = useHistory();
@@ -38,7 +38,7 @@ const WorkspaceBrowser = () => {
             })
             .catch(err => {
                 setLoadingCreatedWorkspace(false);
-                ErrorDialog.showError("An error occurred while creating a workspace", err);
+                ErrorDialog.showError('An error occurred while creating a workspace', err);
             });
     };
 

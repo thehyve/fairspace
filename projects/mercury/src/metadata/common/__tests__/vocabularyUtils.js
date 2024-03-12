@@ -13,8 +13,8 @@ import {
     isRelationShape, typeShapeWithProperties,
 } from '../vocabularyUtils';
 import vocabularyJsonLd from './test.vocabulary.json';
-import * as constants from "../../../constants";
-import {getFirstPredicateId} from "../jsonLdUtils";
+import * as constants from '../../../constants';
+import {getFirstPredicateId} from '../jsonLdUtils';
 import {SHACL_NAME, SHACL_PATH, SHACL_PROPERTY} from '../../../constants';
 
 describe('getLabelForType', () => {
@@ -162,7 +162,7 @@ describe('Class hierarchy (subclasses and descendants)', () => {
             const classHierarchy = getDescendants(vocabularyJsonLd, type);
 
             expect(classHierarchy).toEqual(expect.arrayContaining([...subClasses, ...subSubClasess]));
-            expect(classHierarchy).not.toEqual(expect.arrayContaining(["https://fairspace.nl/ontology#File"]));
+            expect(classHierarchy).not.toEqual(expect.arrayContaining(['https://fairspace.nl/ontology#File']));
         });
     });
 });
@@ -173,19 +173,19 @@ describe('getNamespaces', () => {
 
         expect(namespaces.length).toEqual(2);
         expect(namespaces[0]).toEqual({
-            id: "_:Namespace1",
-            label: "Namespace1",
-            prefix: "ns1",
-            namespace: "http://namespace1#",
+            id: '_:Namespace1',
+            label: 'Namespace1',
+            prefix: 'ns1',
+            namespace: 'http://namespace1#',
             isDefault: true
         });
         expect(namespaces[1].isDefault).toBe(false);
     });
     it('should apply a filter to the namespaces if given', () => {
-        const namespaces = getNamespaces(vocabularyJsonLd, n => n[constants.SHACL_NAME][0]["@value"] === "Namespace2");
+        const namespaces = getNamespaces(vocabularyJsonLd, n => n[constants.SHACL_NAME][0]['@value'] === 'Namespace2');
 
         expect(namespaces.length).toEqual(1);
-        expect(namespaces[0].label).toEqual("Namespace2");
+        expect(namespaces[0].label).toEqual('Namespace2');
     });
 });
 

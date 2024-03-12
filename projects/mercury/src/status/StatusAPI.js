@@ -1,9 +1,9 @@
 // @flow
-import axios from "axios";
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
+import axios from 'axios';
+import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
-export const SERVER_STATUS_UP = "UP";
-export const SERVER_STATUS_DOWN = "DOWN";
+export const SERVER_STATUS_UP = 'UP';
+export const SERVER_STATUS_DOWN = 'DOWN';
 export type ServerStatus = SERVER_STATUS_UP | SERVER_STATUS_DOWN;
 export type StatusResponse = {
     status: ServerStatus;
@@ -23,7 +23,7 @@ export const getSessionStatus = () => axios.get('/api/status', requestOptions)
 export const getServerStatus = (): StatusResponse => axios.get('/actuator/health', requestOptions)
     .then(extractJsonData)
     .then((res: StatusResponse) => ({status: res.status ? res.status.toString().toUpperCase() : SERVER_STATUS_DOWN}))
-    .catch(handleHttpError("Failure when retrieving server status"));
+    .catch(handleHttpError('Failure when retrieving server status'));
 
 export const getServerConfig = (): ConfigResponse => axios.get('/api/config', requestOptions)
     .then(extractJsonData)
@@ -31,4 +31,4 @@ export const getServerConfig = (): ConfigResponse => axios.get('/api/config', re
         maxFileSize: res.maxFileSize,
         maxFileSizeBytes: res.maxFileSizeBytes
     }))
-    .catch(handleHttpError("Failure when retrieving server config"));
+    .catch(handleHttpError('Failure when retrieving server config'));

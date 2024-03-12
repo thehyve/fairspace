@@ -1,8 +1,8 @@
 import React, {useContext} from 'react';
 
 import {LinkedDataVocabularyAPI} from '../common/VocabularyAPI';
-import useAsync from "../../common/hooks/UseAsync";
-import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
+import useAsync from '../../common/hooks/UseAsync';
+import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
 
 const VocabularyContext = React.createContext();
 

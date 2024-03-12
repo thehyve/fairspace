@@ -1,13 +1,13 @@
 import React from 'react';
-import {configure, mount, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {MemoryRouter} from "react-router-dom";
+import {configure, mount, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {MemoryRouter} from 'react-router-dom';
 
 import {ThemeProvider} from '@mui/material/styles';
-import CollectionsContext from "../CollectionsContext";
-import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import LoadingInlay from "../../common/components/LoadingInlay";
+import CollectionsContext from '../CollectionsContext';
+import ContextualCollectionBrowser, {CollectionBrowser} from '../CollectionBrowser';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import LoadingInlay from '../../common/components/LoadingInlay';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.

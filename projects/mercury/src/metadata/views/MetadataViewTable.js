@@ -1,18 +1,18 @@
 import React, {useCallback, useEffect} from 'react';
 import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import {Link as RouterLink} from "react-router-dom";
+import {Link as RouterLink} from 'react-router-dom';
 import qs from 'qs';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import type {MetadataViewColumn, MetadataViewData} from "./MetadataViewAPI";
-import {TextualValueTypes} from "./MetadataViewAPI";
-import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import {RESOURCES_VIEW} from "./metadataViewUtils";
-import {formatDate} from "../../common/utils/genericUtils";
-import type {Collection} from "../../collections/CollectionAPI";
-import {collectionAccessIcon} from "../../collections/collectionUtils";
-import {getPathFromIri, redirectLink} from "../../file/fileUtils";
-import ColumnFilterInput from "../../common/components/ColumnFilterInput";
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import type {MetadataViewColumn, MetadataViewData} from './MetadataViewAPI';
+import {TextualValueTypes} from './MetadataViewAPI';
+import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
+import {RESOURCES_VIEW} from './metadataViewUtils';
+import {formatDate} from '../../common/utils/genericUtils';
+import type {Collection} from '../../collections/CollectionAPI';
+import {collectionAccessIcon} from '../../collections/collectionUtils';
+import {getPathFromIri, redirectLink} from '../../file/fileUtils';
+import ColumnFilterInput from '../../common/components/ColumnFilterInput';
 
 type MetadataViewTableProperties = {
     data: MetadataViewData;

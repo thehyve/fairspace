@@ -1,13 +1,13 @@
 import React, {useContext} from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 import {FormControl, FormGroup, FormHelperText, FormLabel} from '@mui/material';
-import LinkedDataInputFieldsTable from "./LinkedDataInputFieldsTable";
-import LinkedDataRelationTable from "./LinkedDataRelationTable";
-import {LABEL_URI, MAX_LIST_LENGTH, TOOLTIP_ENTER_DELAY} from "../../constants";
-import GenericTooltip from "../../common/components/GenericTooltip";
-import Iri from "../../common/components/Iri";
-import LinkedDataContext from "../LinkedDataContext";
+import LinkedDataInputFieldsTable from './LinkedDataInputFieldsTable';
+import LinkedDataRelationTable from './LinkedDataRelationTable';
+import {LABEL_URI, MAX_LIST_LENGTH, TOOLTIP_ENTER_DELAY} from '../../constants';
+import GenericTooltip from '../../common/components/GenericTooltip';
+import Iri from '../../common/components/Iri';
+import LinkedDataContext from '../LinkedDataContext';
 
 const LinkedDataProperty = (
     {formEditable = true, property, values = [], validationErrors = [], onAdd, onChange, onDelete}
@@ -33,7 +33,7 @@ const LinkedDataProperty = (
         || property.allowedValues
     );
 
-    const getCount = () => "(" + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + "+" : values.length) + ")";
+    const getCount = () => '(' + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + '+' : values.length) + ')';
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values

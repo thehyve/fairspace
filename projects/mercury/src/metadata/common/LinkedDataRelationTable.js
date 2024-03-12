@@ -1,11 +1,11 @@
 import React from 'react';
-import PropTypes from "prop-types";
-import {withRouter} from "react-router-dom";
+import PropTypes from 'prop-types';
+import {withRouter} from 'react-router-dom';
 
-import {TOOLTIP_ENTER_DELAY} from "../../constants";
-import LinkedDataValuesList from "./LinkedDataValuesList";
-import IriTooltip from "../../common/components/IriTooltip";
-import Iri from "../../common/components/Iri";
+import {TOOLTIP_ENTER_DELAY} from '../../constants';
+import LinkedDataValuesList from './LinkedDataValuesList';
+import IriTooltip from '../../common/components/IriTooltip';
+import Iri from '../../common/components/Iri';
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry.label || entry['@id']};
 

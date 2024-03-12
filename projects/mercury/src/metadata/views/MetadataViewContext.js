@@ -1,15 +1,15 @@
 import React from 'react';
-import type {MetadataViewFilter} from "./MetadataViewAPI";
-import MetadataViewAPI from "./MetadataViewAPI";
-import useAsync from "../../common/hooks/UseAsync";
-import useStateWithSessionStorage from "../../common/hooks/UseSessionStorage";
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import type {MetadataViewFilter} from './MetadataViewAPI';
+import MetadataViewAPI from './MetadataViewAPI';
+import useAsync from '../../common/hooks/UseAsync';
+import useStateWithSessionStorage from '../../common/hooks/UseSessionStorage';
+import {isNonEmptyValue} from '../../common/utils/genericUtils';
 
 const MetadataViewContext = React.createContext({});
 
 const SESSION_STORAGE_METADATA_FILTERS_KEY = 'FAIRSPACE_METADATA_FILTERS';
 
-export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAPI, sourceName = ""}) => {
+export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAPI, sourceName = ''}) => {
     const {data = {}, error, loading, refresh} = useAsync(
         () => metadataViewAPI.getViews(),
         []

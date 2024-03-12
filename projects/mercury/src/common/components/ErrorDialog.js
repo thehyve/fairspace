@@ -10,7 +10,7 @@ import {
     Typography,
 } from '@mui/material';
 import {Error as ErrorIcon} from '@mui/icons-material';
-import DialogContentText from "@mui/material/DialogContentText";
+import DialogContentText from '@mui/material/DialogContentText';
 
 const Transition = React.forwardRef(
     (props, ref) => <Slide ref={ref} direction="up" {...props} />
@@ -18,17 +18,6 @@ const Transition = React.forwardRef(
 
 class ErrorDialog extends React.Component {
     static instance;
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            title: null,
-            message: null,
-            onRetry: null,
-            onDismiss: null
-        };
-        ErrorDialog.instance = this;
-    }
 
     static showError(title, details, onRetry, onDismiss) {
         if (ErrorDialog.instance) {
@@ -41,6 +30,17 @@ class ErrorDialog extends React.Component {
                 onDismiss,
             });
         }
+    }
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            title: null,
+            message: null,
+            onRetry: null,
+            onDismiss: null
+        };
+        ErrorDialog.instance = this;
     }
 
     componentDidCatch(error) {

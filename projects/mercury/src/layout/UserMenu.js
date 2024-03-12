@@ -16,9 +16,9 @@ import {
 import withStyles from '@mui/styles/withStyles';
 
 import {ErrorOutline} from '@mui/icons-material';
-import UserContext from "../users/UserContext";
-import LogoutContext from "../users/LogoutContext";
-import {getDisplayName} from "../users/userUtils";
+import UserContext from '../users/UserContext';
+import LogoutContext from '../users/LogoutContext';
+import {getDisplayName} from '../users/userUtils';
 import versionInfo from '../common/VersionInfo';
 import {APPLICATION_NAME} from '../constants';
 

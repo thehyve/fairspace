@@ -1,9 +1,9 @@
 import React from 'react';
 // import ShortcutIcon from '@mui/icons-material/Shortcut';
 import HubIcon from '@mui/icons-material/Hub';
-import {Link, Paper, Typography} from "@mui/material";
-import withStyles from "@mui/styles/withStyles";
-import styles from "./DomainInfo.styles";
+import {Link, Paper, Typography} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import styles from './DomainInfo.styles';
 
 const DomainInfo = (props) => {
     const {domainName, domainLink, classes} = props;

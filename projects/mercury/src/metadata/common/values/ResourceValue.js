@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import IriValueContainer from "./IriValueContainer";
+import IriValueContainer from './IriValueContainer';
 
 class ResourceValue extends React.Component {
     state = {

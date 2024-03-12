@@ -1,14 +1,14 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {MemoryRouter} from "react-router-dom"; // for elements wrapped in 'withRouter'
+import {configure, mount} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {MemoryRouter} from 'react-router-dom'; // for elements wrapped in 'withRouter'
 import {ThemeProvider} from '@mui/material/styles';
-import UserContext from "../../users/UserContext";
-import Layout from "../Layout";
-import MenuDrawer from "../MenuDrawer";
-import StatusAlert from "../../status/StatusAlert";
-import StatusContext from "../../status/StatusContext";
+import UserContext from '../../users/UserContext';
+import Layout from '../Layout';
+import MenuDrawer from '../MenuDrawer';
+import StatusAlert from '../../status/StatusAlert';
+import StatusContext from '../../status/StatusContext';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -57,7 +57,7 @@ describe('Layout', () => {
     it('should render alert if server is DOWN', () => {
         const element = (
             <ThemeProvider theme={theme}>
-                <StatusContext.Provider value={{serverStatus: "DOWN", userSessionStatus: 'OK'}}>
+                <StatusContext.Provider value={{serverStatus: 'DOWN', userSessionStatus: 'OK'}}>
                     <MemoryRouter>
                         <Layout renderMenu={() => null} />
                     </MemoryRouter>
@@ -76,7 +76,7 @@ describe('Layout', () => {
     it('should render alert if user session is not valid', () => {
         const element = (
             <ThemeProvider theme={theme}>
-                <StatusContext.Provider value={{serverStatus: "UP", userSessionStatus: ''}}>
+                <StatusContext.Provider value={{serverStatus: 'UP', userSessionStatus: ''}}>
                     <MemoryRouter>
                         <Layout renderMenu={() => null} />
                     </MemoryRouter>
@@ -94,7 +94,7 @@ describe('Layout', () => {
     it('should not render alert if server is up and session is valid', () => {
         const element = (
             <ThemeProvider theme={theme}>
-                <StatusContext.Provider value={{serverStatus: "UP", userSessionStatus: 'OK'}}>
+                <StatusContext.Provider value={{serverStatus: 'UP', userSessionStatus: 'OK'}}>
                     <MemoryRouter>
                         <Layout renderMenu={() => null} />
                     </MemoryRouter>

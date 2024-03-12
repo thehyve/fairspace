@@ -5,23 +5,23 @@ import {withRouter} from 'react-router-dom';
 
 import {CloudUpload, ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import {useDropzone} from "react-dropzone";
-import CircularProgress from "@mui/material/CircularProgress";
-import Tooltip from "@mui/material/Tooltip";
-import Link from "@mui/material/Link";
-import table from "text-table";
-import {SnackbarProvider, useSnackbar} from "notistack";
+import {useDropzone} from 'react-dropzone';
+import CircularProgress from '@mui/material/CircularProgress';
+import Tooltip from '@mui/material/Tooltip';
+import Link from '@mui/material/Link';
+import table from 'text-table';
+import {SnackbarProvider, useSnackbar} from 'notistack';
 import {flatMap} from 'lodash';
-import CollectionDetails from "./CollectionDetails";
-import CollectionsContext from "./CollectionsContext";
+import CollectionDetails from './CollectionDetails';
+import CollectionsContext from './CollectionsContext';
 import {LinkedDataEntityFormWithLinkedData} from '../metadata/common/LinkedDataEntityFormContainer';
 import type {Collection} from './CollectionAPI';
-import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
+import EmptyInformationDrawer from '../common/components/EmptyInformationDrawer';
 import useAsync from '../common/hooks/UseAsync';
 import {LocalFileAPI} from '../file/FileAPI';
 import MessageDisplay from '../common/components/MessageDisplay';
-import ErrorDialog from "../common/components/ErrorDialog";
-import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
+import ErrorDialog from '../common/components/ErrorDialog';
+import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
 import {
     COLLECTION_URI,
     DIRECTORY_URI,
@@ -34,10 +34,10 @@ import {
     SHACL_MIN_COUNT,
     SHACL_NAME,
     SHACL_PATH
-} from "../constants";
-import {determinePropertyShapesForTypes, determineShapeForTypes} from "../metadata/common/vocabularyUtils";
-import {getFirstPredicateId, getFirstPredicateValue} from "../metadata/common/jsonLdUtils";
-import {getPathHierarchy} from "../file/fileUtils";
+} from '../constants';
+import {determinePropertyShapesForTypes, determineShapeForTypes} from '../metadata/common/vocabularyUtils';
+import {getFirstPredicateId, getFirstPredicateValue} from '../metadata/common/jsonLdUtils';
+import {getPathHierarchy} from '../file/fileUtils';
 
 const useStyles = makeStyles((theme) => ({
     expandOpen: {
@@ -46,17 +46,17 @@ const useStyles = makeStyles((theme) => ({
     card: {
         marginTop: 10,
         flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        transitionBorder: ".24s",
+        display: 'flex',
+        flexDirection: 'column',
+        outline: 'none',
+        transitionBorder: '.24s',
         easeInOut: true
     },
     activeStyle: {
         borderColor: theme.palette.info.main,
         borderWidth: 2,
         borderRadius: 2,
-        borderStyle: "dashed",
+        borderStyle: 'dashed',
         opacity: 0.4
     },
     acceptStyle: {
@@ -100,7 +100,7 @@ const generateTemplate = (vocabulary) => {
     const doc = uniqueProps.map(ps => [
         '# ',
         getFirstPredicateValue(ps, SHACL_NAME),
-        getFirstPredicateValue(ps, SHACL_DESCRIPTION, ""),
+        getFirstPredicateValue(ps, SHACL_DESCRIPTION, ''),
         typename(ps),
         cardinality(ps),
         getFirstPredicateId(ps, SHACL_PATH)
@@ -109,7 +109,7 @@ const generateTemplate = (vocabulary) => {
     const entityNames = uniqueProps.filter(ps => !getFirstPredicateId(ps, SHACL_DATATYPE))
         .map(ps => JSON.stringify(getFirstPredicateValue(ps, SHACL_NAME)).replaceAll('"', "'"));
     const sampleEntityNames = entityNames.length > 2 ? entityNames.slice(0, 2).join(' and ') : entityNames.join(' and ');
-    const sampleRow = suffix => uniqueProps.map(prop => (type(prop) === "string" ? "\"Sample text value\"" : `${type(prop)}${suffix}`));
+    const sampleRow = suffix => uniqueProps.map(prop => (type(prop) === 'string' ? '"Sample text value"' : `${type(prop)}${suffix}`));
 
     return '#   This section describes the CSV-based format used for bulk metadata uploads.\n'
         + `#   Entities (e.g. ${sampleEntityNames}) can be referenced by ID or unique label; multiple values must be separated by the pipe symbol |.\n`
@@ -120,9 +120,9 @@ const generateTemplate = (vocabulary) => {
             ...doc]) + '\n#\n'
         + '"Path",' + uniqueProps.map(ps => JSON.stringify(getFirstPredicateValue(ps, SHACL_NAME))).join(',') + '\n'
         + '# PUT YOUR DATA BELOW FOLLOWING SAMPLE ROWS. REMOVE THIS LINE AND THE SAMPLE ROWS AFTERWARDS.\n'
-        + '# ./,' + sampleRow("_0").join(',') + '\n'
-        + '# ./file1,' + sampleRow("_1").join(',') + '\n'
-        + '# ./file2,' + sampleRow("_2").join(',') + '\n';
+        + '# ./,' + sampleRow('_0').join(',') + '\n'
+        + '# ./file1,' + sampleRow('_1').join(',') + '\n'
+        + '# ./file2,' + sampleRow('_2').join(',') + '\n';
 };
 
 const MetadataCard = (props) => {
@@ -163,7 +163,7 @@ const MetadataCard = (props) => {
             if (files.length === 1) {
                 uploadMetadata(files[0]);
             } else {
-                ErrorDialog.showError("Please upload metadata files one by one");
+                ErrorDialog.showError('Please upload metadata files one by one');
             }
         }
     });

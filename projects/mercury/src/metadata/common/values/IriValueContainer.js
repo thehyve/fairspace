@@ -1,10 +1,10 @@
-import React, {useContext} from "react";
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
-import {Grid, TextField} from "@mui/material";
+import {Grid, TextField} from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import BaseInputValue from "./BaseInputValue";
-import LinkedDataContext from "../../LinkedDataContext";
+import BaseInputValue from './BaseInputValue';
+import LinkedDataContext from '../../LinkedDataContext';
 
 export const noNamespace = {
     id: '',

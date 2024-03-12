@@ -1,18 +1,18 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {withRouter} from "react-router-dom";
-import Button from "@mui/material/Button";
+import {withRouter} from 'react-router-dom';
+import Button from '@mui/material/Button';
 import CollectionEditor from './CollectionEditor';
-import CollectionList from "./CollectionList";
-import CollectionsContext from "./CollectionsContext";
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import UserContext from "../users/UserContext";
-import UsersContext from "../users/UsersContext";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import {getDisplayName} from "../users/userUtils";
-import type {User} from "../users/UsersAPI";
-import type {Collection} from "./CollectionAPI";
-import {getCollectionAbsolutePath} from "./collectionUtils";
+import CollectionList from './CollectionList';
+import CollectionsContext from './CollectionsContext';
+import WorkspaceContext from '../workspaces/WorkspaceContext';
+import UserContext from '../users/UserContext';
+import UsersContext from '../users/UsersContext';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import {getDisplayName} from '../users/userUtils';
+import type {User} from '../users/UsersAPI';
+import type {Collection} from './CollectionAPI';
+import {getCollectionAbsolutePath} from './collectionUtils';
 import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 type ContextualCollectionBrowserProperties = {

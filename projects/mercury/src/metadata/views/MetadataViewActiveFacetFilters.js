@@ -1,8 +1,8 @@
 import React from 'react';
 import {Chip, Grid, Typography} from '@mui/material';
-import type {MetadataViewFacet, MetadataViewFilter} from "./MetadataViewAPI";
-import {ofBooleanValueType, ofRangeValueType} from "./metadataViewUtils";
-import {formatDate, isNonEmptyValue} from "../../common/utils/genericUtils";
+import type {MetadataViewFacet, MetadataViewFilter} from './MetadataViewAPI';
+import {ofBooleanValueType, ofRangeValueType} from './metadataViewUtils';
+import {formatDate, isNonEmptyValue} from '../../common/utils/genericUtils';
 
 type MetadataViewActiveFacetFiltersProperties = {
     facets: MetadataViewFacet[];

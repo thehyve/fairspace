@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState} from 'react';
 
 /**
  * Custom state hook to use either the initial value from the session storage or a default value.

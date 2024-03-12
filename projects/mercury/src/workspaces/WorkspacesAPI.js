@@ -4,7 +4,7 @@ import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 import type {User} from '../users/UsersAPI';
 
-const workspacesUrl = "/api/workspaces/";
+const workspacesUrl = '/api/workspaces/';
 
 export type WorkspaceUserRole = {
     iri: string;
@@ -42,22 +42,22 @@ class WorkspacesAPI {
             headers: {Accept: 'application/json'},
         })
             .then(extractJsonData)
-            .catch(handleHttpError("Failure when retrieving a list of workspaces"));
+            .catch(handleHttpError('Failure when retrieving a list of workspaces'));
     }
 
     createWorkspace(workspace: WorkspaceProperties): Promise<WorkspaceProperties> {
         return axios.put(workspacesUrl, JSON.stringify(workspace), {
-            headers: {'Accept': 'application/json', 'Content-type': 'application/json'},
+            headers: {Accept: 'application/json', 'Content-type': 'application/json'},
         })
             .then(extractJsonData)
-            .catch(handleHttpError("Failure while creating a workspace"));
+            .catch(handleHttpError('Failure while creating a workspace'));
     }
 
     deleteWorkspace(workspaceIri: string): Promise<WorkspaceProperties> {
         return axios.delete(`${workspacesUrl}?workspace=${encodeURI(workspaceIri)}`, {
             headers: {Accept: 'application/json'},
         })
-            .catch(handleHttpError("Failure while deleting a workspace"));
+            .catch(handleHttpError('Failure while deleting a workspace'));
     }
 
     getWorkspaceRoles(workspaceIri: string): Promise<WorkspaceUserRole[]> {
@@ -66,12 +66,12 @@ class WorkspacesAPI {
         })
             .then(extractJsonData)
             .then(roles => Object.entries(roles).map(([iri, role]) => ({iri, role})))
-            .catch(handleHttpError("Failure while retrieving workspace users"));
+            .catch(handleHttpError('Failure while retrieving workspace users'));
     }
 
     setWorkspaceRole(workspace: string, user: string, role: string): Promise<void> {
         return axios.patch(`${workspacesUrl}users/`, JSON.stringify({workspace, user, role}), {
-            headers: {'Content-type': 'application/json', 'Accept': 'application/json'}
+            headers: {'Content-type': 'application/json', Accept: 'application/json'}
         })
             .catch(e => {
                 console.error('Failure while updating a workspace role.', e);

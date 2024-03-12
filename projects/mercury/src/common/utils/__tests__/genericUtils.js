@@ -6,7 +6,7 @@ import {
     formatDateTime,
     isNonEmptyValue,
     joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject
-} from "../genericUtils";
+} from '../genericUtils';
 
 describe('array Utils', () => {
     describe('flattenShallow', () => {
@@ -26,9 +26,9 @@ describe('array Utils', () => {
     describe('groupBy', () => {
         it('group an array by key', () => {
             expect(groupBy(
-                [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
-                "type"
-            )).toEqual({a: [{name: "x", type: "a"}, {name: "y", type: "a"}], b: [{name: "z", type: "b"}]});
+                [{name: 'x', type: 'a'}, {name: 'y', type: 'a'}, {name: 'z', type: 'b'}],
+                'type'
+            )).toEqual({a: [{name: 'x', type: 'a'}, {name: 'y', type: 'a'}], b: [{name: 'z', type: 'b'}]});
         });
     });
 });
@@ -87,7 +87,7 @@ describe('isNonEmptyValue', () => {
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [undefined, null, '', NaN, "", ``];
+        const values = [undefined, null, '', NaN, '', ''];
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
@@ -100,7 +100,7 @@ describe('isEmptyObject', () => {
         values.forEach(v => expect(isEmptyObject(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [{x: "test"}, {y: false}, {z: null}];
+        const values = [{x: 'test'}, {y: false}, {z: null}];
 
         values.forEach(v => expect(isEmptyObject(v)).toBe(false));
     });
@@ -160,13 +160,13 @@ describe('formatDateTime', () => {
 
 describe('stableSort', () => {
     it('respects sorting direction', () => {
-        const a = ["c", "a", "b"];
+        const a = ['c', 'a', 'b'];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
     });
 
     it('respects sorting direction with empty values', () => {
-        const a = ["c", "a", "", "b"];
+        const a = ['c', 'a', '', 'b'];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['', 'a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a', '']);
     });

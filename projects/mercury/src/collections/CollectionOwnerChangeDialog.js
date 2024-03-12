@@ -1,13 +1,13 @@
 // @flow
 import React, {useState} from 'react';
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import {compareBy} from "../common/utils/genericUtils";
-import Dropdown from "../metadata/common/values/Dropdown";
-import ConfirmationButton from "../common/components/ConfirmationButton";
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import {compareBy} from '../common/utils/genericUtils';
+import Dropdown from '../metadata/common/values/Dropdown';
+import ConfirmationButton from '../common/components/ConfirmationButton';
 
 export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner, onClose}) => {
     const [selectedValue, setSelectedValue] = useState();

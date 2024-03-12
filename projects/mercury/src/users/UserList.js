@@ -8,32 +8,32 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 
-import IconButton from "@mui/material/IconButton";
-import {HighlightOffSharp} from "@mui/icons-material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Checkbox from "@mui/material/Checkbox";
-import TableContainer from "@mui/material/TableContainer";
-import PermissionCandidateSelect from "../permissions/PermissionCandidateSelect";
-import type {Workspace} from "../workspaces/WorkspacesAPI";
-import type {User} from "./UsersAPI";
-import UsersContext from "./UsersContext";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import ConfirmationButton from "../common/components/ConfirmationButton";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import UserContext from "./UserContext";
-import {getWorkspaceUsersWithRoles, isAdmin} from "./userUtils";
-import ErrorDialog from "../common/components/ErrorDialog";
-import {canAlterPermission} from "../collections/collectionUtils";
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import IconButton from '@mui/material/IconButton';
+import {HighlightOffSharp} from '@mui/icons-material';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Checkbox from '@mui/material/Checkbox';
+import TableContainer from '@mui/material/TableContainer';
+import PermissionCandidateSelect from '../permissions/PermissionCandidateSelect';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
+import type {User} from './UsersAPI';
+import UsersContext from './UsersContext';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
+import ConfirmationButton from '../common/components/ConfirmationButton';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from '../workspaces/WorkspaceUserRolesContext';
+import UserContext from './UserContext';
+import {getWorkspaceUsersWithRoles, isAdmin} from './userUtils';
+import ErrorDialog from '../common/components/ErrorDialog';
+import {canAlterPermission} from '../collections/collectionUtils';
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 const columns = {
     name: {
@@ -82,7 +82,7 @@ const UserList = (props: UserListProps) => {
     const grantUserRole = (userIri, role) => {
         setWorkspaceRole(userIri, role)
             .catch(err => {
-                const message = err && err.message ? err.message : "An error occurred while updating a workspace users";
+                const message = err && err.message ? err.message : 'An error occurred while updating a workspace users';
                 ErrorDialog.showError(message);
             })
             .finally(() => setShowAddUserDialog(false));
@@ -180,8 +180,8 @@ const UserList = (props: UserListProps) => {
                                         checked={u.role === 'Manager'}
                                         onChange={(event) => (
                                             event.target.checked
-                                                ? grantUserRole(u.iri, "Manager")
-                                                : grantUserRole(u.iri, "Member")
+                                                ? grantUserRole(u.iri, 'Manager')
+                                                : grantUserRole(u.iri, 'Member')
                                         )}
                                         disabled={!canAlterPermission(canManage, u, currentUser)}
                                         disableRipple
@@ -212,7 +212,7 @@ const UserList = (props: UserListProps) => {
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{overflowX: 'hidden'}}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>
