@@ -1,5 +1,4 @@
 import React from 'react';
-import {Button} from '@mui/material';
 import {render, screen} from '@testing-library/react';
 import CollectionOwnerChangeDialog from "../CollectionOwnerChangeDialog";
 
@@ -33,7 +32,7 @@ describe('CollectionOwnerChangeDialog', () => {
         expect(buttons).toHaveLength(3);
 
         // render cancel and submit buttons
-        expect(buttons[0]["title"]).toEqual("Open");
+        expect(buttons[0].title).toEqual("Open");
         expect(buttons[1].textContent).toEqual("Save");
         expect(buttons[2].textContent).toEqual("Cancel");
         expect(buttons[0].disabled).toBeFalsy();

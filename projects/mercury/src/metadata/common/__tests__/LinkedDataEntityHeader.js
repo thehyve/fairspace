@@ -3,6 +3,7 @@ import React from 'react';
 import {configure, mount} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
+import {ThemeProvider} from '@mui/material/styles';
 import LinkedDataEntityHeader from "../LinkedDataEntityHeader";
 import DeleteEntityButton from "../DeleteEntityButton";
 import {
@@ -14,7 +15,6 @@ import {
     FILE_URI,
 } from "../../../constants";
 import VocabularyContext from '../../vocabulary/VocabularyContext';
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.

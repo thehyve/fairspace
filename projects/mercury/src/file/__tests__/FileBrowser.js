@@ -2,9 +2,9 @@
 import React from 'react';
 import {cleanup, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+import {ThemeProvider} from '@mui/material/styles';
 import {FileBrowser} from '../FileBrowser';
 import {UploadsProvider} from "../UploadsContext";
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../App.theme';
 
 afterEach(cleanup);

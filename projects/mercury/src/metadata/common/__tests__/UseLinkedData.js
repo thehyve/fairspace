@@ -1,6 +1,9 @@
-import {render, screen} from "@testing-library/react";
-import {LinkedDataParentMock} from "../__mocks__/LinkedDataParent.mock";
+import React from 'react';
+import {render} from "@testing-library/react";
+import {renderHook} from "@testing-library/react-hooks";
+import {LinkedDataParent} from "../__wrapper__/LinkedDataParent";
 import {COLLECTION_URI, COMMENT_URI, LABEL_URI, SHACL_PATH, SHACL_PROPERTY, SHACL_TARGET_CLASS} from '../../../constants';
+import {useLinkedDataNoContext} from "../UseLinkedData";
 
 describe('useLinkedData', () => {
     const defaultJsonLd = [{
@@ -22,20 +25,22 @@ describe('useLinkedData', () => {
         };
 
         render(
-            <LinkedDataParentMock
+            <LinkedDataParent
                 iri={COLLECTION_URI}
                 context={context}
-            />);
+            />
+        );
 
         expect(context.fetchLinkedDataForSubject).toHaveBeenCalledTimes(1);
     });
 
     it('should handle missing linkedData', async () => {
         render(
-            <LinkedDataParentMock
-                iri={"my-subject"}
+            <LinkedDataParent
+                iri="my-subject"
                 context={defaultContext}
-            />);
+            />
+        );
 
         expect(defaultContext.result.properties).toEqual([]);
         expect(defaultContext.result.values).toEqual({});
@@ -45,10 +50,11 @@ describe('useLinkedData', () => {
     describe('loading state', () => {
         it('should not be loading by default', async () => {
             render(
-                <LinkedDataParentMock
-                    iri={"my-subject"}
+                <LinkedDataParent
+                    iri="my-subject"
                     context={defaultContext}
-                />);
+                />
+            );
 
             expect(defaultContext.result.linkedDataLoading).toBe(false);
         });
@@ -58,14 +64,15 @@ describe('useLinkedData', () => {
                 ...defaultContext,
                 shapesLoading: true,
                 shapes: [{aShapeKey: 'aValue'}],
-                fetchLinkedDataForSubject: jest.fn((parameter) => Promise.resolve([]))
+                fetchLinkedDataForSubject: jest.fn(() => Promise.resolve([]))
             };
 
             render(
-                <LinkedDataParentMock
-                    iri={"my-subject"}
+                <LinkedDataParent
+                    iri="my-subject"
                     context={context}
-                />);
+                />
+            );
 
             expect(context.fetchLinkedDataForSubject).toHaveBeenCalled();
         });
@@ -83,10 +90,11 @@ describe('useLinkedData', () => {
             };
 
             await render(
-                <LinkedDataParentMock
-                    iri={"my-subject"}
+                <LinkedDataParent
+                    iri="my-subject"
                     context={context}
-                />);
+                />
+            );
 
             expect(context.result.linkedDataError).toMatch(/no metadata found/i);
         });
@@ -99,10 +107,11 @@ describe('useLinkedData', () => {
             };
 
             render(
-                <LinkedDataParentMock
-                    iri={"my-subject"}
+                <LinkedDataParent
+                    iri="my-subject"
                     context={context}
-                />);
+                />
+            );
 
             expect(context.result.linkedDataError).toBeTruthy();
         });
@@ -137,10 +146,11 @@ describe('useLinkedData', () => {
         };
 
         render(
-            <LinkedDataParentMock
-                iri={'http://subject'}
+            <LinkedDataParent
+                iri="http://subject"
                 context={context}
-            />);
+            />
+        );
 
         // await waitForNextUpdate();
 

@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
-import {useLinkedDataNoContext} from "../UseLinkedData";
 import {MemoryRouter, useHistory} from "react-router-dom";
+import {useLinkedDataNoContext} from "../UseLinkedData";
 
 const WrapperWithPushToHistory = ({children}) => {
     const history = useHistory();
@@ -10,15 +10,15 @@ const WrapperWithPushToHistory = ({children}) => {
     return children;
 };
 
-const LinkedDataParentMock = (props) => {
+const LinkedDataParent = (props) => {
     const {iri, context} = props;
     context.result = useLinkedDataNoContext(iri, context);
 
     return (
         <MemoryRouter>
-            <WrapperWithPushToHistory>
-            </WrapperWithPushToHistory>
-        </MemoryRouter>);
-}
+            <WrapperWithPushToHistory />
+        </MemoryRouter>
+    );
+};
 
-export {LinkedDataParentMock};
+export {LinkedDataParent};

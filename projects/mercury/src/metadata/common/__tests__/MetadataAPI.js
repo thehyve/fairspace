@@ -1,8 +1,8 @@
 import mockAxios from 'axios';
 
-jest.mock('axios');
-
 import MetadataAPI from "../MetadataAPI";
+
+jest.mock('axios');
 
 beforeEach(() => {
     mockAxios.get.mockResolvedValue({data: [], headers: {'content-type': 'application/json'}});

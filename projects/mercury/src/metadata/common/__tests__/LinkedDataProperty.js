@@ -1,11 +1,12 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
-import { MemoryRouter } from "react-router-dom"; // use to render useRouter wrapped components
+import {MemoryRouter} from "react-router-dom"; // use to render useRouter wrapped components
 import {configure, mount, shallow} from "enzyme";
-import {render, screen} from '@testing-library/react'
+import {render, screen} from '@testing-library/react';
 // import '@testing-library/jest-dom/extend-expect';
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
+import {ThemeProvider} from '@mui/material/styles';
 import {STRING_URI} from "../../../constants";
 import LinkedDataProperty from "../LinkedDataProperty";
 import LinkedDataRelationTable from "../LinkedDataRelationTable";
@@ -14,7 +15,6 @@ import LinkedDataContext from "../../LinkedDataContext";
 import NumberValue from "../values/NumberValue";
 import SwitchValue from "../values/SwitchValue";
 import ReferringValue from "../values/ReferringValue";
-import {ThemeProvider} from '@mui/material/styles';
 import theme from '../../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -39,10 +39,11 @@ describe('LinkedDataProperty elements', () => {
                 <MemoryRouter>
                     <LinkedDataProperty property={defaultProperty} values={defaultValues} />
                 </MemoryRouter>
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
         const inputElements = screen.queryAllByRole("textbox");
-        expect(inputElements).toHaveLength(1)
+        expect(inputElements).toHaveLength(1);
         expect(screen.queryByTestId("label-description")).not.toBeInTheDocument();
     });
 
@@ -55,10 +56,11 @@ describe('LinkedDataProperty elements', () => {
         render(
             <ThemeProvider theme={theme}>
                 <LinkedDataProperty property={property} values={defaultValues} />
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
         const inputElements = screen.queryAllByRole("textbox");
-        expect(inputElements).toHaveLength(4)
+        expect(inputElements).toHaveLength(4);
         expect(screen.queryByTestId("label-description")).toBeInTheDocument();
     });
 

@@ -5,8 +5,8 @@ import '@testing-library/jest-dom/extend-expect';
 import {configure, mount} from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import {TableRow} from "@mui/material";
-import FileList from '../FileList';
 import {ThemeProvider} from '@mui/material/styles';
+import FileList from '../FileList';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
