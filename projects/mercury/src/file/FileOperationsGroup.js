@@ -3,7 +3,7 @@ import withStyles from '@mui/styles/withStyles';
 
 import styles from './FileOperationsGroup.styles';
 
-export const FileOperationsGroup = ({ classes, children }) => (
+export const FileOperationsGroup = ({classes, children}) => (
     <div className={classes.buttonsContainer}>{children}</div>
 );
 

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 
 import ConfirmationDialog from './ConfirmationDialog';
 
-const ConfirmationButton = ({ children, message, disabled, onClick, ...otherProps }) => {
+const ConfirmationButton = ({children, message, disabled, onClick, ...otherProps}) => {
     const [isDialogOpen, showDialog] = useState(false);
 
     const agree = () => {
@@ -35,11 +35,11 @@ const ConfirmationButton = ({ children, message, disabled, onClick, ...otherProp
 ConfirmationButton.propTypes = {
     onClick: PropTypes.func.isRequired,
     message: PropTypes.any.isRequired,
-    disabled: PropTypes.bool,
+    disabled: PropTypes.bool
 };
 
 ConfirmationButton.defaultProps = {
-    disabled: false,
+    disabled: false
 };
 
 export default ConfirmationButton;

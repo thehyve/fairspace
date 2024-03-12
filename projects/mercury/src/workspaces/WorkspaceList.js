@@ -1,6 +1,6 @@
 // @flow
-import React, { useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, {useContext} from 'react';
+import {useHistory} from 'react-router-dom';
 import {
     Chip,
     Link,
@@ -13,18 +13,18 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from '@mui/material';
-import { Lock } from '@mui/icons-material';
+} from "@mui/material";
+import {Lock} from "@mui/icons-material";
 
-import TableContainer from '@mui/material/TableContainer';
-import type { Workspace } from './WorkspacesAPI';
-import MessageDisplay from '../common/components/MessageDisplay';
-import useSorting from '../common/hooks/UseSorting';
-import usePagination from '../common/hooks/UsePagination';
-import { isAdmin } from '../users/userUtils';
+import TableContainer from "@mui/material/TableContainer";
+import type {Workspace} from './WorkspacesAPI';
+import MessageDisplay from "../common/components/MessageDisplay";
+import useSorting from "../common/hooks/UseSorting";
+import usePagination from "../common/hooks/UsePagination";
+import {isAdmin} from '../users/userUtils';
 import UserContext from '../users/UserContext';
 import WorkspaceActionMenu from './WorkspaceActionMenu';
-import TablePaginationActions from '../common/components/TablePaginationActions';
+import TablePaginationActions from "../common/components/TablePaginationActions";
 
 type WorkspaceListProps = {
     workspaces: Workspace[];
@@ -33,33 +33,33 @@ type WorkspaceListProps = {
 const columns = {
     canCollaborate: {
         valueExtractor: 'canCollaborate',
-        label: ' ',
+        label: ' '
     },
     code: {
         valueExtractor: 'code',
-        label: 'Workspace',
+        label: 'Workspace'
     },
     collectionCount: {
         valueExtractor: 'summary.nonDeletedCollectionCount',
         label: 'Collections',
-        align: 'right',
+        align: 'right'
     },
     memberCount: {
         valueExtractor: 'summary.memberCount',
         label: 'Members',
-        align: 'right',
+        align: 'right'
     },
     managers: {
         valueExtractor: 'managers',
-        label: 'Managers',
+        label: 'Managers'
     },
     menu: {
-        label: ' ',
-    },
+        label: ' '
+    }
 };
 
-const EmailChip = ({ email, label }) => {
-    const chip = <Chip style={{ margin: 1, cursor: email ? 'pointer' : 'default' }} size="small" label={label} />;
+const EmailChip = ({email, label}) => {
+    const chip = <Chip style={{margin: 1, cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
     if (email) {
         return <Link underline="hover" color="inherit" title={email} href={`mailto:${email}`}>{chip}</Link>;
     }
@@ -67,17 +67,17 @@ const EmailChip = ({ email, label }) => {
 };
 
 const WorkspaceList = (props: WorkspaceListProps) => {
-    const { workspaces } = props;
+    const {workspaces} = props;
     const history = useHistory();
-    const { currentUser } = useContext(UserContext);
+    const {currentUser} = useContext(UserContext);
 
     const onWorkspaceDoubleClick = (workspace: Workspace) => {
         if (workspace.canCollaborate) {
             history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
         }
     };
-    const { orderedItems, orderAscending, orderBy, toggleSort } = useSorting(workspaces, columns, 'code');
-    const { page, setPage, rowsPerPage, setRowsPerPage, pagedItems } = usePagination(orderedItems);
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'code');
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!props.workspaces || props.workspaces.length === 0) {
         return (
@@ -93,7 +93,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
 
     return (
         <>
-            <Paper style={{ width: '100%' }}>
+            <Paper style={{width: '100%'}}>
                 <TableContainer>
                     <Table>
                         <TableHead>
@@ -120,19 +120,19 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     hover
                                     onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                                 >
-                                    <TableCell style={{ maxWidth: 32, width: 32 }} scope="row" key="canCollaborate">
+                                    <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
                                         {!workspace.canCollaborate && (<Lock />)}
                                     </TableCell>
-                                    <TableCell style={{ minWidth: 250, maxWidth: 350 }} scope="row" key="code">
+                                    <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="code">
                                         <ListItemText
-                                            style={{ margin: 0 }}
+                                            style={{margin: 0}}
                                             primary={workspace.canCollaborate ? (
                                                 <Link
                                                     component="button"
-                                                    onClick={(e) => { e.stopPropagation(); onWorkspaceDoubleClick(workspace); }}
+                                                    onClick={(e) => {e.stopPropagation(); onWorkspaceDoubleClick(workspace);}}
                                                     color="inherit"
                                                     variant="body2"
-                                                    style={{ textAlign: 'left' }}
+                                                    style={{textAlign: "left"}}
                                                 >
                                                     {workspace.code}
                                                 </Link>
@@ -140,18 +140,18 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                             secondary={workspace.title}
                                         />
                                     </TableCell>
-                                    <TableCell align="right" style={{ maxWidth: 32, width: 32 }} scope="row" key="collectionCount">
+                                    <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
                                         {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
                                     </TableCell>
-                                    <TableCell align="right" style={{ maxWidth: 32, width: 32 }} scope="row" key="memberCount">
+                                    <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
                                         {workspace.summary ? workspace.summary.memberCount : ''}
                                     </TableCell>
-                                    <TableCell style={{ maxWidth: 150, width: 150 }} scope="row" key="managers">
+                                    <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
                                         {workspace.managers ? workspace.managers.map(m => (
                                             <EmailChip key={m.iri} email={m.email} label={m.name} />
                                         )) : ''}
                                     </TableCell>
-                                    <TableCell style={{ maxWidth: 32, width: 32 }} scope="row" key="menu">
+                                    <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
                                         { isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} /> }
                                     </TableCell>
                                 </TableRow>
@@ -166,7 +166,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                         page={page}
                         onPageChange={(e, p) => setPage(p)}
                         onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                        style={{ overflowX: 'hidden' }}
+                        style={{overflowX: "hidden"}}
                         ActionsComponent={TablePaginationActions}
                     />
                 </TableContainer>

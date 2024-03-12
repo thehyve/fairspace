@@ -1,19 +1,19 @@
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import Switch from '@mui/material/Switch';
-import { formatDateTime } from '../../../common/utils/genericUtils';
+import ReactMarkdown from "react-markdown";
+import Switch from "@mui/material/Switch";
+import {formatDateTime} from '../../../common/utils/genericUtils';
 
-import LinkedDataLink from '../LinkedDataLink';
-import { BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI } from '../../../constants';
-import Iri from '../../../common/components/Iri';
+import LinkedDataLink from "../LinkedDataLink";
+import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from "../../../constants";
+import Iri from "../../../common/components/Iri";
 
-export const ReferringValue = ({ property, entry }) => {
+export const ReferringValue = ({property, entry}) => {
     function renderValue(prop, value) {
         if (!value || !prop.multiLine) {
             return value;
         }
         return (
-            <span style={{ whiteSpace: 'pre-line' }}>
+            <span style={{whiteSpace: 'pre-line'}}>
                 {value}
             </span>
         );

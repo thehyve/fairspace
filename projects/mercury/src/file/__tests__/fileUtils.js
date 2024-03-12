@@ -5,22 +5,22 @@ import {
     getBaseNameAndExtension,
     getFileName,
     getParentPath, getPathFromIri,
-    getPathInfoFromParams, joinPathsAvoidEmpty, redirectLink,
+    getPathInfoFromParams, joinPathsAvoidEmpty, redirectLink
 } from '../fileUtils';
-import { DIRECTORY_URI, FILE_URI } from '../../constants';
+import {DIRECTORY_URI, FILE_URI} from "../../constants";
 
 describe('getBaseNameAndExtension', () => {
     it('should return the expected file base name and extension', () => {
-        expect(getBaseNameAndExtension()).toEqual({ baseName: '', extension: '' });
-        expect(getBaseNameAndExtension(undefined)).toEqual({ baseName: '', extension: '' });
-        expect(getBaseNameAndExtension(null)).toEqual({ baseName: '', extension: '' });
-        expect(getBaseNameAndExtension('name.ext')).toEqual({ baseName: 'name', extension: '.ext' });
-        expect(getBaseNameAndExtension('name.xxx.ext')).toEqual({ baseName: 'name.xxx', extension: '.ext' });
-        expect(getBaseNameAndExtension('name.')).toEqual({ baseName: 'name', extension: '.' });
-        expect(getBaseNameAndExtension('name')).toEqual({ baseName: 'name', extension: '' });
-        expect(getBaseNameAndExtension('name. xxx.')).toEqual({ baseName: 'name. xxx', extension: '.' });
-        expect(getBaseNameAndExtension('name. xxx.ext')).toEqual({ baseName: 'name. xxx', extension: '.ext' });
-        expect(getBaseNameAndExtension('.hidden')).toEqual({ baseName: '.hidden', extension: '' });
+        expect(getBaseNameAndExtension()).toEqual({baseName: '', extension: ''});
+        expect(getBaseNameAndExtension(undefined)).toEqual({baseName: '', extension: ''});
+        expect(getBaseNameAndExtension(null)).toEqual({baseName: '', extension: ''});
+        expect(getBaseNameAndExtension('name.ext')).toEqual({baseName: 'name', extension: '.ext'});
+        expect(getBaseNameAndExtension('name.xxx.ext')).toEqual({baseName: 'name.xxx', extension: '.ext'});
+        expect(getBaseNameAndExtension('name.')).toEqual({baseName: 'name', extension: '.'});
+        expect(getBaseNameAndExtension('name')).toEqual({baseName: 'name', extension: ''});
+        expect(getBaseNameAndExtension('name. xxx.')).toEqual({baseName: 'name. xxx', extension: '.'});
+        expect(getBaseNameAndExtension('name. xxx.ext')).toEqual({baseName: 'name. xxx', extension: '.ext'});
+        expect(getBaseNameAndExtension('.hidden')).toEqual({baseName: '.hidden', extension: ''});
     });
 });
 
@@ -82,19 +82,19 @@ describe('getFileName', () => {
 
 describe('getPathInfoFromParams', () => {
     it('gets path info properly', () => {
-        expect(getPathInfoFromParams({ collection: '', path: '' })).toEqual({
+        expect(getPathInfoFromParams({collection: '', path: ''})).toEqual({
             collectionName: '',
-            openedPath: '/',
+            openedPath: '/'
         });
 
-        expect(getPathInfoFromParams({ collection: undefined, path: undefined })).toEqual({
+        expect(getPathInfoFromParams({collection: undefined, path: undefined})).toEqual({
             collectionName: '',
-            openedPath: '/',
+            openedPath: '/'
         });
 
-        expect(getPathInfoFromParams({ collection: 'collectionX', path: 'something/something' })).toEqual({
+        expect(getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})).toEqual({
             collectionName: 'collectionX',
-            openedPath: '/collectionX/something/something',
+            openedPath: '/collectionX/something/something'
         });
     });
 });
@@ -145,36 +145,36 @@ describe('getPathFromIri', () => {
 describe('redirectLink', () => {
     it('gets a file redirection link', () => {
         expect(
-            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/coffee_139.jpg', FILE_URI),
+            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/coffee_139.jpg', FILE_URI)
         ).toEqual('/collections/collection%202021-05-27_13_39-0/dir_1?selection=%2Fcollection%202021-05-27_13_39-0%2Fdir_1%2Fcoffee_139.jpg');
     });
     it('gets a directory redirection link', () => {
         expect(
-            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/', DIRECTORY_URI),
+            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/', DIRECTORY_URI)
         ).toEqual('/collections/collection%202021-05-27_13_39-0/dir_1');
     });
     it('gets a file redirection link for external storage', () => {
         const storage = {
-            name: 'test',
-            label: 'Test',
-            path: '/api/storages/test/webdav',
-            searchPath: '/api/storages/test/search',
-            rootDirectoryIri: 'http://localhost:8080/api/webdav',
+            name: "test",
+            label: "Test",
+            path: "/api/storages/test/webdav",
+            searchPath: "/api/storages/test/search",
+            rootDirectoryIri: "http://localhost:8080/api/webdav"
         };
         expect(
-            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/coffee_139.jpg', FILE_URI, storage),
+            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/coffee_139.jpg', FILE_URI, storage)
         ).toEqual('/external-storages/test/collection%202021-05-27_13_39-0/dir_1?selection=%2Fcollection%202021-05-27_13_39-0%2Fdir_1%2Fcoffee_139.jpg');
     });
     it('gets a directory redirection link for external storage', () => {
         const storage = {
-            name: 'test',
-            label: 'Test',
-            path: '/api/storages/test/webdav',
-            searchPath: '/api/storages/test/search',
-            rootDirectoryIri: 'http://localhost:8080/api/webdav',
+            name: "test",
+            label: "Test",
+            path: "/api/storages/test/webdav",
+            searchPath: "/api/storages/test/search",
+            rootDirectoryIri: "http://localhost:8080/api/webdav"
         };
         expect(
-            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1', DIRECTORY_URI, storage),
+            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1', DIRECTORY_URI, storage)
         ).toEqual('/external-storages/test/collection%202021-05-27_13_39-0/dir_1');
     });
 });

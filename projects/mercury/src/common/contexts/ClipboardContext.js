@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { COPY, CUT } from '../../constants';
+import React, {useState} from 'react';
+import {COPY, CUT} from "../../constants";
 
 const ClipboardContext = React.createContext({
     cut: () => {},
@@ -11,7 +11,7 @@ const ClipboardContext = React.createContext({
     filenames: [],
 });
 
-export const ClipboardProvider = ({ children }) => {
+export const ClipboardProvider = ({children}) => {
     const [method, setMethod] = useState(CUT);
     const [filenames, setFilenames] = useState([]);
 
@@ -39,7 +39,7 @@ export const ClipboardProvider = ({ children }) => {
                 clear,
 
                 method,
-                filenames,
+                filenames
             }}
         >
             {children}

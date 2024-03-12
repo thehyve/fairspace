@@ -1,7 +1,7 @@
-import { act } from 'react-dom/test-utils';
+import {act} from 'react-dom/test-utils';
 
-import { testHook } from '../../utils/testUtils';
-import usePagination from '../UsePagination';
+import {testHook} from "../../utils/testUtils";
+import usePagination from "../UsePagination";
 
 const items = ['item 1', 'item 4', 'item 3', 'item 2', 'item 5'];
 const initialRowsPerPage = 2;

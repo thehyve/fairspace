@@ -1,13 +1,13 @@
-import React from 'react';
+import React from "react";
 
-import { render, screen, waitFor } from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import ExternalMetadataSourceView from '../ExternalMetadataSourceView';
-import { ExternalMetadataSourceProvider } from '../ExternalMetadataSourceContext';
-import useAsync from '../../../common/hooks/UseAsync';
+import {ExternalMetadataSourceProvider} from "../ExternalMetadataSourceContext";
+import useAsync from "../../../common/hooks/UseAsync";
 
 jest.mock('axios');
 jest.mock('../../../common/hooks/UseAsync', () => jest.fn());
-jest.mock('../../views/MetadataView', () => ({ pathPrefix }) => <div>{pathPrefix}</div>);
+jest.mock('../../views/MetadataView', () => ({pathPrefix}) => <div>{pathPrefix}</div>);
 
 describe('ExternalMetadataSourceView', () => {
     it('renders MetadataView with proper path redirection', async () => {
@@ -21,8 +21,8 @@ describe('ExternalMetadataSourceView', () => {
 
         render(
             <ExternalMetadataSourceProvider>
-                <ExternalMetadataSourceView match={{ params: { source: 'example' } }} classes={{}} />
-            </ExternalMetadataSourceProvider>,
+                <ExternalMetadataSourceView match={{params: {source: 'example'}}} classes={{}} />
+            </ExternalMetadataSourceProvider>
         );
 
         await waitFor(() => {

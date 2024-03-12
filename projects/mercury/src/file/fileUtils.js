@@ -1,9 +1,9 @@
 /* eslint-disable import/no-cycle */
-import { File } from './FileAPI';
-import { FILE_URI, PATH_SEPARATOR } from '../constants';
-import { getCollectionAbsolutePath } from '../collections/collectionUtils';
-import { getExternalStorageAbsolutePath } from '../external-storage/externalStorageUtils';
-import type { ExternalStorage } from '../external-storage/externalStorageUtils';
+import {File} from "./FileAPI";
+import {FILE_URI, PATH_SEPARATOR} from "../constants";
+import {getCollectionAbsolutePath} from "../collections/collectionUtils";
+import {getExternalStorageAbsolutePath} from "../external-storage/externalStorageUtils";
+import type {ExternalStorage} from "../external-storage/externalStorageUtils";
 
 const NON_SAFE_FILE_NAME_CHARACTERS = ['/', '\\'];
 const NON_SAFE_FILE_NAMES = ['.', '..'];
@@ -42,9 +42,9 @@ export const getParentPath = (path: string) => {
     return (pos > 1) ? path.substring(0, pos) : '';
 };
 
-export const getPathFromIri = (iri: string, pathPrefix = '') => {
+export const getPathFromIri = (iri: string, pathPrefix = "") => {
     const url = new URL(iri);
-    const path = iri.replace(pathPrefix || url.origin + '/api/webdav/', '');
+    const path = iri.replace(pathPrefix || url.origin + "/api/webdav/", '');
     const strippedPath = getStrippedPath(path);
     return decodeURIComponent(strippedPath);
 };
@@ -80,7 +80,7 @@ const decodeIfPossible = segment => {
     }
 };
 
-export const getAbsolutePath = (path: string, storageName: string = '') => {
+export const getAbsolutePath = (path: string, storageName: string = "") => {
     if (storageName) {
         return getExternalStorageAbsolutePath(path, storageName);
     }
@@ -96,11 +96,11 @@ export const redirectLink = (iri: string, type: string, storage: ExternalStorage
     return getAbsolutePath(path, storage.name);
 };
 
-export const getPathInfoFromParams = ({ collection, path }) => (
+export const getPathInfoFromParams = ({collection, path}) => (
     {
         collectionName: decodeIfPossible(collection || ''),
         openedPath: `/${decodeIfPossible(collection || '')}${path
-            ? `/${path.split(PATH_SEPARATOR).map(decodeIfPossible).join(PATH_SEPARATOR)}` : ''}`,
+            ? `/${path.split(PATH_SEPARATOR).map(decodeIfPossible).join(PATH_SEPARATOR)}` : ''}`
     }
 );
 
@@ -113,14 +113,14 @@ export function getFileName(path) {
 // the extension includes a dot in some cases and is empty in others. That will very much help in reusing logic
 export const getBaseNameAndExtension = (fileName) => {
     if (!fileName) {
-        return { baseName: '', extension: '' };
+        return {baseName: '', extension: ''};
     }
 
     const dotPosition = fileName.lastIndexOf('.');
     const baseName = (dotPosition > 0) ? fileName.substring(0, dotPosition) : fileName;
     const extension = (dotPosition > 0) ? fileName.substring(dotPosition) : '';
 
-    return { baseName, extension };
+    return {baseName, extension};
 };
 
 export function generateUniqueFileName(fileName, usedNames = []) {
@@ -128,7 +128,7 @@ export function generateUniqueFileName(fileName, usedNames = []) {
         return fileName;
     }
 
-    const { baseName, extension } = getBaseNameAndExtension(fileName);
+    const {baseName, extension} = getBaseNameAndExtension(fileName);
     let counter = 1;
     let newName = `${baseName} (${counter})${extension}`;
 
@@ -160,4 +160,4 @@ export const isValidFileName = (fileName) => {
         && !isUnsafeFileName(name);
 };
 
-export const isListOnlyFile = (file: File) => file && file.type === 'file' && file.access === 'List';
+export const isListOnlyFile = (file: File) => file && file.type === 'file' && file.access === "List";

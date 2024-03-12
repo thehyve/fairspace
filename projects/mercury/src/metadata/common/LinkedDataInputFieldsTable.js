@@ -1,10 +1,10 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import LinkedDataValuesList from './LinkedDataValuesList';
+import PropTypes from "prop-types";
+import LinkedDataValuesList from "./LinkedDataValuesList";
 
 const LinkedDataInputFieldsTable = (
-    { property, values, validationErrors, onAdd, onChange, onDelete, canEdit,
-        labelId, addComponent, editComponent: EditComponent },
+    {property, values, validationErrors, onAdd, onChange, onDelete, canEdit,
+        labelId, addComponent, editComponent: EditComponent}
 ) => {
     // For input fields there is only a single input field
     const hasErrors = validationErrors && validationErrors.length > 0;
@@ -20,7 +20,7 @@ const LinkedDataInputFieldsTable = (
                 aria-labelledby={labelId}
                 error={hasErrors}
             />
-        ),
+        )
     };
 
     return (
@@ -44,12 +44,12 @@ LinkedDataInputFieldsTable.propTypes = {
     addComponent: PropTypes.func,
     property: PropTypes.object,
     labelId: PropTypes.string,
-    canEdit: PropTypes.bool,
+    canEdit: PropTypes.bool
 };
 
 LinkedDataInputFieldsTable.defaultProps = {
     onChange: () => {},
-    onDelete: () => {},
+    onDelete: () => {}
 };
 
 export default LinkedDataInputFieldsTable;

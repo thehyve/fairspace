@@ -1,4 +1,4 @@
-import { getSearchQueryFromString } from '../searchUtils';
+import {getSearchQueryFromString} from '../searchUtils';
 
 describe('Search Utilities', () => {
     it('should get correct search query from string', () => {

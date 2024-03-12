@@ -1,13 +1,13 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
 
-import InputWithAddition from './values/InputWithAddition';
-import LinkedDataDropdown from './LinkedDataDropdown';
-import LinkedDataContext from '../LinkedDataContext';
-import { determineShapeForTypes } from './vocabularyUtils';
+import InputWithAddition from "./values/InputWithAddition";
+import LinkedDataDropdown from "./LinkedDataDropdown";
+import LinkedDataContext from "../LinkedDataContext";
+import {determineShapeForTypes} from './vocabularyUtils';
 
-const LinkedDataDropdownWithAddition = ({ property, onChange, currentValues }) => {
-    const { shapes, shapesPending, shapesError, requireIdentifier } = useContext(LinkedDataContext);
+const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => {
+    const {shapes, shapesPending, shapesError, requireIdentifier} = useContext(LinkedDataContext);
 
     const shape = (!shapesPending && !shapesError) ? determineShapeForTypes(shapes, [property.className]) : {};
 

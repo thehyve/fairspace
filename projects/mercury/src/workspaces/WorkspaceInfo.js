@@ -1,14 +1,14 @@
-import React, { useContext } from 'react';
-import { Paper } from '@mui/material';
+import React, {useContext} from 'react';
+import {Paper} from '@mui/material';
 
 import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
 import LinkedDataEntityForm from '../metadata/common/LinkedDataEntityForm';
 import useLinkedData from '../metadata/common/UseLinkedData';
 import LinkedDataEntityFormContainer from '../metadata/common/LinkedDataEntityFormContainer';
 import WorkspaceActionMenu from './WorkspaceActionMenu';
-import { isAdmin } from '../users/userUtils';
+import {isAdmin} from '../users/userUtils';
 import UserContext from '../users/UserContext';
-import type { Workspace } from './WorkspacesAPI';
+import type {Workspace} from './WorkspacesAPI';
 import WorkspaceContext from './WorkspaceContext';
 
 type WorkspaceInfoProps = {
@@ -16,11 +16,11 @@ type WorkspaceInfoProps = {
 }
 
 const WorkspaceInfo = (props: WorkspaceInfoProps) => {
-    const { workspace } = props;
-    const { iri } = workspace;
-    const { typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData } = useLinkedData(iri);
-    const { currentUser } = useContext(UserContext);
-    const { refreshWorkspaces } = useContext(WorkspaceContext);
+    const {workspace} = props;
+    const {iri} = workspace;
+    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
+    const {currentUser} = useContext(UserContext);
+    const {refreshWorkspaces} = useContext(WorkspaceContext);
 
     const onUpdate = () => {
         updateLinkedData();
@@ -31,7 +31,7 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
 
     return (
         <>
-            <Paper style={{ padding: 20, overflowX: 'auto' }}>
+            <Paper style={{padding: 20, overflowX: 'auto'}}>
                 {workspace.canManage ? (
                     <LinkedDataEntityFormContainer
                         subject={iri}

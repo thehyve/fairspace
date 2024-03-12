@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import * as consts from '../../constants';
-import { getFirstPredicateId, getFirstPredicateValue } from './jsonLdUtils';
-import { determineShapeForTypes } from './vocabularyUtils';
-import { isNonEmptyValue } from '../../common/utils/genericUtils';
+import * as consts from "../../constants";
+import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import {determineShapeForTypes} from './vocabularyUtils';
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
 
 /**
  * Returns the local part of the given uri
@@ -68,7 +68,7 @@ export function getLabel(entity, shortenExternalUris = false) {
  */
 export function getLabelStrict(entity) {
     return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || '';
+        || "";
 }
 
 /**
@@ -176,7 +176,7 @@ export const getTypeInfo = (linkedDataItem, vocabulary) => {
         typeIri: getFirstPredicateId(shape, consts.SHACL_TARGET_CLASS) || shape['@id'],
         label: getFirstPredicateValue(shape, consts.SHACL_NAME),
         description: getFirstPredicateValue(shape, consts.SHACL_DESCRIPTION),
-        comment: getFirstPredicateValue(shape, consts.COMMENT_URI),
+        comment: getFirstPredicateValue(shape, consts.COMMENT_URI)
     };
 };
 
@@ -227,7 +227,7 @@ export const url2iri = (iri) => {
         const url = new URL(iri);
         return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
     } catch (e) {
-        console.warn('Invalid uri given to convert to iri', iri);
+        console.warn("Invalid uri given to convert to iri", iri);
         return iri;
     }
 };
@@ -257,7 +257,7 @@ export const getNamespacedIri = (iri, namespaces) => {
  */
 export const partitionErrors = (errors, subject) => {
     const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
-    return { entityErrors, otherErrors };
+    return {entityErrors, otherErrors};
 };
 
 /**

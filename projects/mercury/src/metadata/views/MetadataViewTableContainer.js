@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
     CircularProgress,
     FormControlLabel,
@@ -10,32 +10,32 @@ import {
     Typography,
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { useHistory } from 'react-router-dom';
-import { Addchart, ViewColumn, Check } from '@mui/icons-material';
-import Checkbox from '@mui/material/Checkbox';
-import FormControl from '@mui/material/FormControl';
-import Popover from '@mui/material/Popover';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import GetAppIcon from '@mui/icons-material/GetApp';
-import FormGroup from '@mui/material/FormGroup';
-import useDeepCompareEffect from 'use-deep-compare-effect';
+import {useHistory} from "react-router-dom";
+import {Addchart, ViewColumn, Check} from "@mui/icons-material";
+import Checkbox from "@mui/material/Checkbox";
+import FormControl from "@mui/material/FormControl";
+import Popover from "@mui/material/Popover";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import GetAppIcon from "@mui/icons-material/GetApp";
+import FormGroup from "@mui/material/FormGroup";
+import useDeepCompareEffect from "use-deep-compare-effect";
 
-import type { MetadataViewColumn, MetadataViewFilter } from './MetadataViewAPI';
-import MessageDisplay from '../../common/components/MessageDisplay';
-import type { MetadataViewEntityWithLinkedFiles } from './metadataViewUtils';
-import useViewData from './UseViewData';
-import MetadataViewTable from './MetadataViewTable';
-import useStateWithLocalStorage from '../../common/hooks/UseLocalStorage';
-import { Collection } from '../../collections/CollectionAPI';
+import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
+import MessageDisplay from "../../common/components/MessageDisplay";
+import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
+import useViewData from "./UseViewData";
+import MetadataViewTable from "./MetadataViewTable";
+import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
+import {Collection} from "../../collections/CollectionAPI";
 import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
-import { isNonEmptyValue } from '../../common/utils/genericUtils';
-import MetadataViewActiveTextFilters from './MetadataViewActiveTextFilters';
-import TablePaginationActions from '../../common/components/TablePaginationActions';
-import FeaturesContext from '../../common/contexts/FeaturesContext';
-import ProgressButton from '../../common/components/ProgressButton';
-import { ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage } from '../../file/FileAPI';
-import ErrorDialog from '../../common/components/ErrorDialog';
+import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
+import TablePaginationActions from "../../common/components/TablePaginationActions";
+import FeaturesContext from "../../common/contexts/FeaturesContext";
+import ProgressButton from "../../common/components/ProgressButton";
+import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
+import ErrorDialog from "../../common/components/ErrorDialog";
 
 type MetadataViewTableContainerProperties = {
     columns: MetadataViewColumn[];
@@ -56,52 +56,52 @@ const styles = () => ({
     footerButtonDiv: {
         display: 'flex',
         padding: 0,
-        margin: 4,
+        margin: 4
     },
     footerCountDiv: {
         marginTop: 10,
-        marginLeft: 7,
+        marginLeft: 7
     },
     exportButton: {
         margin: 3,
         fontSize: 12,
-        padding: 2,
+        padding: 2
     },
     tableContents: {
-        minHeight: '200px',
-        maxHeight: 'calc(100vh - 310px)',
-        overflowY: 'auto',
-        overflowX: 'auto',
+        "minHeight": '200px',
+        "maxHeight": 'calc(100vh - 310px)',
+        "overflowY": 'auto',
+        "overflowX": 'auto',
         '& .MuiTableCell-stickyHeader': {
-            backgroundColor: 'white',
-        },
+            backgroundColor: "white"
+        }
     },
     tableFooter: {
-        flex: 1,
+        flex: 1
     },
     tableSettings: {
         position: 'relative',
         marginTop: -40,
         marginRight: 10,
         float: 'right',
-        maxWidth: 50,
+        maxWidth: 50
     },
     viewColumnsFormControl: {
-        padding: 10,
+        padding: 10
     },
     messageBox: {
-        padding: 5,
-    },
+        padding: 5
+    }
 });
 
 const LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY = 'FAIRSPACE_METADATA_TABLE_ROWS_NUM';
 const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_COLUMNS';
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const { view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes } = props;
-    const { textFiltersObject, setTextFiltersObject } = props;
+    const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
+    const {textFiltersObject, setTextFiltersObject} = props;
 
-    const { isFeatureEnabled } = useContext(FeaturesContext);
+    const {isFeatureEnabled} = useContext(FeaturesContext);
     const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
     const [exportToAnalysisLoading, setExportToAnalysisLoading] = useState(false);
     const [currentSelectionExported, setCurrentSelectionExported] = useState(false);
@@ -109,7 +109,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
-        columns.map(c => c.name),
+        columns.map(c => c.name)
     );
     const [rowsPerPage, setRowsPerPage] = useStateWithLocalStorage(LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY, 10);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -117,7 +117,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const { data, count, error, loading, loadingCount, refreshDataOnly } = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
     const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
     const resetRowCheckboxes = () => {
@@ -127,7 +127,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const setRowCheckboxState = (id: string, checked: boolean) => {
         if (rowCheckboxes) {
             setRowCheckboxes(oldState => {
-                const newState = { ...oldState };
+                const newState = {...oldState};
                 newState[id] = checked;
                 return newState;
             });
@@ -162,11 +162,11 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     };
 
     const getCsvHeader = () => {
-        let header = 'id';
+        let header = "id";
 
         if (data && data.rows) {
-            header += ';';
-            header += visibleColumnNames.join(';');
+            header += ";";
+            header += visibleColumnNames.join(";");
         }
 
         return header;
@@ -175,22 +175,22 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
     const getCsvValuesForAttribute = (row, attribute) => {
         if (row[attribute] === undefined) {
-            return '-';
+            return "-";
         }
         return Object.values(row[attribute])
-            .map(value => ((value && value.label) ?? '-').replaceAll(';', '.,'))
-            .join(',');
+            .map(value => ((value && value.label) ?? "-").replaceAll(";", ".,"))
+            .join(",");
     };
 
     const getCsvValues = () => {
-        let values = '';
+        let values = "";
         if (Object.keys(rowCheckboxes).length > 0) {
             data.rows.forEach(row => {
                 const rowKey = row[idColumn.name][0].value;
                 if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
                     values += '\n' + rowKey;
                     visibleColumnNames.forEach(attribute => {
-                        values += ';' + getCsvValuesForAttribute(row, attribute);
+                        values += ";" + getCsvValuesForAttribute(row, attribute);
                     });
                 }
             });
@@ -201,19 +201,19 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const createCsvBlob = (): Blob => {
         let csvFile = getCsvHeader();
         csvFile += getCsvValues();
-        return new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+        return new Blob([csvFile], {type: 'text/csv;charset=utf-8;'});
     };
 
     const exportTable = () => {
         const blob = createCsvBlob();
-        const fileName = 'fairspace_export.csv';
-        const link = document.createElement('a');
+        const fileName = "fairspace_export.csv";
+        const link = document.createElement("a");
         if (link.download !== undefined) { // feature detection
             // Browsers that support HTML5 download attribute
             const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', fileName);
-            link.style = 'visibility:hidden';
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style = "visibility:hidden";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -248,8 +248,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             open={columnSelectorOpen}
             onClose={handleColumnSelectorClose}
             anchorEl={anchorEl}
-            anchorOrigin={{ vertical: 'center', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            anchorOrigin={{vertical: 'center', horizontal: 'left'}}
+            transformOrigin={{vertical: 'top', horizontal: 'right'}}
         >
             <FormControl className={classes.viewColumnsFormControl}>
                 <Typography variant="caption">
@@ -291,12 +291,12 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         </div>
     );
 
-    const labelDisplayedRows = ({ from, to, count: totalCount, countIsLoading }) => (
+    const labelDisplayedRows = ({from, to, count: totalCount, countIsLoading}) => (
         <span>
             <Typography variant="body2" component="span" display="inline">{from}-{to} of </Typography>
-            <Typography variant="body2" component="span" display="inline" style={{ fontWeight: 'bold' }}>
-                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : ('more than ' + to)}
-                {countIsLoading && <CircularProgress size={14} style={{ marginLeft: 3 }} />}
+            <Typography variant="body2" component="span" display="inline" style={{fontWeight: "bold"}}>
+                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
+                {countIsLoading && <CircularProgress size={14} style={{marginLeft: 3}} />}
             </Typography>
         </span>
     );
@@ -400,7 +400,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                         className={classes.tableFooter}
-                        labelDisplayedRows={(d) => labelDisplayedRows({ ...d, countIsLoading: loadingCount })}
+                        labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
                         ActionsComponent={TablePaginationActions}
                     />
                 </div>

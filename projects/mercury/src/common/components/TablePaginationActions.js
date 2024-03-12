@@ -1,8 +1,8 @@
 import React from 'react';
-import IconButton from '@mui/material/IconButton';
-import { KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage } from '@mui/icons-material';
+import IconButton from "@mui/material/IconButton";
+import {KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage} from "@mui/icons-material";
 import makeStyles from '@mui/styles/makeStyles';
-import { Typography } from '@mui/material';
+import {Typography} from "@mui/material";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,7 +20,7 @@ export type TablePaginationActionsProperties = {
 
 const TablePaginationActions = (props: TablePaginationActionsProperties) => {
     const classes = useStyles();
-    const { count, page, rowsPerPage, onPageChange } = props;
+    const {count, page, rowsPerPage, onPageChange} = props;
 
     const handleFirstPageButtonClick = (event) => {
         onPageChange(event, 0);

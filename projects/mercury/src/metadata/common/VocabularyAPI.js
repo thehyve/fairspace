@@ -1,7 +1,7 @@
-import LinkedDataAPI from './LinkedDataAPI';
+import LinkedDataAPI from "./LinkedDataAPI";
 
 export class LinkedDataVocabularyAPI extends LinkedDataAPI {
-    constructor(remoteURLPrefix = '/api') {
+    constructor(remoteURLPrefix = "/api") {
         super('vocabulary', remoteURLPrefix);
     }
 }

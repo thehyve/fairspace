@@ -1,38 +1,38 @@
 import React from 'react';
-import { configure, shallow } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
-import { act } from 'react-dom/test-utils';
+import {act} from 'react-dom/test-utils';
 
-import { ExternalStoragePage } from '../ExternalStoragePage';
-import ExternalStorageBrowser from '../ExternalStorageBrowser';
-import MessageDisplay from '../../common/components/MessageDisplay';
+import {ExternalStoragePage} from "../ExternalStoragePage";
+import ExternalStorageBrowser from "../ExternalStorageBrowser";
+import MessageDisplay from "../../common/components/MessageDisplay";
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({ adapter: new Adapter() });
+configure({adapter: new Adapter()});
 
 const storages = [
     {
         url: 'http://xyz',
         name: 'xyz',
-        label: 'Some external storage',
-    },
+        label: 'Some external storage'
+    }
 ];
 
 function shallowRender(path = '', storage = 'xyz', location) {
     const match = {
         params: {
-            storage,
-        },
+            storage
+        }
     };
     return shallow(
         <ExternalStoragePage
             match={match}
-            location={location || { pathname: path }}
+            location={location || {pathname: path}}
             externalStorages={storages}
             classes={{}}
-        />,
+        />
     );
 }
 
@@ -63,8 +63,8 @@ describe('ExternalStoragePage', () => {
 
     it('renders a file browser with a preselected file', () => {
         const location = {
-            pathname: '/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0',
-            search: '?selection=%2Fcollection%202021-05-27_13_39-2%2Fdir_0%2Fcoffee_139.jpg',
+            pathname: "/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0",
+            search: "?selection=%2Fcollection%202021-05-27_13_39-2%2Fdir_0%2Fcoffee_139.jpg",
         };
         act(() => {
             wrapper = shallowRender('/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0', 'xyz', location);

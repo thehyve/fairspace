@@ -1,19 +1,19 @@
-import React, { useContext } from 'react';
+import React, {useContext} from "react";
 
-import withStyles from '@mui/styles/withStyles';
-import { Grid, Link, Paper, Typography } from '@mui/material';
-import BreadCrumbs from '../common/components/BreadCrumbs';
-import styles from './DashboardPage.styles';
-import MetadataViewContext from '../metadata/views/MetadataViewContext';
-import ExternalMetadataSourceContext from '../metadata/external-sources/ExternalMetadataSourceContext';
-import UserContext from '../users/UserContext';
-import DomainInfo from './DomainInfo';
-import { APPLICATION_NAME, METADATA_VIEW_MENU_LABEL } from '../constants';
+import withStyles from "@mui/styles/withStyles";
+import {Grid, Link, Paper, Typography} from "@mui/material";
+import BreadCrumbs from "../common/components/BreadCrumbs";
+import styles from "./DashboardPage.styles";
+import MetadataViewContext from "../metadata/views/MetadataViewContext";
+import ExternalMetadataSourceContext from "../metadata/external-sources/ExternalMetadataSourceContext";
+import UserContext from "../users/UserContext";
+import DomainInfo from "./DomainInfo";
+import {APPLICATION_NAME, METADATA_VIEW_MENU_LABEL} from "../constants";
 
 const DashboardPage = (props) => {
-    const { currentUser, classes } = props;
-    const { views } = useContext(MetadataViewContext);
-    const { externalMetadataSources } = useContext(ExternalMetadataSourceContext);
+    const {currentUser, classes} = props;
+    const {views} = useContext(MetadataViewContext);
+    const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
     const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
 
     return (
@@ -40,7 +40,7 @@ const DashboardPage = (props) => {
                         <Grid item xs={6} md={2} />
                         <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
-                                For more details on how to use Fairspace, e.g. how to query the API, please refer the {' '}
+                                For more details on how to use Fairspace, e.g. how to query the API, please refer the {" "}
                                 <Link href="https://docs.fairway.app/">
                                     user manual
                                 </Link>.
@@ -70,7 +70,7 @@ const DashboardPage = (props) => {
 };
 
 const ContextualDashboardPage = (props) => {
-    const { currentUser } = useContext(UserContext);
+    const {currentUser} = useContext(UserContext);
 
     return <DashboardPage currentUser={currentUser} {...props} />;
 };

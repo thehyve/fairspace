@@ -1,13 +1,13 @@
 import React from 'react';
-import { configure, shallow } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
 import ConfirmationButton from '../ConfirmationButton';
 import ConfirmationDialog from '../ConfirmationDialog';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({ adapter: new Adapter() });
+configure({adapter: new Adapter()});
 
 describe('<ConfirmationButton />', () => {
     it('should close dialog before calling onlick prop', () => {
@@ -15,7 +15,7 @@ describe('<ConfirmationButton />', () => {
         const wrapper = shallow(
             <ConfirmationButton message="test" onClick={onClick}>
                 <div>something</div>
-            </ConfirmationButton>,
+            </ConfirmationButton>
         );
 
         wrapper.childAt(0).simulate('click');
@@ -23,8 +23,8 @@ describe('<ConfirmationButton />', () => {
 
         expect(onClick.mock.calls.length).toEqual(0);
 
-        const agreeCallback = wrapper.find(ConfirmationDialog).prop('onAgree');
-        agreeCallback({ stopPropagation: () => {} });
+        const agreeCallback = wrapper.find(ConfirmationDialog).prop("onAgree");
+        agreeCallback({stopPropagation: () => {}});
         expect(wrapper.find(ConfirmationDialog).length).toEqual(0);
         expect(onClick.mock.calls.length).toEqual(1);
     });
@@ -34,7 +34,7 @@ describe('<ConfirmationButton />', () => {
         const wrapper = shallow(
             <ConfirmationButton message="test" disabled onClick={onClick}>
                 <div>something</div>
-            </ConfirmationButton>,
+            </ConfirmationButton>
         );
 
         wrapper.childAt(0).simulate('click');
@@ -46,7 +46,7 @@ describe('<ConfirmationButton />', () => {
         const wrapper = shallow(
             <ConfirmationButton message="test" onClick={onClick}>
                 <div>something</div>
-            </ConfirmationButton>,
+            </ConfirmationButton>
         );
 
         wrapper.childAt(0).simulate('click');
@@ -58,7 +58,7 @@ describe('<ConfirmationButton />', () => {
         const wrapper = shallow(
             <ConfirmationButton message="test" disabled onClick={onClick}>
                 <div>something</div>
-            </ConfirmationButton>,
+            </ConfirmationButton>
         );
 
         wrapper.childAt(0).simulate('click');

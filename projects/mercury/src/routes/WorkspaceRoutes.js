@@ -1,24 +1,24 @@
-import React, { useContext } from 'react';
-import { Redirect, Route, Switch } from 'react-router-dom';
+import React, {useContext} from 'react';
+import {Redirect, Route, Switch} from "react-router-dom";
 
 import * as queryString from 'query-string';
-import WorkspaceOverview from '../workspaces/WorkspaceOverview';
-import Collections from '../collections/CollectionsPage';
-import Dashboard from '../dashboard/DashboardPage';
-import FilesPage from '../file/FilesPage';
-import { MetadataWrapper } from '../metadata/LinkedDataWrapper';
-import LinkedDataEntityPage from '../metadata/common/LinkedDataEntityPage';
-import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
-import CollectionSearchResultList from '../search/SearchResultList';
-import WorkspacesPage from '../workspaces/WorkspacesPage';
-import { isAdmin } from '../users/userUtils';
-import UserContext from '../users/UserContext';
-import UserRolesPage from '../users/UserRolesPage';
+import WorkspaceOverview from "../workspaces/WorkspaceOverview";
+import Collections from "../collections/CollectionsPage";
+import Dashboard from "../dashboard/DashboardPage";
+import FilesPage from "../file/FilesPage";
+import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
+import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
+import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
+import CollectionSearchResultList from "../search/SearchResultList";
+import WorkspacesPage from "../workspaces/WorkspacesPage";
+import {isAdmin} from "../users/userUtils";
+import UserContext from "../users/UserContext";
+import UserRolesPage from "../users/UserRolesPage";
 import MetadataView from '../metadata/views/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
-import ExternalStoragePage from '../external-storage/ExternalStoragePage';
-import ExternalMetadataSourcesView from '../metadata/external-sources/ExternalMetadataSourceView';
-import { METADATA_VIEW_MENU_LABEL } from '../constants';
+import ExternalStoragePage from "../external-storage/ExternalStoragePage";
+import ExternalMetadataSourcesView from "../metadata/external-sources/ExternalMetadataSourceView";
+import {METADATA_VIEW_MENU_LABEL} from "../constants";
 
 const getSubject = () => (
     document.location.search ? queryString.parse(document.location.search).iri : null
@@ -28,7 +28,7 @@ const getSubject = () => (
 const MetadataViewMemo = React.memo(MetadataView);
 
 const WorkspaceRoutes = () => {
-    const { currentUser } = useContext(UserContext);
+    const {currentUser} = useContext(UserContext);
 
     return (
         <Switch>
@@ -84,7 +84,7 @@ const WorkspaceRoutes = () => {
             <Route
                 path="/metadata-views"
                 render={() => (
-                    <BreadcrumbsContext.Provider value={{ segments: [] }}>
+                    <BreadcrumbsContext.Provider value={{segments: []}}>
                         <LinkedDataMetadataProvider>
                             <MetadataViewMemo />
                         </LinkedDataMetadataProvider>
@@ -95,7 +95,7 @@ const WorkspaceRoutes = () => {
             <Route
                 path="/metadata-sources/:source"
                 render={(props) => (
-                    <BreadcrumbsContext.Provider value={{ segments: [] }}>
+                    <BreadcrumbsContext.Provider value={{segments: []}}>
                         <LinkedDataMetadataProvider>
                             <ExternalMetadataSourcesView {...props} />
                         </LinkedDataMetadataProvider>

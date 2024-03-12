@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import { TextField } from '@mui/material';
+import {TextField} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import SearchIcon from '@mui/icons-material/Search';
 
-import InputAdornment from '@mui/material/InputAdornment';
-import IconButton from '@mui/material/IconButton';
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
 import styles from './SearchBar.styles';
 
 const SearchBar = ({
-    classes, query = '', placeholder, onSearchChange = () => {}, disabled = false, width = '100%',
+    classes, query = '', placeholder, onSearchChange = () => {}, disabled = false, width = '100%'
 }) => {
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
@@ -41,7 +41,7 @@ const SearchBar = ({
                 classes={{
                     root: classes.inputRoot,
                 }}
-                style={{ width }}
+                style={{width}}
                 value={value}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
@@ -50,7 +50,7 @@ const SearchBar = ({
                 InputProps={{
                     classes: {
                         input: classes.inputInput,
-                        adornedEnd: classes.adornedEnd,
+                        adornedEnd: classes.adornedEnd
                     },
                     endAdornment: (
                         <InputAdornment position="end">
@@ -64,7 +64,7 @@ const SearchBar = ({
                                 <SearchIcon />
                             </IconButton>
                         </InputAdornment>
-                    ),
+                    )
                 }}
             />
         </div>
@@ -73,7 +73,7 @@ const SearchBar = ({
 
 SearchBar.propTypes = {
     classes: PropTypes.object.isRequired,
-    placeholder: PropTypes.string,
+    placeholder: PropTypes.string
 };
 
 export default withStyles(styles)(SearchBar);

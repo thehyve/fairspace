@@ -1,40 +1,40 @@
-import { act } from 'react-dom/test-utils';
+import {act} from 'react-dom/test-utils';
 
-import { testHook } from '../../utils/testUtils';
-import useSorting from '../UseSorting';
+import {testHook} from "../../utils/testUtils";
+import useSorting from "../UseSorting";
 
 const items = [
     {
         label: 'item 1',
         fixed: 10,
-        random: 3,
+        random: 3
     },
     {
         label: 'item 4',
         fixed: 10,
-        random: 12,
+        random: 12
     },
     {
         label: 'item 3',
         fixed: 10,
-        random: 5,
+        random: 5
     },
     {
         label: 'item 5',
         fixed: 10,
-        random: 7,
+        random: 7
     },
     {
         label: 'item 2',
         fixed: 10,
-        random: 12,
-    },
+        random: 12
+    }
 ];
 
 const columns = {
-    label: { valueExtractor: 'label' },
-    random: { valueExtractor: f => f.random },
-    fixed: { valueExtractor: 'fixed' },
+    label: {valueExtractor: 'label'},
+    random: {valueExtractor: f => f.random},
+    fixed: {valueExtractor: 'fixed'}
 };
 
 let sorting;

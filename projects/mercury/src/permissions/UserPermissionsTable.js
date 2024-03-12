@@ -1,54 +1,54 @@
 // @flow
 import React from 'react';
-import { IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography } from '@mui/material';
+import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import { Close, Person } from '@mui/icons-material';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import PropTypes from 'prop-types';
-import { accessLevels } from '../collections/CollectionAPI';
-import type { AccessLevel, Permission, Principal } from '../collections/CollectionAPI';
-import { collectionAccessIcon } from '../collections/collectionUtils';
+import {Close, Person} from "@mui/icons-material";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import PropTypes from "prop-types";
+import {accessLevels} from "../collections/CollectionAPI";
+import type {AccessLevel, Permission, Principal} from "../collections/CollectionAPI";
+import {collectionAccessIcon} from "../collections/collectionUtils";
 
 const styles = {
     table: {
-        padding: 0,
+        padding: 0
     },
     tableBody: {
         display: 'block',
         maxHeight: 150,
-        overflowX: 'auto',
+        overflowX: 'auto'
     },
     tableRow: {
         display: 'block',
         height: '99%',
-        width: '100%',
+        width: '100%'
     },
     iconCell: {
         padding: '0 0 0 8px',
-        textAlign: 'right',
+        textAlign: 'right'
     },
     emptyPermissions: {
         margin: 15,
         width: 350,
-        fontStyle: 'italic',
+        fontStyle: 'italic'
     },
     accessDropdown: {
-        fontSize: 14,
+        fontSize: 14
     },
     accessIcon: {
         verticalAlign: 'middle',
-        paddingRight: 5,
+        paddingRight: 5
     },
     accessCell: {
         padding: 0,
-        minWidth: 100,
-    },
+        minWidth: 100
+    }
 };
 
-export const UserPermissionsTable = ({ selectedPermissions = [], emptyPermissionsText, workspaceUsers = [], currentUser,
-    handleChangePermission, handleDeletePermission, canManage, classes }) => {
+export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissionsText, workspaceUsers = [], currentUser,
+    handleChangePermission, handleDeletePermission, canManage, classes}) => {
     if (selectedPermissions.length === 0) {
         return (
             <Typography variant="body2" className={classes.emptyPermissions}>
@@ -57,7 +57,7 @@ export const UserPermissionsTable = ({ selectedPermissions = [], emptyPermission
         );
     }
 
-    const availableWorkspaceMemberAccessLevels = accessLevels.filter(a => a !== 'None' && a !== 'List');
+    const availableWorkspaceMemberAccessLevels = accessLevels.filter(a => a !== "None" && a !== "List");
     const getAccessLevelsForPrincipal: AccessLevel[] = (selectedPrincipal: Principal) => {
         if (workspaceUsers.some(wu => wu.iri === selectedPrincipal.iri)) {
             return availableWorkspaceMemberAccessLevels;
@@ -75,7 +75,7 @@ export const UserPermissionsTable = ({ selectedPermissions = [], emptyPermission
                 value={selectedPermission.access}
                 onChange={v => handleChangePermission({
                     ...selectedPermission,
-                    access: v.target.value,
+                    access: v.target.value
                 })}
                 className={classes.accessDropdown}
             >
@@ -103,7 +103,7 @@ export const UserPermissionsTable = ({ selectedPermissions = [], emptyPermission
                                 </TableCell>
                                 <TableCell width="100%" data-testid="permission">
                                     <Tooltip title={p.name} placement="left-start" arrow>
-                                        <Typography variant="body2" noWrap style={{ width: 275 }}>
+                                        <Typography variant="body2" noWrap style={{width: 275}}>
                                             {p.name}
                                         </Typography>
                                     </Tooltip>
@@ -144,7 +144,7 @@ UserPermissionsTable.propTypes = {
     currentUser: PropTypes.object,
     handleChangePermission: PropTypes.func.isRequired,
     handleDeletePermission: PropTypes.func.isRequired,
-    canManage: PropTypes.bool,
+    canManage: PropTypes.bool
 };
 
 export default withStyles(styles)(UserPermissionsTable);

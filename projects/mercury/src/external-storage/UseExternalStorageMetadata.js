@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
-import type { User } from '../users/UsersAPI';
-import { formatDate, groupBy } from '../common/utils/genericUtils';
-import { getDisplayName } from '../users/userUtils';
-import MetadataAPI from '../metadata/common/MetadataAPI';
-import { getLabel, getTypeInfo } from '../metadata/common/metadataUtils';
-import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
-import UsersContext from '../users/UsersContext';
-import FileAPI from '../file/FileAPI';
+import {useContext, useEffect, useState} from "react";
+import type {User} from "../users/UsersAPI";
+import {formatDate, groupBy} from "../common/utils/genericUtils";
+import {getDisplayName} from "../users/userUtils";
+import MetadataAPI from "../metadata/common/MetadataAPI";
+import {getLabel, getTypeInfo} from "../metadata/common/metadataUtils";
+import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
+import UsersContext from "../users/UsersContext";
+import FileAPI from "../file/FileAPI";
 
 export type LabelValueProperty = {
     label: string;
@@ -24,7 +24,7 @@ const ignoredProperties = [
     'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'canUnpublish', 'accessMode', 'isreadonly',
     'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
     'status', 'getcreated', 'getcontenttype', 'mime', 'etag', 'getetag', 'iscollection',
-    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size', 'metadataLinks', 'version',
+    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size', 'metadataLinks', 'version'
 ];
 
 const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, LabelValueProperty> => {
@@ -34,44 +34,44 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
 
     const defaultProperties = {
         comment: {
-            label: 'Description',
-            value: data.comment,
+            label: "Description",
+            value: data.comment
         },
         lastmod: {
-            label: 'Last modified',
-            value: formatDate(data.lastmod),
+            label: "Last modified",
+            value: formatDate(data.lastmod)
         },
         createdBy: {
-            label: 'Created by',
-            value: getDisplayName(users.find(u => u.iri === data.createdBy)),
+            label: "Created by",
+            value: getDisplayName(users.find(u => u.iri === data.createdBy))
         },
         creationdate: {
-            label: 'Created',
-            value: formatDate(data.creationdate),
+            label: "Created",
+            value: formatDate(data.creationdate)
         },
         contentType: {
-            label: 'Content type',
-            value: data.mime,
-        },
+            label: "Content type",
+            value: data.mime
+        }
     };
     const propertiesToDisplay = Object.keys(data).filter(
-        k => !ignoredProperties.includes(k) && !Object.keys(defaultProperties).includes(k),
+        k => !ignoredProperties.includes(k) && !Object.keys(defaultProperties).includes(k)
     );
     const otherProperties = {};
-    propertiesToDisplay.forEach(p => { otherProperties[p] = { value: data[p] }; });
+    propertiesToDisplay.forEach(p => {otherProperties[p] = {value: data[p]};});
 
-    return { ...defaultProperties, ...otherProperties };
+    return {...defaultProperties, ...otherProperties};
 };
 
 const mapLinkedMetadataProperties = (values: any[], vocabulary: any[]): Map<string, LinkedEntityProperty> => {
     const metadataEntities: LinkedEntityProperty[] = values
         .map(value => ({
-            id: value['@id'],
+            id: value["@id"],
             type: getTypeInfo(value, vocabulary).label,
-            label: getLabel(value),
+            label: getLabel(value)
         }))
         .filter(value => value.type != null);
-    return groupBy(metadataEntities, 'type');
+    return groupBy(metadataEntities, "type");
 };
 
 const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
@@ -81,8 +81,8 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
     const [linkedMetadataEntitiesLoading, setLinkedMetadataEntitiesLoading] = useState(false);
     const [error, setError] = useState();
 
-    const { vocabulary } = useContext(VocabularyContext);
-    const { users } = useContext(UsersContext);
+    const {vocabulary} = useContext(VocabularyContext);
+    const {users} = useContext(UsersContext);
 
     const fetchLinkedMetadataEntities = (subjects = []) => {
         setLinkedMetadataEntitiesLoading(true);
@@ -116,14 +116,14 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => { fetchMetadata(); }, [path]);
+    useEffect(() => {fetchMetadata();}, [path]);
 
     return {
         loading,
         error,
         metadata,
         linkedMetadataEntities,
-        linkedMetadataEntitiesLoading,
+        linkedMetadataEntitiesLoading
     };
 };
 

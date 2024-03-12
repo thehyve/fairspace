@@ -1,17 +1,17 @@
-import { LocalFileAPI } from './FileAPI';
-import { joinPaths } from './fileUtils';
-import useAsync from '../common/hooks/UseAsync';
+import {LocalFileAPI} from "./FileAPI";
+import {joinPaths} from "./fileUtils";
+import useAsync from "../common/hooks/UseAsync";
 
 /**
  * This hook contains logic about files for a certain directory.
  */
 export const useFiles = (path, showDeleted = false, fileApi = LocalFileAPI) => {
-    const { loading, error, data = [], refresh } = useAsync(
+    const {loading, error, data = [], refresh} = useAsync(
         () => fileApi.list(path, showDeleted),
-        [path, showDeleted, fileApi],
+        [path, showDeleted, fileApi]
     );
 
-    const { getDownloadLink } = fileApi;
+    const {getDownloadLink} = fileApi;
 
     const renameFile = (currentFilename, newFilename) => {
         const from = joinPaths(path, currentFilename);
@@ -64,7 +64,7 @@ export const useFiles = (path, showDeleted = false, fileApi = LocalFileAPI) => {
             renameFile,
             copyPaths,
             showFileHistory,
-            revertToVersion,
-        },
+            revertToVersion
+        }
     };
 };

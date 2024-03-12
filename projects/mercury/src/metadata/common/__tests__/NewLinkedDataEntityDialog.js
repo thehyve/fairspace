@@ -1,23 +1,23 @@
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import {fireEvent, render} from '@testing-library/react';
+import {act} from 'react-dom/test-utils';
 import '@testing-library/jest-dom/extend-expect';
-import { MemoryRouter } from 'react-router-dom';
+import {MemoryRouter} from "react-router-dom";
 
-import NewLinkedDataEntityDialog from '../NewLinkedDataEntityDialog';
+import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
 import LinkedDataContext from '../../LinkedDataContext';
 import VocabularyContext from '../../vocabulary/VocabularyContext';
 
 const shape = {
-    '@type': [
-        'https://fairspace.nl/ontology#ClassShape',
+    "@type": [
+        "https://fairspace.nl/ontology#ClassShape"
     ],
-    '@id': 'http://xmlns.com/foaf/0.1/SomeClass',
-    'http://www.w3.org/ns/shacl#targetClass': [
+    "@id": "http://xmlns.com/foaf/0.1/SomeClass",
+    "http://www.w3.org/ns/shacl#targetClass": [
         {
-            '@id': 'http://xmlns.com/foaf/0.1/SomeClass',
-        },
-    ],
+            "@id": "http://xmlns.com/foaf/0.1/SomeClass"
+        }
+    ]
 };
 
 const extendProperties = () => [];
@@ -29,18 +29,18 @@ describe('<NewLinkedDataEntityDialog />', () => {
     });
 
     it('initialises the values/updates with the type', async () => {
-        const { getByTestId } = render(
+        const {getByTestId} = render(
             <MemoryRouter>
                 <VocabularyContext.Provider
                     value={{
-                        vocabulary: [],
+                        vocabulary: []
                     }}
                 >
                     <LinkedDataContext.Provider
                         value={{
                             shapes: [],
                             extendProperties,
-                            createLinkedDataEntity,
+                            createLinkedDataEntity
                         }}
                     >
                         <NewLinkedDataEntityDialog
@@ -51,7 +51,7 @@ describe('<NewLinkedDataEntityDialog />', () => {
                         />
                     </LinkedDataContext.Provider>
                 </VocabularyContext.Provider>
-            </MemoryRouter>,
+            </MemoryRouter>
         );
 
         const submitButton = getByTestId('submit-button');

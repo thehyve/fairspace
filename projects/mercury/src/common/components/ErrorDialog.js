@@ -9,15 +9,26 @@ import {
     Slide,
     Typography,
 } from '@mui/material';
-import { Error as ErrorIcon } from '@mui/icons-material';
-import DialogContentText from '@mui/material/DialogContentText';
+import {Error as ErrorIcon} from '@mui/icons-material';
+import DialogContentText from "@mui/material/DialogContentText";
 
 const Transition = React.forwardRef(
-    (props, ref) => <Slide ref={ref} direction="up" {...props} />,
+    (props, ref) => <Slide ref={ref} direction="up" {...props} />
 );
 
 class ErrorDialog extends React.Component {
     static instance;
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            title: null,
+            message: null,
+            onRetry: null,
+            onDismiss: null
+        };
+        ErrorDialog.instance = this;
+    }
 
     static showError(title, details, onRetry, onDismiss) {
         if (ErrorDialog.instance) {
@@ -32,17 +43,6 @@ class ErrorDialog extends React.Component {
         }
     }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            title: null,
-            message: null,
-            onRetry: null,
-            onDismiss: null,
-        };
-        ErrorDialog.instance = this;
-    }
-
     componentDidCatch(error) {
         console.error(error);
         ErrorDialog.showError('An error has occurred', error);
@@ -53,7 +53,7 @@ class ErrorDialog extends React.Component {
             title: null,
             message: null,
             onRetry: null,
-            onDismiss: null,
+            onDismiss: null
         });
     };
 
@@ -72,7 +72,7 @@ class ErrorDialog extends React.Component {
     };
 
     render() {
-        const { title, message, onRetry, maxWidth } = this.state;
+        const {title, message, onRetry, maxWidth} = this.state;
 
         const dialog = (
             <Dialog
@@ -88,7 +88,7 @@ class ErrorDialog extends React.Component {
                 <DialogTitle id="alert-dialog-slide-title">
                     <Grid container alignItems="center" spacing={1}>
                         <Grid item>
-                            <ErrorIcon color="error" style={{ fontSize: 40 }} />
+                            <ErrorIcon color="error" style={{fontSize: 40}} />
                         </Grid>
                         <Grid item>
                             <Typography variant="h6" gutterBottom>

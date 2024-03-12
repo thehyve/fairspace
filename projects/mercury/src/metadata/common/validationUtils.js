@@ -1,8 +1,8 @@
-import { isNonEmptyValue } from '../../common/utils/genericUtils';
+import {isNonEmptyValue} from '../../common/utils/genericUtils';
 
-import { getFirstPredicateValue } from './jsonLdUtils';
-import * as constants from '../../constants';
-import { getMaxCount } from './vocabularyUtils';
+import {getFirstPredicateValue} from "./jsonLdUtils";
+import * as constants from "../../constants";
+import {getMaxCount} from "./vocabularyUtils";
 
 // remove the string values that only contain whitespace
 export const removeWhitespaceValues = (values) => (values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : []);
@@ -38,7 +38,7 @@ export const pushNonEmpty = (arr, value) => (value ? [...arr, value] : arr);
 export const maxCountValidation = (maxCount, values) => ((values && values.length > maxCount)
     ? `Please provide no more than ${maxCount} values` : null);
 
-export const validateValuesAgainstShape = ({ shape, datatype, values, isGenericIriResource }) => {
+export const validateValuesAgainstShape = ({shape, datatype, values, isGenericIriResource}) => {
     // ignore falsy values (null, NaN, undefined or '') with the exception of zero and false
     const pureValues = values
         .map(v => v.id || v.value)

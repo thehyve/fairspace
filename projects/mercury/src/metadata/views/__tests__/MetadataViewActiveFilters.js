@@ -1,15 +1,15 @@
-import { configure, shallow } from 'enzyme';
-import React from 'react';
-import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
-import MetadataViewActiveFacetFilters from '../MetadataViewActiveFacetFilters';
+import {configure, shallow} from "enzyme";
+import React from "react";
+import Chip from "@mui/material/Chip";
+import Typography from "@mui/material/Typography";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import MetadataViewActiveFacetFilters from "../MetadataViewActiveFacetFilters";
 // eslint-disable-next-line jest/no-mocks-import
-import { mockFacets } from '../__mocks__/MetadataViewAPI';
+import {mockFacets} from "../__mocks__/MetadataViewAPI";
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({ adapter: new Adapter() });
+configure({adapter: new Adapter()});
 
 describe('MetadataViewActiveFacetFilters', () => {
     it('should not show active filters if no filter added', () => {
@@ -34,15 +34,15 @@ describe('MetadataViewActiveFacetFilters', () => {
                     field: 'Subject_gender',
                     values: [
                         'http://example.com/gender#male',
-                        'http://example.com/gender#female',
-                    ],
+                        'http://example.com/gender#female'
+                    ]
                 },
                 {
                     field: 'Subject_species',
                     values: [
                         'http://example.com/species#hs',
-                    ],
-                },
+                    ]
+                }
             ]}
         />);
 
@@ -66,8 +66,8 @@ describe('MetadataViewActiveFacetFilters', () => {
                 {
                     field: 'Sample_tumorCellularity',
                     min: 0,
-                    max: 3,
-                },
+                    max: 3
+                }
             ]}
         />);
 
@@ -84,8 +84,8 @@ describe('MetadataViewActiveFacetFilters', () => {
             filters={[
                 {
                     field: 'Sample_tumorCellularity',
-                    min: 2,
-                },
+                    min: 2
+                }
             ]}
         />);
         activeFilterValues = wrapper.find(Chip);
@@ -98,8 +98,8 @@ describe('MetadataViewActiveFacetFilters', () => {
             filters={[
                 {
                     field: 'Sample_tumorCellularity',
-                    max: 3,
-                },
+                    max: 3
+                }
             ]}
         />);
         activeFilterValues = wrapper.find(Chip);

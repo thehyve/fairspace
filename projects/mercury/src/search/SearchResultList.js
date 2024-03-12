@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import {
     Link,
     ListItemText,
@@ -14,25 +14,25 @@ import {
 
 import withStyles from '@mui/styles/withStyles';
 
-import { Link as RouterLink } from 'react-router-dom';
-import { Folder, FolderOpenOutlined, InsertDriveFileOutlined } from '@mui/icons-material';
-import { COLLECTION_URI, DIRECTORY_URI, FILE_URI } from '../constants';
-import useAsync from '../common/hooks/UseAsync';
+import {Link as RouterLink} from 'react-router-dom';
+import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
+import useAsync from "../common/hooks/UseAsync";
 import {
     getLocationContextFromString, getSearchPathSegments,
     getSearchQueryFromString,
     getStorageFromString,
-    handleSearchError, handleTextSearchRedirect,
-} from './searchUtils';
-import SearchBar from './SearchBar';
-import LoadingInlay from '../common/components/LoadingInlay';
-import MessageDisplay from '../common/components/MessageDisplay';
+    handleSearchError, handleTextSearchRedirect
+} from "./searchUtils";
+import SearchBar from "./SearchBar";
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
 import BreadCrumbs from '../common/components/BreadCrumbs';
-import SearchAPI, { LocalSearchAPI } from './SearchAPI';
-import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
-import CollectionBreadcrumbsContextProvider from '../collections/CollectionBreadcrumbsContextProvider';
-import ExternalStorageBreadcrumbsContextProvider from '../external-storage/ExternalStorageBreadcrumbsContextProvider';
-import { getPathFromIri, redirectLink } from '../file/fileUtils';
+import SearchAPI, {LocalSearchAPI} from "./SearchAPI";
+import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
+import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
+import ExternalStorageBreadcrumbsContextProvider from "../external-storage/ExternalStorageBreadcrumbsContextProvider";
+import {getPathFromIri, redirectLink} from "../file/fileUtils";
 import ShortText from './ShortText';
 
 const styles = {
@@ -40,37 +40,37 @@ const styles = {
         width: '100%',
         maxHeight: 'calc(100% - 60px)',
         overflowX: 'auto',
-        marginTop: 16,
+        marginTop: 16
     },
     table: {
         minWidth: 700,
     },
     search: {
         width: '80%',
-        margin: 10,
+        margin: 10
     },
     title: {
         margin: 10,
-        marginTop: 16,
-    },
+        marginTop: 16
+    }
 };
 
-const SearchResultList = ({ classes, items, total, storage = {}, loading, error, history }) => {
+const SearchResultList = ({classes, items, total, storage = {}, loading, error, history}) => {
     const renderType = (item) => {
         let avatar;
         let typeLabel;
         switch (item.type) {
             case COLLECTION_URI:
                 avatar = <Folder />;
-                typeLabel = 'Collection';
+                typeLabel = "Collection";
                 break;
             case DIRECTORY_URI:
                 avatar = <FolderOpenOutlined />;
-                typeLabel = 'Directory';
+                typeLabel = "Directory";
                 break;
             case FILE_URI:
                 avatar = <InsertDriveFileOutlined />;
-                typeLabel = 'File';
+                typeLabel = "File";
                 break;
             default:
                 avatar = null;
@@ -129,7 +129,7 @@ const SearchResultList = ({ classes, items, total, storage = {}, loading, error,
                                 onDoubleClick={() => handleResultDoubleClick(item)}
                             >
                                 <TableCell width={5}>{renderType(item)}</TableCell>
-                                <TableCell style={{ maxWidth: 500 }}>
+                                <TableCell style={{maxWidth: 500}}>
                                     <ListItemText
                                         primary={item.label}
                                         secondary={<ShortText text={item.comment} maxLength={200} maxLines={3} />}
@@ -155,16 +155,16 @@ const SearchResultList = ({ classes, items, total, storage = {}, loading, error,
 
 // This separation/wrapping of components is mostly for unit testing purposes (much harder if it's 1 component)
 export const SearchResultListContainer = ({
-    location: { search },
+    location: {search},
     query = getSearchQueryFromString(search),
     context = getLocationContextFromString(search),
     storage = getStorageFromString(search),
-    classes, history,
+    classes, history
 }) => {
-    const { externalStorages = [] } = useContext(ExternalStoragesContext);
+    const {externalStorages = []} = useContext(ExternalStoragesContext);
     const currentStorage = externalStorages.find(s => s.name === storage);
 
-    const { data, loading, error } = useAsync(() => {
+    const {data, loading, error} = useAsync(() => {
         const searchAPI = currentStorage ? new SearchAPI(currentStorage.searchPath) : LocalSearchAPI;
         return searchAPI.searchForFiles(query, context).catch(handleSearchError);
     }, [search, query, storage]);

@@ -1,20 +1,20 @@
 import React from 'react';
-import { configure, shallow } from 'enzyme';
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {configure, shallow} from "enzyme";
+import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 
 import Autocomplete from '@mui/material/Autocomplete';
 
-import { IriValue } from '../IriValueContainer';
+import {IriValue} from "../IriValueContainer";
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
-configure({ adapter: new Adapter() });
+configure({adapter: new Adapter()});
 
 describe('IriValueContainer', () => {
     it('should render a dropdown with namespaces', () => {
         const namespaces = [
-            { id: 'a', label: 'RDF', prefix: 'rdf', namespace: 'http://rdf' },
-            { id: 'b', label: 'Fairspace', namespace: 'https://fairspace.nl/ontology#' },
+            {id: 'a', label: 'RDF', prefix: 'rdf', namespace: 'http://rdf'},
+            {id: 'b', label: 'Fairspace', namespace: 'https://fairspace.nl/ontology#'}
         ];
         const wrapper = shallow(<IriValue namespaces={namespaces} />);
         const select = wrapper.find(Autocomplete);
@@ -24,18 +24,18 @@ describe('IriValueContainer', () => {
             {
                 id: '',
                 label: '(no namespace)',
-                value: '',
+                value: ''
             },
             {
                 id: 'a',
                 label: 'RDF',
-                value: 'http://rdf',
+                value: 'http://rdf'
             },
             {
                 id: 'b',
                 label: 'Fairspace',
-                value: 'https://fairspace.nl/ontology#',
-            },
+                value: 'https://fairspace.nl/ontology#'
+            }
         ]);
     });
 
@@ -48,8 +48,8 @@ describe('IriValueContainer', () => {
             {
                 id: '',
                 label: '(no namespace)',
-                value: '',
-            },
+                value: ''
+            }
         ]);
     });
 });

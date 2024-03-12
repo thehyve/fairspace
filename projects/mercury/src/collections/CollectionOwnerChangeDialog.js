@@ -1,15 +1,15 @@
 // @flow
-import React, { useState } from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import { compareBy } from '../common/utils/genericUtils';
-import Dropdown from '../metadata/common/values/Dropdown';
-import ConfirmationButton from '../common/components/ConfirmationButton';
+import React, {useState} from 'react';
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import {compareBy} from "../common/utils/genericUtils";
+import Dropdown from "../metadata/common/values/Dropdown";
+import ConfirmationButton from "../common/components/ConfirmationButton";
 
-export const CollectionOwnerChangeDialog = ({ collection, workspaces, changeOwner, onClose }) => {
+export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner, onClose}) => {
     const [selectedValue, setSelectedValue] = useState();
     const [openDialog, setOpenDialog] = useState(true);
 
@@ -18,13 +18,13 @@ export const CollectionOwnerChangeDialog = ({ collection, workspaces, changeOwne
         .map(workspace => (
             {
                 label: workspace.code,
-                ...workspace,
+                ...workspace
             }
         ));
 
     const handleValueChange = (selectedOwnerWorkspace) => {
         if (selectedOwnerWorkspace) {
-            setSelectedValue({ label: selectedOwnerWorkspace.code, ...selectedOwnerWorkspace });
+            setSelectedValue({label: selectedOwnerWorkspace.code, ...selectedOwnerWorkspace});
         } else {
             setSelectedValue(null);
         }

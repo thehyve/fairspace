@@ -1,27 +1,27 @@
-import { createTheme } from '@mui/material';
-import { blue, indigo, pink } from '@mui/material/colors';
+import {createTheme} from "@mui/material";
+import {blue, indigo, pink} from '@mui/material/colors';
 
 export default createTheme({
     palette: {
         primary: process.env.NODE_ENV === 'development' ? blue : indigo,
-        secondary: pink,
+        secondary: pink
     },
     components: {
         MuiMenu: {
             defaultProps: {
-                elevation: 1,
+                elevation: 1
             },
         },
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    marginTop: 0,
+                    marginTop: 0
                 },
             },
             defaultProps: {
-                size: 'small',
-                variant: 'standard',
-            },
+                size: "small",
+                variant: "standard"
+            }
         },
         MuiDivider: {
             styleOverrides: {
@@ -29,23 +29,23 @@ export default createTheme({
                     margin: 0,
                 },
                 margin: 0,
-            },
+            }
         },
         MuiMenuItem: {
             styleOverrides: {
                 root: {
                     marginTop: 0,
                     padding: 5,
-                    border: 0,
-                },
-            },
+                    border: 0
+                }
+            }
         },
         MuiFormControl: {
             styleOverrides: {
                 root: {
                     margin: 0,
-                    padding: 0,
-                },
+                    padding: 0
+                }
             },
         },
         MuiList: {
@@ -53,8 +53,8 @@ export default createTheme({
                 root: {
                     margin: 0,
                     padding: 0,
-                    border: 0,
-                },
+                    border: 0
+                }
             },
         },
         MuiListItem: {
@@ -63,21 +63,21 @@ export default createTheme({
                     marginTop: 0,
                     marginBottom: 0,
                     paddingRight: 0,
-                    border: 0,
-                },
+                    border: 0
+                }
             },
             defaultProps: {
-                size: 'small',
-            },
+                size: "small"
+            }
         },
         MuiListItemText: {
             styleOverrides: {
                 root: {
                     margin: 0,
                     padding: 0,
-                    border: 0,
-                },
-            },
+                    border: 0
+                }
+            }
         },
         MuiListItemButton: {
             styleOverrides: {
@@ -85,38 +85,38 @@ export default createTheme({
                     margin: 0,
                     paddingBottom: 0,
                     border: 0,
-                },
-            },
+                }
+            }
         },
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'whitesmoke',
+                    backgroundColor: "whitesmoke",
                     marginBottom: 0,
-                    padding: 5,
-                },
-            },
+                    padding: 5
+                }
+            }
         },
         MuiFormHelperText: {
             styleOverrides: {
                 root: {
-                    marginBottom: 18,
-                },
-            },
+                    marginBottom: 18
+                }
+            }
         },
         MuiToolbar: {
             defaultProps: {
-                variant: 'dense',
-            },
+                variant: "dense"
+            }
         },
         MuiAutocomplete: {
             styleOverrides: {
                 listbox: {
                     '& .MuiAutocomplete-option': {
-                        display: 'block',
-                    },
-                },
-            },
-        },
+                        display: "block"
+                    }
+                }
+            }
+        }
     },
 });

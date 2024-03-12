@@ -1,25 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { Widgets } from '@mui/icons-material';
+import {Widgets} from '@mui/icons-material';
 import WorkspaceInfo from './WorkspaceInfo';
-import UserList from '../users/UserList';
-import WorkspaceContext from './WorkspaceContext';
-import { currentWorkspace, workspacePrefix } from './workspaces';
-import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
-import Collections from '../collections/CollectionsPage';
-import LoadingInlay from '../common/components/LoadingInlay';
-import MessageDisplay from '../common/components/MessageDisplay';
-import BreadCrumbs from '../common/components/BreadCrumbs';
+import UserList from "../users/UserList";
+import WorkspaceContext from "./WorkspaceContext";
+import {currentWorkspace, workspacePrefix} from "./workspaces";
+import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
+import Collections from "../collections/CollectionsPage";
+import LoadingInlay from "../common/components/LoadingInlay";
+import MessageDisplay from "../common/components/MessageDisplay";
+import BreadCrumbs from "../common/components/BreadCrumbs";
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
-import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
+import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
 
 export const TabPanel = (props) => {
-    const { children, value, index, ...other } = props;
+    const {children, value, index, ...other} = props;
 
     return (
         <Typography
@@ -42,16 +42,16 @@ TabPanel.propTypes = {
 };
 
 const a11yProps = (index) => ({
-    id: `workspace-tab-${index}`,
+    'id': `workspace-tab-${index}`,
     'aria-controls': `workspace-tabpanel-${index}`,
 });
 
 const WorkspaceOverview = (props) => {
     const [selectedTab, setSelectedTab] = useState(0);
-    const { workspaces, workspacesError, workspacesLoading } = useContext(WorkspaceContext);
+    const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
     const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
 
-    usePageTitleUpdater(workspace ? workspace.code : '');
+    usePageTitleUpdater(workspace ? workspace.code : "");
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
@@ -80,17 +80,17 @@ const WorkspaceOverview = (props) => {
     };
 
     return (
-        <BreadcrumbsContext.Provider value={{ segments: [
+        <BreadcrumbsContext.Provider value={{segments: [
             {
                 label: 'Workspaces',
                 icon: <Widgets />,
-                href: '/workspaces',
-            },
-        ] }}
+                href: '/workspaces'
+            }
+        ]}}
         >
             <BreadCrumbs additionalSegments={[{
                 label: workspace.code,
-                href: workspacePrefix(),
+                href: workspacePrefix()
             }]}
             />
             <Tabs

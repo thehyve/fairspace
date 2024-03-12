@@ -1,18 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Divider, Drawer, IconButton } from '@mui/material';
+import {Divider, Drawer, IconButton} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-import styles from './MenuDrawer.styles';
+import styles from "./MenuDrawer.styles";
 
-const MenuDrawer = ({ open, renderMenu, toggleMenuExpansion, onMouseEnter, onMouseLeave, classes }) => (
+const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMouseLeave, classes}) => (
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose),
+            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose)
         }}
     >
         <div className={classes.toolbar}>
@@ -36,7 +36,7 @@ MenuDrawer.propTypes = {
     toggleMenuExpansion: PropTypes.func,
     onMouseEnter: PropTypes.func,
     onMouseLeave: PropTypes.func,
-    classes: PropTypes.object,
+    classes: PropTypes.object
 };
 
 export default withStyles(styles)(MenuDrawer);

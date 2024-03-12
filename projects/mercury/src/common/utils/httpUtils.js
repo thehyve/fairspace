@@ -6,8 +6,8 @@
  * @param providedMessage   If the backend does not provide an error message, this message will be given in the Error
  * @returns {Function}
  */
-import axios, { AxiosError } from 'axios';
-import ErrorDialog from '../components/ErrorDialog';
+import axios, {AxiosError} from 'axios';
+import ErrorDialog from "../components/ErrorDialog";
 
 export const handleAuthError = (status) => {
     switch (status) {
@@ -32,7 +32,7 @@ export function handleHttpError(defaultMessage) {
         if (!e || !e.response) {
             throw Error(defaultMessage);
         }
-        const { response: { status, data } } = e;
+        const {response: {status, data}} = e;
 
         switch (status) {
             case 401:
@@ -59,7 +59,7 @@ export function handleRemoteSourceHttpError(defaultMessage) {
         if (!e || !e.response) {
             throw Error(defaultMessage);
         }
-        const { response: { status, data } } = e;
+        const {response: {status, data}} = e;
         if (status === 400 && data) {
             if (typeof data === 'string') {
                 throw Error(data);
@@ -77,9 +77,9 @@ export function handleRemoteSourceHttpError(defaultMessage) {
  */
 export function extractJsonData(response) {
     if (!response) {
-        throw Error('Cannot parse empty response');
+        throw Error(`Cannot parse empty response`);
     }
-    const { headers, data } = response;
+    const {headers, data} = response;
     const contentType = headers ? headers['content-type'] : '';
     const isJson = contentType && contentType.includes('json');
 

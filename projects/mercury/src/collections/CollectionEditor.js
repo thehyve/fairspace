@@ -1,6 +1,6 @@
 // @flow
-import React, { useContext } from 'react';
-import { withRouter, useHistory } from 'react-router-dom';
+import React, {useContext} from 'react';
+import {withRouter, useHistory} from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -9,16 +9,16 @@ import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import withStyles from '@mui/styles/withStyles';
-import type { Collection, CollectionProperties } from './CollectionAPI';
+import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
-import { getCollectionAbsolutePath, isCollectionPage } from './collectionUtils';
-import type { Match, History } from '../types';
-import ErrorDialog from '../common/components/ErrorDialog';
+import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
+import type {Match, History} from '../types';
+import ErrorDialog from "../common/components/ErrorDialog";
 import {
     fileNameContainsInvalidCharacter, isUnsafeFileName,
-    isValidFileName,
+    isValidFileName
 } from '../file/fileUtils';
-import type { Workspace } from '../workspaces/WorkspacesAPI';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 const fields = ['name', 'description', 'ownerWorkspace'];
 
@@ -53,7 +53,7 @@ const styles = theme => ({
     },
     textHelperWarning: {
         color: theme.palette.warning.dark,
-    },
+    }
 });
 
 type PathParam = {
@@ -84,7 +84,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     static defaultProps = {
         setBusy: () => {},
         updateExisting: false,
-        workspace: {},
+        workspace: {}
     };
 
     state = {
@@ -95,36 +95,33 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
             : {
                 name: formatPrefix(this.props.workspace.code),
                 description: '',
-                ownerWorkspace: this.props.workspace.iri,
-            },
+                ownerWorkspace: this.props.workspace.iri
+            }
     };
 
     unmounting = false;
-
-    editNameEnabled = (!this.props.collection) || (
-        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
 
     componentWillUnmount() {
         this.unmounting = true;
     }
 
     onSaveStart = () => {
-        const { setBusy } = this.props;
-        this.setState({ saveInProgress: true });
+        const {setBusy} = this.props;
+        this.setState({saveInProgress: true});
         setBusy(true);
     };
 
     onSaveComplete = () => {
         if (!this.unmounting) {
-            this.setState({ saveInProgress: false });
+            this.setState({saveInProgress: false});
         }
-        const { setBusy } = this.props;
+        const {setBusy} = this.props;
         setBusy(false);
     };
 
     handleAddCollection = (properties: CollectionProperties) => {
         properties.name = properties.name.trim();
-        const { addCollection } = this.props;
+        const {addCollection} = this.props;
         this.onSaveStart();
         return addCollection(properties)
             .then(() => {
@@ -136,25 +133,25 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 if (err.message.includes('name already exists') || err.message.includes('status code 409')) {
                     ErrorDialog.showError(
                         'Collection name must be unique',
-                        'Collection name is already in use. Please choose a unique name.',
+                        'Collection name is already in use. Please choose a unique name.'
                     );
                     return;
                 }
                 ErrorDialog.showError(
                     'Could not create collection',
-                    err.message,
+                    err.message
                 );
             });
     };
 
     handleCollectionRename = (target: string) => {
-        const { collection, renameCollection } = this.props;
+        const {collection, renameCollection} = this.props;
         return renameCollection(collection.name, target)
             .then(() => {
                 this.onSaveComplete();
                 if (isCollectionPage()) {
                     // If the collection location changes, the URI for the current page should change as well
-                    const { history, match: { params: { path } } } = this.props;
+                    const {history, match: {params: {path}}} = this.props;
                     history.push(`${getCollectionAbsolutePath(target)}/${path || ''}`);
                 } else {
                     this.close();
@@ -165,22 +162,22 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 if (err.message.includes('destination file already exists')) {
                     ErrorDialog.showError(
                         'Collection name must be unique',
-                        'Collection name is already in use. Please choose a unique name.',
+                        'Collection name is already in use. Please choose a unique name.'
                     );
                     return;
                 }
                 ErrorDialog.showError(
                     'Could not rename collection',
-                    err.message,
+                    err.message
                 );
             });
     };
 
     handleUpdateCollection = (properties: CollectionProperties) => {
-        const { collection, updateCollection } = this.props;
+        const {collection, updateCollection} = this.props;
         this.onSaveStart();
 
-        return updateCollection((({ iri: collection.iri, ...properties }: any): Collection))
+        return updateCollection((({iri: collection.iri, ...properties}: any): Collection))
             .then(() => {
                 if (collection.name.trim() !== properties.name.trim()) {
                     this.handleCollectionRename(properties.name.trim());
@@ -202,7 +199,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
 
     close = () => {
         if (!this.unmounting) {
-            this.setState({ editing: false });
+            this.setState({editing: false});
         }
         if (this.props.onClose) {
             this.props.onClose();
@@ -210,11 +207,14 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     };
 
     handleInputChange = (name: string, value: any) => {
-        const { properties } = this.state;
+        const {properties} = this.state;
         properties[name] = value;
-        const state = { properties };
+        const state = {properties};
         this.setState(state);
     };
+
+    editNameEnabled = (!this.props.collection) || (
+        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
 
     isSaveEnabled = () => (!this.state.saveInProgress)
         && isInputValid(this.state.properties)
@@ -300,7 +300,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
 
 const ContextualCollectionEditor = (props) => {
     const history = useHistory();
-    const { addCollection, updateCollection, renameCollection } = useContext(CollectionsContext);
+    const {addCollection, updateCollection, renameCollection} = useContext(CollectionsContext);
 
     return (
         <CollectionEditor

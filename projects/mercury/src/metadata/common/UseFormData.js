@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import useDeepCompareEffect from 'use-deep-compare-effect';
+import {useState} from "react";
+import useDeepCompareEffect from "use-deep-compare-effect";
 import _ from 'lodash';
-import useValidation from './UseValidation';
-import { first } from '../../common/utils/genericUtils';
-import { DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI } from '../../constants';
+import useValidation from "./UseValidation";
+import {first} from "../../common/utils/genericUtils";
+import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from "../../constants";
 
 const DEFAULTABLE_DATATYPES = [STRING_URI, INTEGER_URI, DECIMAL_URI, LONG_URI, MARKDOWN_URI];
 
@@ -11,12 +11,12 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
     // Values of some properties have to be set to empty strings
     // not to dynamically add single-value fields when these values are updated.
     initialProperties.forEach(p => {
-        const defaultValue = [{ value: '' }];
+        const defaultValue = [{value: ""}];
         const newValues = !values[p.key] && p.maxValuesCount === 1 && DEFAULTABLE_DATATYPES.includes(p.datatype)
             ? defaultValue : values[p.key];
         setFormValues(prev => ({
             ...prev,
-            [p.key]: newValues,
+            [p.key]: newValues
         }));
     });
 };
@@ -35,7 +35,7 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
  */
 const useFormData = (values, initialProperties = []) => {
     const [updates, setUpdates] = useState({});
-    const { validateProperty, validationErrors, isValid } = useValidation();
+    const {validateProperty, validationErrors, isValid} = useValidation();
     const [initialFormValues, setInitialFormValues] = useState(values);
 
     const resetUpdates = () => setUpdates({});
@@ -46,12 +46,12 @@ const useFormData = (values, initialProperties = []) => {
     }, [initialProperties, values]);
 
     const hasFormUpdates = Object.keys(updates).length > 0;
-    const valuesWithUpdates = { ...initialFormValues, ...updates };
+    const valuesWithUpdates = {...initialFormValues, ...updates};
 
     let updatesToReturn = updates;
 
     const deleteUpdate = (propertyKey) => {
-        const newUpdates = { ...updates };
+        const newUpdates = {...updates};
         delete newUpdates[propertyKey];
         setUpdates(newUpdates);
     };
@@ -61,7 +61,7 @@ const useFormData = (values, initialProperties = []) => {
             || _.isEqual(newValue, initialFormValues[property.key]);
         if (equalToInitialValue) {
             // Remove property from updated values if the current value equals its initial value.
-            updatesToReturn = { ...updates };
+            updatesToReturn = {...updates};
             delete updatesToReturn[property.key];
             deleteUpdate(property.key);
             return;
@@ -70,12 +70,12 @@ const useFormData = (values, initialProperties = []) => {
         // submission of the updates before the form is re-rendered.
         updatesToReturn = {
             ...updates,
-            [property.key]: newValue,
+            [property.key]: newValue
         };
 
         setUpdates(prev => ({
             ...prev,
-            [property.key]: newValue,
+            [property.key]: newValue
         }));
         validateProperty(property, newValue);
     };
@@ -99,7 +99,7 @@ const useFormData = (values, initialProperties = []) => {
     const deleteValue = (property, index) => {
         if (property.maxValuesCount === 1 && !property.allowedValues) {
             if (DEFAULTABLE_DATATYPES.includes(property.datatype)) {
-                updateValue(property, { value: '' }, index);
+                updateValue(property, {value: ""}, index);
             } else {
                 save(property, []);
             }
@@ -127,7 +127,7 @@ const useFormData = (values, initialProperties = []) => {
         validateAll,
         validateProperty,
         validationErrors,
-        isValid,
+        isValid
     };
 };
 

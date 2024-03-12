@@ -1,4 +1,4 @@
-import nodeCrypto from 'crypto';
+import nodeCrypto from "crypto";
 
 import {
     generateUuid,
@@ -13,9 +13,9 @@ import {
     relativeLink,
     shouldPropertyBeHidden,
     url2iri,
-    valuesContainsValueOrId,
-} from '../metadataUtils';
-import * as constants from '../../../constants';
+    valuesContainsValueOrId
+} from "../metadataUtils";
+import * as constants from "../../../constants";
 
 describe('Metadata Utils', () => {
     describe('linkLabel', () => {
@@ -48,43 +48,43 @@ describe('Metadata Utils', () => {
 
     describe('getLabel', () => {
         it('should return the label if present', () => {
-            expect(getLabel({ [constants.LABEL_URI]: [{ '@value': 'My label' }] })).toEqual('My label');
+            expect(getLabel({[constants.LABEL_URI]: [{'@value': 'My label'}]})).toEqual('My label');
         });
 
         it('should return the shacl name if no label is present', () => {
-            expect(getLabel({ 'http://www.w3.org/ns/shacl#name': [{ '@value': 'My label' }] })).toEqual('My label');
+            expect(getLabel({'http://www.w3.org/ns/shacl#name': [{'@value': 'My label'}]})).toEqual('My label');
         });
 
         it('should not fail if json-ld is not properly expanded', () => {
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: 'My label',
+                [constants.LABEL_URI]: 'My label'
             }, true)).toEqual('name');
 
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: { '@value': 'My label' },
+                [constants.LABEL_URI]: {'@value': 'My label'}
             }, true)).toEqual('name');
 
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: ['My label'],
+                [constants.LABEL_URI]: ['My label']
             }, true)).toEqual('name');
 
             expect(getLabel({
                 '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: [],
+                [constants.LABEL_URI]: []
             }, true)).toEqual('name');
         });
 
         it('should keep external urls intact if shortenExternalUris is set to false', () => {
-            expect(getLabel({ '@id': 'http://test.nl/name#lastname' }, false)).toEqual('http://test.nl/name#lastname');
+            expect(getLabel({'@id': 'http://test.nl/name#lastname'}, false)).toEqual('http://test.nl/name#lastname');
         });
         it('should return part of the url after the pound sign', () => {
-            expect(getLabel({ '@id': 'http://test.nl/name#lastname' }, true)).toEqual('lastname');
+            expect(getLabel({'@id': 'http://test.nl/name#lastname'}, true)).toEqual('lastname');
         });
         it('should return part of the url after the last slash if no pound sign present', () => {
-            expect(getLabel({ '@id': 'http://test.nl/name' }, true)).toEqual('name');
+            expect(getLabel({'@id': 'http://test.nl/name'}, true)).toEqual('name');
         });
     });
 
@@ -103,7 +103,7 @@ describe('Metadata Utils', () => {
     describe('generateUuid', () => {
         it('should generate valid UUIDS', () => {
             global.crypto = {
-                getRandomValues: nodeCrypto.randomFillSync,
+                getRandomValues: nodeCrypto.randomFillSync
             };
             const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
             expect(UUID_REGEX.test(generateUuid())).toBe(true);
@@ -154,23 +154,23 @@ describe('Metadata Utils', () => {
     describe('propertiesToShow', () => {
         it('should hide the type of an entity', () => {
             const properties = [{
-                key: '@type',
-                values: [{ id: 'https://fairspace.nl/ontology#Collection', comment: 'A specific collection in Fairspace.' }],
+                key: "@type",
+                values: [{id: "https://fairspace.nl/ontology#Collection", comment: "A specific collection in Fairspace."}]
             }, {
-                key: 'https://fairspace.nl/ontology#otherProp',
-                values: [{ id: 'https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd' }],
+                key: "https://fairspace.nl/ontology#otherProp",
+                values: [{id: "https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd"}]
             }, {
-                key: 'https://fairspace.nl/ontology#additionalDate',
-                values: [{ value: '2019-03-18T13:06:22.62Z' }],
+                key: "https://fairspace.nl/ontology#additionalDate",
+                values: [{value: "2019-03-18T13:06:22.62Z"}]
             }];
 
             const expected = [
                 {
-                    key: 'https://fairspace.nl/ontology#otherProp',
-                    values: [{ id: 'https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd' }],
+                    key: "https://fairspace.nl/ontology#otherProp",
+                    values: [{id: "https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd"}]
                 }, {
-                    key: 'https://fairspace.nl/ontology#additionalDate',
-                    values: [{ value: '2019-03-18T13:06:22.62Z' }],
+                    key: "https://fairspace.nl/ontology#additionalDate",
+                    values: [{value: "2019-03-18T13:06:22.62Z"}]
                 }];
 
             expect(propertiesToShow(properties)).toEqual(expected);
@@ -201,21 +201,21 @@ describe('Metadata Utils', () => {
     // TODO: Could'nt fix this test!
     describe('getTypeInfo', () => {
         const vocabulary = [{
-            [constants.SHACL_TARGET_CLASS]: [{ '@id': 'http://example.com/123' }],
-            [constants.SHACL_NAME]: [{ '@value': 'Name' }],
-            [constants.SHACL_DESCRIPTION]: [{ '@value': 'Description' }],
+            [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
+            [constants.SHACL_NAME]: [{'@value': 'Name'}],
+            [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
         }];
 
         it('retrieves information on the type of the entity', () => {
             const metadata = {
                 '@type': ['http://example.com/123'],
-                [constants.SHACL_TARGET_CLASS]: [{ '@id': 'http://example.com/123' }],
+                [constants.SHACL_TARGET_CLASS]: [{"@id": "http://example.com/123"}],
             };
 
             expect(getTypeInfo(metadata, vocabulary)).toEqual({
                 label: 'Name',
                 description: 'Description',
-                typeIri: 'http://example.com/123',
+                typeIri: 'http://example.com/123'
             });
         });
 
@@ -230,45 +230,45 @@ describe('Metadata Utils', () => {
         it('returns 2 arrays one for errors of the given subjects other is the rest of errors', () => {
             const errorsSub1 = [
                 {
-                    message: 'Error message...',
-                    subject: 'subject1',
-                    predicate: 'some-predicate-x',
+                    message: "Error message...",
+                    subject: "subject1",
+                    predicate: "some-predicate-x"
                 },
                 {
-                    message: 'Error message',
-                    subject: 'subject1',
-                    predicate: 'some-predicate-y',
-                },
+                    message: "Error message",
+                    subject: "subject1",
+                    predicate: "some-predicate-y"
+                }
             ];
             const errorsSub2 = [
                 {
-                    message: 'Error message x',
-                    subject: 'subject2',
-                    predicate: 'some-predicate-a',
+                    message: "Error message x",
+                    subject: "subject2",
+                    predicate: "some-predicate-a"
                 },
                 {
-                    message: 'Error message y',
-                    subject: 'subject2',
-                    predicate: 'some-predicate-b',
-                },
+                    message: "Error message y",
+                    subject: "subject2",
+                    predicate: "some-predicate-b"
+                }
             ];
             const allErrors = [...errorsSub1, ...errorsSub2];
 
             expect(partitionErrors(allErrors, 'subject1'))
                 .toEqual({
                     entityErrors: errorsSub1,
-                    otherErrors: errorsSub2,
+                    otherErrors: errorsSub2
                 });
         });
     });
 
     describe('valuesContainsValueOrId', () => {
         const values = [
-            { value: 'first value' },
-            { value: '321' },
-            { id: '1234' },
-            { value: 'other value' },
-            { id: 'some-id-555', value: 'with given value' },
+            {value: 'first value'},
+            {value: '321'},
+            {id: '1234'},
+            {value: 'other value'},
+            {id: 'some-id-555', value: 'with given value'}
         ];
 
         it('should returns true for the given values', () => {
@@ -293,9 +293,9 @@ describe('Metadata Utils', () => {
 
     describe('hasValue', () => {
         it('should return false if values list is empty', () => expect(hasValue([])).toBe(false));
-        it('should return false if only an empty string is is present', () => expect(hasValue([{ value: '' }])).toBe(false));
-        it('should return true if an id is present', () => expect(hasValue([{ id: 'http://a' }])).toBe(true));
-        it('should return true if a non-empty value is present', () => expect(hasValue([{ value: 'label' }])).toBe(true));
+        it('should return false if only an empty string is is present', () => expect(hasValue([{value: ""}])).toBe(false));
+        it('should return true if an id is present', () => expect(hasValue([{id: "http://a"}])).toBe(true));
+        it('should return true if a non-empty value is present', () => expect(hasValue([{value: "label"}])).toBe(true));
     });
 
     describe('getLocalPart', () => {
@@ -319,16 +319,16 @@ describe('Metadata Utils', () => {
         const namespaces = [
             {
                 namespace: 'http://prefix/',
-                prefix: 'pr',
+                prefix: 'pr'
             },
             {
                 namespace: 'http://multiple/',
-                prefix: 'm1',
+                prefix: 'm1'
             },
             {
                 namespace: 'http://multiple/',
-                prefix: 'm2',
-            },
+                prefix: 'm2'
+            }
         ];
         it('should shorten the iri if a namespace exists', () => {
             expect(getNamespacedIri('http://prefix/blabla', namespaces)).toEqual('pr:blabla');
@@ -345,7 +345,7 @@ describe('Metadata Utils', () => {
             expect(getNamespacedIri('http://prefix/blabla')).toEqual('http://prefix/blabla');
         });
         it('should shorten a uri with any of the prefixes if multiple namespaces apply', () => {
-            expect(getNamespacedIri('http://multiple/123', namespaces)).toEqual(expect.stringContaining(':123'));
+            expect(getNamespacedIri('http://multiple/123', namespaces)).toEqual(expect.stringContaining(":123"));
         });
     });
 });

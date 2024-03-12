@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import useIsMounted from 'react-is-mounted-hook';
-import { useFormField } from '../../common/hooks/UseFormField';
-import { isValidFileName } from '../fileUtils';
-import FileNameDialog from './FileNameDialog';
+import useIsMounted from "react-is-mounted-hook";
+import {useFormField} from "../../common/hooks/UseFormField";
+import {isValidFileName} from "../fileUtils";
+import FileNameDialog from "./FileNameDialog";
 
-const RenameButton = ({ disabled, currentName, onRename, children }) => {
+const RenameButton = ({disabled, currentName, onRename, children}) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
@@ -59,11 +59,11 @@ const RenameButton = ({ disabled, currentName, onRename, children }) => {
 
 RenameButton.propTypes = {
     onRename: PropTypes.func.isRequired,
-    disabled: PropTypes.bool,
+    disabled: PropTypes.bool
 };
 
 RenameButton.defaultProps = {
-    disabled: false,
+    disabled: false
 };
 
 export default RenameButton;

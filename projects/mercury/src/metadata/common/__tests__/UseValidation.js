@@ -1,7 +1,7 @@
-import { act } from 'react-dom/test-utils';
-import { testHook } from '../../../common/utils/testUtils';
-import useValidation from '../UseValidation';
-import { SHACL_MIN_COUNT } from '../../../constants';
+import {act} from 'react-dom/test-utils';
+import {testHook} from "../../../common/utils/testUtils";
+import useValidation from "../UseValidation";
+import {SHACL_MIN_COUNT} from "../../../constants";
 
 let validation;
 beforeEach(() => {
@@ -18,7 +18,7 @@ describe('useValidation', () => {
     it('should store state for validation errors', () => {
         const property = {
             key: 'a',
-            shape: { [SHACL_MIN_COUNT]: [{ '@value': 1 }] },
+            shape: {[SHACL_MIN_COUNT]: [{'@value': 1}]},
             datatype: '',
             isGenericIriResource: false,
         };
@@ -34,7 +34,7 @@ describe('useValidation', () => {
     it('should override state on second validation', () => {
         const property = {
             key: 'a',
-            shape: { [SHACL_MIN_COUNT]: [{ '@value': 1 }] },
+            shape: {[SHACL_MIN_COUNT]: [{'@value': 1}]},
             datatype: '',
             isGenericIriResource: false,
         };
@@ -46,7 +46,7 @@ describe('useValidation', () => {
         expect(validation.isValid).toBe(false);
 
         act(() => {
-            expect(validation.validateProperty(property, [{ value: '1' }])).toBe(false);
+            expect(validation.validateProperty(property, [{value: '1'}])).toBe(false);
         });
 
         expect(validation.isValid).toBe(true);

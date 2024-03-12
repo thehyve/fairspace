@@ -1,9 +1,9 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import {useCallback, useContext, useEffect, useState} from 'react';
 
 import LinkedDataContext from '../LinkedDataContext';
-import { fromJsonLd, getJsonLdForSubject } from './jsonLdConverter';
-import { determinePropertyShapesForTypes, getProperties } from './vocabularyUtils';
-import { getTypeInfo } from './metadataUtils';
+import {fromJsonLd, getJsonLdForSubject} from "./jsonLdConverter";
+import {determinePropertyShapesForTypes, getProperties} from './vocabularyUtils';
+import {getTypeInfo} from './metadataUtils';
 
 /**
  * This custom hook is a helper for many Linked Data functions, such as fetching, searching and transforming/parsing metadata.
@@ -20,7 +20,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
     const [values, setValues] = useState({});
     const [typeInfo, setTypeInfo] = useState({});
 
-    const { shapes, shapesLoading, shapesError, fetchLinkedDataForSubject } = context;
+    const {shapes, shapesLoading, shapesError, fetchLinkedDataForSubject} = context;
 
     const updateLinkedData = useCallback(() => {
         if (Array.isArray(shapes) && shapes.length > 0) {
@@ -33,7 +33,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
                         setTypeInfo(getTypeInfo(linkedDataItem, shapes));
 
                         if (!Array.isArray(linkedDataItem['@type'])) {
-                            console.warn('Can not get values from metadata without a type or that is not expanded');
+                            console.warn("Can not get values from metadata without a type or that is not expanded");
                         } else {
                             const propertyShapes = determinePropertyShapesForTypes(shapes, linkedDataItem['@type']);
                             setProperties(getProperties(shapes, propertyShapes));
@@ -73,7 +73,7 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
         properties,
         values,
         typeInfo,
-        updateLinkedData,
+        updateLinkedData
     };
 };
 

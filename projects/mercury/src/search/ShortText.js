@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
-import { IconButton } from '@mui/material';
-import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
+import {IconButton} from '@mui/material';
+import {ArrowDropDown, ArrowDropUp} from '@mui/icons-material';
 
 type ShortTextProps = {
     text: string;
@@ -42,7 +42,7 @@ export const limitLines = (text: string, maxLines: number) => {
 export const ShortText = (props: ShortTextProps) => {
     const [expanded, setExpanded] = useState(false);
     const toggle = () => (expanded ? setExpanded(false) : setExpanded(true));
-    const { text, maxLength, maxLines } = props;
+    const {text, maxLength, maxLines} = props;
     if (text == null) {
         return null;
     }
@@ -51,7 +51,7 @@ export const ShortText = (props: ShortTextProps) => {
     shortText = limitLines(shortText, maxLines);
     const overflow = (shortText.length < displayText.length);
     return (
-        <p style={{ whiteSpace: 'pre-line' }}>
+        <p style={{whiteSpace: 'pre-line'}}>
             {expanded ? displayText : shortText}
             {overflow && !expanded && (
                 <span> &hellip;

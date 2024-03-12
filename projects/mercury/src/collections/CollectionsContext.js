@@ -1,22 +1,22 @@
-import React, { useContext, useState } from 'react';
-import type { AccessLevel, AccessMode, Collection, CollectionProperties, Status } from './CollectionAPI';
-import CollectionAPI from './CollectionAPI';
-import useAsync from '../common/hooks/UseAsync';
-import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
-import UserContext from '../users/UserContext';
-import WorkspaceContext from '../workspaces/WorkspaceContext';
+import React, {useContext, useState} from 'react';
+import type {AccessLevel, AccessMode, Collection, CollectionProperties, Status} from './CollectionAPI';
+import CollectionAPI from "./CollectionAPI";
+import useAsync from "../common/hooks/UseAsync";
+import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
+import UserContext from "../users/UserContext";
+import WorkspaceContext from "../workspaces/WorkspaceContext";
 
 const CollectionsContext = React.createContext({});
 
-export const CollectionsProvider = ({ children, collectionApi = CollectionAPI }) => {
+export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) => {
     const [showDeleted, setShowDeleted] = useState(false);
-    const { vocabulary } = useContext(VocabularyContext);
-    const { currentUser } = useContext(UserContext);
-    const { refreshWorkspaces } = useContext(WorkspaceContext);
+    const {vocabulary} = useContext(VocabularyContext);
+    const {currentUser} = useContext(UserContext);
+    const {refreshWorkspaces} = useContext(WorkspaceContext);
 
-    const { data: collections = [], error, loading, refresh } = useAsync(
+    const {data: collections = [], error, loading, refresh} = useAsync(
         () => collectionApi.getCollections(showDeleted),
-        [currentUser, showDeleted],
+        [currentUser, showDeleted]
     );
 
     const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection, vocabulary).then(refresh).then(refreshWorkspaces);
@@ -48,7 +48,7 @@ export const CollectionsProvider = ({ children, collectionApi = CollectionAPI })
                 setStatus,
                 setOwnedBy,
                 showDeleted,
-                setShowDeleted,
+                setShowDeleted
             }}
         >
             {children}

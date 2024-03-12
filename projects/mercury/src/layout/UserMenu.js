@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, {useContext, useState} from 'react';
 import {
     Avatar,
     Button,
@@ -11,23 +11,23 @@ import {
     MenuList,
     Paper,
     Popper,
-    Typography,
+    Typography
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 
-import { ErrorOutline } from '@mui/icons-material';
-import UserContext from '../users/UserContext';
-import LogoutContext from '../users/LogoutContext';
-import { getDisplayName } from '../users/userUtils';
+import {ErrorOutline} from '@mui/icons-material';
+import UserContext from "../users/UserContext";
+import LogoutContext from "../users/LogoutContext";
+import {getDisplayName} from "../users/userUtils";
 import versionInfo from '../common/VersionInfo';
-import { APPLICATION_NAME } from '../constants';
+import {APPLICATION_NAME} from '../constants';
 
 const styles = {
     row: {
         display: 'flex',
         justifyContent: 'center',
         paddingTop: 0,
-        paddingBottom: 0,
+        paddingBottom: 0
     },
     avatar: {
         margin: 10,
@@ -35,23 +35,23 @@ const styles = {
         height: 28,
     },
     logout: {
-        width: 50,
+        width: 50
     },
     menu: {
-        paddingTop: 0,
+        paddingTop: 0
     },
     userMenu: {
         backgroundColor: 'lightgrey',
-        cursor: 'default',
+        cursor: 'default'
     },
     customFont: {
         fontFamily: 'sans-serif',
-    },
+    }
 };
 
-const UserMenu = ({ classes }) => {
+const UserMenu = ({classes}) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const { currentUser, currentUserLoading, currentUserError } = useContext(UserContext);
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const logout = useContext(LogoutContext);
 
     const handleClick = (event) => {
@@ -72,7 +72,7 @@ const UserMenu = ({ classes }) => {
     }
 
     if (currentUserError || !currentUser) {
-        return <ErrorOutline style={{ fontSize: '2em' }} color="inherit" />;
+        return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
     }
 
     return (
@@ -90,11 +90,11 @@ const UserMenu = ({ classes }) => {
                 </span>
             </Button>
             <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
-                {({ TransitionProps, placement }) => (
+                {({TransitionProps, placement}) => (
                     <Grow
                         {...TransitionProps}
                         id="menu-list-grow"
-                        style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                        style={{transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom'}}
                     >
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
@@ -103,15 +103,15 @@ const UserMenu = ({ classes }) => {
                                         className={classes.userMenu}
                                         disablefocusonhover="true"
                                     >
-                                        <Card sx={{ minWidth: 275 }}>
+                                        <Card sx={{minWidth: 275}}>
                                             <CardContent>
-                                                <Typography sx={{ fontSize: 12 }} color="text.secondary" gutterBottom>
+                                                <Typography sx={{fontSize: 12}} color="text.secondary" gutterBottom>
                                                 Welcome
                                                 </Typography>
                                                 <Typography variant="h5" component="div">
                                                     {currentUser.username}
                                                 </Typography>
-                                                <Typography sx={{ mb: 1.5 }} color="text.secondary">
+                                                <Typography sx={{mb: 1.5}} color="text.secondary">
                                                     {currentUser.email}
                                                 </Typography>
                                                 <Typography variant="body2">

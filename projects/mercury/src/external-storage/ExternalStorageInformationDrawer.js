@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     Card,
     CardContent,
@@ -13,19 +13,19 @@ import {
     ListItem,
     ListItemText,
 } from '@mui/material';
-import { withRouter } from 'react-router-dom';
+import {withRouter} from 'react-router-dom';
 
-import { ExpandMore, FolderOpenOutlined, InsertDriveFileOutlined } from '@mui/icons-material';
+import {ExpandMore, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import EmptyInformationDrawer from '../common/components/EmptyInformationDrawer';
-import { getPathHierarchy } from '../file/fileUtils';
-import type { ExternalStorage } from './externalStorageUtils';
-import { getPathToDisplay } from './externalStorageUtils';
-import MessageDisplay from '../common/components/MessageDisplay';
-import FileAPI from '../file/FileAPI';
-import LinkedDataLink from '../metadata/common/LinkedDataLink';
-import type { DisplayProperty } from './UseExternalStorageMetadata';
-import useExternalStorageMetadata from './UseExternalStorageMetadata';
+import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
+import {getPathHierarchy} from "../file/fileUtils";
+import type {ExternalStorage} from "./externalStorageUtils";
+import {getPathToDisplay} from "./externalStorageUtils";
+import MessageDisplay from "../common/components/MessageDisplay";
+import FileAPI from "../file/FileAPI";
+import LinkedDataLink from "../metadata/common/LinkedDataLink";
+import type {DisplayProperty} from "./UseExternalStorageMetadata";
+import useExternalStorageMetadata from "./UseExternalStorageMetadata";
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
@@ -34,12 +34,12 @@ const useStyles = makeStyles(() => ({
     card: {
         marginTop: 10,
         flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        outline: 'none',
-        transitionBorder: '.24s',
-        easeInOut: true,
-    },
+        display: "flex",
+        flexDirection: "column",
+        outline: "none",
+        transitionBorder: ".24s",
+        easeInOut: true
+    }
 }));
 
 type ExternalMetadataCardProperties = {
@@ -50,12 +50,12 @@ type ExternalMetadataCardProperties = {
 }
 
 const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
-    const { title, forceExpand, path, storage } = props;
+    const {title, forceExpand, path, storage} = props;
     const classes = useStyles();
 
     const fileAPI = new FileAPI(storage.path);
     const {
-        metadata = {}, loading, error, linkedMetadataEntities = {}, linkedMetadataEntitiesLoading,
+        metadata = {}, loading, error, linkedMetadataEntities = {}, linkedMetadataEntitiesLoading
     } = useExternalStorageMetadata(path, fileAPI);
 
     const isDirectory = metadata.iscollection && (metadata.iscollection.toLowerCase() === 'true');
@@ -66,12 +66,12 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
 
     const renderProperty = (data: Map<string, DisplayProperty>, key: string) => (
-        data[key] && data[key].value != null && data[key].value !== '' && (
+        data[key] && data[key].value != null && data[key].value !== "" && (
             <ListItem disableGutters key={key}>
                 <FormControl>
                     <FormLabel>{data[key].label || key}</FormLabel>
                     <FormGroup>
-                        <ListItemText primary={data[key].value} style={{ whiteSpace: 'pre-line' }} />
+                        <ListItemText primary={data[key].value} style={{whiteSpace: 'pre-line'}} />
                     </FormGroup>
                 </FormControl>
             </ListItem>
@@ -122,10 +122,10 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     return (
         <Card className={classes.card}>
             <CardHeader
-                titleTypographyProps={{ variant: 'h6' }}
+                titleTypographyProps={{variant: 'h6'}}
                 title={title}
                 avatar={avatar}
-                style={{ wordBreak: 'break-word' }}
+                style={{wordBreak: 'break-word'}}
                 action={(
                     <IconButton
                         onClick={toggleExpand}
@@ -139,7 +139,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                 )}
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent style={{ paddingTop: 0 }}>
+                <CardContent style={{paddingTop: 0}}>
                     {renderCardContent()}
                 </CardContent>
             </Collapse>
@@ -155,7 +155,7 @@ type ExternalStorageInformationDrawerProperties = {
 }
 
 export const ExternalStorageInformationDrawer = (props: ExternalStorageInformationDrawerProperties) => {
-    const { atLeastSingleRootFileExists, path, selected, storage } = props;
+    const {atLeastSingleRootFileExists, path, selected, storage} = props;
 
     const paths = getPathHierarchy(path, false);
     if (selected) {

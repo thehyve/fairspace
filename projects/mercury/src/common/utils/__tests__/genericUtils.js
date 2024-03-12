@@ -5,8 +5,8 @@ import {
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject,
-} from '../genericUtils';
+    joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject
+} from "../genericUtils";
 
 describe('array Utils', () => {
     describe('flattenShallow', () => {
@@ -26,9 +26,9 @@ describe('array Utils', () => {
     describe('groupBy', () => {
         it('group an array by key', () => {
             expect(groupBy(
-                [{ name: 'x', type: 'a' }, { name: 'y', type: 'a' }, { name: 'z', type: 'b' }],
-                'type',
-            )).toEqual({ a: [{ name: 'x', type: 'a' }, { name: 'y', type: 'a' }], b: [{ name: 'z', type: 'b' }] });
+                [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
+                "type"
+            )).toEqual({a: [{name: "x", type: "a"}, {name: "y", type: "a"}], b: [{name: "z", type: "b"}]});
         });
     });
 });
@@ -36,25 +36,25 @@ describe('array Utils', () => {
 describe('comparison Utils', () => {
     describe('compareBy', () => {
         it('can compare by attribute', () => {
-            expect([{ a: 2 }, { a: 3 }, { a: 1 }].sort(compareBy('a'))).toEqual([{ a: 1 }, { a: 2 }, { a: 3 }]);
-            expect([{ a: 2 }, { a: 3 }, { a: 1 }].sort(compareBy('a', false))).toEqual([{ a: 3 }, { a: 2 }, { a: 1 }]);
-            expect([{ a: 2 }, {}, { a: 1 }].sort(compareBy('a', true))).toEqual([{}, { a: 1 }, { a: 2 }]);
-            expect([{ a: 2 }, {}, { a: 1 }].sort(compareBy('a', false))).toEqual([{ a: 2 }, { a: 1 }, {}]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a'))).toEqual([{a: 1}, {a: 2}, {a: 3}]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 3}, {a: 2}, {a: 1}]);
+            expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', true))).toEqual([{}, {a: 1}, {a: 2}]);
+            expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 2}, {a: 1}, {}]);
         });
 
         it('can compare by function', () => {
-            expect([{ a: 2 }, { a: 3 }, { a: 1 }].sort(compareBy(obj => obj.a))).toEqual([{ a: 1 }, { a: 2 }, { a: 3 }]);
-            expect([{ a: 2 }, { a: 3 }, { a: 1 }].sort(compareBy(obj => obj.a, false))).toEqual([{ a: 3 }, { a: 2 }, { a: 1 }]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy(obj => obj.a))).toEqual([{a: 1}, {a: 2}, {a: 3}]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy(obj => obj.a, false))).toEqual([{a: 3}, {a: 2}, {a: 1}]);
         });
     });
 
     describe('comparing', () => {
         it('combines comparators', () => {
             const c = comparing(compareBy('x'), compareBy('y'), compareBy('z'));
-            expect(c({ x: 1, y: 2, z: 3 }, { x: 1, y: 2, z: 3 })).toBe(0);
-            expect(c({ x: 2, y: 2, z: 3 }, { x: 1, y: 20, z: 30 })).toBe(1);
-            expect(c({ x: 1, y: 2, z: 3 }, { x: 1, y: 2, z: 4 })).toBe(-1);
-            expect(c({ x: 1, y: 3, z: 3 }, { x: 1, y: 2, z: 30 })).toBe(1);
+            expect(c({x: 1, y: 2, z: 3}, {x: 1, y: 2, z: 3})).toBe(0);
+            expect(c({x: 2, y: 2, z: 3}, {x: 1, y: 20, z: 30})).toBe(1);
+            expect(c({x: 1, y: 2, z: 3}, {x: 1, y: 2, z: 4})).toBe(-1);
+            expect(c({x: 1, y: 3, z: 3}, {x: 1, y: 2, z: 30})).toBe(1);
         });
     });
 
@@ -87,7 +87,7 @@ describe('isNonEmptyValue', () => {
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [undefined, null, '', NaN, '', ''];
+        const values = [undefined, null, '', NaN, "", ``];
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
@@ -100,7 +100,7 @@ describe('isEmptyObject', () => {
         values.forEach(v => expect(isEmptyObject(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [{ x: 'test' }, { y: false }, { z: null }];
+        const values = [{x: "test"}, {y: false}, {z: null}];
 
         values.forEach(v => expect(isEmptyObject(v)).toBe(false));
     });
@@ -149,7 +149,7 @@ describe('formatDateTime', () => {
 
     it('should return the given value for invalid dates', () => {
         const invalidDates = [
-            '2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN,
+            '2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN
         ];
 
         invalidDates.forEach(date => {
@@ -160,13 +160,13 @@ describe('formatDateTime', () => {
 
 describe('stableSort', () => {
     it('respects sorting direction', () => {
-        const a = ['c', 'a', 'b'];
+        const a = ["c", "a", "b"];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
     });
 
     it('respects sorting direction with empty values', () => {
-        const a = ['c', 'a', '', 'b'];
+        const a = ["c", "a", "", "b"];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['', 'a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a', '']);
     });

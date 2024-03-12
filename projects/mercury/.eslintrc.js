@@ -22,6 +22,7 @@ module.exports = {
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
         'ft-flow/define-flow-type': 1,
+        'linebreak-style': 0,
         indent: [
             'error',
             4,
@@ -29,6 +30,11 @@ module.exports = {
                 SwitchCase: 1
             }
         ],
+        'quote-props': [
+            2,
+            'consistent-as-needed'
+        ],
+        quotes: 0,
         'class-methods-use-this': 0,
         'import/no-named-as-default': 0,
         'react/jsx-filename-extension': [
@@ -40,6 +46,11 @@ module.exports = {
                 ]
             }
         ],
+        'object-curly-spacing': [
+            'error',
+            'never'
+        ],
+        'comma-dangle': 0,
         'no-console': [
             'error',
             {
@@ -52,16 +63,20 @@ module.exports = {
         'max-len': 0,
         'react/jsx-indent': 0,
         'react/jsx-indent-props': 0,
+        'react/sort-comp': 0,
         'react/prop-types': 0,
         'react/destructuring-assignment': 0,
         'react/jsx-one-expression-per-line': 0,
+        'block-spacing': 0,
         'arrow-parens': 0,
+        'no-multi-assign': 0,
         'no-param-reassign': [
             2,
             {
                 props: false
             }
         ],
+        'jsx-a11y/mouse-events-have-key-events': 0,
         'jsx-a11y/click-events-have-key-events': 0,
         'jsx-a11y/no-static-element-interactions': 0,
         'object-curly-newline': [
@@ -81,7 +96,7 @@ module.exports = {
         'jest/no-try-expect': 0,
         'react/static-property-placement': 0,
         'react/default-props-match-prop-types': 0,
-        'no-cond-assign': ['error', 'except-parens'],
+        'no-cond-assign': 0,
         'no-plusplus': 0,
         'jsx-a11y/anchor-is-valid': 0,
         'react/no-unused-prop-types': 0

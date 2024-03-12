@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Tooltip } from '@mui/material';
-import ContentCopy from 'mdi-material-ui/ContentCopy';
-import { CheckOutlined } from '@mui/icons-material';
-import useIsMounted from 'react-is-mounted-hook';
+import React, {useState} from 'react';
+import {Tooltip} from "@mui/material";
+import ContentCopy from "mdi-material-ui/ContentCopy";
+import {CheckOutlined} from "@mui/icons-material";
+import useIsMounted from "react-is-mounted-hook";
 
 const DEFAULT_TIMEOUT = 1000;
 const clipboardSupported = 'clipboard' in navigator;
@@ -36,7 +36,7 @@ const CopyButton = ({
                 data-testid="tooltip"
                 title={justCopied ? labelAfterCopy : labelPreCopy}
                 onClick={handleCopy}
-                style={{ ...style, cursor: 'pointer' }}
+                style={{...style, cursor: 'pointer'}}
             >
                 <span>
                     {justCopied ? (

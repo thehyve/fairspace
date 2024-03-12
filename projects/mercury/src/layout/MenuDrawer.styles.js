@@ -21,7 +21,7 @@ const styles = theme => ({
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        width: 62,
+        width: 62
     },
     toolbar: {
         backgroundColor: '#f0f0f0',
@@ -32,10 +32,10 @@ const styles = theme => ({
         ...theme.mixins.toolbar,
     },
     customerLogo: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 50,
-        height: 100,
-    },
+        height: 100
+    }
 });
 
 export default styles;

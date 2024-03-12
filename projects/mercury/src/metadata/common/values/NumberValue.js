@@ -1,5 +1,5 @@
 import React from 'react';
-import BaseInputValue from './BaseInputValue';
+import BaseInputValue from "./BaseInputValue";
 
 function NumberValue(props) {
     return (

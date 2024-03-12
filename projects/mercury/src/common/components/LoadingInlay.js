@@ -1,5 +1,5 @@
 import React from 'react';
-import { CircularProgress } from '@mui/material';
+import {CircularProgress} from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
 
@@ -7,8 +7,8 @@ const styles = theme => ({
     inlayProgress: {
         margin: theme.spacing(2),
         textAlign: 'center',
-        backgroundColor: 'transparent',
-    },
+        backgroundColor: 'transparent'
+    }
 });
 
 const loadingInlay = (props) => (

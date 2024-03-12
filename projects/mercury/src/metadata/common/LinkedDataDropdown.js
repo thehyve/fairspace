@@ -1,14 +1,14 @@
-import React, { useRef } from 'react';
-import { PropTypes } from 'prop-types';
+import React, {useRef} from 'react';
+import {PropTypes} from 'prop-types';
 
-import { valuesContainsValueOrId } from './metadataUtils';
+import {valuesContainsValueOrId} from "./metadataUtils";
 import Dropdown from './values/Dropdown';
-import { LocalSearchAPI } from '../../search/SearchAPI';
+import {LocalSearchAPI} from "../../search/SearchAPI";
 
-export const LinkedDataDropdown = ({ property, currentValues, fetchItems, type, debounce, ...otherProps }) => {
+export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, debounce, ...otherProps}) => {
     const fetchRequest = useRef(null);
 
-    const search = query => fetchItems({ type, query });
+    const search = query => fetchItems({type, query});
 
     const debouncedSearch = (query) => {
         if (fetchRequest.current) {
@@ -43,12 +43,12 @@ LinkedDataDropdown.propTypes = {
     fetchItems: PropTypes.func,
     property: PropTypes.object.isRequired,
     type: PropTypes.string.isRequired,
-    debounce: PropTypes.number,
+    debounce: PropTypes.number
 };
 
 LinkedDataDropdown.defaultProps = {
-    fetchItems: ({ type, query }) => LocalSearchAPI.lookupSearch(query, type),
-    debounce: 300,
+    fetchItems: ({type, query}) => LocalSearchAPI.lookupSearch(query, type),
+    debounce: 300
 };
 
 export default props => (

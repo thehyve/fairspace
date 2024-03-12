@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { List, ListItem, Typography } from '@mui/material';
+import PropTypes from "prop-types";
+import {List, ListItem, Typography} from '@mui/material';
 import _ from 'lodash';
-import { SHACL_NAME, SHACL_PATH, SHACL_PROPERTY } from '../constants';
+import {SHACL_NAME, SHACL_PATH, SHACL_PROPERTY} from '../constants';
 
 const labelForKey = (key, typeShape) => {
     if (!typeShape) {
@@ -24,19 +24,19 @@ const filterProperties = ([key, value]) => !['iri', 'type', 'contains', 'label',
  * @returns {*}
  * @constructor
  */
-const SearchResultHighlights = ({ highlights, typeShape }) => highlights && (
+const SearchResultHighlights = ({highlights, typeShape}) => highlights && (
     <List dense>
         {
             highlights
                 .filter(filterProperties)
                 .map(([key, value]) => (
-                    <ListItem key={key} dense disableGutters style={{ display: 'inline-table' }}>
+                    <ListItem key={key} dense disableGutters style={{display: 'inline-table'}}>
                         <Typography variant="overline">
                             {labelForKey(key, typeShape)}
                         </Typography>
                         <Typography variant="body1">
                             {/* eslint-disable-next-line react/no-danger */}
-                            <span dangerouslySetInnerHTML={{ __html: value }} />
+                            <span dangerouslySetInnerHTML={{__html: value}} />
                         </Typography>
                     </ListItem>
                 ))
@@ -46,7 +46,7 @@ const SearchResultHighlights = ({ highlights, typeShape }) => highlights && (
 
 SearchResultHighlights.propTypes = {
     highlights: PropTypes.array,
-    typeShape: PropTypes.any,
+    typeShape: PropTypes.any
 };
 
 export default SearchResultHighlights;

@@ -1,10 +1,10 @@
 import React from 'react';
 
-import BaseInputValue from './BaseInputValue';
+import BaseInputValue from "./BaseInputValue";
 
 function ExternalLinkValue(props) {
-    const entry = { ...props.entry, value: props.entry.id || '' };
-    const onChange = ({ value }) => ((value && value.trim()) ? (props.onChange({ id: value })) : {});
+    const entry = {...props.entry, value: props.entry.id || ''};
+    const onChange = ({value}) => ((value && value.trim()) ? (props.onChange({id: value})) : {});
     return (
         <BaseInputValue
             {...props}
@@ -16,7 +16,7 @@ function ExternalLinkValue(props) {
 }
 
 ExternalLinkValue.defaultProps = {
-    entry: {},
+    entry: {}
 };
 
 export default ExternalLinkValue;

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
-import { Autocomplete, ListItemText, TextField } from '@mui/material';
+import {Autocomplete, ListItemText, TextField} from '@mui/material';
 import useIsMounted from 'react-is-mounted-hook';
-import { compareBy } from '../../../common/utils/genericUtils';
+import {compareBy} from "../../../common/utils/genericUtils";
 
 const Dropdown = ({
     options = null, clearTextOnSelection, placeholder,
@@ -34,7 +34,7 @@ const Dropdown = ({
         value: searchText,
         onChange: (e) => isMounted() && setSearchText(e.target.value),
         onFocus: () => setTouched(true),
-        onClick: () => setTouched(true),
+        onClick: () => setTouched(true)
     });
 
     const inputRef = React.createRef();
@@ -76,7 +76,7 @@ const Dropdown = ({
 
 Dropdown.propTypes = {
     onChange: PropTypes.func,
-    options: PropTypes.array,
+    options: PropTypes.array
 };
 
 export default Dropdown;

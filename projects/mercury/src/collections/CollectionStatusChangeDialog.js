@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
     Button,
     Dialog,
@@ -11,28 +11,28 @@ import {
     ListItemText,
     Radio,
     RadioGroup,
-} from '@mui/material';
+} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
-import { camelCaseToWords } from '../common/utils/genericUtils';
-import ConfirmationButton from '../common/components/ConfirmationButton';
-import { descriptionForStatus } from './collectionUtils';
-import { statuses } from './CollectionAPI';
-import type { Status } from './CollectionAPI';
+import {camelCaseToWords} from "../common/utils/genericUtils";
+import ConfirmationButton from "../common/components/ConfirmationButton";
+import {descriptionForStatus} from "./collectionUtils";
+import {statuses} from './CollectionAPI';
+import type {Status} from './CollectionAPI';
 
 export const styles = {
     group: {
-        width: 350,
+        width: 350
     },
     groupItem: {
-        marginBottom: 10,
+        marginBottom: 10
     },
     helperText: {
         marginLeft: 32,
-        marginTop: 0,
-    },
+        marginTop: 0
+    }
 };
 
-export const CollectionStatusChangeDialog = ({ collection, setValue, onClose, classes }) => {
+export const CollectionStatusChangeDialog = ({collection, setValue, onClose, classes}) => {
     const [selectedValue, setSelectedValue] = useState(collection.status);
     const [openDialog, setOpenDialog] = useState(true);
 
@@ -106,7 +106,7 @@ export const CollectionStatusChangeDialog = ({ collection, setValue, onClose, cl
                                         control={<Radio />}
                                         label={(
                                             <ListItemText
-                                                primary={camelCaseToWords(status, '-')}
+                                                primary={camelCaseToWords(status, "-")}
                                                 secondary={descriptionForStatus(status)}
                                             />
                                         )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -6,38 +6,38 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import withStyles from '@mui/styles/withStyles';
-import { Typography } from '@mui/material';
-import Divider from '@mui/material/Divider';
-import PermissionCandidateSelect from './PermissionCandidateSelect';
-import type { Permission } from '../collections/CollectionAPI';
-import WorkspacePermissionsTable from './WorkspacePermissionsTable';
+import {Typography} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import PermissionCandidateSelect from "./PermissionCandidateSelect";
+import type {Permission} from "../collections/CollectionAPI";
+import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
 
 export const styles = {
     dialog: {
-        width: 650,
+        width: 650
     },
     root: {
         display: 'block',
-        paddingBottom: 40,
+        paddingBottom: 40
     },
     container: {
         display: 'flex',
         flexWrap: 'wrap',
     },
     autocomplete: {
-        width: '100%',
+        width: '100%'
     },
     accessLevelControl: {
-        marginTop: 10,
+        marginTop: 10
     },
     divider: {
         marginTop: 15,
-        marginBottom: 15,
-    },
+        marginBottom: 15
+    }
 };
 
-export const AlterWorkspacePermissionsDialog = ({ collection, permissionCandidates, setPermission,
-    open = false, onClose, classes }) => {
+export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidates, setPermission,
+    open = false, onClose, classes}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
@@ -81,7 +81,7 @@ export const AlterWorkspacePermissionsDialog = ({ collection, permissionCandidat
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
-            onChange={p => handleAddSelectedPermission({ ...p, access: 'Read' })}
+            onChange={p => handleAddSelectedPermission({...p, access: "Read"})}
             filter={p => ((p.iri !== collection.ownerWorkspace) && !selectedPermissions.some(sp => sp.iri === p.iri))}
             label="Select workspace"
             autoFocus
@@ -127,7 +127,7 @@ AlterWorkspacePermissionsDialog.propTypes = {
     onClose: PropTypes.func.isRequired,
     setPermission: PropTypes.func.isRequired,
     collection: PropTypes.object,
-    permissionCandidates: PropTypes.array,
+    permissionCandidates: PropTypes.array
 };
 
 export default withStyles(styles)(AlterWorkspacePermissionsDialog);

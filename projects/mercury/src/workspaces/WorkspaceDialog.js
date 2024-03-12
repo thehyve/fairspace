@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, {useState} from "react";
 
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from "@mui/material";
 import withStyles from '@mui/styles/withStyles';
-import TextField from '@mui/material/TextField';
-import LoadingOverlay from '../common/components/LoadingOverlay';
+import TextField from "@mui/material/TextField";
+import LoadingOverlay from "../common/components/LoadingOverlay";
 
 const styles = theme => ({
     textHelperBasic: {
@@ -11,10 +11,10 @@ const styles = theme => ({
     },
     textHelperWarning: {
         color: theme.palette.warning.dark,
-    },
+    }
 });
 
-const WorkspaceDialog = ({ onSubmit, onClose, creating, workspaces, classes = {} }) => {
+const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}) => {
     const [value, setValue] = useState(null);
 
     const isCodeLengthWarning = () => (!!value && value.trim().length > 10);
@@ -25,7 +25,7 @@ const WorkspaceDialog = ({ onSubmit, onClose, creating, workspaces, classes = {}
         e.preventDefault();
         e.stopPropagation();
         if (value && isCodeValid()) {
-            onSubmit({ code: value.trim() });
+            onSubmit({code: value.trim()});
         }
     };
 
@@ -35,9 +35,7 @@ const WorkspaceDialog = ({ onSubmit, onClose, creating, workspaces, classes = {}
             <span className={!isCodeLengthWarning() ? classes.textHelperBasic : classes.textHelperWarning}>
                 <br />
                 {isCodeLengthWarning() && (
-                    <span>
-                        <b>Warning!</b> Code is longer than 10 characters!<br />
-                    </span>
+                    <span><b>Warning!</b> Code is longer than 10 characters!<br /></span>
                 )}
                 The code will prefix all collections of the workspace - preferred length is maximum 10 characters
                 <br />
@@ -59,7 +57,7 @@ const WorkspaceDialog = ({ onSubmit, onClose, creating, workspaces, classes = {}
                         <Typography variant="h5" component="h2">Create workspace</Typography>
                     </div>
                 </DialogTitle>
-                <DialogContent style={{ overflowX: 'hidden' }}>
+                <DialogContent style={{overflowX: 'hidden'}}>
                     <TextField
                         autoFocus
                         margin="dense"

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from "react";
 
 /**
  * Custom hook to perform pagination
@@ -20,7 +20,7 @@ const usePagination = (items, initialRowsPerPage = 10) => {
         setPage,
         rowsPerPage,
         setRowsPerPage,
-        pagedItems,
+        pagedItems
     };
 };
 

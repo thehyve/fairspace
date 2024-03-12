@@ -1,25 +1,25 @@
-import React, { useContext } from 'react';
-import PropTypes from 'prop-types';
-import { Box, FormHelperText, FormLabel } from '@mui/material';
+import React, {useContext} from 'react';
+import PropTypes from "prop-types";
+import {Box, FormHelperText, FormLabel} from "@mui/material";
 import makeStyles from '@mui/styles/makeStyles';
-import MessageDisplay from '../common/components/MessageDisplay';
-import LoadingInlay from '../common/components/LoadingInlay';
-import UserPermissionsComponent from './UserPermissionsComponent';
-import UserContext from '../users/UserContext';
-import CollectionsContext from '../collections/CollectionsContext';
-import WorkspacePermissionsComponent from './WorkspacePermissionsComponent';
-import { sortPermissions } from '../collections/collectionUtils';
+import MessageDisplay from "../common/components/MessageDisplay";
+import LoadingInlay from "../common/components/LoadingInlay";
+import UserPermissionsComponent from "./UserPermissionsComponent";
+import UserContext from "../users/UserContext";
+import CollectionsContext from "../collections/CollectionsContext";
+import WorkspacePermissionsComponent from "./WorkspacePermissionsComponent";
+import {sortPermissions} from "../collections/collectionUtils";
 
 const useStyles = makeStyles({
     root: {
         marginLeft: 20,
-        marginBottom: 5,
+        marginBottom: 5
     },
 });
 
 export const PermissionViewer = ({
     collection, workspaceUsers, collaboratingWorkspaces,
-    collaboratingUsers, currentUser, setPermission, error, loading,
+    collaboratingUsers, currentUser, setPermission, error, loading
 }) => {
     const classes = useStyles();
 
@@ -69,12 +69,12 @@ PermissionViewer.defaultProps = {
     collaboratingWorkspaces: PropTypes.array,
     collaboratingUsers: PropTypes.array,
     currentUser: PropTypes.object,
-    setPermission: PropTypes.func,
+    setPermission: PropTypes.func
 };
 
-const ContextualPermissionViewer = ({ collection, workspaceUsers, collaboratingUsers, collaboratingWorkspaces }) => {
-    const { currentUser, currentUserLoading, currentUserError } = useContext(UserContext);
-    const { setPermission, loading, error } = useContext(CollectionsContext);
+const ContextualPermissionViewer = ({collection, workspaceUsers, collaboratingUsers, collaboratingWorkspaces}) => {
+    const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
+    const {setPermission, loading, error} = useContext(CollectionsContext);
 
     return (
         <PermissionViewer
