@@ -87,7 +87,7 @@ describe('isNonEmptyValue', () => {
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [undefined, null, '', NaN, '', ''];
+        const values = [undefined, null, '', NaN, "", ``]; // eslint-disable-line quotes
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
