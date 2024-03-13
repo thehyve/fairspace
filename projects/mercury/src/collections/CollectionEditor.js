@@ -44,7 +44,7 @@ const isNameValid = (name: string) => (
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
 export const formatPrefix = (prefix: string) => (
-    prefix ? `[${prefix.replace(/[/\\]/, '')}] ` : ''
+    prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : ''
 );
 
 const styles = theme => ({
