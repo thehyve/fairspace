@@ -4,14 +4,11 @@ module.exports = {
         jest: true,
         'jest/globals': true
     },
-    plugins: [
-        'ft-flow',
-        'react-hooks',
-        'jest'
-    ],
+    plugins: ['ft-flow', 'react-hooks', 'jest'],
     extends: [
         'eslint-config-react-app', // This is the default react-app config, was used once we switched custom linter off
         'airbnb',
+        'plugin:prettier/recommended',
         'plugin:jest/recommended'
     ],
     parser: 'hermes-eslint',
@@ -22,36 +19,20 @@ module.exports = {
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
         'ft-flow/define-flow-type': 1,
-        indent: [
-            'error',
-            4,
-            {
-                SwitchCase: 1
-            }
-        ],
         'class-methods-use-this': 0,
         'import/no-named-as-default': 0,
         'react/jsx-filename-extension': [
             'error',
             {
-                'extensions': [
-                    '.js',
-                    '.jsx'
-                ]
+                extensions: ['.js', '.jsx']
             }
         ],
-        'object-curly-spacing': [
-            'error',
-            'never'
-        ],
+        'object-curly-spacing': ['error', 'never'],
         'comma-dangle': 0,
         'no-console': [
             'error',
             {
-                'allow': [
-                    'warn',
-                    'error'
-                ]
+                allow: ['warn', 'error']
             }
         ],
         'max-len': 0,
