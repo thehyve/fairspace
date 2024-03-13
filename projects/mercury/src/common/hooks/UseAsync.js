@@ -25,9 +25,8 @@ const useAsync = (callback, deps = []) => {
                     setError(e || true);
                     console.error(e || new Error('Unknown error'));
                 })
-                // eslint-disable-next-line
                 .finally(() => setLoading(false)),
-        deps
+        deps // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     useEffect(() => {

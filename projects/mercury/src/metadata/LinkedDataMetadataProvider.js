@@ -19,9 +19,8 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
         subject =>
             metadataAPI.getDict({subject, withValueProperties: true}).catch(() => {
                 throw new Error('An error occurred while loading the metadata');
-                // eslint-disable-next-line react-hooks/exhaustive-deps
             }),
-        []
+        [] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     const submitLinkedDataChanges = useCallback(

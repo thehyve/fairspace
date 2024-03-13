@@ -152,10 +152,9 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
             .finally(() => setLoading(false));
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         fetchMetadata();
-    }, [path]);
+    }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return {
         loading,

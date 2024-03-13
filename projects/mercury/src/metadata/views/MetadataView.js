@@ -96,9 +96,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
             toggle();
             setTextFiltersObject({});
             handleViewChangeRedirect(views[tabIndex].name, pathPrefix);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         },
-        [views]
+        [views] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     const clearFilterCandidates = useCallback(() => {
@@ -149,9 +148,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 setFilterValues(facet.type, newFilter, newValues);
                 setFilterCandidates([...filterCandidates, newFilter]);
             }
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         },
-        [filterCandidates]
+        [filterCandidates] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     const handleClearAllFilters = () => {
@@ -164,9 +162,8 @@ export const MetadataView = (props: MetadataViewProperties) => {
         (facetName: string) => {
             setFilterCandidates([...filterCandidates.filter(f => f.field !== facetName)]);
             clearFilter(facetName);
-            // eslint-disable-next-line react-hooks/exhaustive-deps
         },
-        [filterCandidates]
+        [filterCandidates] // eslint-disable-line react-hooks/exhaustive-deps
     );
 
     const collectionsFacet = useMemo(
@@ -343,10 +340,9 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         initialLoad();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (error && error.message) {
         return <MessageDisplay message={error.message} />;
