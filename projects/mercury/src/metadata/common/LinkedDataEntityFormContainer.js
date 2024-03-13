@@ -1,16 +1,16 @@
-import React, {useContext, useEffect, useState} from "react";
-import PropTypes from "prop-types";
-import {Button, CircularProgress, Grid, IconButton} from "@mui/material";
+import React, {useContext, useEffect, useState} from 'react';
+import PropTypes from 'prop-types';
+import {Button, CircularProgress, Grid, IconButton} from '@mui/material';
 import {Edit} from '@mui/icons-material';
 
-import LinkedDataEntityForm from "./LinkedDataEntityForm";
+import LinkedDataEntityForm from './LinkedDataEntityForm';
 import useFormData from './UseFormData';
-import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "./UseFormSubmission";
-import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import useLinkedData from "./UseLinkedData";
-import {DATE_DELETED_URI} from "../../constants";
-import ConfirmationDialog from "../../common/components/ConfirmationDialog";
+import LinkedDataContext from '../LinkedDataContext';
+import useFormSubmission from './UseFormSubmission';
+import useNavigationBlocker from '../../common/hooks/UseNavigationBlocker';
+import useLinkedData from './UseLinkedData';
+import {DATE_DELETED_URI} from '../../constants';
+import ConfirmationDialog from '../../common/components/ConfirmationDialog';
 import {UpdatePageTitleEditingMark} from '../../common/hooks/UsePageTitleUpdater';
 
 const LinkedDataEntityFormContainer = ({

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React from 'react';
-import {extractJsonData, handleHttpError} from "../utils/httpUtils";
-import useAsync from "../hooks/UseAsync";
+import {extractJsonData, handleHttpError} from '../utils/httpUtils';
+import useAsync from '../hooks/UseAsync';
 
 const ServicesContext = React.createContext({});
 

@@ -13,7 +13,7 @@ import type {Collection, CollectionProperties} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
-import ErrorDialog from "../common/components/ErrorDialog";
+import ErrorDialog from '../common/components/ErrorDialog';
 import {
     fileNameContainsInvalidCharacter, isUnsafeFileName,
     isValidFileName
@@ -100,6 +100,9 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     };
 
     unmounting = false;
+
+    editNameEnabled = (!this.props.collection) || (
+        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
 
     componentWillUnmount() {
         this.unmounting = true;
@@ -212,9 +215,6 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         const state = {properties};
         this.setState(state);
     };
-
-    editNameEnabled = (!this.props.collection) || (
-        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
 
     isSaveEnabled = () => (!this.state.saveInProgress)
         && isInputValid(this.state.properties)

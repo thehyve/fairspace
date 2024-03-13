@@ -6,11 +6,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import withStyles from '@mui/styles/withStyles';
-import {Typography} from "@mui/material";
-import Divider from "@mui/material/Divider";
-import PermissionCandidateSelect from "./PermissionCandidateSelect";
-import type {Permission} from "../collections/CollectionAPI";
-import UserPermissionsTable from "./UserPermissionsTable";
+import {Typography} from '@mui/material';
+import Divider from '@mui/material/Divider';
+import PermissionCandidateSelect from './PermissionCandidateSelect';
+import type {Permission} from '../collections/CollectionAPI';
+import UserPermissionsTable from './UserPermissionsTable';
 
 export const styles = {
     dialog: {
@@ -42,13 +42,13 @@ export const styles = {
         padding: 0
     },
     tableBody: {
-        display: "block",
-        overflow: "auto",
+        display: 'block',
+        overflow: 'auto',
         maxHeight: 150
     },
     tableRow: {
-        display: "table",
-        width: "100%",
+        display: 'table',
+        width: '100%',
         height: 48
     },
     nameCell: {
@@ -113,7 +113,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
-            onChange={p => handleAddSelectedPermission({...p, access: "Read"})}
+            onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
             filter={p => ((!currentUser || p.iri !== currentUser.iri) && !selectedPermissions.some(sp => sp.iri === p.iri))}
             label="Select user"
             autoFocus

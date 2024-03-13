@@ -2,14 +2,14 @@
 import React from 'react';
 import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {Close, Person} from "@mui/icons-material";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import PropTypes from "prop-types";
-import {accessLevels} from "../collections/CollectionAPI";
-import type {AccessLevel, Permission, Principal} from "../collections/CollectionAPI";
-import {collectionAccessIcon} from "../collections/collectionUtils";
+import {Close, Person} from '@mui/icons-material';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import PropTypes from 'prop-types';
+import {accessLevels} from '../collections/CollectionAPI';
+import type {AccessLevel, Permission, Principal} from '../collections/CollectionAPI';
+import {collectionAccessIcon} from '../collections/collectionUtils';
 
 const styles = {
     table: {
@@ -57,7 +57,7 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
         );
     }
 
-    const availableWorkspaceMemberAccessLevels = accessLevels.filter(a => a !== "None" && a !== "List");
+    const availableWorkspaceMemberAccessLevels = accessLevels.filter(a => a !== 'None' && a !== 'List');
     const getAccessLevelsForPrincipal: AccessLevel[] = (selectedPrincipal: Principal) => {
         if (workspaceUsers.some(wu => wu.iri === selectedPrincipal.iri)) {
             return availableWorkspaceMemberAccessLevels;

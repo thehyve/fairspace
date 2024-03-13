@@ -1,9 +1,9 @@
 import React from 'react';
 import withStyles from '@mui/styles/withStyles';
 import {Button, Grid} from '@mui/material';
-import {ofBooleanValueType, ofRangeValueType} from "./metadataViewUtils";
+import {ofBooleanValueType, ofRangeValueType} from './metadataViewUtils';
 import Facet from './MetadataViewFacetFactory';
-import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from "./MetadataViewAPI";
+import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from './MetadataViewAPI';
 
 type MetadataViewFacetsProperties = {
     views: MetadataViewOptions[];
@@ -102,7 +102,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                         facetsEx
                             .filter(facet => facet.name.toLowerCase().startsWith('location'))
                             .map(facet => (renderSingleFacet(facet, filters, filterCandidates, updateFilterCandidates, handleClearFilter)))
-                    ) : ""
+                    ) : ''
                 }
             </Grid>
         );

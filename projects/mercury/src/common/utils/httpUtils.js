@@ -7,7 +7,7 @@
  * @returns {Function}
  */
 import axios, {AxiosError} from 'axios';
-import ErrorDialog from "../components/ErrorDialog";
+import ErrorDialog from '../components/ErrorDialog';
 
 export const handleAuthError = (status) => {
     switch (status) {
@@ -77,7 +77,7 @@ export function handleRemoteSourceHttpError(defaultMessage) {
  */
 export function extractJsonData(response) {
     if (!response) {
-        throw Error(`Cannot parse empty response`);
+        throw Error('Cannot parse empty response');
     }
     const {headers, data} = response;
     const contentType = headers ? headers['content-type'] : '';

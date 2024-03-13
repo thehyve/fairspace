@@ -1,22 +1,22 @@
-import {TextField} from "@mui/material";
-import React, {useEffect, useState} from "react";
-import {alpha} from "@mui/material/styles";
+import {TextField} from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {alpha} from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
-import IconButton from "@mui/material/IconButton";
-import SearchIcon from "@mui/icons-material/Search";
-import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from '@mui/material/IconButton';
+import SearchIcon from '@mui/icons-material/Search';
+import InputAdornment from '@mui/material/InputAdornment';
 
 const useStyles = makeStyles((theme) => ({
     search: {
-        'position': 'relative',
-        'flex': 0.8,
-        'borderRadius': theme.shape.borderRadius,
-        'backgroundColor': alpha(theme.palette.common.white, 0.15),
+        position: 'relative',
+        flex: 0.8,
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: alpha(theme.palette.common.white, 0.15),
         '&:hover': {
             backgroundColor: alpha(theme.palette.common.white, 0.25),
         },
-        'marginLeft': 0,
-        'width': '100%',
+        marginLeft: 0,
+        width: '100%',
         [theme.breakpoints.up('sm')]: {
             width: 'auto',
         },
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ColumnFilterInput = ({setFilterValue, filterValue = "", placeholder, useApplyButton = false}) => {
+const ColumnFilterInput = ({setFilterValue, filterValue = '', placeholder, useApplyButton = false}) => {
     const classes = useStyles();
     const [value, setValue] = useState(filterValue);
 

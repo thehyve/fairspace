@@ -1,8 +1,8 @@
-import {renderHook} from "@testing-library/react-hooks";
+import {renderHook} from '@testing-library/react-hooks';
 import {act} from 'react-test-renderer';
 
-import React from "react";
-import {useFormSubmission} from "../UseFormSubmission";
+import React from 'react';
+import {useFormSubmission} from '../UseFormSubmission';
 import ValidationErrorsDisplay from '../ValidationErrorsDisplay';
 
 // same as UseLinkedData
@@ -66,10 +66,10 @@ describe.skip('UseFormSubmission', () => {
         ];
         const details = [
             {
-                message: "Cannot add a machine-only property",
-                subject: "https://fairspace.nl/ontology#collectionTypeShape",
-                predicate: "https://fairspace.nl/ontology#domainIncludes",
-                value: "http://workspace.ci.fairway.app/vocabulary/AnalysisShape"
+                message: 'Cannot add a machine-only property',
+                subject: 'https://fairspace.nl/ontology#collectionTypeShape',
+                predicate: 'https://fairspace.nl/ontology#domainIncludes',
+                value: 'http://workspace.ci.fairway.app/vocabulary/AnalysisShape'
             }
         ];
 
@@ -88,10 +88,10 @@ describe.skip('UseFormSubmission', () => {
                 entityErrors={[]}
                 otherErrors={
                     [{
-                        message: "Cannot add a machine-only property",
-                        predicate: "fs:ontology#domainIncludes",
-                        subject: "fs:ontology#collectionTypeShape",
-                        value: "http://workspace.ci.fairway.app/vocabulary/AnalysisShape"
+                        message: 'Cannot add a machine-only property',
+                        predicate: 'fs:ontology#domainIncludes',
+                        subject: 'fs:ontology#collectionTypeShape',
+                        value: 'http://workspace.ci.fairway.app/vocabulary/AnalysisShape'
                     }]
                 }
             />)

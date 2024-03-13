@@ -7,7 +7,7 @@ import {
     getParentPath, getPathFromIri,
     getPathInfoFromParams, joinPathsAvoidEmpty, redirectLink
 } from '../fileUtils';
-import {DIRECTORY_URI, FILE_URI} from "../../constants";
+import {DIRECTORY_URI, FILE_URI} from '../../constants';
 
 describe('getBaseNameAndExtension', () => {
     it('should return the expected file base name and extension', () => {
@@ -155,11 +155,11 @@ describe('redirectLink', () => {
     });
     it('gets a file redirection link for external storage', () => {
         const storage = {
-            name: "test",
-            label: "Test",
-            path: "/api/storages/test/webdav",
-            searchPath: "/api/storages/test/search",
-            rootDirectoryIri: "http://localhost:8080/api/webdav"
+            name: 'test',
+            label: 'Test',
+            path: '/api/storages/test/webdav',
+            searchPath: '/api/storages/test/search',
+            rootDirectoryIri: 'http://localhost:8080/api/webdav'
         };
         expect(
             redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/coffee_139.jpg', FILE_URI, storage)
@@ -167,11 +167,11 @@ describe('redirectLink', () => {
     });
     it('gets a directory redirection link for external storage', () => {
         const storage = {
-            name: "test",
-            label: "Test",
-            path: "/api/storages/test/webdav",
-            searchPath: "/api/storages/test/search",
-            rootDirectoryIri: "http://localhost:8080/api/webdav"
+            name: 'test',
+            label: 'Test',
+            path: '/api/storages/test/webdav',
+            searchPath: '/api/storages/test/search',
+            rootDirectoryIri: 'http://localhost:8080/api/webdav'
         };
         expect(
             redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1', DIRECTORY_URI, storage)

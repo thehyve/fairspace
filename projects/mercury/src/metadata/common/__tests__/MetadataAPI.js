@@ -1,6 +1,6 @@
 import mockAxios from 'axios';
 
-import MetadataAPI from "../MetadataAPI";
+import MetadataAPI from '../MetadataAPI';
 
 jest.mock('axios');
 
@@ -48,14 +48,14 @@ describe('MetadataAPI', () => {
         const expected = [
             {
                 '@id': 'http://thehyve.nl',
-                'hasEmployees': [
+                hasEmployees: [
                     {'@value': 'John Snow'},
                     {'@value': 'Ygritte'}
                 ]
             },
             {
                 '@id': 'http://thehyve.nl',
-                'hasFriends': [
+                hasFriends: [
                     {'@value': 'John Sand'},
                     {'@value': 'Ettirgy'}
                 ]

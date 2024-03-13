@@ -1,13 +1,13 @@
 import React from 'react';
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import {act} from 'react-dom/test-utils';
 
-import {FilesPage} from "../FilesPage";
-import CollectionInformationDrawer from "../../collections/CollectionInformationDrawer";
+import {FilesPage} from '../FilesPage';
+import CollectionInformationDrawer from '../../collections/CollectionInformationDrawer';
 import FileBrowser from '../FileBrowser';
-import {getPathInfoFromParams} from "../fileUtils";
+import {getPathInfoFromParams} from '../fileUtils';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.

@@ -1,4 +1,4 @@
-import {createTheme} from "@mui/material";
+import {createTheme} from '@mui/material';
 import {blue, indigo, pink} from '@mui/material/colors';
 
 export default createTheme({
@@ -19,8 +19,8 @@ export default createTheme({
                 },
             },
             defaultProps: {
-                size: "small",
-                variant: "standard"
+                size: 'small',
+                variant: 'standard'
             }
         },
         MuiDivider: {
@@ -67,7 +67,7 @@ export default createTheme({
                 }
             },
             defaultProps: {
-                size: "small"
+                size: 'small'
             }
         },
         MuiListItemText: {
@@ -91,7 +91,7 @@ export default createTheme({
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: "whitesmoke",
+                    backgroundColor: 'whitesmoke',
                     marginBottom: 0,
                     padding: 5
                 }
@@ -106,14 +106,14 @@ export default createTheme({
         },
         MuiToolbar: {
             defaultProps: {
-                variant: "dense"
+                variant: 'dense'
             }
         },
         MuiAutocomplete: {
             styleOverrides: {
                 listbox: {
                     '& .MuiAutocomplete-option': {
-                        display: "block"
+                        display: 'block'
                     }
                 }
             }

@@ -1,4 +1,4 @@
-import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from "../jsonLdUtils";
+import {getFirstPredicateId, getFirstPredicateValue, normalizeJsonLdResource} from '../jsonLdUtils';
 
 describe('json-ld Utils', () => {
     describe('getFirstPredicateValue', () => {

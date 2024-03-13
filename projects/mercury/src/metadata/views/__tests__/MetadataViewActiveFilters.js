@@ -1,11 +1,11 @@
-import {configure, shallow} from "enzyme";
-import React from "react";
-import Chip from "@mui/material/Chip";
-import Typography from "@mui/material/Typography";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import MetadataViewActiveFacetFilters from "../MetadataViewActiveFacetFilters";
+import {configure, shallow} from 'enzyme';
+import React from 'react';
+import Chip from '@mui/material/Chip';
+import Typography from '@mui/material/Typography';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import MetadataViewActiveFacetFilters from '../MetadataViewActiveFacetFilters';
 // eslint-disable-next-line jest/no-mocks-import
-import {mockFacets} from "../__mocks__/MetadataViewAPI";
+import {mockFacets} from '../__mocks__/MetadataViewAPI';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.

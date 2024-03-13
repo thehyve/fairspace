@@ -1,4 +1,4 @@
-import * as consts from "../../constants";
+import * as consts from '../../constants';
 
 export type ExternalMetadataSource = {
     path: string,
@@ -7,5 +7,5 @@ export type ExternalMetadataSource = {
 }
 
 export const getExternalMetadataSourcePathPrefix = (sourceName: string) => (
-    consts.PATH_SEPARATOR + "metadata-sources" + consts.PATH_SEPARATOR + sourceName
+    consts.PATH_SEPARATOR + 'metadata-sources' + consts.PATH_SEPARATOR + sourceName
 );

@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React from 'react';
-import {configure} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {fireEvent, render} from "@testing-library/react";
-import {ThemeProvider} from "@mui/material/styles";
-import LinkedDataLink from "../LinkedDataLink";
-import theme from "../../../App.theme";
+import {fireEvent, render} from '@testing-library/react';
+import {ThemeProvider} from '@mui/material/styles';
+import LinkedDataLink from '../LinkedDataLink';
+import theme from '../../../App.theme';
 import UserContext from '../../../users/UserContext';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.

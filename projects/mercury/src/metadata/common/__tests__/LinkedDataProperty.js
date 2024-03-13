@@ -1,20 +1,20 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
-import {MemoryRouter} from "react-router-dom"; // use to render useRouter wrapped components
-import {configure, mount, shallow} from "enzyme";
+import {MemoryRouter} from 'react-router-dom'; // use to render useRouter wrapped components
+import {configure, mount, shallow} from 'enzyme';
 import {render, screen} from '@testing-library/react';
 // import '@testing-library/jest-dom/extend-expect';
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import {ThemeProvider} from '@mui/material/styles';
-import {STRING_URI} from "../../../constants";
-import LinkedDataProperty from "../LinkedDataProperty";
-import LinkedDataRelationTable from "../LinkedDataRelationTable";
-import LinkedDataInputFieldsTable from "../LinkedDataInputFieldsTable";
-import LinkedDataContext from "../../LinkedDataContext";
-import NumberValue from "../values/NumberValue";
-import SwitchValue from "../values/SwitchValue";
-import ReferringValue from "../values/ReferringValue";
+import {STRING_URI} from '../../../constants';
+import LinkedDataProperty from '../LinkedDataProperty';
+import LinkedDataRelationTable from '../LinkedDataRelationTable';
+import LinkedDataInputFieldsTable from '../LinkedDataInputFieldsTable';
+import LinkedDataContext from '../../LinkedDataContext';
+import NumberValue from '../values/NumberValue';
+import SwitchValue from '../values/SwitchValue';
+import ReferringValue from '../values/ReferringValue';
 import theme from '../../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -42,9 +42,9 @@ describe('LinkedDataProperty elements', () => {
             </ThemeProvider>
         );
 
-        const inputElements = screen.queryAllByRole("textbox");
+        const inputElements = screen.queryAllByRole('textbox');
         expect(inputElements).toHaveLength(1);
-        expect(screen.queryByTestId("label-description")).not.toBeInTheDocument();
+        expect(screen.queryByTestId('label-description')).not.toBeInTheDocument();
     });
 
     it('shows a table for input fields for non-relationShapes', () => {
@@ -59,9 +59,9 @@ describe('LinkedDataProperty elements', () => {
             </ThemeProvider>
         );
 
-        const inputElements = screen.queryAllByRole("textbox");
+        const inputElements = screen.queryAllByRole('textbox');
         expect(inputElements).toHaveLength(4);
-        expect(screen.queryByTestId("label-description")).toBeInTheDocument();
+        expect(screen.queryByTestId('label-description')).toBeInTheDocument();
     });
 
     describe('canEdit', () => {
@@ -69,7 +69,7 @@ describe('LinkedDataProperty elements', () => {
             const wrapper = shallow(<LinkedDataProperty property={property} values={defaultValues} />);
             const table = wrapper.find(LinkedDataRelationTable);
             expect(table.length).toEqual(1);
-            expect(table.prop("canEdit")).toBe(expectedCanEdit);
+            expect(table.prop('canEdit')).toBe(expectedCanEdit);
         };
 
         it('should allow adding new entities', () => verifyCanEdit(defaultProperty, true));
@@ -102,7 +102,7 @@ describe('LinkedDataProperty elements', () => {
                 renderTable({
                     ...defaultProperty,
                     isRelationShape: false
-                }).prop("addComponent")
+                }).prop('addComponent')
             ).toEqual(NumberValue);
         });
 
@@ -111,7 +111,7 @@ describe('LinkedDataProperty elements', () => {
                 renderTable({
                     ...defaultProperty,
                     isRelationShape: false
-                }).prop("editComponent")
+                }).prop('editComponent')
             ).toEqual(ReferringValue);
         });
 
@@ -121,7 +121,7 @@ describe('LinkedDataProperty elements', () => {
                     ...defaultProperty,
                     isRelationShape: false,
                     isEditable: false
-                }).prop("editComponent")
+                }).prop('editComponent')
             ).toEqual(SwitchValue);
         });
 
@@ -131,7 +131,7 @@ describe('LinkedDataProperty elements', () => {
                     ...defaultProperty,
                     isRelationShape: false,
                     machineOnly: true
-                }).prop("editComponent")
+                }).prop('editComponent')
             ).toEqual(SwitchValue);
         });
 
@@ -141,7 +141,7 @@ describe('LinkedDataProperty elements', () => {
                     ...defaultProperty,
                     isRelationShape: false,
                     isGenericIriResource: true
-                }).prop("editComponent")
+                }).prop('editComponent')
             ).toEqual(SwitchValue);
         });
 
@@ -151,7 +151,7 @@ describe('LinkedDataProperty elements', () => {
                     ...defaultProperty,
                     isRelationShape: false,
                     allowedValues: ['a']
-                }).prop("editComponent")
+                }).prop('editComponent')
             ).toEqual(SwitchValue);
         });
     });

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BaseInputValue from "./BaseInputValue";
+import BaseInputValue from './BaseInputValue';
 
 function ExternalLinkValue(props) {
     const entry = {...props.entry, value: props.entry.id || ''};

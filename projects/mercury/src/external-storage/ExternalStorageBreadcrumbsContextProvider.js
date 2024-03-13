@@ -1,7 +1,7 @@
-import React from "react";
-import {FolderSpecial} from "@mui/icons-material";
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
-import {getExternalStoragePathPrefix} from "./externalStorageUtils";
+import React from 'react';
+import {FolderSpecial} from '@mui/icons-material';
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
+import {getExternalStoragePathPrefix} from './externalStorageUtils';
 
 export default ({children, storage}) => (
     <BreadcrumbsContext.Provider value={{

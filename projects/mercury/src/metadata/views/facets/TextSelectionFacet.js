@@ -5,24 +5,24 @@ import {
     FormControl,
     FormControlLabel,
     FormGroup
-} from "@mui/material";
+} from '@mui/material';
 
 // react-window https://react-window.vercel.app/#/examples/
 import {FixedSizeList as List} from 'react-window';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import {Clear, Search} from "@mui/icons-material";
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import {Clear, Search} from '@mui/icons-material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import InputAdornment from "@mui/material/InputAdornment";
-import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Tooltip from "@mui/material/Tooltip";
-import Switch from "@mui/material/Switch";
-import Grid from "@mui/material/Grid";
-import type {MetadataViewFacetProperties, Option} from "../MetadataViewFacetFactory";
-import Iri from "../../../common/components/Iri";
-import useStateWithSessionStorage from "../../../common/hooks/UseSessionStorage";
+import InputAdornment from '@mui/material/InputAdornment';
+import TextField from '@mui/material/TextField';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import Tooltip from '@mui/material/Tooltip';
+import Switch from '@mui/material/Switch';
+import Grid from '@mui/material/Grid';
+import type {MetadataViewFacetProperties, Option} from '../MetadataViewFacetFactory';
+import Iri from '../../../common/components/Iri';
+import useStateWithSessionStorage from '../../../common/hooks/UseSessionStorage';
 import {collectionAccessIcon} from '../../../collections/collectionUtils';
 
 type SelectProperties = {
@@ -40,7 +40,7 @@ const SelectMultiple = (props: SelectProperties) => {
     const defaultOptions = Object.fromEntries(options.map(option => [option.value, activeFilterValues.includes(option.value)]));
     const [state, setState] = useState(defaultOptions);
 
-    const textFilter = (val) => (textFilterValue.trim() === "" || val.label.toLowerCase().includes(textFilterValue.toLowerCase()));
+    const textFilter = (val) => (textFilterValue.trim() === '' || val.label.toLowerCase().includes(textFilterValue.toLowerCase()));
     const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
     const filteredOptions = options.filter(readAccessFilter).filter(textFilter);
 
@@ -100,7 +100,7 @@ const SelectMultiple = (props: SelectProperties) => {
                     <Grid item xs={10}>
                         {renderCheckboxListElement(option)}
                     </Grid>
-                    <Grid item xs={2} style={{textAlign: "right"}}>
+                    <Grid item xs={2} style={{textAlign: 'right'}}>
                         {collectionAccessIcon(option.access, 'small')}
                     </Grid>
                 </Grid>
@@ -134,7 +134,7 @@ const SelectMultiple = (props: SelectProperties) => {
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues = [], classes} = props;
-    const [textFilterValue, setTextFilterValue] = useState("");
+    const [textFilterValue, setTextFilterValue] = useState('');
     const [accessFilterValue, setAccessFilterValue] = useStateWithSessionStorage(
         SHOW_READABLE_COLLECTION_FACET_FILTER, false
     );
@@ -177,7 +177,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
             icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
             checkedIcon={<CheckBoxIcon fontSize="small" />}
             className={classes.checkbox}
-            title={activeFilterValues.length === availableOptions.length ? "Deselect all" : "Select all"}
+            title={activeFilterValues.length === availableOptions.length ? 'Deselect all' : 'Select all'}
         />
     );
 
@@ -212,7 +212,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                     <InputAdornment position="end">
                         {textFilterValue && (
                             <IconButton
-                                onClick={() => setTextFilterValue("")}
+                                onClick={() => setTextFilterValue('')}
                                 disabled={!textFilterValue}
                                 style={{order: 1}}
                                 size="medium"
@@ -244,7 +244,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         <>
             {renderOptionsHeader()}
             <div className={classes.textContent}>
-                <FormControl component="fieldset" style={{width: "100%"}}>
+                <FormControl component="fieldset" style={{width: '100%'}}>
                     <SelectMultiple
                         options={availableOptions}
                         onChange={onChange}

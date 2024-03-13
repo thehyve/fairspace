@@ -4,7 +4,7 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 // eslint-disable-next-line jest/no-mocks-import
 import '../__mocks__/clipboard.mock';
-import CopyButton from "../CopyButton";
+import CopyButton from '../CopyButton';
 
 describe('<CopyButton />', () => {
     beforeEach(() => {

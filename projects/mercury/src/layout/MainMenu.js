@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import withStyles from '@mui/styles/withStyles';
-import {NavLink} from "react-router-dom";
-import {Divider, List, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import {NavLink} from 'react-router-dom';
+import {Divider, List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
 import {
     Search,
     SavedSearch,
@@ -10,17 +10,17 @@ import {
     OpenInNew,
     VerifiedUser,
     Widgets
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
-import ServicesContext from "../common/contexts/ServicesContext";
-import UserContext from "../users/UserContext";
-import {isAdmin} from "../users/userUtils";
-import MetadataViewContext from "../metadata/views/MetadataViewContext";
-import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
-import ExternalMetadataSourceContext from "../metadata/external-sources/ExternalMetadataSourceContext";
-import {getExternalStoragePathPrefix} from "../external-storage/externalStorageUtils";
-import {getExternalMetadataSourcePathPrefix} from "../metadata/external-sources/externalMetadataSourceUtils";
-import {METADATA_VIEW_MENU_LABEL} from "../constants";
+import ServicesContext from '../common/contexts/ServicesContext';
+import UserContext from '../users/UserContext';
+import {isAdmin} from '../users/userUtils';
+import MetadataViewContext from '../metadata/views/MetadataViewContext';
+import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
+import ExternalMetadataSourceContext from '../metadata/external-sources/ExternalMetadataSourceContext';
+import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
+import {getExternalMetadataSourcePathPrefix} from '../metadata/external-sources/externalMetadataSourceUtils';
+import {METADATA_VIEW_MENU_LABEL} from '../constants';
 
 const styles = {
     mainMenuButton: {

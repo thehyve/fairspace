@@ -1,40 +1,40 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import {withRouter} from "react-router-dom";
-import {useDropzone} from "react-dropzone";
-import {Typography} from "@mui/material";
+import {withRouter} from 'react-router-dom';
+import {useDropzone} from 'react-dropzone';
+import {Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import FileList from "./FileList";
-import FileOperations from "./FileOperations";
-import {useFiles} from "./UseFiles";
-import LoadingInlay from "../common/components/LoadingInlay";
-import MessageDisplay from "../common/components/MessageDisplay";
-import {encodePath, splitPathIntoArray} from "./fileUtils";
-import UploadProgressComponent from "./UploadProgressComponent";
-import UploadsContext, {showCannotOverwriteDeletedError} from "./UploadsContext";
-import {generateUuid} from "../metadata/common/metadataUtils";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import type {Collection} from "../collections/CollectionAPI";
+import FileList from './FileList';
+import FileOperations from './FileOperations';
+import {useFiles} from './UseFiles';
+import LoadingInlay from '../common/components/LoadingInlay';
+import MessageDisplay from '../common/components/MessageDisplay';
+import {encodePath, splitPathIntoArray} from './fileUtils';
+import UploadProgressComponent from './UploadProgressComponent';
+import UploadsContext, {showCannotOverwriteDeletedError} from './UploadsContext';
+import {generateUuid} from '../metadata/common/metadataUtils';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import type {Collection} from '../collections/CollectionAPI';
 
 const styles = (theme) => ({
     container: {
-        height: "100%"
+        height: '100%'
     },
     uploadProgress: {
         marginTop: 20
     },
     dropzone: {
         flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        transitionBorder: ".24s",
+        display: 'flex',
+        flexDirection: 'column',
+        outline: 'none',
+        transitionBorder: '.24s',
         easeInOut: true
     },
     activeStyle: {
         borderColor: theme.palette.info.main,
         borderWidth: 2,
         borderRadius: 2,
-        borderStyle: "dashed",
+        borderStyle: 'dashed',
         opacity: 0.4
     },
     acceptStyle: {
@@ -80,7 +80,7 @@ type FileBrowserProperties = ContextualFileBrowserProperties & {
 export const FileBrowser = (props: FileBrowserProperties) => {
     const {
         openedCollection = {},
-        openedPath = "",
+        openedPath = '',
         isOpenedPathDeleted = false,
         files = [],
         showDeleted = false,
@@ -93,8 +93,8 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
 
-    const existingFileNames = files ? files.filter(file => file.type === "file").map(file => file.basename) : [];
-    const existingFolderNames = files ? files.filter(file => file.type === "directory").map(file => file.basename) : [];
+    const existingFileNames = files ? files.filter(file => file.type === 'file').map(file => file.basename) : [];
+    const existingFolderNames = files ? files.filter(file => file.type === 'directory').map(file => file.basename) : [];
 
     const isOverwriteCandidateDeleted = (filenames: string[]) => {
         const fileCandidates = files ? files.filter(file => filenames.some(name => name === file.basename)) : [];
@@ -287,7 +287,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
                 {/* Since dropzone doesn't support a native folder picker we need to create an input element for both folders and files
                 https://github.com/react-dropzone/react-dropzone/discussions/1157 */}
                 <input {...fileDropzoneProperties.getInputProps({webkitdirectory: undefined})} />
-                <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ""})} />
+                <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ''})} />
                 <FileList
                     selectionEnabled={openedCollection.canRead}
                     files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}

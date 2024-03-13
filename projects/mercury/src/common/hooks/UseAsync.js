@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from 'react';
 
 /**
  * Custom hook to perform an async call and keeps track of the result.

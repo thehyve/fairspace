@@ -1,9 +1,9 @@
-import {useState} from "react";
-import useDeepCompareEffect from "use-deep-compare-effect";
+import {useState} from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 import _ from 'lodash';
-import useValidation from "./UseValidation";
-import {first} from "../../common/utils/genericUtils";
-import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from "../../constants";
+import useValidation from './UseValidation';
+import {first} from '../../common/utils/genericUtils';
+import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from '../../constants';
 
 const DEFAULTABLE_DATATYPES = [STRING_URI, INTEGER_URI, DECIMAL_URI, LONG_URI, MARKDOWN_URI];
 
@@ -11,7 +11,7 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
     // Values of some properties have to be set to empty strings
     // not to dynamically add single-value fields when these values are updated.
     initialProperties.forEach(p => {
-        const defaultValue = [{value: ""}];
+        const defaultValue = [{value: ''}];
         const newValues = !values[p.key] && p.maxValuesCount === 1 && DEFAULTABLE_DATATYPES.includes(p.datatype)
             ? defaultValue : values[p.key];
         setFormValues(prev => ({
@@ -99,7 +99,7 @@ const useFormData = (values, initialProperties = []) => {
     const deleteValue = (property, index) => {
         if (property.maxValuesCount === 1 && !property.allowedValues) {
             if (DEFAULTABLE_DATATYPES.includes(property.datatype)) {
-                updateValue(property, {value: ""}, index);
+                updateValue(property, {value: ''}, index);
             } else {
                 save(property, []);
             }

@@ -7,7 +7,7 @@ const styles = (theme) => ({
         bgcolor: 'background.paper',
         border: '0px solid #000',
         boxShadow: 0,
-        outline: "none",
+        outline: 'none',
         p: 4,
     },
     modalContent: {
@@ -28,7 +28,7 @@ const styles = (theme) => ({
 
     },
     clickableDiv: {
-        'cursor': 'pointer',
+        cursor: 'pointer',
         '&:hover': {
             textDecoration: 'underline'
         }

@@ -1,11 +1,11 @@
 import React from 'react';
-import {Paper} from "@mui/material";
-import useNamespacedIri from "../../common/hooks/UseNamespacedIri";
+import {Paper} from '@mui/material';
+import useNamespacedIri from '../../common/hooks/UseNamespacedIri';
 import useLinkedData from './UseLinkedData';
-import LinkedDataEntityFormContainer from "./LinkedDataEntityFormContainer";
-import LinkedDataEntityHeader from "./LinkedDataEntityHeader";
-import BreadCrumbs from "../../common/components/BreadCrumbs";
-import usePageTitleUpdater from "../../common/hooks/UsePageTitleUpdater";
+import LinkedDataEntityFormContainer from './LinkedDataEntityFormContainer';
+import LinkedDataEntityHeader from './LinkedDataEntityHeader';
+import BreadCrumbs from '../../common/components/BreadCrumbs';
+import usePageTitleUpdater from '../../common/hooks/UsePageTitleUpdater';
 
 export default ({title, subject}) => {
     const iri = useNamespacedIri(subject);

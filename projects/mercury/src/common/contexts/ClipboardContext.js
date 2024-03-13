@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {COPY, CUT} from "../../constants";
+import {COPY, CUT} from '../../constants';
 
 const ClipboardContext = React.createContext({
     cut: () => {},

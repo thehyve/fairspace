@@ -1,6 +1,6 @@
-import {LocalFileAPI} from "./FileAPI";
-import {joinPaths} from "./fileUtils";
-import useAsync from "../common/hooks/UseAsync";
+import {LocalFileAPI} from './FileAPI';
+import {joinPaths} from './fileUtils';
+import useAsync from '../common/hooks/UseAsync';
 
 /**
  * This hook contains logic about files for a certain directory.

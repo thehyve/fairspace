@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
-import useIsMounted from "react-is-mounted-hook";
-import FileNameDialog from "./FileNameDialog";
-import {useFormField} from "../../common/hooks/UseFormField";
-import {isValidFileName} from "../fileUtils";
+import useIsMounted from 'react-is-mounted-hook';
+import FileNameDialog from './FileNameDialog';
+import {useFormField} from '../../common/hooks/UseFormField';
+import {isValidFileName} from '../fileUtils';
 
 const CreateDirectoryButton = ({children, disabled, onCreate}) => {
     const [opened, setOpened] = useState(false);

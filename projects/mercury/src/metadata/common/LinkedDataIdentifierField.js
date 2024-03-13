@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 import PropTypes from 'prop-types';
-import {FormControl, FormHelperText, FormLabel} from "@mui/material";
+import {FormControl, FormHelperText, FormLabel} from '@mui/material';
 
-import IriValueContainer from "./values/IriValueContainer";
+import IriValueContainer from './values/IriValueContainer';
 
 export const LinkedDataIdentifierField = props => (
     <FormControl

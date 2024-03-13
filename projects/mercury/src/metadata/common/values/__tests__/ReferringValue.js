@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {ReferringValue} from "../ReferringValue";
-import LinkedDataLink from "../../LinkedDataLink";
+import {ReferringValue} from '../ReferringValue';
+import LinkedDataLink from '../../LinkedDataLink';
 
 describe('ReferringValue', () => {
     it('should render an external link directly', () => {

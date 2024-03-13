@@ -11,17 +11,17 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import styles from './CollectionList.styles';
-import MessageDisplay from "../common/components/MessageDisplay";
-import {camelCaseToWords, formatDateTime} from "../common/utils/genericUtils";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
+import MessageDisplay from '../common/components/MessageDisplay';
+import {camelCaseToWords, formatDateTime} from '../common/utils/genericUtils';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
 import {currentWorkspace} from '../workspaces/workspaces';
 import {accessLevelForCollection, collectionAccessIcon} from './collectionUtils';
-import ColumnFilterInput from "../common/components/ColumnFilterInput";
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import ColumnFilterInput from '../common/components/ColumnFilterInput';
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 const baseColumns = {
     name: {
@@ -75,7 +75,7 @@ const CollectionList = ({
         delete columns.workspace;
     }
 
-    const [filterValue, setFilterValue] = useState("");
+    const [filterValue, setFilterValue] = useState('');
     const [filteredCollections, setFilteredCollections] = useState(collections);
     const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredCollections, allColumns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
@@ -127,7 +127,7 @@ const CollectionList = ({
                                         >
                                             {column.label}
                                         </TableSortLabel>
-                                        {(key === "name") && renderCollectionFilter()}
+                                        {(key === 'name') && renderCollectionFilter()}
                                     </TableCell>
                                 ))
                             }
@@ -158,7 +158,7 @@ const CollectionList = ({
                                     selected={selected}
                                     className={collection.dateDeleted && classes.deletedCollectionRow}
                                 >
-                                    <TableCell style={{overflowWrap: "break-word", maxWidth: 160}} scope="row">
+                                    <TableCell style={{overflowWrap: 'break-word', maxWidth: 160}} scope="row">
                                         <ListItemText
                                             style={{margin: 0}}
                                             primary={(
@@ -167,7 +167,7 @@ const CollectionList = ({
                                                     onClick={(e) => {e.stopPropagation(); onCollectionDoubleClick(collection);}}
                                                     color="inherit"
                                                     variant="body2"
-                                                    style={{textAlign: "left"}}
+                                                    style={{textAlign: 'left'}}
                                                 >
                                                     {collection.name}
                                                 </Link>
@@ -188,7 +188,7 @@ const CollectionList = ({
                                         </TableCell>
                                     ) }
                                     <TableCell>
-                                        {camelCaseToWords(collection.status, "-")}
+                                        {camelCaseToWords(collection.status, '-')}
                                     </TableCell>
                                     <TableCell>
                                         {camelCaseToWords(collection.accessMode)}
@@ -220,7 +220,7 @@ const CollectionList = ({
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{overflowX: 'hidden'}}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>

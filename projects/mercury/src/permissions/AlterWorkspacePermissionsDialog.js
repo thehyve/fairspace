@@ -6,11 +6,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import withStyles from '@mui/styles/withStyles';
-import {Typography} from "@mui/material";
-import Divider from "@mui/material/Divider";
-import PermissionCandidateSelect from "./PermissionCandidateSelect";
-import type {Permission} from "../collections/CollectionAPI";
-import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
+import {Typography} from '@mui/material';
+import Divider from '@mui/material/Divider';
+import PermissionCandidateSelect from './PermissionCandidateSelect';
+import type {Permission} from '../collections/CollectionAPI';
+import WorkspacePermissionsTable from './WorkspacePermissionsTable';
 
 export const styles = {
     dialog: {
@@ -81,7 +81,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
-            onChange={p => handleAddSelectedPermission({...p, access: "Read"})}
+            onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
             filter={p => ((p.iri !== collection.ownerWorkspace) && !selectedPermissions.some(sp => sp.iri === p.iri))}
             label="Select workspace"
             autoFocus

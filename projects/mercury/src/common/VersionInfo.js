@@ -1,4 +1,4 @@
-import {APPLICATION_NAME} from "../constants";
+import {APPLICATION_NAME} from '../constants';
 
 const VersionInfo = {
     id: process.env.REACT_APP_NAME,

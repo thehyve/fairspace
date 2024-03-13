@@ -17,28 +17,28 @@ import {
 import {CloudDownload, Folder, MoreVert} from '@mui/icons-material';
 import {useHistory, withRouter} from 'react-router-dom';
 
-import CollectionEditor from "./CollectionEditor";
+import CollectionEditor from './CollectionEditor';
 import type {Collection, Resource, Status} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import type {Workspace} from "../workspaces/WorkspacesAPI";
-import ErrorDialog from "../common/components/ErrorDialog";
-import LoadingInlay from "../common/components/LoadingInlay";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import PermissionCard from "../permissions/PermissionCard";
-import MessageDisplay from "../common/components/MessageDisplay";
-import UsersContext from "../users/UsersContext";
-import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
-import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
-import {descriptionForStatus, isCollectionPage} from "./collectionUtils";
+import WorkspaceContext from '../workspaces/WorkspaceContext';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
+import ErrorDialog from '../common/components/ErrorDialog';
+import LoadingInlay from '../common/components/LoadingInlay';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import PermissionCard from '../permissions/PermissionCard';
+import MessageDisplay from '../common/components/MessageDisplay';
+import UsersContext from '../users/UsersContext';
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from '../workspaces/WorkspaceUserRolesContext';
+import CollectionStatusChangeDialog from './CollectionStatusChangeDialog';
+import CollectionOwnerChangeDialog from './CollectionOwnerChangeDialog';
+import {descriptionForStatus, isCollectionPage} from './collectionUtils';
 import {getDisplayName} from '../users/userUtils';
 import {camelCaseToWords, formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
-import UserContext from "../users/UserContext";
-import ProgressButton from "../common/components/ProgressButton";
+import UserContext from '../users/UserContext';
+import ProgressButton from '../common/components/ProgressButton';
 
 export const ICONS = {
     LOCAL_STORAGE: <Folder aria-label="Local storage" />,
@@ -185,7 +185,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 }
             })
             .catch(e => ErrorDialog.showError(
-                "An error occurred while deleting a collection",
+                'An error occurred while deleting a collection',
                 e,
                 () => this.handleCollectionDelete(collection)
             ));
@@ -196,7 +196,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         this.handleCloseUndelete();
         this.handleCollectionOperation(undeleteCollection(collection))
             .catch(e => ErrorDialog.showError(
-                "An error occurred while undeleting a collection",
+                'An error occurred while undeleting a collection',
                 e,
                 () => this.handleCollectionUndelete(collection)
             ));
@@ -207,7 +207,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         this.handleCloseUnpublish();
         this.handleCollectionOperation(unpublish(collection))
             .catch(err => ErrorDialog.showError(
-                "An error occurred while unpublishing a collection",
+                'An error occurred while unpublishing a collection',
                 err,
                 () => this.handleCollectionUnpublish(collection)
             ));
@@ -224,7 +224,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 }
             })
             .catch(err => ErrorDialog.showError(
-                "An error occurred while changing an owner of a collection",
+                'An error occurred while changing an owner of a collection',
                 err,
                 () => this.handleCollectionOwnerChange(collection, selectedOwner)
             ));
@@ -259,7 +259,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 <FormLabel>Status</FormLabel>
                 <FormGroup>
                     <ListItemText
-                        primary={camelCaseToWords(this.props.collection.status, "-")}
+                        primary={camelCaseToWords(this.props.collection.status, '-')}
                         secondary={descriptionForStatus(this.props.collection.status)}
                     />
                 </FormGroup>
@@ -348,8 +348,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         if (collection.canDelete) {
             menuItems.push(
                 <MenuItem key="delete" onClick={this.handleDelete}>
-                    <Typography color={collection.dateDeleted ? "error" : "inherit"}>
-                        {collection.dateDeleted ? "Delete permanently" : "Delete"} &hellip;
+                    <Typography color={collection.dateDeleted ? 'error' : 'inherit'}>
+                        {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
                     </Typography>
                 </MenuItem>
             );

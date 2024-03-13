@@ -1,5 +1,5 @@
-import * as constants from "../../constants";
-import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from "./jsonLdUtils";
+import * as constants from '../../constants';
+import {getFirstPredicateId, getFirstPredicateList, getFirstPredicateValue} from './jsonLdUtils';
 
 const TYPE_PROPERTY = {
     key: '@type',

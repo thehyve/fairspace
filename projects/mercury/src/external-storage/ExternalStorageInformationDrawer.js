@@ -17,15 +17,15 @@ import {withRouter} from 'react-router-dom';
 
 import {ExpandMore, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import EmptyInformationDrawer from "../common/components/EmptyInformationDrawer";
-import {getPathHierarchy} from "../file/fileUtils";
-import type {ExternalStorage} from "./externalStorageUtils";
-import {getPathToDisplay} from "./externalStorageUtils";
-import MessageDisplay from "../common/components/MessageDisplay";
-import FileAPI from "../file/FileAPI";
-import LinkedDataLink from "../metadata/common/LinkedDataLink";
-import type {DisplayProperty} from "./UseExternalStorageMetadata";
-import useExternalStorageMetadata from "./UseExternalStorageMetadata";
+import EmptyInformationDrawer from '../common/components/EmptyInformationDrawer';
+import {getPathHierarchy} from '../file/fileUtils';
+import type {ExternalStorage} from './externalStorageUtils';
+import {getPathToDisplay} from './externalStorageUtils';
+import MessageDisplay from '../common/components/MessageDisplay';
+import FileAPI from '../file/FileAPI';
+import LinkedDataLink from '../metadata/common/LinkedDataLink';
+import type {DisplayProperty} from './UseExternalStorageMetadata';
+import useExternalStorageMetadata from './UseExternalStorageMetadata';
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
@@ -34,10 +34,10 @@ const useStyles = makeStyles(() => ({
     card: {
         marginTop: 10,
         flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        transitionBorder: ".24s",
+        display: 'flex',
+        flexDirection: 'column',
+        outline: 'none',
+        transitionBorder: '.24s',
         easeInOut: true
     }
 }));
@@ -66,7 +66,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
 
     const renderProperty = (data: Map<string, DisplayProperty>, key: string) => (
-        data[key] && data[key].value != null && data[key].value !== "" && (
+        data[key] && data[key].value != null && data[key].value !== '' && (
             <ListItem disableGutters key={key}>
                 <FormControl>
                     <FormLabel>{data[key].label || key}</FormLabel>

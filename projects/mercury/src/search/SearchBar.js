@@ -4,8 +4,8 @@ import {TextField} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import SearchIcon from '@mui/icons-material/Search';
 
-import InputAdornment from "@mui/material/InputAdornment";
-import IconButton from "@mui/material/IconButton";
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
 import styles from './SearchBar.styles';
 
 const SearchBar = ({

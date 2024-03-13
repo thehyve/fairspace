@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Dropdown from "./Dropdown";
-import {getLabel, valuesContainsValueOrId} from "../metadataUtils";
+import Dropdown from './Dropdown';
+import {getLabel, valuesContainsValueOrId} from '../metadataUtils';
 
 function EnumerationDropdown({property, currentValues, ...otherProps}) {
     const options = property.allowedValues.map((entity) => {

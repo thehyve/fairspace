@@ -32,7 +32,7 @@ const styles = theme => ({
         ...theme.mixins.toolbar,
     },
     customerLogo: {
-        position: "absolute",
+        position: 'absolute',
         bottom: 50,
         height: 100
     }

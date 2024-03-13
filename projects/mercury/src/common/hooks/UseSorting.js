@@ -1,6 +1,6 @@
-import {useState} from "react";
+import {useState} from 'react';
 
-import {compareBy, stableSort} from "../utils/genericUtils";
+import {compareBy, stableSort} from '../utils/genericUtils';
 
 /**
  * Custom hook to perform sorting

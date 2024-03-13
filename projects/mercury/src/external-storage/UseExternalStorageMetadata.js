@@ -1,12 +1,12 @@
-import {useContext, useEffect, useState} from "react";
-import type {User} from "../users/UsersAPI";
-import {formatDate, groupBy} from "../common/utils/genericUtils";
-import {getDisplayName} from "../users/userUtils";
-import MetadataAPI from "../metadata/common/MetadataAPI";
-import {getLabel, getTypeInfo} from "../metadata/common/metadataUtils";
-import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
-import UsersContext from "../users/UsersContext";
-import FileAPI from "../file/FileAPI";
+import {useContext, useEffect, useState} from 'react';
+import type {User} from '../users/UsersAPI';
+import {formatDate, groupBy} from '../common/utils/genericUtils';
+import {getDisplayName} from '../users/userUtils';
+import MetadataAPI from '../metadata/common/MetadataAPI';
+import {getLabel, getTypeInfo} from '../metadata/common/metadataUtils';
+import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
+import UsersContext from '../users/UsersContext';
+import FileAPI from '../file/FileAPI';
 
 export type LabelValueProperty = {
     label: string;
@@ -34,23 +34,23 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
 
     const defaultProperties = {
         comment: {
-            label: "Description",
+            label: 'Description',
             value: data.comment
         },
         lastmod: {
-            label: "Last modified",
+            label: 'Last modified',
             value: formatDate(data.lastmod)
         },
         createdBy: {
-            label: "Created by",
+            label: 'Created by',
             value: getDisplayName(users.find(u => u.iri === data.createdBy))
         },
         creationdate: {
-            label: "Created",
+            label: 'Created',
             value: formatDate(data.creationdate)
         },
         contentType: {
-            label: "Content type",
+            label: 'Content type',
             value: data.mime
         }
     };
@@ -66,12 +66,12 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
 const mapLinkedMetadataProperties = (values: any[], vocabulary: any[]): Map<string, LinkedEntityProperty> => {
     const metadataEntities: LinkedEntityProperty[] = values
         .map(value => ({
-            id: value["@id"],
+            id: value['@id'],
             type: getTypeInfo(value, vocabulary).label,
             label: getLabel(value)
         }))
         .filter(value => value.type != null);
-    return groupBy(metadataEntities, "type");
+    return groupBy(metadataEntities, 'type');
 };
 
 const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {

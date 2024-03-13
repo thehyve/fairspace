@@ -1,7 +1,7 @@
 import React from 'react';
-import axios from "axios";
-import useAsync from "../common/hooks/UseAsync";
-import {extractJsonData, handleHttpError} from "../common/utils/httpUtils";
+import axios from 'axios';
+import useAsync from '../common/hooks/UseAsync';
+import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 
 const ExternalStoragesContext = React.createContext({});
 

@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import WorkspacesAPI from './WorkspacesAPI';
-import useAsync from "../common/hooks/UseAsync";
-import WorkspaceContext from "./WorkspaceContext";
+import useAsync from '../common/hooks/UseAsync';
+import WorkspaceContext from './WorkspaceContext';
 
 const WorkspaceUserRolesContext = React.createContext({});
 

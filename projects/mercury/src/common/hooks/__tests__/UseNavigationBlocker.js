@@ -1,9 +1,9 @@
-import React, {useEffect} from "react";
-import {renderHook} from "@testing-library/react-hooks";
+import React, {useEffect} from 'react';
+import {renderHook} from '@testing-library/react-hooks';
 import {act} from 'react-test-renderer';
-import {MemoryRouter, useHistory} from "react-router-dom";
+import {MemoryRouter, useHistory} from 'react-router-dom';
 
-import useNavigationBlocker from "../UseNavigationBlocker";
+import useNavigationBlocker from '../UseNavigationBlocker';
 
 const WrapperWithPushToHistory = ({children}) => {
     const history = useHistory();

@@ -1,8 +1,8 @@
 import React from 'react';
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from 'react-router-dom';
 
 import WorkspaceLayout from '../layout/WorkspaceLayout';
-import logout from "./logout";
+import logout from './logout';
 
 const GlobalRoutes = () => (
     <Switch>

@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import * as consts from "../../constants";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
+import * as consts from '../../constants';
+import {getFirstPredicateId, getFirstPredicateValue} from './jsonLdUtils';
 import {determineShapeForTypes} from './vocabularyUtils';
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
+import {isNonEmptyValue} from '../../common/utils/genericUtils';
 
 /**
  * Returns the local part of the given uri
@@ -68,7 +68,7 @@ export function getLabel(entity, shortenExternalUris = false) {
  */
 export function getLabelStrict(entity) {
     return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || "";
+        || '';
 }
 
 /**
@@ -227,7 +227,7 @@ export const url2iri = (iri) => {
         const url = new URL(iri);
         return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
     } catch (e) {
-        console.warn("Invalid uri given to convert to iri", iri);
+        console.warn('Invalid uri given to convert to iri', iri);
         return iri;
     }
 };

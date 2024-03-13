@@ -2,9 +2,9 @@
 import React from 'react';
 import {cleanup, fireEvent, render} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {TableRow} from "@mui/material";
+import {configure, mount} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {TableRow} from '@mui/material';
 import {ThemeProvider} from '@mui/material/styles';
 import FileList from '../FileList';
 import theme from '../../App.theme';
@@ -24,11 +24,11 @@ const wrap = (element) => (
 describe('FileList', () => {
     const files = [
         {
-            filename: "/Collection/q",
-            basename: "base-file",
-            lastmod: "Wed, 09 Oct 2019 16:17:37 GMT",
+            filename: '/Collection/q',
+            basename: 'base-file',
+            lastmod: 'Wed, 09 Oct 2019 16:17:37 GMT',
             size: 0,
-            type: "directory",
+            type: 'directory',
             etag: null,
             selected: false
         }
@@ -90,20 +90,20 @@ describe('FileList', () => {
     it('filters files by basename on filter input change', () => {
         const allFiles = [
             {
-                filename: "/Collection/q",
-                basename: "base-dir",
-                lastmod: "Wed, 09 Oct 2019 16:17:37 GMT",
+                filename: '/Collection/q',
+                basename: 'base-dir',
+                lastmod: 'Wed, 09 Oct 2019 16:17:37 GMT',
                 size: 0,
-                type: "directory",
+                type: 'directory',
                 etag: null,
                 selected: false
             },
             {
-                filename: "/Collection/f1",
-                basename: "base-file",
-                lastmod: "Thu, 10 Oct 2019 12:12:31 GMT",
+                filename: '/Collection/f1',
+                basename: 'base-file',
+                lastmod: 'Thu, 10 Oct 2019 12:12:31 GMT',
                 size: 0,
-                type: "file",
+                type: 'file',
                 etag: null,
                 selected: false
             }];

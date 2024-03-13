@@ -1,11 +1,11 @@
 // @flow
 // eslint-disable-next-line import/no-cycle
-import {mapFilePropertiesToCollection} from "./collectionUtils";
+import {mapFilePropertiesToCollection} from './collectionUtils';
 import {handleHttpError} from '../common/utils/httpUtils';
 // eslint-disable-next-line import/no-cycle
-import {LocalFileAPI} from "../file/FileAPI";
-import MetadataAPI from "../metadata/common/MetadataAPI";
-import {COMMENT_URI} from "../constants";
+import {LocalFileAPI} from '../file/FileAPI';
+import MetadataAPI from '../metadata/common/MetadataAPI';
+import {COMMENT_URI} from '../constants';
 
 const rootUrl = '';
 
@@ -79,7 +79,7 @@ class CollectionAPI {
     getCollections(showDeleted = false): Promise<Collection[]> {
         return LocalFileAPI.list(rootUrl, showDeleted)
             .then(collections => collections.map(mapFilePropertiesToCollection))
-            .catch(handleHttpError("Failure when retrieving a list of collections"));
+            .catch(handleHttpError('Failure when retrieving a list of collections'));
     }
 
     addCollection(collection: CollectionProperties, vocabulary): Promise<void> {
@@ -99,12 +99,12 @@ class CollectionAPI {
 
     deleteCollection(collection: CollectionProperties, showDeleted = false): Promise<void> {
         return LocalFileAPI.delete(collection.name, showDeleted)
-            .catch(handleHttpError("Failure while deleting collection"));
+            .catch(handleHttpError('Failure while deleting collection'));
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
         return LocalFileAPI.undelete(collection.name)
-            .catch(handleHttpError("Failure while undeleting collection"));
+            .catch(handleHttpError('Failure while undeleting collection'));
     }
 
     unpublish(collection: CollectionProperties): Promise<void> {
@@ -120,7 +120,7 @@ class CollectionAPI {
             [COMMENT_URI]: [{value: collection.description}]
         };
         return MetadataAPI.updateEntity(collection.iri, metadataProperties, vocabulary)
-            .catch(handleHttpError("Failure while updating a collection"));
+            .catch(handleHttpError('Failure while updating a collection'));
     }
 
     setAccessMode(name: string, mode: AccessMode): Promise<void> {

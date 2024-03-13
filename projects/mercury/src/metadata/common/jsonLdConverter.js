@@ -1,8 +1,8 @@
-import * as constants from "../../constants";
-import {getFirstPredicateId} from "./jsonLdUtils";
-import {determineShapeForProperty, isRdfList} from "./vocabularyUtils";
-import {getLabel, getLabelStrict} from "./metadataUtils";
-import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../common/utils/genericUtils";
+import * as constants from '../../constants';
+import {getFirstPredicateId} from './jsonLdUtils';
+import {determineShapeForProperty, isRdfList} from './vocabularyUtils';
+import {getLabel, getLabelStrict} from './metadataUtils';
+import {compareBy, comparing, flattenShallow, isNonEmptyValue} from '../../common/utils/genericUtils';
 
 /**
  * Generates an entry to describe a single value for a property
@@ -10,12 +10,12 @@ import {compareBy, comparing, flattenShallow, isNonEmptyValue} from "../../commo
  * @returns {{id: *, label, value: *}}
  */
 const generateValueEntry = (entry, allMetadata) => {
-    let label = "";
+    let label = '';
 
     if (entry['@id']) {
         label = getLabelStrict(entry);
 
-        if (label === "") {
+        if (label === '') {
             const elementFromAll = allMetadata[entry['@id']];
             label = getLabel(elementFromAll);
         }
@@ -126,7 +126,7 @@ const jsonLdWrapper = (values, shape) => {
 
     const dataType = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
 
-    return values.map(({id, value}) => ({'@id': id, '@value': value, "@type": dataType}));
+    return values.map(({id, value}) => ({'@id': id, '@value': value, '@type': dataType}));
 };
 
 /**
@@ -172,7 +172,7 @@ export const getJsonLdForSubject = (expandedMetadata, subject) => {
 
     // when expandedMetadata is a list
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
-        console.warn("Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject");
+        console.warn('Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject');
         return {};
     }
 

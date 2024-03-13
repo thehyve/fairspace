@@ -1,4 +1,4 @@
-import {LocalFileAPI} from "../FileAPI";
+import {LocalFileAPI} from '../FileAPI';
 
 /* eslint-disable prefer-promise-reject-errors */
 describe('FileAPI', () => {
@@ -14,7 +14,7 @@ describe('FileAPI', () => {
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith(
                 '/src',
-                {details: true, headers: {"X-Requested-With": "XMLHttpRequest"}, withCredentials: true, data: '<propfind><allprop /></propfind>'}
+                {details: true, headers: {'X-Requested-With': 'XMLHttpRequest'}, withCredentials: true, data: '<propfind><allprop /></propfind>'}
             );
         });
 
@@ -31,9 +31,9 @@ describe('FileAPI', () => {
                 '/src',
                 {
                     details: true,
-                    headers: {"Show-Deleted": "on", "X-Requested-With": "XMLHttpRequest"},
+                    headers: {'Show-Deleted': 'on', 'X-Requested-With': 'XMLHttpRequest'},
                     withCredentials: true,
-                    data: "<propfind><allprop /></propfind>"
+                    data: '<propfind><allprop /></propfind>'
                 }
             );
         });
@@ -53,7 +53,7 @@ describe('FileAPI', () => {
             const moveFile = jest.fn(() => Promise.reject({response: {status: 400}}));
             LocalFileAPI.client = () => ({moveFile});
 
-            return expect(LocalFileAPI.move("/test", "special-characters"))
+            return expect(LocalFileAPI.move('/test', 'special-characters'))
                 .rejects.toThrow(/contains special characters/);
         });
     });
@@ -63,7 +63,7 @@ describe('FileAPI', () => {
             const copyFile = jest.fn(() => Promise.reject({response: {status: 403}}));
             LocalFileAPI.client = () => ({copyFile});
 
-            return expect(LocalFileAPI.copy("/test", "special-characters"))
+            return expect(LocalFileAPI.copy('/test', 'special-characters'))
                 .rejects.toThrow(/write permission/);
         });
 
@@ -71,7 +71,7 @@ describe('FileAPI', () => {
             const copyFile = jest.fn(() => Promise.reject({response: {status: 409}}));
             LocalFileAPI.client = () => ({copyFile});
 
-            return expect(LocalFileAPI.copy("/test", "special-characters"))
+            return expect(LocalFileAPI.copy('/test', 'special-characters'))
                 .rejects.toThrow(/destination can not be copied to/);
         });
 
@@ -79,7 +79,7 @@ describe('FileAPI', () => {
             const copyFile = jest.fn(() => Promise.reject({response: {status: 412}}));
             LocalFileAPI.client = () => ({copyFile});
 
-            return expect(LocalFileAPI.copy("/test", "special-characters"))
+            return expect(LocalFileAPI.copy('/test', 'special-characters'))
                 .rejects.toThrow(/already exists/);
         });
     });
@@ -98,7 +98,7 @@ describe('FileAPI', () => {
             await LocalFileAPI.deleteMultiple(['/src']);
 
             expect(deleteFile).toHaveBeenCalledTimes(1);
-            expect(deleteFile).toHaveBeenCalledWith('/src', {headers: {"X-Requested-With": "XMLHttpRequest"}, withCredentials: true});
+            expect(deleteFile).toHaveBeenCalledWith('/src', {headers: {'X-Requested-With': 'XMLHttpRequest'}, withCredentials: true});
         });
 
         it('deletes files permanently', async () => {
@@ -108,7 +108,7 @@ describe('FileAPI', () => {
 
             expect(deleteFile).toHaveBeenCalledTimes(1);
             expect(deleteFile).toHaveBeenCalledWith(
-                '/src', {headers: {"X-Requested-With": "XMLHttpRequest", "Show-Deleted": "on"}, withCredentials: true}
+                '/src', {headers: {'X-Requested-With': 'XMLHttpRequest', 'Show-Deleted': 'on'}, withCredentials: true}
             );
         });
     });
@@ -142,21 +142,21 @@ describe('FileAPI', () => {
         it('should result in clear error on 400 response', () => {
             LocalFileAPI.client = () => ({createDirectory: () => Promise.reject({response: {status: 400}})});
 
-            return expect(LocalFileAPI.createDirectory("/test"))
+            return expect(LocalFileAPI.createDirectory('/test'))
                 .rejects.toThrow(/contain special characters/);
         });
 
         it('should result in clear error on 403 response', () => {
             LocalFileAPI.client = () => ({createDirectory: () => Promise.reject({response: {status: 403}})});
 
-            return expect(LocalFileAPI.createDirectory("/test"))
+            return expect(LocalFileAPI.createDirectory('/test'))
                 .rejects.toThrow(/authorization to create/);
         });
 
         it('should result in clear error on 405 response', () => {
             LocalFileAPI.client = () => ({createDirectory: () => Promise.reject({response: {status: 405}})});
 
-            return expect(LocalFileAPI.createDirectory("/test"))
+            return expect(LocalFileAPI.createDirectory('/test'))
                 .rejects.toThrow(/already exists/);
         });
     });
@@ -174,38 +174,38 @@ describe('FileAPI', () => {
             expect(stat).toHaveBeenCalledTimes(4);
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
+                data: '<propfind><allprop /></propfind>',
                 details: true,
                 headers: {
-                    "Version": 4,
-                    "X-Requested-With": "XMLHttpRequest"
+                    Version: 4,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
+                data: '<propfind><allprop /></propfind>',
                 details: true,
                 headers: {
-                    "Version": 3,
-                    "X-Requested-With": "XMLHttpRequest"
+                    Version: 3,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
+                data: '<propfind><allprop /></propfind>',
                 details: true,
                 headers: {
-                    "Version": 2,
-                    "X-Requested-With": "XMLHttpRequest"
+                    Version: 2,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
+                data: '<propfind><allprop /></propfind>',
                 details: true,
                 headers: {
-                    "Version": 1,
-                    "X-Requested-With": "XMLHttpRequest"
+                    Version: 1,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
         });
@@ -221,20 +221,20 @@ describe('FileAPI', () => {
             expect(stat).toHaveBeenCalledTimes(11);
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
+                data: '<propfind><allprop /></propfind>',
                 details: true,
                 headers: {
-                    "Version": 296,
-                    "X-Requested-With": "XMLHttpRequest"
+                    Version: 296,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
             expect(stat).toHaveBeenCalledWith('/f1', {
                 withCredentials: true,
-                data: "<propfind><allprop /></propfind>",
+                data: '<propfind><allprop /></propfind>',
                 details: true,
                 headers: {
-                    "Version": 287,
-                    "X-Requested-With": "XMLHttpRequest"
+                    Version: 287,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
             });
         });

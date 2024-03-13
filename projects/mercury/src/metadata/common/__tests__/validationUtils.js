@@ -1,4 +1,4 @@
-import * as constants from "../../../constants";
+import * as constants from '../../../constants';
 import {
     iriValidation,
     maxCountValidation,
@@ -58,15 +58,15 @@ describe('Validation Utils', () => {
     describe('validateValuesAgainstShape', () => {
         it('should return all error messages (max length, min count)', () => {
             const shape = {
-                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                '@id': 'http://www.w3.org/2000/01/rdf-schema#labelShape',
                 [constants.SHACL_MAX_LENGTH]: [
                     {
-                        "@value": 10
+                        '@value': 10
                     }
                 ],
                 [constants.SHACL_MIN_COUNT]: [
                     {
-                        "@value": 2
+                        '@value': 2
                     }
                 ]
             };
@@ -80,10 +80,10 @@ describe('Validation Utils', () => {
 
         it('should return an error for max count', () => {
             const shape = {
-                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                '@id': 'http://www.w3.org/2000/01/rdf-schema#labelShape',
                 [constants.SHACL_MAX_COUNT]: [
                     {
-                        "@value": 2
+                        '@value': 2
                     }
                 ]
             };
@@ -95,15 +95,15 @@ describe('Validation Utils', () => {
 
         it('should ignore falsy values but zero', () => {
             const shape = {
-                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                '@id': 'http://www.w3.org/2000/01/rdf-schema#labelShape',
                 [constants.SHACL_MAX_LENGTH]: [
                     {
-                        "@value": 1
+                        '@value': 1
                     }
                 ],
                 [constants.SHACL_MIN_COUNT]: [
                     {
-                        "@value": 1
+                        '@value': 1
                     }
                 ]
             };
@@ -114,15 +114,15 @@ describe('Validation Utils', () => {
 
         it('should ignore falsy values but false', () => {
             const shape = {
-                "@id": "http://www.w3.org/2000/01/rdf-schema#labelShape",
+                '@id': 'http://www.w3.org/2000/01/rdf-schema#labelShape',
                 [constants.SHACL_MAX_LENGTH]: [
                     {
-                        "@value": 1
+                        '@value': 1
                     }
                 ],
                 [constants.SHACL_MIN_COUNT]: [
                     {
-                        "@value": 1
+                        '@value': 1
                     }
                 ]
             };

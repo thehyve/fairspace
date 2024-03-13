@@ -1,6 +1,6 @@
 import React from 'react';
-import {Assignment} from "@mui/icons-material";
-import BreadcrumbsContext from "../common/contexts/BreadcrumbsContext";
+import {Assignment} from '@mui/icons-material';
+import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import LinkedDataMetadataProvider from './LinkedDataMetadataProvider';
 
 export const MetadataWrapper = ({children}) => (

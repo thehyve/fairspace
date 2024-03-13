@@ -1,16 +1,16 @@
 import React, {useContext} from 'react';
-import LoadingInlay from "../../common/components/LoadingInlay";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import MetadataView from "../views/MetadataView";
-import ExternalMetadataSourceContext from "./ExternalMetadataSourceContext";
-import type {ExternalMetadataSource} from "./externalMetadataSourceUtils";
-import {getExternalMetadataSourcePathPrefix} from "./externalMetadataSourceUtils";
-import MetadataAPIPathContext from "../common/MetadataAPIPathContext";
-import {MetadataViewProvider} from "../views/MetadataViewContext";
-import {MetadataViewAPI} from "../views/MetadataViewAPI";
-import {MetadataViewFacetsProvider} from "../views/MetadataViewFacetsContext";
-import {VocabularyProvider} from "../vocabulary/VocabularyContext";
-import LinkedDataMetadataProvider from "../LinkedDataMetadataProvider";
+import LoadingInlay from '../../common/components/LoadingInlay';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import MetadataView from '../views/MetadataView';
+import ExternalMetadataSourceContext from './ExternalMetadataSourceContext';
+import type {ExternalMetadataSource} from './externalMetadataSourceUtils';
+import {getExternalMetadataSourcePathPrefix} from './externalMetadataSourceUtils';
+import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
+import {MetadataViewProvider} from '../views/MetadataViewContext';
+import {MetadataViewAPI} from '../views/MetadataViewAPI';
+import {MetadataViewFacetsProvider} from '../views/MetadataViewFacetsContext';
+import {VocabularyProvider} from '../vocabulary/VocabularyContext';
+import LinkedDataMetadataProvider from '../LinkedDataMetadataProvider';
 
 export type ExternalMetadataSourceViewProperties = {
     classes: any;

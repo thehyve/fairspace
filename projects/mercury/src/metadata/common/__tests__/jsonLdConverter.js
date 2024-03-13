@@ -1,5 +1,5 @@
-import * as constants from "../../../constants";
-import {fromJsonLd, getJsonLdForSubject, normalizeTypes, toJsonLd} from "../jsonLdConverter";
+import * as constants from '../../../constants';
+import {fromJsonLd, getJsonLdForSubject, normalizeTypes, toJsonLd} from '../jsonLdConverter';
 
 describe('jsonLdConverter', () => {
     describe('fromJsonLd', () => {
@@ -205,58 +205,58 @@ describe('jsonLdConverter', () => {
 
     describe('toJsonLd', () => {
         it('should creates a valid json-ld (@value)', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const values = [{value: "some-value"}];
+            const subject = 'some-subject';
+            const predicate = 'some-predicate';
+            const values = [{value: 'some-value'}];
 
             const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
-                "@id": "some-subject",
-                "some-predicate": [{"@value": "some-value"}]
+                '@id': 'some-subject',
+                'some-predicate': [{'@value': 'some-value'}]
             };
 
             expect(jsonLd).toEqual(expected);
         });
 
         it('should creates a valid json-ld (@id)', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
-            const values = [{id: "some-id"}];
+            const subject = 'some-subject';
+            const predicate = 'some-predicate';
+            const values = [{id: 'some-id'}];
 
             const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
-                "@id": "some-subject",
-                "some-predicate": [{"@id": "some-id"}]
+                '@id': 'some-subject',
+                'some-predicate': [{'@id': 'some-id'}]
             };
 
             expect(jsonLd).toEqual(expected);
         });
 
         it('returns null if no valid predicate is provided', () => {
-            const subject = "some-subject";
-            const values = [{id: "some-id"}];
+            const subject = 'some-subject';
+            const values = [{id: 'some-id'}];
             const jsonLd = toJsonLd(subject, null, values, []);
 
             expect(jsonLd).toEqual(null);
         });
 
         it('returns null if no valid values are provided', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
+            const subject = 'some-subject';
+            const predicate = 'some-predicate';
             const jsonLd = toJsonLd(subject, predicate, null, []);
 
             expect(jsonLd).toEqual(null);
         });
 
         it('serializes a an empty list as fs:NIL', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
+            const subject = 'some-subject';
+            const predicate = 'some-predicate';
             const jsonLd = toJsonLd(subject, predicate, [], []);
 
             const expected = {
-                "@id": "some-subject",
+                '@id': 'some-subject',
                 [predicate]: {'@id': constants.NIL_URI}
             };
 
@@ -264,13 +264,13 @@ describe('jsonLdConverter', () => {
         });
 
         it('serializes a list with only empty values as fs:NIL', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
+            const subject = 'some-subject';
+            const predicate = 'some-predicate';
             const values = [{value: ''}, {value: undefined}, {value: null}];
             const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
-                "@id": "some-subject",
+                '@id': 'some-subject',
                 [predicate]: {'@id': constants.NIL_URI}
             };
 
@@ -278,22 +278,22 @@ describe('jsonLdConverter', () => {
         });
 
         it('filters out invalid values', () => {
-            const subject = "some-subject";
-            const predicate = "some-predicate";
+            const subject = 'some-subject';
+            const predicate = 'some-predicate';
             const values = [{value: ''}, {value: undefined}, {value: null}, {value: 'some-value'}, {value: 'some-other-value'}];
             const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
-                "@id": "some-subject",
-                "some-predicate": [{"@value": "some-value"}, {"@value": "some-other-value"}]
+                '@id': 'some-subject',
+                'some-predicate': [{'@value': 'some-value'}, {'@value': 'some-other-value'}]
             };
 
             expect(jsonLd).toEqual(expected);
         });
 
         it('returns null if no valid subject is provided', () => {
-            const predicate = "some-predicate";
-            const values = [{id: "some-id"}];
+            const predicate = 'some-predicate';
+            const values = [{id: 'some-id'}];
             const jsonLd = toJsonLd(null, predicate, values, []);
 
             expect(jsonLd).toEqual(null);

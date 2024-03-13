@@ -5,10 +5,10 @@ import {withRouter} from 'react-router-dom';
 
 import {Close} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import EmptyInformationDrawer from "../../common/components/EmptyInformationDrawer";
+import EmptyInformationDrawer from '../../common/components/EmptyInformationDrawer';
 import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityFormContainer';
-import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import CopyButton from "../../common/components/CopyButton";
+import type {MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
+import CopyButton from '../../common/components/CopyButton';
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
@@ -17,10 +17,10 @@ const useStyles = makeStyles(() => ({
     card: {
         marginTop: 10,
         flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        outline: "none",
-        transitionBorder: ".24s",
+        display: 'flex',
+        flexDirection: 'column',
+        outline: 'none',
+        transitionBorder: '.24s',
         easeInOut: true
     },
     emptyLinkedFiles: {

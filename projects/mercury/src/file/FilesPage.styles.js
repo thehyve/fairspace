@@ -1,4 +1,4 @@
-import * as consts from "../constants";
+import * as consts from '../constants';
 
 const styles = () => ({
     breadcrumbs: {
@@ -10,8 +10,8 @@ const styles = () => ({
         width: consts.MAIN_CONTENT_WIDTH
     },
     topBarSwitch: {
-        textAlign: "right",
-        whiteSpace: "nowrap"
+        textAlign: 'right',
+        whiteSpace: 'nowrap'
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,

@@ -1,8 +1,8 @@
 import React from 'react';
 import {Chip, Divider, Grid, IconButton, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {Close} from "@mui/icons-material";
-import type {MetadataViewColumn} from "./MetadataViewAPI";
+import {Close} from '@mui/icons-material';
+import type {MetadataViewColumn} from './MetadataViewAPI';
 
 const styles = theme => ({
     activeTextFiltersBox: {
@@ -27,7 +27,7 @@ type MetadataViewActiveTextFiltersProperties = {
 export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFiltersProperties) => {
     const {textFiltersObject, setTextFiltersObject, columns, classes} = props;
 
-    if (Object.values(textFiltersObject).every(v => v === null || v === "")) {
+    if (Object.values(textFiltersObject).every(v => v === null || v === '')) {
         return <></>;
     }
 
@@ -54,7 +54,7 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
                     <Grid key="activeTextFilters" item>
                         <Typography variant="overline" component="span" color="textSecondary">Active text filters: </Typography>
                     </Grid>
-                    {Object.entries(textFiltersObject).filter(([, value]) => value !== null && value !== "")
+                    {Object.entries(textFiltersObject).filter(([, value]) => value !== null && value !== '')
                         .map(([field, value]) => (
                             <Grid key={`activeTextFilters_${field}`} item>
                                 <Chip

@@ -13,18 +13,18 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
-import {Lock} from "@mui/icons-material";
+} from '@mui/material';
+import {Lock} from '@mui/icons-material';
 
-import TableContainer from "@mui/material/TableContainer";
+import TableContainer from '@mui/material/TableContainer';
 import type {Workspace} from './WorkspacesAPI';
-import MessageDisplay from "../common/components/MessageDisplay";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
+import MessageDisplay from '../common/components/MessageDisplay';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
 import {isAdmin} from '../users/userUtils';
 import UserContext from '../users/UserContext';
 import WorkspaceActionMenu from './WorkspaceActionMenu';
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 type WorkspaceListProps = {
     workspaces: Workspace[];
@@ -132,7 +132,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                                     onClick={(e) => {e.stopPropagation(); onWorkspaceDoubleClick(workspace);}}
                                                     color="inherit"
                                                     variant="body2"
-                                                    style={{textAlign: "left"}}
+                                                    style={{textAlign: 'left'}}
                                                 >
                                                     {workspace.code}
                                                 </Link>
@@ -166,7 +166,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                         page={page}
                         onPageChange={(e, p) => setPage(p)}
                         onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                        style={{overflowX: "hidden"}}
+                        style={{overflowX: 'hidden'}}
                         ActionsComponent={TablePaginationActions}
                     />
                 </TableContainer>

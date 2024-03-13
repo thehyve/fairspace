@@ -1,5 +1,5 @@
-import useAsync from "../common/hooks/UseAsync";
-import FileAPI from "../file/FileAPI";
+import useAsync from '../common/hooks/UseAsync';
+import FileAPI from '../file/FileAPI';
 
 /**
  * This hook contains logic about files for a certain external storage.

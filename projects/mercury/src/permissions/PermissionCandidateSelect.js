@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import Dropdown from "../metadata/common/values/Dropdown";
-import {getDisplayName} from "../users/userUtils";
-import {compareBy} from "../common/utils/genericUtils";
+import Dropdown from '../metadata/common/values/Dropdown';
+import {getDisplayName} from '../users/userUtils';
+import {compareBy} from '../common/utils/genericUtils';
 
 const PermissionCandidateSelect = ({filter = () => true, permissionCandidates = [], ...otherProps}) => {
     const options = permissionCandidates

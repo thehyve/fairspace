@@ -17,7 +17,7 @@ describe('LinkedDataDropdown', () => {
 
         const dropdown = wrapper.find(Dropdown);
 
-        return dropdown.prop("loadOptions")()
+        return dropdown.prop('loadOptions')()
             .then(() => {
                 expect(mockFetchItems).toHaveBeenCalledTimes(1);
                 expect(mockFetchItems)

@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from "react";
-import {useHistory} from "react-router-dom";
+import {useEffect, useRef, useState} from 'react';
+import {useHistory} from 'react-router-dom';
 
 const UseNavigationBlocker = (shouldBlock) => {
     const history = useHistory();

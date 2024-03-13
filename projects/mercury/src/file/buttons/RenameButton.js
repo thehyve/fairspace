@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import useIsMounted from "react-is-mounted-hook";
-import {useFormField} from "../../common/hooks/UseFormField";
-import {isValidFileName} from "../fileUtils";
-import FileNameDialog from "./FileNameDialog";
+import useIsMounted from 'react-is-mounted-hook';
+import {useFormField} from '../../common/hooks/UseFormField';
+import {isValidFileName} from '../fileUtils';
+import FileNameDialog from './FileNameDialog';
 
 const RenameButton = ({disabled, currentName, onRename, children}) => {
     const [opened, setOpened] = useState(false);

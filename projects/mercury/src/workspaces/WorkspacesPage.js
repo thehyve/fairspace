@@ -1,10 +1,10 @@
 import React from 'react';
 import {Grid} from '@mui/material';
 import {Widgets} from '@mui/icons-material';
-import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 
 import * as consts from '../constants';
-import WorkspaceBrowser from "./WorkspaceBrowser";
+import WorkspaceBrowser from './WorkspaceBrowser';
 import BreadCrumbs from '../common/components/BreadCrumbs';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 

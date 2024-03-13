@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 import {
     Table,
@@ -9,22 +9,22 @@ import {
     TablePagination,
     TableRow,
     TableSortLabel,
-} from "@mui/material";
+} from '@mui/material';
 
-import Checkbox from "@mui/material/Checkbox";
-import TableContainer from "@mui/material/TableContainer";
-import Paper from "@mui/material/Paper";
-import UsersContext from "./UsersContext";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import {setUserRole} from "./UsersAPI";
-import ErrorDialog from "../common/components/ErrorDialog";
-import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
-import ColumnFilterInput from "../common/components/ColumnFilterInput";
-import TablePaginationActions from "../common/components/TablePaginationActions";
-import UserContext from "./UserContext";
+import Checkbox from '@mui/material/Checkbox';
+import TableContainer from '@mui/material/TableContainer';
+import Paper from '@mui/material/Paper';
+import UsersContext from './UsersContext';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import {setUserRole} from './UsersAPI';
+import ErrorDialog from '../common/components/ErrorDialog';
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
+import ColumnFilterInput from '../common/components/ColumnFilterInput';
+import TablePaginationActions from '../common/components/TablePaginationActions';
+import UserContext from './UserContext';
 
 const columns = {
     name: {
@@ -75,7 +75,7 @@ const roleSelectionColumns = [
 ];
 
 const UserRolesPage = () => {
-    usePageTitleUpdater("Users");
+    usePageTitleUpdater('Users');
 
     const {currentUser} = useContext(UserContext);
     const {users = [], usersLoading, usersError, refresh} = useContext(UsersContext);
@@ -91,7 +91,7 @@ const UserRolesPage = () => {
 
     const updateFilteredUsers = () => {
         if (users && users.length > 0) {
-            if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === "")) {
+            if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === '')) {
                 setFilteredUsers(users);
             } else {
                 setFilteredUsers(users.filter(u => (
@@ -123,7 +123,7 @@ const UserRolesPage = () => {
         .then(refresh)
         .catch(e => {
             const message = Object.prototype.hasOwnProperty.call(e, 'message') ? e.message : null;
-            ErrorDialog.showError("Error assigning role", message);
+            ErrorDialog.showError('Error assigning role', message);
         });
 
     const renderColumnFilter = (columnName: string) => {
@@ -239,7 +239,7 @@ const UserRolesPage = () => {
                     page={page}
                     onPageChange={(e, p) => setPage(p)}
                     onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                    style={{overflowX: "hidden"}}
+                    style={{overflowX: 'hidden'}}
                     ActionsComponent={TablePaginationActions}
                 />
             </TableContainer>

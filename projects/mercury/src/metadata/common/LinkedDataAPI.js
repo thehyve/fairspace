@@ -2,8 +2,8 @@ import {expand} from 'jsonld';
 import axios from 'axios';
 import {extractJsonData, handleHttpError} from '../../common/utils/httpUtils';
 
-import {normalizeTypes, normalizeTypesBySubjectId} from "./jsonLdConverter";
-import {flattenShallow} from "../../common/utils/genericUtils";
+import {normalizeTypes, normalizeTypesBySubjectId} from './jsonLdConverter';
+import {flattenShallow} from '../../common/utils/genericUtils';
 
 const requestOptions = {
     headers: {Accept: 'application/ld+json'}
@@ -15,7 +15,7 @@ class LinkedDataAPI {
      * @param graph Either 'metadata' or 'vocabulary'
      * @param remoteURLPrefix URL path to the API
      */
-    constructor(graph, remoteURLPrefix = "/api") {
+    constructor(graph, remoteURLPrefix = '/api') {
         this.statementsUrl = `${remoteURLPrefix}/${graph}/`;
     }
 
@@ -38,7 +38,7 @@ class LinkedDataAPI {
             .then(extractJsonData)
             .then(expand)
             .then(normalizeTypes)
-            .catch(handleHttpError("Failure when retrieving metadata"));
+            .catch(handleHttpError('Failure when retrieving metadata'));
     }
 
     /**
@@ -56,7 +56,7 @@ class LinkedDataAPI {
             .then(extractJsonData)
             .then(expand)
             .then(normalizeTypesBySubjectId)
-            .catch(handleHttpError("Failure when retrieving metadata"));
+            .catch(handleHttpError('Failure when retrieving metadata'));
     }
 
     getForAllSubjects(subjects: string[]) {

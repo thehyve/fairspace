@@ -1,12 +1,12 @@
-import {render, screen} from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import React from "react";
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {ThemeProvider} from '@mui/material/styles';
-import {MetadataViewTable} from "../MetadataViewTable";
+import {MetadataViewTable} from '../MetadataViewTable';
 // eslint-disable-next-line jest/no-mocks-import
-import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";
-import {RESOURCES_VIEW} from "../metadataViewUtils";
+import {mockRows, mockViews} from '../__mocks__/MetadataViewAPI';
+import {RESOURCES_VIEW} from '../metadataViewUtils';
 import theme from '../../../App.theme';
 
 describe('MetadataViewTable', () => {
@@ -116,7 +116,7 @@ describe('MetadataViewTable', () => {
             </ThemeProvider>
         );
 
-        const tableRows = screen.queryAllByRole("row");
+        const tableRows = screen.queryAllByRole('row');
         expect(tableRows.length).toEqual(2);
 
         await user.dblClick(tableRows[1]);

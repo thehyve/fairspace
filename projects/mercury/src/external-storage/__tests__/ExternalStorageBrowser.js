@@ -2,11 +2,11 @@
 import React from 'react';
 import {cleanup, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {configure} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {ThemeProvider} from '@mui/material/styles';
-import {ExternalStorageBrowser} from "../ExternalStorageBrowser";
-import type {ExternalStorage} from "../ExternalStoragesContext";
+import {ExternalStorageBrowser} from '../ExternalStorageBrowser';
+import type {ExternalStorage} from '../ExternalStoragesContext';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -26,9 +26,9 @@ const selectionMock = {
 };
 
 const storageMock: ExternalStorage = {
-    name: "testStorage",
-    label: "Test storage",
-    url: "https://example.com/api/webdav"
+    name: 'testStorage',
+    label: 'Test storage',
+    url: 'https://example.com/api/webdav'
 };
 
 const initialProps = {
@@ -68,7 +68,7 @@ describe('ExternalStorageBrowser', () => {
             </ThemeProvider>
         );
 
-        expect(getByText("An error occurred while loading data from Test storage.")).toBeInTheDocument();
+        expect(getByText('An error occurred while loading data from Test storage.')).toBeInTheDocument();
     });
 
     it('show loading inlay as long as the files are pending', () => {
@@ -81,6 +81,6 @@ describe('ExternalStorageBrowser', () => {
             </ThemeProvider>
         );
 
-        expect(screen.getByTestId("loading")).toBeInTheDocument();
+        expect(screen.getByTestId('loading')).toBeInTheDocument();
     });
 });

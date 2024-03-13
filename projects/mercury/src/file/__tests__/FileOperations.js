@@ -1,11 +1,11 @@
 import React from 'react';
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
-import {IconButton} from "@mui/material";
+import {IconButton} from '@mui/material';
 
-import {FileOperations} from "../FileOperations";
-import {COPY, CUT} from "../../constants";
+import {FileOperations} from '../FileOperations';
+import {COPY, CUT} from '../../constants';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
@@ -53,7 +53,7 @@ describe('FileOperations', () => {
 
         wrapper = renderFileOperations(clipboardMock, fileActionsMock);
 
-        clickHandler = ariaLabel => wrapper.find('[aria-label="' + ariaLabel + '"]').prop("onClick");
+        clickHandler = ariaLabel => wrapper.find('[aria-label="' + ariaLabel + '"]').prop('onClick');
     });
 
     it('should disable all buttons on when file operation is not finished yet', () => {
@@ -92,9 +92,9 @@ describe('FileOperations', () => {
     }
 
     it('should clear selection and refresh files after all successful file operations', async () => {
-        await performOperation(() => wrapper.find('CreateDirectoryButton').prop("onCreate")("some-dir"));
+        await performOperation(() => wrapper.find('CreateDirectoryButton').prop('onCreate')('some-dir'));
         await performOperation(() => clickHandler('Paste')({stopPropagation: () => {}}));
-        await performOperation(() => wrapper.find('[aria-label="Delete"]').parent().prop("onClick")());
+        await performOperation(() => wrapper.find('[aria-label="Delete"]').parent().prop('onClick')());
     });
 
     describe('paste button', () => {
@@ -107,7 +107,7 @@ describe('FileOperations', () => {
             };
 
             wrapper = renderFileOperations(emptyClipboard, fileActionsMock);
-            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Paste"]').prop('disabled')).toEqual(true);
         });
         it('should be disabled if the clipboard contains files cut from the current directory', () => {
             const openedPath = '/subdirectory';
@@ -119,7 +119,7 @@ describe('FileOperations', () => {
             };
 
             wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
-            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Paste"]').prop('disabled')).toEqual(true);
         });
         it('should be enabled if the clipboard contains files cut from the other directory', () => {
             const openedPath = '/other-directory';
@@ -131,7 +131,7 @@ describe('FileOperations', () => {
             };
 
             wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
-            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
+            expect(wrapper.find('[aria-label="Paste"]').prop('disabled')).toEqual(false);
         });
         it('should be enabled if the clipboard contains files copied from the current directory', () => {
             const openedPath = '/subdirectory';
@@ -143,7 +143,7 @@ describe('FileOperations', () => {
             };
 
             wrapper = renderFileOperations(currentDirClipboard, fileActionsMock, openedPath);
-            expect(wrapper.find('[aria-label="Paste"]').prop("disabled")).toEqual(false);
+            expect(wrapper.find('[aria-label="Paste"]').prop('disabled')).toEqual(false);
         });
     });
 
@@ -192,7 +192,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Undelete"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Undelete"]').prop('disabled')).toEqual(true);
         });
         it('should be disabled if non-deleted file selected', () => {
             const render = (fileActions) => shallow(<FileOperations
@@ -212,7 +212,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Undelete"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Undelete"]').prop('disabled')).toEqual(true);
         });
         it('should be enabled if deleted file selected', () => {
             const render = (fileActions) => shallow(<FileOperations
@@ -232,7 +232,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Undelete"]').prop("disabled")).toEqual(false);
+            expect(wrapper.find('[aria-label="Undelete"]').prop('disabled')).toEqual(false);
         });
     });
 
@@ -260,7 +260,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Show history"]').prop("disabled")).toEqual(true);
+            expect(wrapper.find('[aria-label="Show history"]').prop('disabled')).toEqual(true);
         });
         it('should be enabled if one file selected', () => {
             const render = (fileActions) => shallow(<FileOperations
@@ -279,7 +279,7 @@ describe('FileOperations', () => {
             />);
 
             wrapper = render(fileActionsMock);
-            expect(wrapper.find('[aria-label="Show history"]').prop("disabled")).toEqual(false);
+            expect(wrapper.find('[aria-label="Show history"]').prop('disabled')).toEqual(false);
         });
     });
 });
