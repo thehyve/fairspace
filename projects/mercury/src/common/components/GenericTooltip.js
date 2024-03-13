@@ -10,6 +10,8 @@ const styles = theme => ({
     }
 });
 
-export default withStyles(styles)(
-    ({classes, children, ...otherProps}) => (<Tooltip classes={classes} {...otherProps}>{children}</Tooltip>)
-);
+export default withStyles(styles)(({classes, children, ...otherProps}) => (
+    <Tooltip classes={classes} {...otherProps}>
+        {children}
+    </Tooltip>
+));

@@ -7,7 +7,8 @@ import {Typography} from '@mui/material';
 import type {MetadataViewFacetProperties} from '../MetadataViewFacetFactory';
 import {isNonEmptyValue} from '../../../common/utils/genericUtils';
 
-const nonEmptyNumber = (value, alternative) => (isNonEmptyValue(value) ? Number(value) : alternative);
+const nonEmptyNumber = (value, alternative) =>
+    isNonEmptyValue(value) ? Number(value) : alternative;
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
@@ -38,7 +39,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         commitChange(val);
     };
 
-    const handleMinValueInputChange = (event) => {
+    const handleMinValueInputChange = event => {
         const newMinValue = event.target.value;
         setValue([newMinValue, value[1]]);
         if (isNonEmptyValue(newMinValue)) {
@@ -58,7 +59,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         }
     };
 
-    const handleMaxValueInputChange = (event) => {
+    const handleMaxValueInputChange = event => {
         const newMaxValue = event.target.value;
         setValue([value[0], newMaxValue]);
         if (isNonEmptyValue(event.target.value)) {
@@ -132,7 +133,11 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const renderSlider = () => (
         <Slider
             value={getSliderValue()}
-            track={dynamicSliderValue[1] === null && isNonEmptyValue(dynamicSliderValue[0]) ? 'inverted' : 'normal'}
+            track={
+                dynamicSliderValue[1] === null && isNonEmptyValue(dynamicSliderValue[0])
+                    ? 'inverted'
+                    : 'normal'
+            }
             onChange={handleSliderChange}
             onChangeCommitted={() => commitChange(dynamicSliderValue)}
             valueLabelDisplay="auto"
@@ -159,18 +164,29 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
                     </Grid>
                 </Grid>
             ) : (
-                <Grid container spacing={3} alignItems="center" className={classes.numericalContent}>
+                <Grid
+                    container
+                    spacing={3}
+                    alignItems="center"
+                    className={classes.numericalContent}
+                >
                     <Grid item xs={6}>
-                        {renderInput(value[0], handleMinValueInputChange, nonEmptyNumber(minValue, 'min'))}
+                        {renderInput(
+                            value[0],
+                            handleMinValueInputChange,
+                            nonEmptyNumber(minValue, 'min')
+                        )}
                     </Grid>
                     <Grid item xs={6}>
-                        {renderInput(value[1], handleMaxValueInputChange, nonEmptyNumber(maxValue, 'max'))}
+                        {renderInput(
+                            value[1],
+                            handleMaxValueInputChange,
+                            nonEmptyNumber(maxValue, 'max')
+                        )}
                     </Grid>
                 </Grid>
             )}
-            <Typography color="error">
-                {validationError}
-            </Typography>
+            <Typography color="error">{validationError}</Typography>
         </div>
     );
 };

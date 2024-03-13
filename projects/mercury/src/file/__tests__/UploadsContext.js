@@ -4,7 +4,11 @@ import {configure, mount} from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import {act} from '@testing-library/react';
-import UploadsContext, {UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UploadsProvider} from '../UploadsContext';
+import UploadsContext, {
+    UPLOAD_STATUS_FINISHED,
+    UPLOAD_STATUS_IN_PROGRESS,
+    UploadsProvider
+} from '../UploadsContext';
 import {LocalFileAPI} from '../FileAPI';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -18,7 +22,9 @@ const getUploadsProviderValue = props => {
         mount(
             <UploadsProvider {...props}>
                 <UploadsContext.Consumer>
-                    {value => { contextValue = value; }}
+                    {value => {
+                        contextValue = value;
+                    }}
                 </UploadsContext.Consumer>
             </UploadsProvider>
         );
@@ -40,7 +46,11 @@ describe('UploadsProvider', () => {
         context = getContext();
         expect(context.uploads.length).toEqual(0);
 
-        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: 'upload1', destinationPath: '/'};
+        const upload = {
+            files: [{path: 'first.txt'}, {path: 'second.txt'}],
+            id: 'upload1',
+            destinationPath: '/'
+        };
         const uploadPromise = act(() => context.startUpload(upload));
 
         context = getContext();
@@ -52,15 +62,23 @@ describe('UploadsProvider', () => {
         await uploadPromise;
 
         context = getContext();
-        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
+        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(
+            UPLOAD_STATUS_FINISHED
+        );
     });
 
     it('should handle upload errors', async () => {
-        const getContext = getUploadsProviderValue({fileApi: {uploadMulti: () => Promise.reject()}});
+        const getContext = getUploadsProviderValue({
+            fileApi: {uploadMulti: () => Promise.reject()}
+        });
         let context;
 
         context = getContext();
-        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: 'upload2', destinationPath: '/'};
+        const upload = {
+            files: [{path: 'first.txt'}, {path: 'second.txt'}],
+            id: 'upload2',
+            destinationPath: '/'
+        };
         const uploadPromise = act(() => context.startUpload(upload));
 
         // Refresh context to get new state
@@ -76,7 +94,9 @@ describe('UploadsProvider', () => {
     });
 
     it('should remove uploads from list', async () => {
-        const getContext = getUploadsProviderValue({fileApi: {uploadMulti: () => Promise.reject()}});
+        const getContext = getUploadsProviderValue({
+            fileApi: {uploadMulti: () => Promise.reject()}
+        });
         let context;
 
         context = getContext();
@@ -96,16 +116,17 @@ describe('UploadsProvider', () => {
 
     it('should store upload progress', async () => {
         const fileApi = {
-            uploadMulti: (destination, files, maxFileSizeBytes, onProgress) => new Promise(resolve => {
-                // Set progress to 50 on start
-                onProgress({loaded: 1024, total: 2048});
+            uploadMulti: (destination, files, maxFileSizeBytes, onProgress) =>
+                new Promise(resolve => {
+                    // Set progress to 50 on start
+                    onProgress({loaded: 1024, total: 2048});
 
-                setTimeout(() => {
-                    // Set progress to 100 on finish
-                    onProgress({loaded: 2048, total: 2048});
-                    resolve();
-                }, 50);
-            })
+                    setTimeout(() => {
+                        // Set progress to 100 on finish
+                        onProgress({loaded: 2048, total: 2048});
+                        resolve();
+                    }, 50);
+                })
         };
 
         const getContext = getUploadsProviderValue({fileApi});
@@ -113,7 +134,11 @@ describe('UploadsProvider', () => {
 
         context = getContext();
 
-        const upload = {files: [{path: 'first.txt'}, {path: 'second.txt'}], id: 'upload2', destinationPath: '/'};
+        const upload = {
+            files: [{path: 'first.txt'}, {path: 'second.txt'}],
+            id: 'upload2',
+            destinationPath: '/'
+        };
         const uploadPromise = act(() => context.startUpload(upload));
 
         // Refresh context to get new state
@@ -127,6 +152,8 @@ describe('UploadsProvider', () => {
 
         context = getContext();
         expect(context.uploads.find(u => u.file === upload.file).progress).toEqual(100);
-        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
+        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(
+            UPLOAD_STATUS_FINISHED
+        );
     });
 });

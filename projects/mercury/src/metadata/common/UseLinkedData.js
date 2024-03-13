@@ -33,9 +33,14 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
                         setTypeInfo(getTypeInfo(linkedDataItem, shapes));
 
                         if (!Array.isArray(linkedDataItem['@type'])) {
-                            console.warn('Can not get values from metadata without a type or that is not expanded');
+                            console.warn(
+                                'Can not get values from metadata without a type or that is not expanded'
+                            );
                         } else {
-                            const propertyShapes = determinePropertyShapesForTypes(shapes, linkedDataItem['@type']);
+                            const propertyShapes = determinePropertyShapesForTypes(
+                                shapes,
+                                linkedDataItem['@type']
+                            );
                             setProperties(getProperties(shapes, propertyShapes));
                             setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
                         }
@@ -78,4 +83,4 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
 };
 
 // Export a custom hook attached to the context by default
-export default (subject) => useLinkedDataNoContext(subject, useContext(LinkedDataContext));
+export default subject => useLinkedDataNoContext(subject, useContext(LinkedDataContext));

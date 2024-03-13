@@ -1,6 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle
+} from '@mui/material';
 
 const confirmationDialog = ({
     title = 'Confirmation',
@@ -10,7 +17,7 @@ const confirmationDialog = ({
     dangerous = false,
     open = false,
     onAgree = () => {},
-    onDisagree = () => {},
+    onDisagree = () => {}
 }) => (
     <Dialog
         open={open}
@@ -18,13 +25,9 @@ const confirmationDialog = ({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
-        <DialogTitle id="alert-dialog-title">
-            {title}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-                {content}
-            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
         </DialogContent>
         <DialogActions>
             <Button
@@ -34,9 +37,7 @@ const confirmationDialog = ({
             >
                 {agreeButtonText}
             </Button>
-            <Button onClick={onDisagree}>
-                {disagreeButtonText}
-            </Button>
+            <Button onClick={onDisagree}>{disagreeButtonText}</Button>
         </DialogActions>
     </Dialog>
 );
@@ -48,7 +49,7 @@ confirmationDialog.propTypes = {
     agreeButtonText: PropTypes.string,
     disagreeButtonText: PropTypes.string,
     onAgree: PropTypes.func,
-    onDisagree: PropTypes.func,
+    onDisagree: PropTypes.func
 };
 
 export default confirmationDialog;

@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 
 import BaseInputValue from './BaseInputValue';
 
-const MarkdownValue = (props) => {
+const MarkdownValue = props => {
     // Show the editor if the user chose to edit
     // or if there is no value yet
     const [showEdit, setShowEdit] = useState(!props.entry.value);
@@ -17,7 +17,9 @@ const MarkdownValue = (props) => {
                     onBlur={() => setShowEdit(false)}
                     type="text"
                 />
-            ) : (<ReactMarkdown>{props.entry.value}</ReactMarkdown>)}
+            ) : (
+                <ReactMarkdown>{props.entry.value}</ReactMarkdown>
+            )}
         </div>
     );
 };

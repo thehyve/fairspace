@@ -13,6 +13,6 @@ export const useFormField = (initialValue, validator) => {
         setValue,
         valid: validator(value),
         touched,
-        declareTouched,
+        declareTouched
     };
 };

@@ -9,11 +9,9 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
-    const nameControl = useFormField('', value => (
-        !!value && isValidFileName(value)
-    ));
+    const nameControl = useFormField('', value => !!value && isValidFileName(value));
 
-    const openDialog = (e) => {
+    const openDialog = e => {
         if (e) e.stopPropagation();
         nameControl.setValue(currentName);
         if (!disabled) {
@@ -27,8 +25,9 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
     };
 
     const handleRename = () => {
-        onRename(nameControl.value)
-            .then(shouldClose => isMounted() && shouldClose && setOpened(false));
+        onRename(nameControl.value).then(
+            shouldClose => isMounted() && shouldClose && setOpened(false)
+        );
     };
 
     const validateAndRename = () => nameControl.valid && handleRename();
@@ -36,7 +35,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
     const dialog = opened ? (
         <FileNameDialog
             onClose={closeDialog}
-            onSubmit={(e) => {
+            onSubmit={e => {
                 e.preventDefault();
                 e.stopPropagation();
                 validateAndRename();
@@ -49,9 +48,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
 
     return (
         <>
-            <span onClick={openDialog}>
-                {children}
-            </span>
+            <span onClick={openDialog}>{children}</span>
             {dialog}
         </>
     );

@@ -26,9 +26,7 @@ describe('CollectionInformationDrawer', () => {
     };
 
     it('renders collection details for the selected collection', () => {
-        const wrapper = shallow(<CollectionInformationDrawer
-            {...defaultProps}
-        />);
+        const wrapper = shallow(<CollectionInformationDrawer {...defaultProps} />);
 
         const collectionDetailsProps = wrapper.find(CollectionDetails).first().props();
         expect(collectionDetailsProps.collection.name).toBe('My collection');

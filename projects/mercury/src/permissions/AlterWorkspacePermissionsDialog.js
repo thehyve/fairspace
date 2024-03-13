@@ -22,7 +22,7 @@ export const styles = {
     },
     container: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap'
     },
     autocomplete: {
         width: '100%'
@@ -36,12 +36,20 @@ export const styles = {
     }
 };
 
-export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidates, setPermission,
-    open = false, onClose, classes}) => {
+export const AlterWorkspacePermissionsDialog = ({
+    collection,
+    permissionCandidates,
+    setPermission,
+    open = false,
+    onClose,
+    classes
+}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
-        const reducedPermissions = selectedPermissions.filter(p => selectedPermission.iri !== p.iri);
+        const reducedPermissions = selectedPermissions.filter(
+            p => selectedPermission.iri !== p.iri
+        );
         setSelectedPermissions(reducedPermissions);
     };
 
@@ -64,9 +72,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
 
     const renderSelectedWorkspaceList = () => (
         <div className={classes.accessLevelControl}>
-            <Typography component="p">
-                Selected workspaces
-            </Typography>
+            <Typography component="p">Selected workspaces</Typography>
             <WorkspacePermissionsTable
                 emptyPermissionsText="No workspace selected."
                 selectedPermissions={selectedPermissions}
@@ -82,7 +88,10 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
             onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
-            filter={p => ((p.iri !== collection.ownerWorkspace) && !selectedPermissions.some(sp => sp.iri === p.iri))}
+            filter={p =>
+                p.iri !== collection.ownerWorkspace &&
+                !selectedPermissions.some(sp => sp.iri === p.iri)
+            }
             label="Select workspace"
             autoFocus
         />
@@ -113,9 +122,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
                 >
                     Save
                 </Button>
-                <Button onClick={handleClose}>
-                    Cancel
-                </Button>
+                <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

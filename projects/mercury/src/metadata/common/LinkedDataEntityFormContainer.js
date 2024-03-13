@@ -14,17 +14,37 @@ import ConfirmationDialog from '../../common/components/ConfirmationDialog';
 import {UpdatePageTitleEditingMark} from '../../common/hooks/UsePageTitleUpdater';
 
 const LinkedDataEntityFormContainer = ({
-    subject, typeInfo, hasEditRight = true, showEditButtons = false, fullpage = false,
+    subject,
+    typeInfo,
+    hasEditRight = true,
+    showEditButtons = false,
+    fullpage = false,
     contextMenu = null,
-    properties, values, linkedDataLoading, linkedDataError, updateLinkedData, setHasUpdates = () => {}, ...otherProps
+    properties,
+    values,
+    linkedDataLoading,
+    linkedDataError,
+    updateLinkedData,
+    setHasUpdates = () => {},
+    ...otherProps
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
-    const [editingEnabled, setEditingEnabled] = useState(hasEditRight && !showEditButtons && !isDeleted);
+    const [editingEnabled, setEditingEnabled] = useState(
+        hasEditRight && !showEditButtons && !isDeleted
+    );
     const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
 
     const {
-        addValue, updateValue, deleteValue, clearForm, getUpdates, hasFormUpdates, valuesWithUpdates,
-        validateAll, validationErrors, isValid
+        addValue,
+        updateValue,
+        deleteValue,
+        clearForm,
+        getUpdates,
+        hasFormUpdates,
+        valuesWithUpdates,
+        validateAll,
+        validationErrors,
+        isValid
     } = useFormData(values, properties);
 
     useEffect(() => setHasUpdates(hasFormUpdates), [hasFormUpdates, setHasUpdates]);
@@ -34,8 +54,8 @@ const LinkedDataEntityFormContainer = ({
     }, [hasEditRight, isDeleted, showEditButtons]);
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => submitLinkedDataChanges(subject, getUpdates())
-            .then(() => {
+        () =>
+            submitLinkedDataChanges(subject, getUpdates()).then(() => {
                 setEditingEnabled(false);
                 clearForm();
                 updateLinkedData();
@@ -43,14 +63,18 @@ const LinkedDataEntityFormContainer = ({
         subject
     );
 
-    const {
-        confirmationShown, hideConfirmation, executeNavigation
-    } = useNavigationBlocker(hasFormUpdates && editingEnabled);
+    const {confirmationShown, hideConfirmation, executeNavigation} = useNavigationBlocker(
+        hasFormUpdates && editingEnabled
+    );
 
     UpdatePageTitleEditingMark(hasFormUpdates && editingEnabled);
 
     // Apply context-specific logic to the properties and filter on visibility
-    const extendedProperties = extendProperties({properties, subject, isEntityEditable: editingEnabled});
+    const extendedProperties = extendProperties({
+        properties,
+        subject,
+        isEntityEditable: editingEnabled
+    });
     const validateAndSubmit = () => {
         const hasErrors = validateAll(extendedProperties);
 
@@ -80,7 +104,8 @@ const LinkedDataEntityFormContainer = ({
                         clearForm();
                         setEditingEnabled(!showEditButtons);
                     }}
-                >Cancel
+                >
+                    Cancel
                 </Button>
             </div>
         );
@@ -113,8 +138,10 @@ const LinkedDataEntityFormContainer = ({
                     <ConfirmationDialog
                         open
                         title="Unsaved changes"
-                        content={'You have unsaved changes, are you sure you want to navigate away?'
-                        + ' Your pending changes will be lost.'}
+                        content={
+                            'You have unsaved changes, are you sure you want to navigate away?' +
+                            ' Your pending changes will be lost.'
+                        }
                         agreeButtonText="Navigate"
                         disagreeButtonText="back to form"
                         onAgree={() => executeNavigation()}
@@ -143,13 +170,16 @@ const LinkedDataEntityFormContainer = ({
 
 LinkedDataEntityFormContainer.propTypes = {
     subject: PropTypes.string.isRequired,
-    hasEditRight: PropTypes.bool,
+    hasEditRight: PropTypes.bool
 };
 
-export const LinkedDataEntityFormWithLinkedData = (
-    {subject, hasEditRight, setHasCollectionMetadataUpdates}
-) => {
-    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
+export const LinkedDataEntityFormWithLinkedData = ({
+    subject,
+    hasEditRight,
+    setHasCollectionMetadataUpdates
+}) => {
+    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} =
+        useLinkedData(subject);
 
     return (
         <LinkedDataEntityFormContainer

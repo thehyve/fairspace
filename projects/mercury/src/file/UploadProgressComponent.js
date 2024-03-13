@@ -1,5 +1,13 @@
 import React, {useContext, useState} from 'react';
-import {Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography} from '@mui/material';
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    Collapse,
+    IconButton,
+    TableHead,
+    Typography
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from '@mui/icons-material';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -22,11 +30,11 @@ const styles = theme => ({
         transform: 'rotate(0deg)',
         marginLeft: 'auto',
         transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
+            duration: theme.transitions.duration.shortest
+        })
     },
     expandOpen: {
-        transform: 'rotate(180deg)',
+        transform: 'rotate(180deg)'
     },
     wrapIcon: {
         verticalAlign: 'middle',
@@ -53,7 +61,11 @@ export const UploadProgressComponent = ({classes}) => {
             case UPLOAD_STATUS_FINISHED:
                 return 'Finished';
             case UPLOAD_STATUS_ERROR:
-                return <Typography variant="body2" color="error">Error uploading</Typography>;
+                return (
+                    <Typography variant="body2" color="error">
+                        Error uploading
+                    </Typography>
+                );
             default:
                 return '';
         }
@@ -63,7 +75,7 @@ export const UploadProgressComponent = ({classes}) => {
         <IconButton
             onClick={toggleExpand}
             className={classnames(classes.expand, {
-                [classes.expandOpen]: expanded,
+                [classes.expandOpen]: expanded
             })}
             aria-expanded={expanded}
             aria-label="Show more"
@@ -74,10 +86,13 @@ export const UploadProgressComponent = ({classes}) => {
     );
 
     const renderFolderUploadName = (upload, folderName) => {
-        const additionalFilesOrFolders = upload.files.filter(f => !f.path.startsWith(`${folderName}${PATH_SEPARATOR}`));
+        const additionalFilesOrFolders = upload.files.filter(
+            f => !f.path.startsWith(`${folderName}${PATH_SEPARATOR}`)
+        );
         return (
             <Typography variant="body2" className={classes.wrapIcon} component="span">
-                <FolderOpen fontSize="small" />&nbsp;{upload.destinationPath}/{folderName}
+                <FolderOpen fontSize="small" />
+                &nbsp;{upload.destinationPath}/{folderName}
                 {additionalFilesOrFolders.length > 0 && (
                     <em>&nbsp;and {additionalFilesOrFolders.length} other(s)</em>
                 )}
@@ -85,16 +100,15 @@ export const UploadProgressComponent = ({classes}) => {
         );
     };
 
-    const renderFileUploadName = (upload) => (
+    const renderFileUploadName = upload => (
         <Typography variant="body2" className={classes.wrapIcon}>
-            <NoteOutlined fontSize="small" />&nbsp;{upload.destinationPath}/{upload.files[0].path}
-            {upload.files.length > 1 && (
-                <em>&nbsp;and {upload.files.length - 1} other(s)</em>
-            )}
+            <NoteOutlined fontSize="small" />
+            &nbsp;{upload.destinationPath}/{upload.files[0].path}
+            {upload.files.length > 1 && <em>&nbsp;and {upload.files.length - 1} other(s)</em>}
         </Typography>
     );
 
-    const renderUploadName = (upload) => {
+    const renderUploadName = upload => {
         const folder = upload.files.find(f => splitPathIntoArray(f.path).length > 1);
         if (folder) {
             const folderName = splitPathIntoArray(folder.path)[0];
@@ -120,12 +134,15 @@ export const UploadProgressComponent = ({classes}) => {
                                 <TableCell>{renderUploadName(upload)}</TableCell>
                                 <TableCell width={100}>{progress(upload)}</TableCell>
                                 <TableCell width={40} padding="none">
-                                    { upload.status === UPLOAD_STATUS_ERROR
-                                        && (
-                                            <IconButton aria-label="remove" onClick={() => removeUpload(upload)} size="medium">
-                                                <HighlightOffOutlined fontSize="small" />
-                                            </IconButton>
-                                        )}
+                                    {upload.status === UPLOAD_STATUS_ERROR && (
+                                        <IconButton
+                                            aria-label="remove"
+                                            onClick={() => removeUpload(upload)}
+                                            size="medium"
+                                        >
+                                            <HighlightOffOutlined fontSize="small" />
+                                        </IconButton>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -143,9 +160,7 @@ export const UploadProgressComponent = ({classes}) => {
                 title="Uploads"
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent style={{paddingTop: 0}}>
-                    {renderUploadList()}
-                </CardContent>
+                <CardContent style={{paddingTop: 0}}>{renderUploadList()}</CardContent>
             </Collapse>
         </Card>
     );

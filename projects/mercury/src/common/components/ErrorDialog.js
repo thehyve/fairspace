@@ -7,27 +7,25 @@ import {
     DialogTitle,
     Grid,
     Slide,
-    Typography,
+    Typography
 } from '@mui/material';
 import {Error as ErrorIcon} from '@mui/icons-material';
 import DialogContentText from '@mui/material/DialogContentText';
 
-const Transition = React.forwardRef(
-    (props, ref) => <Slide ref={ref} direction="up" {...props} />
-);
+const Transition = React.forwardRef((props, ref) => <Slide ref={ref} direction="up" {...props} />);
 
 class ErrorDialog extends React.Component {
     static instance;
 
     static showError(title, details, onRetry, onDismiss) {
         if (ErrorDialog.instance) {
-            const message = (details instanceof Error) ? details.message : details;
+            const message = details instanceof Error ? details.message : details;
 
             ErrorDialog.instance.setState({
                 title,
                 message,
                 onRetry,
-                onDismiss,
+                onDismiss
             });
         }
     }
@@ -98,30 +96,23 @@ class ErrorDialog extends React.Component {
                     </Grid>
                 </DialogTitle>
                 <DialogContent>
-                    {(typeof message) === 'string'
-                        ? (
-                            <DialogContentText component="div">
-                                <Typography component="pre">{message}</Typography>
-                            </DialogContentText>
-                        )
-                        : message}
+                    {typeof message === 'string' ? (
+                        <DialogContentText component="div">
+                            <Typography component="pre">{message}</Typography>
+                        </DialogContentText>
+                    ) : (
+                        message
+                    )}
                 </DialogContent>
                 <DialogActions>
-                    <Button
-                        onClick={this.handleClose}
-                        color="primary"
-                    >
+                    <Button onClick={this.handleClose} color="primary">
                         Dismiss
                     </Button>
-                    {onRetry
-                        ? (
-                            <Button
-                                onClick={this.handleRetry}
-                                color="primary"
-                            >
-                                Retry
-                            </Button>
-                        ) : null}
+                    {onRetry ? (
+                        <Button onClick={this.handleRetry} color="primary">
+                            Retry
+                        </Button>
+                    ) : null}
                 </DialogActions>
             </Dialog>
         );

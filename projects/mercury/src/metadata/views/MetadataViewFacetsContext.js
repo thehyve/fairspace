@@ -18,12 +18,13 @@ export const MetadataViewFacetsProvider = ({children}) => {
     const initialLoad = () => {
         if (!requested) {
             setRequested(true);
-            (new MetadataViewAPI(metadataAPIPath)).getFacets()
+            new MetadataViewAPI(metadataAPIPath)
+                .getFacets()
                 .then(d => {
                     setData(d);
                     setFacetsError(undefined);
                 })
-                .catch((e) => {
+                .catch(e => {
                     setFacetsError(e || true);
                     console.error(e || new Error('Unknown error while fetching facets.'));
                 })

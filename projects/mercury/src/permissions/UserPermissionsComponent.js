@@ -39,19 +39,30 @@ const styles = {
     }
 };
 
-export const UserPermissionsComponent = ({permissions, setPermission, collection, currentUser, workspaceUsers, users, classes}) => {
+export const UserPermissionsComponent = ({
+    permissions,
+    setPermission,
+    collection,
+    currentUser,
+    workspaceUsers,
+    users,
+    classes
+}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [showConfirmChangeDialog, setShowConfirmChangeDialog] = useState(false);
     const [showAlterUserPermissionsDialog, setShowAlterUserPermissionsDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState();
 
-    const isWorkspaceMember: boolean = (user: Principal) => user && workspaceUsers.some(u => u.iri === user.iri);
+    const isWorkspaceMember: boolean = (user: Principal) =>
+        user && workspaceUsers.some(u => u.iri === user.iri);
     const sortedPermissions = sortPermissions(permissions);
     const prioritizedSortedPermissions = [
         ...sortedPermissions.filter(p => isWorkspaceMember(p)),
         ...sortedPermissions.filter(p => !isWorkspaceMember(p))
     ];
-    const permissionCandidates: PrincipalPermission[] = users.filter(p => !sortedPermissions.some(c => c.iri === p.iri));
+    const permissionCandidates: PrincipalPermission[] = users.filter(
+        p => !sortedPermissions.some(c => c.iri === p.iri)
+    );
 
     const handleDeletePermission = (permission: Permission) => {
         setSelectedUser(permission);
@@ -191,7 +202,7 @@ UserPermissionsComponent.propTypes = {
     users: PropTypes.array
 };
 
-const ContextualUserPermissionsComponent = (props) => {
+const ContextualUserPermissionsComponent = props => {
     const {users, usersLoading, usersError} = useContext(UsersContext);
 
     return (

@@ -12,11 +12,7 @@ export const ReferringValue = ({property, entry}) => {
         if (!value || !prop.multiLine) {
             return value;
         }
-        return (
-            <span style={{whiteSpace: 'pre-line'}}>
-                {value}
-            </span>
-        );
+        return <span style={{whiteSpace: 'pre-line'}}>{value}</span>;
     }
     function extractDisplayValue(value) {
         switch (property.datatype) {
@@ -31,18 +27,18 @@ export const ReferringValue = ({property, entry}) => {
         }
     }
 
-    const displayValue = property.isGenericIriResource ? decodeURI(entry.id) : extractDisplayValue(entry);
+    const displayValue = property.isGenericIriResource
+        ? decodeURI(entry.id)
+        : extractDisplayValue(entry);
 
     if (entry.id) {
         // External links should be represented by a direct link to the URI itself
         // Other iri entities should be opened in the metadata editor
-        return property.isExternalLink
-            ? <a href={entry.id}>{entry.id}</a>
-            : (
-                <LinkedDataLink uri={entry.id}>
-                    {displayValue}
-                </LinkedDataLink>
-            );
+        return property.isExternalLink ? (
+            <a href={entry.id}>{entry.id}</a>
+        ) : (
+            <LinkedDataLink uri={entry.id}>{displayValue}</LinkedDataLink>
+        );
     }
 
     return displayValue;

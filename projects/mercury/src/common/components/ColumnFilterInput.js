@@ -6,20 +6,20 @@ import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     search: {
         position: 'relative',
         flex: 0.8,
         borderRadius: theme.shape.borderRadius,
         backgroundColor: alpha(theme.palette.common.white, 0.15),
         '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25),
+            backgroundColor: alpha(theme.palette.common.white, 0.25)
         },
         marginLeft: 0,
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: 'auto',
-        },
+            width: 'auto'
+        }
     },
     inputRoot: {
         color: 'inherit',
@@ -47,7 +47,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const ColumnFilterInput = ({setFilterValue, filterValue = '', placeholder, useApplyButton = false}) => {
+const ColumnFilterInput = ({
+    setFilterValue,
+    filterValue = '',
+    placeholder,
+    useApplyButton = false
+}) => {
     const classes = useStyles();
     const [value, setValue] = useState(filterValue);
 
@@ -55,7 +60,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue = '', placeholder, useAp
         setFilterValue(value.trim());
     };
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
         if (e.keyCode === 13) {
             if (useApplyButton) {
                 handleChange(e.target.value);
@@ -80,7 +85,7 @@ const ColumnFilterInput = ({setFilterValue, filterValue = '', placeholder, useAp
                 id="filter"
                 placeholder={placeholder}
                 classes={{
-                    root: classes.inputRoot,
+                    root: classes.inputRoot
                 }}
                 value={value}
                 onChange={event => setValue(event.target.value)}
@@ -90,7 +95,9 @@ const ColumnFilterInput = ({setFilterValue, filterValue = '', placeholder, useAp
                 InputProps={{
                     classes: {
                         input: classes.inputInput,
-                        adornedEnd: useApplyButton ? classes.adornedEnd : classes.adornedEndNoPadding
+                        adornedEnd: useApplyButton
+                            ? classes.adornedEnd
+                            : classes.adornedEndNoPadding
                     },
                     endAdornment: (
                         <InputAdornment position="end">

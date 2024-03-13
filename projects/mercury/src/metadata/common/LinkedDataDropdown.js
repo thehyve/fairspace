@@ -5,12 +5,19 @@ import {valuesContainsValueOrId} from './metadataUtils';
 import Dropdown from './values/Dropdown';
 import {LocalSearchAPI} from '../../search/SearchAPI';
 
-export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, debounce, ...otherProps}) => {
+export const LinkedDataDropdown = ({
+    property,
+    currentValues,
+    fetchItems,
+    type,
+    debounce,
+    ...otherProps
+}) => {
     const fetchRequest = useRef(null);
 
     const search = query => fetchItems({type, query});
 
-    const debouncedSearch = (query) => {
+    const debouncedSearch = query => {
         if (fetchRequest.current) {
             clearTimeout(fetchRequest.current);
         }
@@ -21,9 +28,7 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, d
             }
 
             fetchRequest.current = setTimeout(() => {
-                search(query)
-                    .then(resolve)
-                    .catch(reject);
+                search(query).then(resolve).catch(reject);
             }, debounce);
         });
     };
@@ -34,7 +39,9 @@ export const LinkedDataDropdown = ({property, currentValues, fetchItems, type, d
             clearTextOnSelection
             loadOptionsOnMount={false}
             loadOptions={debouncedSearch}
-            isOptionDisabled={option => valuesContainsValueOrId(currentValues, undefined, option.id)}
+            isOptionDisabled={option =>
+                valuesContainsValueOrId(currentValues, undefined, option.id)
+            }
         />
     );
 };
@@ -51,9 +58,4 @@ LinkedDataDropdown.defaultProps = {
     debounce: 300
 };
 
-export default props => (
-    <LinkedDataDropdown
-        type={props.property.className}
-        {...props}
-    />
-);
+export default props => <LinkedDataDropdown type={props.property.className} {...props} />;

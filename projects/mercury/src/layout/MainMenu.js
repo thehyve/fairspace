@@ -74,20 +74,23 @@ const MainMenu = ({classes}) => {
                     </ListItemIcon>
                     <ListItemText primary="Collections" />
                 </ListItemButton>
-                {externalStorages && externalStorages.map(storage => (
-                    <ListItemButton
-                        className={classes.mainMenuButton}
-                        key={getExternalStoragePathPrefix(storage.name)}
-                        component={NavLink}
-                        to={getExternalStoragePathPrefix(storage.name)}
-                        selected={pathname.startsWith(getExternalStoragePathPrefix(storage.name))}
-                    >
-                        <ListItemIcon>
-                            <FolderSpecial />
-                        </ListItemIcon>
-                        <ListItemText primary={storage.label} />
-                    </ListItemButton>
-                ))}
+                {externalStorages &&
+                    externalStorages.map(storage => (
+                        <ListItemButton
+                            className={classes.mainMenuButton}
+                            key={getExternalStoragePathPrefix(storage.name)}
+                            component={NavLink}
+                            to={getExternalStoragePathPrefix(storage.name)}
+                            selected={pathname.startsWith(
+                                getExternalStoragePathPrefix(storage.name)
+                            )}
+                        >
+                            <ListItemIcon>
+                                <FolderSpecial />
+                            </ListItemIcon>
+                            <ListItemText primary={storage.label} />
+                        </ListItemButton>
+                    ))}
                 {views && views.length > 0 && currentUser.canViewPublicMetadata && (
                     <ListItemButton
                         className={classes.mainMenuButton}
@@ -102,20 +105,24 @@ const MainMenu = ({classes}) => {
                         <ListItemText primary={METADATA_VIEW_MENU_LABEL} />
                     </ListItemButton>
                 )}
-                {currentUser.canViewPublicMetadata && externalMetadataSources && externalMetadataSources.map(source => (
-                    <ListItemButton
-                        className={classes.mainMenuButton}
-                        key={getExternalMetadataSourcePathPrefix(source.name)}
-                        component={NavLink}
-                        to={getExternalMetadataSourcePathPrefix(source.name)}
-                        selected={pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name))}
-                    >
-                        <ListItemIcon>
-                            <SavedSearch />
-                        </ListItemIcon>
-                        <ListItemText primary={source.label} />
-                    </ListItemButton>
-                ))}
+                {currentUser.canViewPublicMetadata &&
+                    externalMetadataSources &&
+                    externalMetadataSources.map(source => (
+                        <ListItemButton
+                            className={classes.mainMenuButton}
+                            key={getExternalMetadataSourcePathPrefix(source.name)}
+                            component={NavLink}
+                            to={getExternalMetadataSourcePathPrefix(source.name)}
+                            selected={pathname.startsWith(
+                                getExternalMetadataSourcePathPrefix(source.name)
+                            )}
+                        >
+                            <ListItemIcon>
+                                <SavedSearch />
+                            </ListItemIcon>
+                            <ListItemText primary={source.label} />
+                        </ListItemButton>
+                    ))}
                 {isAdmin(currentUser) && (
                     <ListItemButton
                         className={classes.mainMenuButton}
@@ -135,22 +142,20 @@ const MainMenu = ({classes}) => {
             <div>
                 <Divider />
                 <List>
-                    {
-                        Object.keys(services).map(key => (
-                            <ListItemButton
-                                className={classes.mainMenuButton}
-                                component="a"
-                                target="_blank"
-                                href={interpolate(services[key])}
-                                key={'service-' + key}
-                            >
-                                <ListItemIcon>
-                                    <OpenInNew />
-                                </ListItemIcon>
-                                <ListItemText primary={key} />
-                            </ListItemButton>
-                        ))
-                    }
+                    {Object.keys(services).map(key => (
+                        <ListItemButton
+                            className={classes.mainMenuButton}
+                            component="a"
+                            target="_blank"
+                            href={interpolate(services[key])}
+                            key={'service-' + key}
+                        >
+                            <ListItemIcon>
+                                <OpenInNew />
+                            </ListItemIcon>
+                            <ListItemText primary={key} />
+                        </ListItemButton>
+                    ))}
                 </List>
             </div>
         </>

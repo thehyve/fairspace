@@ -9,7 +9,8 @@ import {determineShapeForTypes} from './vocabularyUtils';
 const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => {
     const {shapes, shapesPending, shapesError, requireIdentifier} = useContext(LinkedDataContext);
 
-    const shape = (!shapesPending && !shapesError) ? determineShapeForTypes(shapes, [property.className]) : {};
+    const shape =
+        !shapesPending && !shapesError ? determineShapeForTypes(shapes, [property.className]) : {};
 
     return (
         <InputWithAddition
@@ -31,7 +32,7 @@ const LinkedDataDropdownWithAddition = ({property, onChange, currentValues}) => 
 
 LinkedDataDropdownWithAddition.propTypes = {
     property: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired
 };
 
 export default LinkedDataDropdownWithAddition;

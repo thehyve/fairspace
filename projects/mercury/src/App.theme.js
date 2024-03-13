@@ -10,13 +10,13 @@ export default createTheme({
         MuiMenu: {
             defaultProps: {
                 elevation: 1
-            },
+            }
         },
         MuiTextField: {
             styleOverrides: {
                 root: {
                     marginTop: 0
-                },
+                }
             },
             defaultProps: {
                 size: 'small',
@@ -26,9 +26,9 @@ export default createTheme({
         MuiDivider: {
             styleOverrides: {
                 root: {
-                    margin: 0,
+                    margin: 0
                 },
-                margin: 0,
+                margin: 0
             }
         },
         MuiMenuItem: {
@@ -46,7 +46,7 @@ export default createTheme({
                     margin: 0,
                     padding: 0
                 }
-            },
+            }
         },
         MuiList: {
             styleOverrides: {
@@ -55,7 +55,7 @@ export default createTheme({
                     padding: 0,
                     border: 0
                 }
-            },
+            }
         },
         MuiListItem: {
             styleOverrides: {
@@ -84,7 +84,7 @@ export default createTheme({
                 root: {
                     margin: 0,
                     paddingBottom: 0,
-                    border: 0,
+                    border: 0
                 }
             }
         },
@@ -118,5 +118,5 @@ export default createTheme({
                 }
             }
         }
-    },
+    }
 });

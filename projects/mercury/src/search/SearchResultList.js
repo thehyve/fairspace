@@ -9,7 +9,7 @@ import {
     TableHead,
     TableRow,
     Tooltip,
-    Typography,
+    Typography
 } from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
@@ -19,10 +19,12 @@ import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-ma
 import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
 import useAsync from '../common/hooks/UseAsync';
 import {
-    getLocationContextFromString, getSearchPathSegments,
+    getLocationContextFromString,
+    getSearchPathSegments,
     getSearchQueryFromString,
     getStorageFromString,
-    handleSearchError, handleTextSearchRedirect
+    handleSearchError,
+    handleTextSearchRedirect
 } from './searchUtils';
 import SearchBar from './SearchBar';
 import LoadingInlay from '../common/components/LoadingInlay';
@@ -43,7 +45,7 @@ const styles = {
         marginTop: 16
     },
     table: {
-        minWidth: 700,
+        minWidth: 700
     },
     search: {
         width: '80%',
@@ -56,7 +58,7 @@ const styles = {
 };
 
 const SearchResultList = ({classes, items, total, storage = {}, loading, error, history}) => {
-    const renderType = (item) => {
+    const renderType = item => {
         let avatar;
         let typeLabel;
         switch (item.type) {
@@ -88,13 +90,13 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
         return <Typography>{typeLabel}</Typography>;
     };
 
-    const link = (item) => redirectLink(item.id, item.type, storage);
+    const link = item => redirectLink(item.id, item.type, storage);
 
     /**
      * Handles a click on a search result.
      * @param item The clicked search result.
      */
-    const handleResultDoubleClick = (item) => {
+    const handleResultDoubleClick = item => {
         history.push(link(item));
     };
 
@@ -121,32 +123,37 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {items
-                        .map((item) => (
-                            <TableRow
-                                hover
-                                key={item.id}
-                                onDoubleClick={() => handleResultDoubleClick(item)}
-                            >
-                                <TableCell width={5}>{renderType(item)}</TableCell>
-                                <TableCell style={{maxWidth: 500}}>
-                                    <ListItemText
-                                        primary={item.label}
-                                        secondary={<ShortText text={item.comment} maxLength={200} maxLines={3} />}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <Link
-                                        to={link(item)}
-                                        component={RouterLink}
-                                        color="inherit"
-                                        underline="hover"
-                                    >
-                                        {getPathFromIri(item.id, storage.rootDirectoryIri)}
-                                    </Link>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                    {items.map(item => (
+                        <TableRow
+                            hover
+                            key={item.id}
+                            onDoubleClick={() => handleResultDoubleClick(item)}
+                        >
+                            <TableCell width={5}>{renderType(item)}</TableCell>
+                            <TableCell style={{maxWidth: 500}}>
+                                <ListItemText
+                                    primary={item.label}
+                                    secondary={
+                                        <ShortText
+                                            text={item.comment}
+                                            maxLength={200}
+                                            maxLines={3}
+                                        />
+                                    }
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <Link
+                                    to={link(item)}
+                                    component={RouterLink}
+                                    color="inherit"
+                                    underline="hover"
+                                >
+                                    {getPathFromIri(item.id, storage.rootDirectoryIri)}
+                                </Link>
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </Paper>
@@ -159,20 +166,23 @@ export const SearchResultListContainer = ({
     query = getSearchQueryFromString(search),
     context = getLocationContextFromString(search),
     storage = getStorageFromString(search),
-    classes, history
+    classes,
+    history
 }) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
     const currentStorage = externalStorages.find(s => s.name === storage);
 
     const {data, loading, error} = useAsync(() => {
-        const searchAPI = currentStorage ? new SearchAPI(currentStorage.searchPath) : LocalSearchAPI;
+        const searchAPI = currentStorage
+            ? new SearchAPI(currentStorage.searchPath)
+            : LocalSearchAPI;
         return searchAPI.searchForFiles(query, context).catch(handleSearchError);
     }, [search, query, storage]);
 
     const items = data || [];
     const total = items.length;
 
-    const handleSearch = (value) => {
+    const handleSearch = value => {
         handleTextSearchRedirect(history, value, context, currentStorage);
     };
 
@@ -205,7 +215,6 @@ export const SearchResultListContainer = ({
         <CollectionBreadcrumbsContextProvider>
             {renderTextSearchResultList()}
         </CollectionBreadcrumbsContextProvider>
-
     );
 };
 

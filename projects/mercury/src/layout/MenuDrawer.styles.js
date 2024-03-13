@@ -7,19 +7,19 @@ const styles = theme => ({
         overflow: 'hidden',
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
+            duration: theme.transitions.duration.enteringScreen
+        })
     },
     drawerPaperOpen: {
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
+            duration: theme.transitions.duration.enteringScreen
+        })
     },
     drawerPaperClose: {
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
+            duration: theme.transitions.duration.leavingScreen
         }),
         width: 62
     },
@@ -29,7 +29,7 @@ const styles = theme => ({
         alignItems: 'center',
         justifyContent: 'flex-end',
         padding: '0 8px',
-        ...theme.mixins.toolbar,
+        ...theme.mixins.toolbar
     },
     customerLogo: {
         position: 'absolute',

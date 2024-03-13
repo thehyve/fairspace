@@ -18,47 +18,32 @@ import {compareBy} from '../../common/utils/genericUtils';
 import LoadingInlay from '../../common/components/LoadingInlay';
 
 const LinkedDataShapeChooserDialog = props => {
-    const closeDialog = (e) => {
+    const closeDialog = e => {
         if (e) e.stopPropagation();
         props.onClose();
     };
 
     return (
-        <Dialog
-            open={props.open}
-            onClose={closeDialog}
-            aria-labelledby="form-dialog-title"
-        >
+        <Dialog open={props.open} onClose={closeDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Create new entity of type</DialogTitle>
             <DialogContent>
-                {
-                    props.shapes && props.shapes.length
-                        ? (
-                            <List>
-                                {
-                                    props.shapes.sort(compareBy(getLabel)).map(t => (
-                                        <ListItem
-                                            key={t['@id']}
-                                            button
-                                            onClick={() => props.onChooseShape(t)}
-                                        >
-                                            <ListItemText
-                                                primary={getLabel(t)}
-                                                secondary={getFirstPredicateValue(t, consts.SHACL_DESCRIPTION)}
-                                            />
-                                        </ListItem>
-                                    ))
-                                }
-                            </List>
-                        )
-                        : <LoadingInlay />
-                }
+                {props.shapes && props.shapes.length ? (
+                    <List>
+                        {props.shapes.sort(compareBy(getLabel)).map(t => (
+                            <ListItem key={t['@id']} button onClick={() => props.onChooseShape(t)}>
+                                <ListItemText
+                                    primary={getLabel(t)}
+                                    secondary={getFirstPredicateValue(t, consts.SHACL_DESCRIPTION)}
+                                />
+                            </ListItem>
+                        ))}
+                    </List>
+                ) : (
+                    <LoadingInlay />
+                )}
             </DialogContent>
             <DialogActions>
-                <Button
-                    onClick={closeDialog}
-                    color="secondary"
-                >
+                <Button onClick={closeDialog} color="secondary">
                     Cancel
                 </Button>
             </DialogActions>

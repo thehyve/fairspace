@@ -74,8 +74,12 @@ describe('Validation Utils', () => {
             const values = [{value: 'This is some text that is over 10 characters'}];
             const datatype = constants.STRING_URI;
             expect(validateValuesAgainstShape({shape, datatype, values}).length).toBe(2);
-            expect(validateValuesAgainstShape({shape, datatype, values})[0].length).toBeGreaterThan(0);
-            expect(validateValuesAgainstShape({shape, datatype, values})[1].length).toBeGreaterThan(0);
+            expect(validateValuesAgainstShape({shape, datatype, values})[0].length).toBeGreaterThan(
+                0
+            );
+            expect(validateValuesAgainstShape({shape, datatype, values})[1].length).toBeGreaterThan(
+                0
+            );
         });
 
         it('should return an error for max count', () => {
@@ -161,13 +165,19 @@ describe('Validation Utils', () => {
         });
         it('should return nothing on valid URIs', () => {
             // values from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples
-            expect(iriValidation(['https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top'])).toBeNull();
+            expect(
+                iriValidation([
+                    'https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top'
+                ])
+            ).toBeNull();
             expect(iriValidation(['ldap://[2001:db8::7]/c=GB?objectClass?one'])).toBeNull();
             expect(iriValidation(['mailto:John.Doe@example.com'])).toBeNull();
             expect(iriValidation(['news:comp.infosystems.www.servers.unix'])).toBeNull();
             expect(iriValidation(['tel:+1-816-555-1212'])).toBeNull();
             expect(iriValidation(['telnet://192.0.2.16:80/'])).toBeNull();
-            expect(iriValidation(['urn:oasis:names:specification:docbook:dtd:xml:4.1.2'])).toBeNull();
+            expect(
+                iriValidation(['urn:oasis:names:specification:docbook:dtd:xml:4.1.2'])
+            ).toBeNull();
         });
     });
 });

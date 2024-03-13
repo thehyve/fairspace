@@ -1,7 +1,14 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton, ListItemText} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@mui/icons-material';
+import {
+    BorderColor,
+    CloudUpload,
+    CreateNewFolder,
+    Delete,
+    Restore,
+    RestoreFromTrash
+} from '@mui/icons-material';
 import ContentCopy from 'mdi-material-ui/ContentCopy';
 import ContentCut from 'mdi-material-ui/ContentCut';
 import ContentPaste from 'mdi-material-ui/ContentPaste';
@@ -61,8 +68,12 @@ export const FileOperations = ({
     const isDeletedItemSelected = selectedDeletedItems.length > 0;
     const isListOnlyItemSelected = isListOnlyFile(selectedItem);
     const isDisabledForMoreThanOneSelection = selectedPaths.length === 0 || moreThanOneItemSelected;
-    const isClipboardItemsOnOpenedPath = !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
-    const isPasteDisabled = !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
+    const isClipboardItemsOnOpenedPath =
+        !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
+    const isPasteDisabled =
+        !isWritingEnabled ||
+        clipboard.isEmpty() ||
+        (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
@@ -104,39 +115,59 @@ export const FileOperations = ({
         if (operation) {
             return fileOperation(Operations.PASTE, operation)
                 .then(clipboard.clear)
-                .catch(err => ErrorDialog.showError('An error occurred while pasting your contents', err));
+                .catch(err =>
+                    ErrorDialog.showError('An error occurred while pasting your contents', err)
+                );
         }
 
         return Promise.resolve();
     };
 
-    const handleCreateDirectory = name => fileOperation(Operations.MKDIR, fileActions.createDirectory(joinPaths(openedPath, name)))
-        .catch((err) => {
+    const handleCreateDirectory = name =>
+        fileOperation(
+            Operations.MKDIR,
+            fileActions.createDirectory(joinPaths(openedPath, name))
+        ).catch(err => {
             if (err.message.includes('status code 409')) {
                 ErrorDialog.showError(
                     'Directory name must be unique',
-                    'Directory with this name already exists and was marked as deleted.\n'
-                    + 'Please delete the existing directory permanently or choose a unique name.'
+                    'Directory with this name already exists and was marked as deleted.\n' +
+                        'Please delete the existing directory permanently or choose a unique name.'
                 );
                 return true;
             }
-            ErrorDialog.showError('An error occurred while creating directory', err, () => handleCreateDirectory(name));
+            ErrorDialog.showError('An error occurred while creating directory', err, () =>
+                handleCreateDirectory(name)
+            );
             return true;
         });
 
-    const handlePathRename = (path, newName) => fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName))
-        .catch((err) => {
-            ErrorDialog.showError('An error occurred while renaming file or directory', err, () => handlePathRename(path, newName));
+    const handlePathRename = (path, newName) =>
+        fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName)).catch(
+            err => {
+                ErrorDialog.showError(
+                    'An error occurred while renaming file or directory',
+                    err,
+                    () => handlePathRename(path, newName)
+                );
+                return false;
+            }
+        );
+
+    const handleRevert = versionToRevert =>
+        fileOperation(
+            Operations.REVERT,
+            fileActions.revertToVersion(selectedItem, versionToRevert)
+        ).catch(err => {
+            ErrorDialog.showError(
+                'An error occurred while reverting a file to a previous version',
+                err,
+                () => handleRevert(versionToRevert)
+            );
             return false;
         });
 
-    const handleRevert = (versionToRevert) => fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem, versionToRevert))
-        .catch((err) => {
-            ErrorDialog.showError('An error occurred while reverting a file to a previous version', err, () => handleRevert(versionToRevert));
-            return false;
-        });
-
-    const handleUploadMenuClick = (event) => {
+    const handleUploadMenuClick = event => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -165,16 +196,20 @@ export const FileOperations = ({
         return children;
     };
 
-    const handleDelete = () => fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths))
-        .catch((err) => {
-            ErrorDialog.showError('An error occurred while deleting file or directory', err, () => handleDelete());
+    const handleDelete = () =>
+        fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths)).catch(err => {
+            ErrorDialog.showError('An error occurred while deleting file or directory', err, () =>
+                handleDelete()
+            );
         });
 
     const getDeletionConfirmationMessage = () => {
         if (isDeletedItemSelected) {
             if (selectedDeletedItems.length === 1 && selectedItems.length === 1) {
-                return 'Selected item is already marked as deleted. '
-                    + 'By clicking "Remove" you agree to remove the item permanently!';
+                return (
+                    'Selected item is already marked as deleted. ' +
+                    'By clicking "Remove" you agree to remove the item permanently!'
+                );
             }
             return `${selectedDeletedItems.length} of ${selectedPaths.length} selected items are already marked as deleted. 
             By clicking "Remove" you agree to remove these items permanently!`;
@@ -182,10 +217,16 @@ export const FileOperations = ({
         return `Are you sure you want to remove ${selectedPaths.length} item(s)? `;
     };
 
-    const handleUndelete = () => fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths))
-        .catch((err) => {
-            ErrorDialog.showError('An error occurred while undeleting file or directory', err, () => handleUndelete());
-        });
+    const handleUndelete = () =>
+        fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths)).catch(
+            err => {
+                ErrorDialog.showError(
+                    'An error occurred while undeleting file or directory',
+                    err,
+                    () => handleUndelete()
+                );
+            }
+        );
 
     return (
         <>
@@ -235,7 +276,6 @@ export const FileOperations = ({
                                 />
                             </MenuItem>
                         </Menu>
-
                     </>
                 )}
             </FileOperationsGroup>
@@ -244,8 +284,11 @@ export const FileOperations = ({
                     title={`Download ${selectedItem.basename}`}
                     aria-label={`Download ${selectedItem.basename}`}
                     disabled={
-                        isDisabledForMoreThanOneSelection || selectedItem.type !== 'file'
-                        || isDeletedItemSelected || busy || isListOnlyItemSelected
+                        isDisabledForMoreThanOneSelection ||
+                        selectedItem.type !== 'file' ||
+                        isDeletedItemSelected ||
+                        busy ||
+                        isListOnlyItemSelected
                     }
                     component="a"
                     href={fileActions.getDownloadLink(selectedItem.filename)}
@@ -260,12 +303,20 @@ export const FileOperations = ({
                             <RenameButton
                                 currentName={selectedItem.basename}
                                 onRename={newName => handlePathRename(selectedItem, newName)}
-                                disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
+                                disabled={
+                                    isDisabledForMoreThanOneSelection ||
+                                    isDeletedItemSelected ||
+                                    busy
+                                }
                             >
                                 <IconButton
                                     title={`Rename ${selectedItem.basename}`}
                                     aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
+                                    disabled={
+                                        isDisabledForMoreThanOneSelection ||
+                                        isDeletedItemSelected ||
+                                        busy
+                                    }
                                     size="medium"
                                 >
                                     <BorderColor />
@@ -297,12 +348,20 @@ export const FileOperations = ({
                                     agreeButtonText="Undelete"
                                     dangerous
                                     onClick={handleUndelete}
-                                    disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
+                                    disabled={
+                                        noPathSelected ||
+                                        selectedDeletedItems.length !== selectedItems.length ||
+                                        busy
+                                    }
                                 >
                                     <IconButton
                                         title="Undelete"
                                         aria-label="Undelete"
-                                        disabled={noPathSelected || (selectedDeletedItems.length !== selectedItems.length) || busy}
+                                        disabled={
+                                            noPathSelected ||
+                                            selectedDeletedItems.length !== selectedItems.length ||
+                                            busy
+                                        }
                                         size="medium"
                                     >
                                         <RestoreFromTrash />
@@ -310,7 +369,6 @@ export const FileOperations = ({
                                 </ConfirmationButton>
                             </ProgressButton>
                         )}
-
                     </>
                 )}
             </FileOperationsGroup>
@@ -357,13 +415,23 @@ export const FileOperations = ({
                         <ShowFileVersionsButton
                             selectedFile={selectedItem}
                             onRevert={handleRevert}
-                            disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                            disabled={
+                                isDisabledForMoreThanOneSelection ||
+                                selectedItem.type !== 'file' ||
+                                isDeletedItemSelected ||
+                                busy
+                            }
                             isWritingEnabled={isWritingEnabled}
                         >
                             <IconButton
                                 aria-label="Show history"
                                 title="Show history"
-                                disabled={isDisabledForMoreThanOneSelection || selectedItem.type !== 'file' || isDeletedItemSelected || busy}
+                                disabled={
+                                    isDisabledForMoreThanOneSelection ||
+                                    selectedItem.type !== 'file' ||
+                                    isDeletedItemSelected ||
+                                    busy
+                                }
                                 size="medium"
                             >
                                 <Restore />

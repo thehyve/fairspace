@@ -9,19 +9,15 @@ const GlobalRoutes = () => (
         <Route
             path="/login"
             render={() => {
-                window.location.href = new URLSearchParams(window.location.search).get('redirectUrl');
+                window.location.href = new URLSearchParams(window.location.search).get(
+                    'redirectUrl'
+                );
             }}
         />
 
-        <Route
-            path="/logout"
-            render={() => logout()}
-        />
+        <Route path="/logout" render={() => logout()} />
 
-        <Route
-            path="/"
-            component={WorkspaceLayout}
-        />
+        <Route path="/" component={WorkspaceLayout} />
 
         <Redirect to="/workspaces" />
     </Switch>

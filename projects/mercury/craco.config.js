@@ -16,7 +16,7 @@ To fix that we have to switch to its successor - Craco - https://craco.js.org/
 
 module.exports = {
     webpack: {
-        configure: (webpackConfig, { env, paths }) => {
+        configure: (webpackConfig, {env, paths}) => {
             webpackConfig.resolve.fallback = {
                 stream: false,
                 crypto: false,
@@ -27,7 +27,7 @@ module.exports = {
         }
     },
     eslint: {
-        mode: 'file',
+        mode: 'file'
     }
 };
 

@@ -10,7 +10,7 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TableSortLabel,
+    TableSortLabel
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {FolderOpen, NoteOutlined} from '@mui/icons-material';
@@ -25,9 +25,15 @@ import MessageDisplay from '../common/components/MessageDisplay';
 import TablePaginationActions from '../common/components/TablePaginationActions';
 
 const FileList = ({
-    classes, files, onPathCheckboxClick, onPathDoubleClick,
-    selectionEnabled, onAllSelection, onPathHighlight,
-    showDeleted, preselectedFile
+    classes,
+    files,
+    onPathCheckboxClick,
+    onPathDoubleClick,
+    selectionEnabled,
+    onAllSelection,
+    onPathHighlight,
+    showDeleted,
+    preselectedFile
 }) => {
     const [hoveredFileName, setHoveredFileName] = useState('');
 
@@ -52,19 +58,26 @@ const FileList = ({
 
     const [filterValue, setFilterValue] = useState('');
     const [filteredFiles, setFilteredFiles] = useState(files);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredFiles, columns, 'name');
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(
+        filteredFiles,
+        columns,
+        'name'
+    );
     const directoriesBeforeFiles = useMemo(
         () => stableSort(orderedItems, compareBy('type')),
         [orderedItems]
     );
 
-    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(directoriesBeforeFiles);
+    const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} =
+        usePagination(directoriesBeforeFiles);
 
     useEffect(() => {
         if (!filterValue) {
             setFilteredFiles(files);
         } else {
-            setFilteredFiles(files.filter(f => f.basename.toLowerCase().includes(filterValue.toLowerCase())));
+            setFilteredFiles(
+                files.filter(f => f.basename.toLowerCase().includes(filterValue.toLowerCase()))
+            );
         }
     }, [files, filterValue]);
 
@@ -75,7 +88,9 @@ const FileList = ({
 
     useEffect(() => {
         if (preselectedFile) {
-            const preselectedFileIndex = directoriesBeforeFiles.findIndex(f => f.filename === preselectedFile);
+            const preselectedFileIndex = directoriesBeforeFiles.findIndex(
+                f => f.filename === preselectedFile
+            );
             if (preselectedFileIndex > -1) {
                 const preselectedFilePage = Math.floor(preselectedFileIndex / rowsPerPage);
                 setPage(preselectedFilePage);
@@ -107,14 +122,18 @@ const FileList = ({
                 <Checkbox
                     indeterminate={numOfSelected > 0 && numOfSelected < files.length}
                     checked={allItemsSelected}
-                    onChange={(event) => onAllSelection(event.target.checked)}
+                    onChange={event => onAllSelection(event.target.checked)}
                 />
             </TableCell>
         );
     }
 
     const renderFileFilter = () => (
-        <ColumnFilterInput placeholder="Filter by name" filterValue={filterValue} setFilterValue={setFilterValue} />
+        <ColumnFilterInput
+            placeholder="Filter by name"
+            filterValue={filterValue}
+            setFilterValue={setFilterValue}
+        />
     );
 
     return (
@@ -131,7 +150,7 @@ const FileList = ({
                                     direction={orderAscending ? 'asc' : 'desc'}
                                     onClick={() => toggleSort('name')}
                                 >
-                                Name
+                                    Name
                                 </TableSortLabel>
                                 {renderFileFilter()}
                             </TableCell>
@@ -141,7 +160,7 @@ const FileList = ({
                                     direction={orderAscending ? 'asc' : 'desc'}
                                     onClick={() => toggleSort('size')}
                                 >
-                                Size
+                                    Size
                                 </TableSortLabel>
                             </TableCell>
                             <TableCell align="right" className={classes.headerCell}>
@@ -150,7 +169,7 @@ const FileList = ({
                                     direction={orderAscending ? 'asc' : 'desc'}
                                     onClick={() => toggleSort('lastmodified')}
                                 >
-                                Last modified
+                                    Last modified
                                 </TableSortLabel>
                             </TableCell>
                             {showDeleted && (
@@ -160,15 +179,18 @@ const FileList = ({
                                         direction={orderAscending ? 'asc' : 'desc'}
                                         onClick={() => toggleSort('dateDeleted')}
                                     >
-                                    Deleted
+                                        Deleted
                                     </TableSortLabel>
                                 </TableCell>
                             )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {pagedItems.map((file) => {
-                            const checkboxVisibility = hoveredFileName === file.filename || file.selected ? 'visible' : 'hidden';
+                        {pagedItems.map(file => {
+                            const checkboxVisibility =
+                                hoveredFileName === file.filename || file.selected
+                                    ? 'visible'
+                                    : 'hidden';
 
                             return (
                                 <TableRow
@@ -181,29 +203,37 @@ const FileList = ({
                                     onMouseLeave={() => setHoveredFileName('')}
                                     className={file.dateDeleted && classes.deletedFileRow}
                                 >
-                                    {
-                                        selectionEnabled ? (
-                                            <TableCell
-                                                data-testid="checkbox-cell"
-                                                padding="none"
-                                                onDoubleClick={(e) => e.stopPropagation()}
-                                                onClick={(e) => {e.stopPropagation(); onPathCheckboxClick(file);}}
-                                            >
-                                                <Checkbox
-                                                    style={{visibility: checkboxVisibility}}
-                                                    checked={file.selected}
-                                                />
-                                            </TableCell>
-                                        ) : null
-                                    }
+                                    {selectionEnabled ? (
+                                        <TableCell
+                                            data-testid="checkbox-cell"
+                                            padding="none"
+                                            onDoubleClick={e => e.stopPropagation()}
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                onPathCheckboxClick(file);
+                                            }}
+                                        >
+                                            <Checkbox
+                                                style={{visibility: checkboxVisibility}}
+                                                checked={file.selected}
+                                            />
+                                        </TableCell>
+                                    ) : null}
 
                                     <TableCell style={{padding: 5}} align="left">
-                                        {file.type === 'directory' ? <FolderOpen /> : <NoteOutlined />}
+                                        {file.type === 'directory' ? (
+                                            <FolderOpen />
+                                        ) : (
+                                            <NoteOutlined />
+                                        )}
                                     </TableCell>
                                     <TableCell>
                                         {file.type === 'directory' ? (
                                             <Link
-                                                onClick={(e) => {e.stopPropagation(); onPathDoubleClick(file);}}
+                                                onClick={e => {
+                                                    e.stopPropagation();
+                                                    onPathDoubleClick(file);
+                                                }}
                                                 color="inherit"
                                                 variant="body2"
                                                 component="button"
@@ -216,14 +246,18 @@ const FileList = ({
                                         )}
                                     </TableCell>
                                     <TableCell align="right">
-                                        {file.type === 'file' ? filesize(file.size, {base: 10}) : ''}
+                                        {file.type === 'file'
+                                            ? filesize(file.size, {base: 10})
+                                            : ''}
                                     </TableCell>
                                     <TableCell align="right">
                                         {file.lastmod ? formatDateTime(file.lastmod) : null}
                                     </TableCell>
                                     {showDeleted && (
                                         <TableCell align="right">
-                                            {file.dateDeleted ? formatDateTime(file.dateDeleted) : null}
+                                            {file.dateDeleted
+                                                ? formatDateTime(file.dateDeleted)
+                                                : null}
                                         </TableCell>
                                     )}
                                 </TableRow>

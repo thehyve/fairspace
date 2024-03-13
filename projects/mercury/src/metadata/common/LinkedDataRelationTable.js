@@ -9,10 +9,21 @@ import Iri from '../../common/components/Iri';
 
 const IDENTIFIER_COLUMN = {id: '@id', label: 'Uri', getValue: entry => entry.label || entry['@id']};
 
-export const LinkedDataRelationTable = (
-    {property, values, onDelete, onAdd, canEdit, addComponent, editorPath, history}
-) => {
-    const rowDecorator = (entry, children) => <IriTooltip key={entry.id} enterDelay={TOOLTIP_ENTER_DELAY} title={<Iri iri={entry.id} />}>{children}</IriTooltip>;
+export const LinkedDataRelationTable = ({
+    property,
+    values,
+    onDelete,
+    onAdd,
+    canEdit,
+    addComponent,
+    editorPath,
+    history
+}) => {
+    const rowDecorator = (entry, children) => (
+        <IriTooltip key={entry.id} enterDelay={TOOLTIP_ENTER_DELAY} title={<Iri iri={entry.id} />}>
+            {children}
+        </IriTooltip>
+    );
     const onOpen = entry => history.push(`${editorPath}?iri=${encodeURIComponent(entry.id)}`);
 
     return (

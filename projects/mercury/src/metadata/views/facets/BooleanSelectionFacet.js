@@ -33,11 +33,14 @@ const BooleanSelectionFacet = (props: MetadataViewFacetProperties) => {
                 exclusive
                 onChange={handleChange}
             >
-                <ToggleButton color="success" variant="contained" value="true">True</ToggleButton>
-                <ToggleButton color="error" variant="contained" value="false">False</ToggleButton>
+                <ToggleButton color="success" variant="contained" value="true">
+                    True
+                </ToggleButton>
+                <ToggleButton color="error" variant="contained" value="false">
+                    False
+                </ToggleButton>
             </ToggleButtonGroup>
         </div>
-
     );
 };
 

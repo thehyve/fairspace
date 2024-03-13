@@ -10,8 +10,12 @@ import {canAddSharedMetadata} from '../../../users/userUtils';
 import UserContext from '../../../users/UserContext';
 
 const InputWithAddition = ({
-    children, onChange,
-    pending, error, shape, requireIdentifier = true
+    children,
+    onChange,
+    pending,
+    error,
+    shape,
+    requireIdentifier = true
 }) => {
     const {currentUser} = useContext(UserContext);
     const [adding, setAdding] = useState(false);

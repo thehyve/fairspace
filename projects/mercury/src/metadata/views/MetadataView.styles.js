@@ -21,7 +21,7 @@ const styles = theme => ({
         overflowX: 'auto',
         width: '100%',
         overflowY: 'hidden',
-        maxHeight: 'calc(100vh - 150px)',
+        maxHeight: 'calc(100vh - 150px)'
     },
     clearAllButtonContainer: {
         textAlign: 'end'

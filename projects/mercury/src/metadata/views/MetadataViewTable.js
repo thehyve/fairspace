@@ -15,24 +15,24 @@ import {getPathFromIri, redirectLink} from '../../file/fileUtils';
 import ColumnFilterInput from '../../common/components/ColumnFilterInput';
 
 type MetadataViewTableProperties = {
-    data: MetadataViewData;
-    loading: boolean;
-    columns: MetadataViewColumn[];
-    visibleColumnNames: string[];
-    idColumn: MetadataViewColumn;
-    toggleRow: () => {};
-    history: any;
-    selected?: MetadataViewEntityWithLinkedFiles;
-    view: string;
-    collections: Collection[];
-    textFiltersObject: Object;
-    setTextFiltersObject: () => {};
+    data: MetadataViewData,
+    loading: boolean,
+    columns: MetadataViewColumn[],
+    visibleColumnNames: string[],
+    idColumn: MetadataViewColumn,
+    toggleRow: () => {},
+    history: any,
+    selected?: MetadataViewEntityWithLinkedFiles,
+    view: string,
+    collections: Collection[],
+    textFiltersObject: Object,
+    setTextFiltersObject: () => {}
 };
 
 const useStyles = makeStyles(() => ({
     headerCellContents: {
         verticalAlign: 'top',
-        whiteSpace: 'nowrap',
+        whiteSpace: 'nowrap'
     },
     cellContents: {
         verticalAlign: 'top',
@@ -49,7 +49,18 @@ const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
 const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} = props;
+    const {
+        columns,
+        visibleColumnNames,
+        loading,
+        data,
+        toggleRow,
+        selected,
+        view,
+        idColumn,
+        history,
+        collections
+    } = props;
     const classes = useStyles();
     const {textFiltersObject, setTextFiltersObject} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
@@ -57,9 +68,10 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const isResourcesView = view === RESOURCES_VIEW;
     const {checkboxes, setCheckboxState} = props;
 
-    const isCustomResourceColumn = (column: MetadataViewColumn) => (
-        isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom'
-    );
+    const isCustomResourceColumn = (column: MetadataViewColumn) =>
+        isResourcesView &&
+        CUSTOM_RESOURCE_COLUMNS.includes(column.name) &&
+        column.type === 'Custom';
 
     const getAccess = (iri: string) => {
         const col = collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/'));
@@ -71,11 +83,16 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         return qs.parse(window.location.search, {ignoreQueryPrefix: true})[idColumnName];
     };
 
-    const getResourceType = (row: Map<string, any>) => (
-        row[RESOURCE_TYPE_COLUMN] && row[RESOURCE_TYPE_COLUMN][0] && row[RESOURCE_TYPE_COLUMN][0].value
-    );
+    const getResourceType = (row: Map<string, any>) =>
+        row[RESOURCE_TYPE_COLUMN] &&
+        row[RESOURCE_TYPE_COLUMN][0] &&
+        row[RESOURCE_TYPE_COLUMN][0].value;
 
-    const handleResultSingleClick = (iri: string, label: string, linkedFiles: MetadataViewEntity[]) => {
+    const handleResultSingleClick = (
+        iri: string,
+        label: string,
+        linkedFiles: MetadataViewEntity[]
+    ) => {
         if (selected && selected.iri === iri) {
             toggleRow();
         } else {
@@ -83,13 +100,17 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
     };
     useEffect(() => {
-        if (!textFiltersObject || !textFiltersObject.keys || !textFiltersObject.keys.includes(idColumn)) {
+        if (
+            !textFiltersObject ||
+            !textFiltersObject.keys ||
+            !textFiltersObject.keys.includes(idColumn)
+        ) {
             const idColumnTextFilter = getIdColumnFilterFromSearchParams();
             if (idColumnTextFilter) {
                 setTextFiltersObject({...textFiltersObject, [idColumn.name]: idColumnTextFilter});
             }
         }
-    // eslint-disable-next-line
+        // eslint-disable-next-line
     }, []);
 
     const initializeCheckboxes = useCallback(() => {
@@ -105,7 +126,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const handleCheckallChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target) {
-            Array.from(Object.keys(checkboxes)).forEach((key) => {
+            Array.from(Object.keys(checkboxes)).forEach(key => {
                 setCheckboxState(key, event.target.checked);
             });
         }
@@ -126,11 +147,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         switch (column.name) {
             case 'access': {
                 const access = getAccess(iri);
-                return (
-                    <TableCell key={column.name}>
-                        {collectionAccessIcon(access)}
-                    </TableCell>
-                );
+                return <TableCell key={column.name}>{collectionAccessIcon(access)}</TableCell>;
             }
             case 'path': {
                 const path = getPathFromIri(iri);
@@ -156,9 +173,15 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = textFiltersObject[columnName];
-        const setFilterValue = value => setTextFiltersObject({...textFiltersObject, [columnName]: value});
+        const setFilterValue = value =>
+            setTextFiltersObject({...textFiltersObject, [columnName]: value});
         return (
-            <ColumnFilterInput placeholder="Filter" filterValue={filterValue} setFilterValue={setFilterValue} useApplyButton />
+            <ColumnFilterInput
+                placeholder="Filter"
+                filterValue={filterValue}
+                setFilterValue={setFilterValue}
+                useApplyButton
+            />
         );
     };
 
@@ -168,7 +191,9 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
 
         const value = row[column.name];
-        const displayValue = (value || []).map(v => ((column.type === 'Date') ? formatDate(v.value) : v.label)).join(', ');
+        const displayValue = (value || [])
+            .map(v => (column.type === 'Date' ? formatDate(v.value) : v.label))
+            .join(', ');
 
         return (
             <TableCell key={column.name} onClick={onClickHandler}>
@@ -181,7 +206,9 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         initializeCheckboxes();
     }, [data, initializeCheckboxes]);
 
-    const checkedCount = (Object.values(checkboxes) ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
+    const checkedCount = Object.values(checkboxes)
+        ? Object.values(checkboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0)
+        : 0;
     const rowCount = data && data.rows && data.rows.length;
 
     return (
@@ -189,40 +216,55 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
             <TableHead>
                 <TableRow>
                     <TableCell style={{padding: 0}}>
-                        <Checkbox id="checkAll" key={'checkall-key-' + checkedCount} onChange={handleCheckallChange} defaultChecked={rowCount > 0 && checkedCount === rowCount} />
+                        <Checkbox
+                            id="checkAll"
+                            key={'checkall-key-' + checkedCount}
+                            onChange={handleCheckallChange}
+                            defaultChecked={rowCount > 0 && checkedCount === rowCount}
+                        />
                     </TableCell>
                     {visibleColumns.map(column => (
                         <TableCell key={column.name} className={classes.headerCellContents}>
                             {column.title}
-                            {(TextualValueTypes.includes(column.type)) && renderColumnFilter(column.name)}
+                            {TextualValueTypes.includes(column.type) &&
+                                renderColumnFilter(column.name)}
                         </TableCell>
                     ))}
                 </TableRow>
             </TableHead>
             <TableBody>
-                {idColumn && data && data.rows && data.rows.map(row => (
-                    <TableRow
-                        className={classes.row}
-                        key={row[idColumn.name][0].value}
-                        hover
-                        selected={selected && selected.iri === row[idColumn.name][0].value}
-                        onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
-                    >
-                        <TableCell style={{padding: 0}}>
-                            <Checkbox
-                                id={row[idColumn.name][0].value}
-                                key={Math.random()}
-                                defaultChecked={checkboxes[row[idColumn.name][0].value]}
-                                onChange={handleCheckboxChange}
-                            />
-                        </TableCell>
-                        {visibleColumns.map(column => renderTableCell(row, column, () => handleResultSingleClick(
-                            row[idColumn.name][0].value,
-                            row[idColumn.name][0].label,
-                            dataLinkColumn ? row[dataLinkColumn.name] : []
-                        )))}
-                    </TableRow>
-                ))}
+                {idColumn &&
+                    data &&
+                    data.rows &&
+                    data.rows.map(row => (
+                        <TableRow
+                            className={classes.row}
+                            key={row[idColumn.name][0].value}
+                            hover
+                            selected={selected && selected.iri === row[idColumn.name][0].value}
+                            onDoubleClick={() =>
+                                handleResultDoubleClick(row[idColumn.name][0].value, row)
+                            }
+                        >
+                            <TableCell style={{padding: 0}}>
+                                <Checkbox
+                                    id={row[idColumn.name][0].value}
+                                    key={Math.random()}
+                                    defaultChecked={checkboxes[row[idColumn.name][0].value]}
+                                    onChange={handleCheckboxChange}
+                                />
+                            </TableCell>
+                            {visibleColumns.map(column =>
+                                renderTableCell(row, column, () =>
+                                    handleResultSingleClick(
+                                        row[idColumn.name][0].value,
+                                        row[idColumn.name][0].label,
+                                        dataLinkColumn ? row[dataLinkColumn.name] : []
+                                    )
+                                )
+                            )}
+                        </TableRow>
+                    ))}
             </TableBody>
         </Table>
     );

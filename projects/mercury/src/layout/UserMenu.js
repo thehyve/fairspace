@@ -32,7 +32,7 @@ const styles = {
     avatar: {
         margin: 10,
         width: 28,
-        height: 28,
+        height: 28
     },
     logout: {
         width: 50
@@ -45,7 +45,7 @@ const styles = {
         cursor: 'default'
     },
     customFont: {
-        fontFamily: 'sans-serif',
+        fontFamily: 'sans-serif'
     }
 };
 
@@ -54,7 +54,7 @@ const UserMenu = ({classes}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const logout = useContext(LogoutContext);
 
-    const handleClick = (event) => {
+    const handleClick = event => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -84,17 +84,21 @@ const UserMenu = ({classes}) => {
                 onClick={handleClick}
                 className={classes.row}
             >
-                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
-                <span>
-                    {getDisplayName(currentUser)}
-                </span>
+                <Avatar
+                    alt={currentUser.name}
+                    src="/public/images/avatar.png"
+                    className={classes.avatar}
+                />
+                <span>{getDisplayName(currentUser)}</span>
             </Button>
             <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
                 {({TransitionProps, placement}) => (
                     <Grow
                         {...TransitionProps}
                         id="menu-list-grow"
-                        style={{transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom'}}
+                        style={{
+                            transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom'
+                        }}
                     >
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
@@ -105,8 +109,12 @@ const UserMenu = ({classes}) => {
                                     >
                                         <Card sx={{minWidth: 275}}>
                                             <CardContent>
-                                                <Typography sx={{fontSize: 12}} color="text.secondary" gutterBottom>
-                                                Welcome
+                                                <Typography
+                                                    sx={{fontSize: 12}}
+                                                    color="text.secondary"
+                                                    gutterBottom
+                                                >
+                                                    Welcome
                                                 </Typography>
                                                 <Typography variant="h5" component="div">
                                                     {currentUser.username}
@@ -121,7 +129,9 @@ const UserMenu = ({classes}) => {
                                                 </Typography>
                                             </CardContent>
                                             <CardActions>
-                                                <Button size="small" onClick={handleLogout}>Logout</Button>
+                                                <Button size="small" onClick={handleLogout}>
+                                                    Logout
+                                                </Button>
                                             </CardActions>
                                         </Card>
                                     </MenuItem>

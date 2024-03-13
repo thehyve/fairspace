@@ -8,9 +8,12 @@ export type Feature = 'ExtraStorage' | any; // more to come
 const FeaturesContext = React.createContext({});
 
 export const FeaturesProvider = ({children}) => {
-    const {data = []} = useAsync(() => axios.get('/api/features/')
-        .then(extractJsonData)
-        .catch(handleHttpError('Connection error.')));
+    const {data = []} = useAsync(() =>
+        axios
+            .get('/api/features/')
+            .then(extractJsonData)
+            .catch(handleHttpError('Connection error.'))
+    );
 
     return (
         <FeaturesContext.Provider

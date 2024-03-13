@@ -5,9 +5,17 @@ import useIsMounted from 'react-is-mounted-hook';
 import {compareBy} from '../../../common/utils/genericUtils';
 
 const Dropdown = ({
-    options = null, clearTextOnSelection, placeholder,
-    loadOptions, loadOptionsOnMount = true, isOptionDisabled, onChange, value,
-    autoFocus = false, label, ...otherProps
+    options = null,
+    clearTextOnSelection,
+    placeholder,
+    loadOptions,
+    loadOptionsOnMount = true,
+    isOptionDisabled,
+    onChange,
+    value,
+    autoFocus = false,
+    label,
+    ...otherProps
 }) => {
     const [optionsToShow, setOptionsToShow] = useState(options);
     const [searchText, setSearchText] = useState('');
@@ -18,8 +26,7 @@ const Dropdown = ({
     useEffect(() => {
         if (isMounted()) {
             if (loadOptions && touched) {
-                loadOptions(searchText)
-                    .then(setOptionsToShow);
+                loadOptions(searchText).then(setOptionsToShow);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -29,10 +36,10 @@ const Dropdown = ({
         setOptionsToShow(options);
     }, [options]);
 
-    const inputProps = (params) => ({
+    const inputProps = params => ({
         ...params.inputProps,
         value: searchText,
-        onChange: (e) => isMounted() && setSearchText(e.target.value),
+        onChange: e => isMounted() && setSearchText(e.target.value),
         onFocus: () => setTouched(true),
         onClick: () => setTouched(true)
     });
@@ -55,9 +62,9 @@ const Dropdown = ({
             loading={optionsToShow == null}
             onOpen={() => setTouched(true)}
             options={optionsToShow ? optionsToShow.sort(compareBy('disabled')) : []}
-            getOptionDisabled={option => (isOptionDisabled && isOptionDisabled(option))}
+            getOptionDisabled={option => isOptionDisabled && isOptionDisabled(option)}
             getOptionLabel={option => option.label}
-            renderInput={(params) => (
+            renderInput={params => (
                 <TextField
                     autoFocus={autoFocus}
                     fullWidth

@@ -9,30 +9,34 @@
 import axios, {AxiosError} from 'axios';
 import ErrorDialog from '../components/ErrorDialog';
 
-export const handleAuthError = (status) => {
+export const handleAuthError = status => {
     switch (status) {
         case 401:
             sessionStorage.clear();
             window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
             break;
         case 403:
-            ErrorDialog.showError('You have no access to this resource. Ask your administrator to grant you access.',
+            ErrorDialog.showError(
+                'You have no access to this resource. Ask your administrator to grant you access.',
                 null,
-                () => window.location.assign('/workspaces'));
+                () => window.location.assign('/workspaces')
+            );
             break;
         default:
     }
 };
 
 export function handleHttpError(defaultMessage) {
-    return (e: Error|AxiosError) => {
+    return (e: Error | AxiosError) => {
         if (e && axios.isCancel(e)) {
             return;
         }
         if (!e || !e.response) {
             throw Error(defaultMessage);
         }
-        const {response: {status, data}} = e;
+        const {
+            response: {status, data}
+        } = e;
 
         switch (status) {
             case 401:
@@ -59,7 +63,9 @@ export function handleRemoteSourceHttpError(defaultMessage) {
         if (!e || !e.response) {
             throw Error(defaultMessage);
         }
-        const {response: {status, data}} = e;
+        const {
+            response: {status, data}
+        } = e;
         if (status === 400 && data) {
             if (typeof data === 'string') {
                 throw Error(data);

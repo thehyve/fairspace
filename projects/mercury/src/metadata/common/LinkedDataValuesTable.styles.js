@@ -23,7 +23,7 @@ const styles = theme => ({
         borderStyle: 'solid',
         borderWidth: 1.5,
         borderRadius: 6,
-        backgroundColor: theme.palette.grey['50'],
+        backgroundColor: theme.palette.grey['50']
     },
     addValueInput: {
         backgroundColor: theme.palette.background.paper

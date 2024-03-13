@@ -15,7 +15,7 @@ let onClose;
 let workspaceDialog;
 let wrapper;
 
-const enterValue = (value) => {
+const enterValue = value => {
     const nameField = wrapper.find('input#code').first();
     nameField.simulate('focus');
     nameField.simulate('change', {target: {value}});
@@ -39,9 +39,9 @@ beforeEach(() => {
 
 describe('WorkspaceDialog', () => {
     it('should enable and disable submit button at proper times', () => {
-        expect((wrapper.find('[data-testid="submit-button"]').first()).prop('disabled')).toBe(true);
+        expect(wrapper.find('[data-testid="submit-button"]').first().prop('disabled')).toBe(true);
         enterValue('a');
-        expect((wrapper.find('[data-testid="submit-button"]').first()).prop('disabled')).toBe(false);
+        expect(wrapper.find('[data-testid="submit-button"]').first().prop('disabled')).toBe(false);
     });
 
     it('should send all entered parameters to the creation method', () => {
@@ -55,7 +55,7 @@ describe('WorkspaceDialog', () => {
     it('should require unique workspace code', () => {
         enterValue('w1');
         const submitButton = wrapper.find('[data-testid="submit-button"]').first();
-        expect((submitButton).prop('disabled')).toBe(true);
+        expect(submitButton.prop('disabled')).toBe(true);
     });
 
     it('should warn if workspace code is too long', () => {

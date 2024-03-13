@@ -14,12 +14,14 @@ describe('CollectionStatusChangeDialog', () => {
     };
 
     it('should render initial state of the dialog correctly', () => {
-        render(<CollectionStatusChangeDialog
-            collection={mockCollection}
-            setValue={mockSetValueFn}
-            onClose={() => {}}
-            classes={{}}
-        />);
+        render(
+            <CollectionStatusChangeDialog
+                collection={mockCollection}
+                setValue={mockSetValueFn}
+                onClose={() => {}}
+                classes={{}}
+            />
+        );
 
         // title
         expect(screen.getByText('Change collection status')).toBeInTheDocument();

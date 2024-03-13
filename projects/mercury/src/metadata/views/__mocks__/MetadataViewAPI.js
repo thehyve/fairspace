@@ -81,11 +81,13 @@ export const mockViews: MetadataViewOptions[] = () => [
                 name: 'Collection',
                 title: 'Collection',
                 type: 'Identifier'
-            }, {
+            },
+            {
                 name: 'Collection_analysisType',
                 title: 'Analysis type',
                 type: 'Term'
-            }, {
+            },
+            {
                 name: 'Collection_keyword',
                 title: 'Key words',
                 type: 'Set'
@@ -94,11 +96,10 @@ export const mockViews: MetadataViewOptions[] = () => [
     }
 ];
 
-export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
-    new Promise(resolve => resolve(mockViews()))
-);
+export const mockGetViews: Promise<MetadataViewOptions[]> = () =>
+    new Promise(resolve => resolve(mockViews()));
 
-export const mockFacets = (name) => {
+export const mockFacets = name => {
     switch (name) {
         case 'Sample':
             return [
@@ -286,21 +287,24 @@ export const mockFacets = (name) => {
     }
 };
 
-export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
-    new Promise(resolve => resolve(mockFacets(name)))
-);
+export const mockGetFacets: Promise<MetadataViewFacet[]> = name =>
+    new Promise(resolve => resolve(mockFacets(name)));
 
-export const mockRows = (viewName) => {
+export const mockRows = viewName => {
     switch (viewName) {
         case 'Sample':
             return [
                 {
                     Sample: [{value: 'http://example.com/sampleType/s01', label: 'S01'}],
-                    Sample_sampleType: [{value: 'http://example.com/sampleType#tissue', label: 'Tissue'}],
+                    Sample_sampleType: [
+                        {value: 'http://example.com/sampleType#tissue', label: 'Tissue'}
+                    ],
                     Sample_topography: [{value: 'http://example.com/sampleType#lip', label: 'Lip'}],
                     Sample_tumorCellularity: [{value: 2, label: '2'}],
                     Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
-                    Sample_origin: [{value: 'http://example.com/sampleType#normal', label: 'Normal'}],
+                    Sample_origin: [
+                        {value: 'http://example.com/sampleType#normal', label: 'Normal'}
+                    ],
                     Collection: [
                         {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'},
                         {value: 'http://localhost:8080/api/webdav/f02', label: 'f02'}
@@ -308,20 +312,30 @@ export const mockRows = (viewName) => {
                 },
                 {
                     Sample: [{value: 'http://example.com/sampleType/s02', label: 'S02'}],
-                    Sample_sampleType: [{value: 'http://example.com/sampleType#tissue', label: 'Tissue'}],
-                    Sample_topography: [{value: 'http://example.com/sampleType#tongue', label: 'Tongue'}],
+                    Sample_sampleType: [
+                        {value: 'http://example.com/sampleType#tissue', label: 'Tissue'}
+                    ],
+                    Sample_topography: [
+                        {value: 'http://example.com/sampleType#tongue', label: 'Tongue'}
+                    ],
                     Sample_tumorCellularity: [{value: 4, label: '4'}],
                     Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
-                    Sample_origin: [{value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}],
-                },
+                    Sample_origin: [
+                        {value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}
+                    ]
+                }
             ];
         case 'Subject':
             return [
                 {
                     Subject: [{value: 'http://example.com/sampleType/p01', label: 'P01'}],
                     Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
-                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
-                    Subject_birthDate: [{value: new Date(2010, 11, 25).toLocaleString(), label: '2010-11-25'}],
+                    Subject_species: [
+                        {value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}
+                    ],
+                    Subject_birthDate: [
+                        {value: new Date(2010, 11, 25).toLocaleString(), label: '2010-11-25'}
+                    ],
                     Collection: [
                         {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'},
                         {value: 'http://localhost:8080/api/webdav/f02', label: 'f02'}
@@ -330,37 +344,53 @@ export const mockRows = (viewName) => {
                 {
                     Subject: [{value: 'http://example.com/sampleType/p02', label: 'P02'}],
                     Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
-                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
+                    Subject_species: [
+                        {value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}
+                    ]
                 },
                 {
                     Subject: [{value: 'http://example.com/sampleType/p03', label: 'P03'}],
-                    Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
-                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
-                    files: [
-                        {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'}
-                    ]
+                    Subject_gender: [
+                        {value: 'http://example.com/sampleType#female', label: 'Female'}
+                    ],
+                    Subject_species: [
+                        {value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}
+                    ],
+                    files: [{value: 'http://localhost:8080/api/webdav/f01', label: 'f01'}]
                 },
                 {
                     Subject: [{value: 'http://example.com/sampleType/p04', label: 'P04'}],
                     Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
-                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
+                    Subject_species: [
+                        {value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}
+                    ]
                 },
                 {
                     Subject: [{value: 'http://example.com/sampleType/p05', label: 'P05'}],
-                    Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
-                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
+                    Subject_gender: [
+                        {value: 'http://example.com/sampleType#female', label: 'Female'}
+                    ],
+                    Subject_species: [
+                        {value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}
+                    ]
                 },
                 {
                     Subject: [{value: 'http://example.com/sampleType/p06', label: 'P06'}],
-                    Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
-                    Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
-                },
+                    Subject_gender: [
+                        {value: 'http://example.com/sampleType#female', label: 'Female'}
+                    ],
+                    Subject_species: [
+                        {value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}
+                    ]
+                }
             ];
         case 'Resource':
             return [
                 {
                     Collection: [{value: 'http://localhost:8080/api/webdav/c01', label: 'C01'}],
-                    Collection_analysisType: [{value: 'http://example.com/analysisType#biology', label: 'Biology'}]
+                    Collection_analysisType: [
+                        {value: 'http://example.com/analysisType#biology', label: 'Biology'}
+                    ]
                 }
             ];
         default:
@@ -368,11 +398,13 @@ export const mockRows = (viewName) => {
     }
 };
 
-export const mockGetViewData: Promise<MetadataViewData> = (viewName) => {
+export const mockGetViewData: Promise<MetadataViewData> = viewName => {
     const rows = mockRows(viewName);
-    return new Promise(resolve => resolve({
-        page: 0,
-        rows,
-        totalCount: rows.length
-    }));
+    return new Promise(resolve =>
+        resolve({
+            page: 0,
+            rows,
+            totalCount: rows.length
+        })
+    );
 };

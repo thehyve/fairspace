@@ -20,7 +20,8 @@ import {ExternalMetadataSourceProvider} from '../metadata/external-sources/Exter
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
 
-    const workspace: Workspace = currentWorkspace() && workspaces.find(w => w.iri === currentWorkspace());
+    const workspace: Workspace =
+        currentWorkspace() && workspaces.find(w => w.iri === currentWorkspace());
     const title = (workspace && workspace.code) || 'fairspace';
 
     return (

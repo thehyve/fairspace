@@ -48,19 +48,17 @@ const initialProps = {
     history: {
         listen: () => {}
     },
-    files: [{
-        filename: 'a'
-    }],
+    files: [
+        {
+            filename: 'a'
+        }
+    ],
     selection: selectionMock,
     classes: {}
 };
 
 describe('FileBrowser', () => {
-    const renderWithProviders = children => render(
-        <UploadsProvider>
-            {children}
-        </UploadsProvider>
-    );
+    const renderWithProviders = children => render(<UploadsProvider>{children}</UploadsProvider>);
 
     it('renders proper view', () => {
         const {queryByTestId} = renderWithProviders(
@@ -77,11 +75,7 @@ describe('FileBrowser', () => {
     });
 
     it('show error when no open collection is provided', () => {
-        const {getByText} = renderWithProviders(
-            <FileBrowser
-                {...initialProps}
-            />
-        );
+        const {getByText} = renderWithProviders(<FileBrowser {...initialProps} />);
 
         // finds substring ignoring case
         expect(getByText(/collection does not exist/i)).toBeInTheDocument();
@@ -89,10 +83,7 @@ describe('FileBrowser', () => {
 
     it('show no open collection error when no collection is provided even when another error is given', () => {
         const {getByText} = renderWithProviders(
-            <FileBrowser
-                {...initialProps}
-                error="some error"
-            />
+            <FileBrowser {...initialProps} error="some error" />
         );
 
         expect(getByText(/collection does not exist/i)).toBeInTheDocument();

@@ -22,7 +22,7 @@ export const styles = {
     },
     container: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap'
     },
     autocomplete: {
         width: '100%'
@@ -58,8 +58,16 @@ export const styles = {
     }
 };
 
-export const AlterUserPermissionsDialog = ({collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
-    open = false, onClose, classes}) => {
+export const AlterUserPermissionsDialog = ({
+    collection,
+    permissionCandidates,
+    workspaceUsers,
+    currentUser,
+    setPermission,
+    open = false,
+    onClose,
+    classes
+}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleClose = () => {
@@ -73,7 +81,9 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
     };
 
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
-        const reducedPermissions = selectedPermissions.filter(p => selectedPermission.iri !== p.iri);
+        const reducedPermissions = selectedPermissions.filter(
+            p => selectedPermission.iri !== p.iri
+        );
         setSelectedPermissions(reducedPermissions);
     };
 
@@ -92,9 +102,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
 
     const renderAccessLevelControl = () => (
         <div className={classes.accessLevelControl}>
-            <Typography component="p">
-                Selected users and access levels
-            </Typography>
+            <Typography component="p">Selected users and access levels</Typography>
             <UserPermissionsTable
                 selectedPermissions={selectedPermissions}
                 workspaceUsers={workspaceUsers}
@@ -114,7 +122,10 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
             onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
-            filter={p => ((!currentUser || p.iri !== currentUser.iri) && !selectedPermissions.some(sp => sp.iri === p.iri))}
+            filter={p =>
+                (!currentUser || p.iri !== currentUser.iri) &&
+                !selectedPermissions.some(sp => sp.iri === p.iri)
+            }
             label="Select user"
             autoFocus
         />
@@ -145,9 +156,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
                 >
                     Save
                 </Button>
-                <Button onClick={handleClose}>
-                    Cancel
-                </Button>
+                <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

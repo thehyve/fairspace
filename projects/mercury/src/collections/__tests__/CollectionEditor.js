@@ -24,7 +24,8 @@ const collection: CollectionProperties = {
     ownerWorkspace: 'http://owner'
 };
 
-const longName = 'aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrrssssstttttuuuuuuvvvvvvwwwwwwxxxxxyyyyyzzzzz';
+const longName =
+    'aaaaabbbbbcccccdddddeeeeefffffggggghhhhhiiiiijjjjjkkkkklllllmmmmmnnnnnooooopppppqqqqqrrrrrrssssstttttuuuuuuvvvvvvwwwwwwxxxxxyyyyyzzzzz';
 
 describe('CollectionEditor', () => {
     describe('isInputValid', () => {

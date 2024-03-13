@@ -27,19 +27,19 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
                     className={classes.link}
                     color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}
                 >
-                    { icon ? <div className={classes.icon}>{icon}</div> : undefined }
-                    { idx === allSegments.length - 1
-                        ? label
-                        : (
-                            <Link
-                                component={RouterLink}
-                                className={classes.link}
-                                color="inherit"
-                                to={href}
-                            >
-                                {label}
-                            </Link>
-                        ) }
+                    {icon ? <div className={classes.icon}>{icon}</div> : undefined}
+                    {idx === allSegments.length - 1 ? (
+                        label
+                    ) : (
+                        <Link
+                            component={RouterLink}
+                            className={classes.link}
+                            color="inherit"
+                            to={href}
+                        >
+                            {label}
+                        </Link>
+                    )}
                 </Typography>
             ))}
         </Breadcrumbs>
@@ -62,12 +62,12 @@ const styles = theme => ({
         display: 'flex'
     },
     link: {
-        display: 'flex',
+        display: 'flex'
     },
     icon: {
         marginRight: theme.spacing(1),
         width: 24,
-        height: 24,
+        height: 24
     }
 });
 

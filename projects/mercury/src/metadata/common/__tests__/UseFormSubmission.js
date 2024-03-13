@@ -28,7 +28,9 @@ describe.skip('UseFormSubmission', () => {
         const errorDialogMock = {
             showError: jest.fn()
         };
-        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
+        const {result, waitForNextUpdate} = renderHook(() =>
+            useFormSubmission(submitFunc, '', [], errorDialogMock)
+        );
 
         expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
 
@@ -43,9 +45,11 @@ describe.skip('UseFormSubmission', () => {
     it('should show the default error component for general errors', async () => {
         const submitFunc = jest.fn(() => Promise.reject(new Error()));
         const errorDialogMock = {
-            showError: jest.fn(),
+            showError: jest.fn()
         };
-        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
+        const {result, waitForNextUpdate} = renderHook(() =>
+            useFormSubmission(submitFunc, '', [], errorDialogMock)
+        );
 
         expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
 
@@ -76,7 +80,9 @@ describe.skip('UseFormSubmission', () => {
         // eslint-disable-next-line prefer-promise-reject-errors
         const submitFunc = jest.fn(() => Promise.reject({details, message: 'Validation Error'}));
         const showError = jest.fn();
-        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', namespaces, {showError}));
+        const {result, waitForNextUpdate} = renderHook(() =>
+            useFormSubmission(submitFunc, '', namespaces, {showError})
+        );
 
         act(() => {
             result.current.submitForm();
@@ -84,17 +90,17 @@ describe.skip('UseFormSubmission', () => {
         await waitForNextUpdate();
 
         expect(showError).toHaveBeenCalledWith(
-            (<ValidationErrorsDisplay
+            <ValidationErrorsDisplay
                 entityErrors={[]}
-                otherErrors={
-                    [{
+                otherErrors={[
+                    {
                         message: 'Cannot add a machine-only property',
                         predicate: 'fs:ontology#domainIncludes',
                         subject: 'fs:ontology#collectionTypeShape',
                         value: 'http://workspace.ci.fairway.app/vocabulary/AnalysisShape'
-                    }]
-                }
-            />)
+                    }
+                ]}
+            />
         );
     });
 });

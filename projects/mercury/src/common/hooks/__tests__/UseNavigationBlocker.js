@@ -37,9 +37,7 @@ describe.skip('UseFormSubmission', () => {
         const {result} = renderHook(() => useNavigationBlocker(true), {
             wrapper: ({children}) => (
                 <MemoryRouter>
-                    <WrapperWithPushToHistory>
-                        {children}
-                    </WrapperWithPushToHistory>
+                    <WrapperWithPushToHistory>{children}</WrapperWithPushToHistory>
                 </MemoryRouter>
             )
         });
@@ -51,9 +49,7 @@ describe.skip('UseFormSubmission', () => {
         const {result} = renderHook(() => useNavigationBlocker(true), {
             wrapper: ({children}) => (
                 <MemoryRouter>
-                    <WrapperWithPushToHistory>
-                        {children}
-                    </WrapperWithPushToHistory>
+                    <WrapperWithPushToHistory>{children}</WrapperWithPushToHistory>
                 </MemoryRouter>
             )
         });

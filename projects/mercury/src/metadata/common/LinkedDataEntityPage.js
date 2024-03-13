@@ -11,7 +11,8 @@ export default ({title, subject}) => {
     const iri = useNamespacedIri(subject);
     usePageTitleUpdater(`${iri} - ${title}`);
 
-    const {properties, values, linkedDataLoading, linkedDataError, typeInfo, updateLinkedData} = useLinkedData(subject);
+    const {properties, values, linkedDataLoading, linkedDataError, typeInfo, updateLinkedData} =
+        useLinkedData(subject);
 
     return (
         <>

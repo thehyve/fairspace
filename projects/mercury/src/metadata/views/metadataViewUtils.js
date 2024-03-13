@@ -3,13 +3,13 @@ import type {ValueType} from './MetadataViewAPI';
 export const RESOURCES_VIEW = 'Resource';
 
 export type MetadataViewEntity = {
-    iri: string;
-    label: string;
-}
+    iri: string,
+    label: string
+};
 
 export type MetadataViewEntityWithLinkedFiles = MetadataViewEntity & {|
-    linkedFiles: MetadataViewEntity[];
-|}
+    linkedFiles: MetadataViewEntity[]
+|};
 
 export const getMetadataViewsPath = (viewName: string, viewPath = '/metadata-views') => {
     let path = viewPath;

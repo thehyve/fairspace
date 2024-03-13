@@ -5,9 +5,9 @@ import {ofBooleanValueType, ofRangeValueType} from './metadataViewUtils';
 import {formatDate, isNonEmptyValue} from '../../common/utils/genericUtils';
 
 type MetadataViewActiveFacetFiltersProperties = {
-    facets: MetadataViewFacet[];
-    filters: MetadataViewFilter[];
-    setFilters: () => {};
+    facets: MetadataViewFacet[],
+    filters: MetadataViewFilter[],
+    setFilters: () => {}
 };
 
 export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFiltersProperties) => {
@@ -15,7 +15,9 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
 
     const renderActiveFilterValues = (facet, filter) => {
         if (ofRangeValueType(facet.type)) {
-            let min; let max; let label;
+            let min;
+            let max;
+            let label;
             if (facet.type === 'Date') {
                 min = formatDate(filter.min);
                 max = formatDate(filter.max);
@@ -72,7 +74,9 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                         style={{marginLeft: 5}}
                         onDelete={() => {
                             const index = filters.indexOf(filter);
-                            filters[index].values = [...filter.values.filter(v => v !== value.value)];
+                            filters[index].values = [
+                                ...filter.values.filter(v => v !== value.value)
+                            ];
                             setFilters(filters);
                         }}
                     />
@@ -90,25 +94,29 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
             alignItems="stretch"
             spacing={1}
         >
-            {
-                filters && filters.map(filter => {
-                    if (!isNonEmptyValue(filter.min) && !isNonEmptyValue(filter.max)
-                        && (!filter.values || filter.values.length === 0)
-                        && filter.booleanValue === null) {
+            {filters &&
+                filters.map(filter => {
+                    if (
+                        !isNonEmptyValue(filter.min) &&
+                        !isNonEmptyValue(filter.max) &&
+                        (!filter.values || filter.values.length === 0) &&
+                        filter.booleanValue === null
+                    ) {
                         return null;
                     }
                     const facet = facets.find(f => f.name === filter.field);
                     if (facet) {
                         return (
                             <Grid key={filter.field} item>
-                                <Typography variant="overline" component="span">{facet.title}</Typography>
+                                <Typography variant="overline" component="span">
+                                    {facet.title}
+                                </Typography>
                                 {renderActiveFilterValues(facet, filter)}
                             </Grid>
                         );
                     }
                     return <></>;
-                })
-            }
+                })}
         </Grid>
     );
 };

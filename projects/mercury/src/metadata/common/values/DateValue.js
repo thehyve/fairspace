@@ -20,7 +20,7 @@ class DateValue extends React.Component {
         }
     }
 
-    handleChange = (date) => {
+    handleChange = date => {
         // Formatting is required because the backend expect the date with no time
         const value = date && format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
         this.props.onChange({value});
@@ -38,7 +38,7 @@ class DateValue extends React.Component {
                     invalidDateMessage="Invalid date format"
                     value={this.state.value}
                     onChange={this.handleChange}
-                    renderInput={(params) => <TextField {...params} />}
+                    renderInput={params => <TextField {...params} />}
                 />
             </LocalizationProvider>
         );
@@ -46,7 +46,7 @@ class DateValue extends React.Component {
 }
 
 DateValue.defaultProps = {
-    entry: {value: undefined},
+    entry: {value: undefined}
 };
 
 export default DateValue;

@@ -14,22 +14,30 @@ configure({adapter: new Adapter()});
 
 describe('CollectionList', () => {
     it('shows warning message when no collections available', () => {
-        const {getByText} = render(<ThemeProvider theme={theme}><CollectionList /></ThemeProvider>);
+        const {getByText} = render(
+            <ThemeProvider theme={theme}>
+                <CollectionList />
+            </ThemeProvider>
+        );
         expect(getByText(/No collections available/i)).toBeInTheDocument();
     });
 
     it('renders correct header and values columns', () => {
-        const collections = [{
-            name: 'My Collection',
-            creatorDisplayName: 'Mariah Carey',
-            dateCreated: new Date().toUTCString(),
-            iri: 'http://example.com/0',
-            ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceCode: 'ws1'
-        }];
+        const collections = [
+            {
+                name: 'My Collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/0',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceCode: 'ws1'
+            }
+        ];
 
         const {queryByText} = render(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted={false} /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} showDeleted={false} />
+            </ThemeProvider>
         );
 
         expect(queryByText('Name')).toBeInTheDocument();
@@ -43,18 +51,22 @@ describe('CollectionList', () => {
     });
 
     it('renders correct header and values columns in "show deleted" mode', () => {
-        const collections = [{
-            name: 'My Collection',
-            creatorDisplayName: 'Mariah Carey',
-            dateCreated: new Date().toUTCString(),
-            iri: 'http://example.com/0',
-            ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceCode: 'ws1',
-            dateDeleted: new Date().toUTCString()
-        }];
+        const collections = [
+            {
+                name: 'My Collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/0',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceCode: 'ws1',
+                dateDeleted: new Date().toUTCString()
+            }
+        ];
 
         const {getByText} = render(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} showDeleted />
+            </ThemeProvider>
         );
 
         expect(getByText('Name')).toBeInTheDocument();
@@ -86,10 +98,13 @@ describe('CollectionList', () => {
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
-            }];
+            }
+        ];
 
         const wrapper = mount(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} />
+            </ThemeProvider>
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 
@@ -120,10 +135,13 @@ describe('CollectionList', () => {
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
-            }];
+            }
+        ];
 
         const wrapper = mount(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} />
+            </ThemeProvider>
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 

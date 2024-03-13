@@ -8,21 +8,27 @@ import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
 const LOCATION_FILTER_FIELD = 'location';
 
 export type Count = {
-    count: number;
-    timeout: boolean;
-}
+    count: number,
+    timeout: boolean
+};
 
 export type ViewData = {
-    data: MetadataViewData;
-    count: Count;
-    loading: boolean;
-    loadingCount: boolean;
-    error: any;
-    refreshDataOnly: boolean;
+    data: MetadataViewData,
+    count: Count,
+    loading: boolean,
+    loadingCount: boolean,
+    error: any,
+    refreshDataOnly: boolean,
     textFiltersObject: Object
 };
 
-const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObject: Object, locationContext: string, rowsPerPage: number): ViewData => {
+const useViewData = (
+    view: string,
+    filters: MetadataViewFilter[],
+    textFiltersObject: Object,
+    locationContext: string,
+    rowsPerPage: number
+): ViewData => {
     const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
     const metadataViewAPI = new MetadataViewAPI(metadataAPIPath);
     const [data, setData] = useState({});
@@ -45,11 +51,13 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
             prefix: value
         }));
 
-    const allFilters = !locationContext ? (
-        [...filters, ...textFilters]
-    ) : (
-        [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter, ...textFilters]
-    );
+    const allFilters = !locationContext
+        ? [...filters, ...textFilters]
+        : [
+              ...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)),
+              locationFilter,
+              ...textFilters
+          ];
 
     const fetchCount = () => {
         setCount({count: -1});
@@ -72,7 +80,9 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
     const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
         if (viewDataRequestCancelToken) {
-            viewDataRequestCancelToken.cancel('Fetching data operation canceled due to new request.');
+            viewDataRequestCancelToken.cancel(
+                'Fetching data operation canceled due to new request.'
+            );
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
@@ -88,7 +98,9 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
                 if (d) {
                     if (!d.hasNext) {
                         if (viewDataRequestCancelToken) {
-                            viewDataRequestCancelToken.cancel('Fetching count operation canceled due to new data.');
+                            viewDataRequestCancelToken.cancel(
+                                'Fetching count operation canceled due to new data.'
+                            );
                         }
                         setCount({count: d.rows.length, timeout: false});
                         setLoadingCount(false);
@@ -98,7 +110,7 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
                 }
                 setError(undefined);
             })
-            .catch((e) => {
+            .catch(e => {
                 setError(e || true);
                 console.error(e || new Error('Unknown error'));
             })
@@ -107,18 +119,21 @@ const useViewData = (view: string, filters: MetadataViewFilter[], textFiltersObj
 
     const refreshDataOnly = useCallback((newPage, newRowsPerPage) => {
         setLoading(true);
-        fetchViewData(newPage, newRowsPerPage).then(d => {
-            setData(d);
-            setError(undefined);
-        })
-            .catch((e) => {
+        fetchViewData(newPage, newRowsPerPage)
+            .then(d => {
+                setData(d);
+                setError(undefined);
+            })
+            .catch(e => {
                 setError(e || true);
                 console.error(e || new Error('Unknown error'));
             })
             .finally(() => setLoading(false));
     });
 
-    useEffect(() => {refreshAll();}, [view, filters, locationContext, textFiltersObject]);
+    useEffect(() => {
+        refreshAll();
+    }, [view, filters, locationContext, textFiltersObject]);
 
     return {
         data,

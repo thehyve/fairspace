@@ -15,10 +15,8 @@ import WorkspaceDialog from './WorkspaceDialog';
 const WorkspaceBrowser = () => {
     const history = useHistory();
     const {currentUser, currentUserError, currentUserLoading} = useContext(UserContext);
-    const {workspaces,
-        workspacesLoading,
-        workspacesError,
-        createWorkspace} = useContext(WorkspaceContext);
+    const {workspaces, workspacesLoading, workspacesError, createWorkspace} =
+        useContext(WorkspaceContext);
 
     const loading = currentUserLoading || workspacesLoading;
     const error = currentUserError || workspacesError;
@@ -46,9 +44,7 @@ const WorkspaceBrowser = () => {
 
     const renderWorkspaceList = () => (
         <>
-            <WorkspaceList
-                workspaces={workspaces}
-            />
+            <WorkspaceList workspaces={workspaces} />
             {creatingWorkspace ? (
                 <WorkspaceDialog
                     onSubmit={handleSaveWorkspace}
@@ -80,7 +76,7 @@ const WorkspaceBrowser = () => {
     return (
         <>
             {loading ? <LoadingInlay /> : renderWorkspaceList()}
-            {isAdmin(currentUser) ? renderAddWorkspaceButton() : null }
+            {isAdmin(currentUser) ? renderAddWorkspaceButton() : null}
         </>
     );
 };

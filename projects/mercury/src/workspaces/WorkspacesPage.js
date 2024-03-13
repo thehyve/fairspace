@@ -12,13 +12,16 @@ const WorkspacesPage = () => {
     usePageTitleUpdater('Workspaces');
 
     return (
-        <BreadcrumbsContext.Provider value={{segments: [
-            {
-                label: 'Workspaces',
-                icon: <Widgets />,
-                href: '/workspaces'
-            }
-        ]}}
+        <BreadcrumbsContext.Provider
+            value={{
+                segments: [
+                    {
+                        label: 'Workspaces',
+                        icon: <Widgets />,
+                        href: '/workspaces'
+                    }
+                ]
+            }}
         >
             <BreadCrumbs />
             <Grid container spacing={1}>

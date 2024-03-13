@@ -10,9 +10,9 @@ import WorkspaceContext from './WorkspaceContext';
 import {currentWorkspace} from './workspaces';
 
 type WorkspaceActionMenuProps = {
-    workspace: Workspace;
-    small: boolean;
-}
+    workspace: Workspace,
+    small: boolean
+};
 
 const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
     const {workspace, small} = props;
@@ -24,7 +24,7 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [showDeletionConfirmDialog, setShowDeletionConfirmDialog] = useState(false);
 
-    const handleMenuClick = (event) => {
+    const handleMenuClick = event => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -50,11 +50,11 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
                     history.push('/workspaces');
                 }
             })
-            .catch(err => ErrorDialog.showError(
-                'An error occurred while deleting a workspace',
-                err,
-                () => handleDeleteWorkspace(workspace)
-            ));
+            .catch(err =>
+                ErrorDialog.showError('An error occurred while deleting a workspace', err, () =>
+                    handleDeleteWorkspace(workspace)
+                )
+            );
     };
 
     const renderDeletionConfirmation = () => (
@@ -80,7 +80,7 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
                 aria-label="More"
                 aria-owns={`workspace-menu-${workspace.iri}`}
                 aria-haspopup="true"
-                onClick={(event) => handleMenuClick(event, workspace)}
+                onClick={event => handleMenuClick(event, workspace)}
             >
                 <MoreVert fontSize={small ? 'small' : 'default'} />
             </IconButton>
@@ -90,14 +90,11 @@ const WorkspaceActionMenu = (props: WorkspaceActionMenuProps) => {
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
             >
-                <MenuItem
-                    title="Delete empty workspace."
-                    onClick={openDeleteWorkspaceDialog}
-                >
+                <MenuItem title="Delete empty workspace." onClick={openDeleteWorkspaceDialog}>
                     Delete workspace &hellip;
                 </MenuItem>
             </Menu>
-            { showDeletionConfirmDialog && renderDeletionConfirmation() }
+            {showDeletionConfirmDialog && renderDeletionConfirmation()}
         </>
     );
 };

@@ -13,13 +13,13 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
     // from the full IRI to the shortcut/namespaced IRI
     const toNamespaced = iri => !!iri && getNamespacedIri(iri, namespaces);
 
-    const withNamespacedProperties = (error) => ({
+    const withNamespacedProperties = error => ({
         ...error,
         subject: toNamespaced(error.subject),
         predicate: toNamespaced(error.predicate)
     });
 
-    const onFormSubmissionError = (entityType: string) => (error) => {
+    const onFormSubmissionError = (entityType: string) => error => {
         if (error.details) {
             if (error.details.length === 1 && error.details[0].message === 'Duplicate label') {
                 if (entityType === 'Workspace') {
@@ -39,7 +39,9 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
             const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
             const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
 
-            errorDialog.showError((<ValidationErrorsDisplay otherErrors={otherErrors} entityErrors={entityErrors} />));
+            errorDialog.showError(
+                <ValidationErrorsDisplay otherErrors={otherErrors} entityErrors={entityErrors} />
+            );
         } else {
             errorDialog.showError('Error saving entity.', error);
         }

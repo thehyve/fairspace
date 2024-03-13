@@ -8,7 +8,11 @@ const VocabularyContext = React.createContext();
 
 export const VocabularyProvider = ({children}) => {
     const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
-    const {data: vocabulary = [], loading: vocabularyLoading, error: vocabularyError} = useAsync(() => new LinkedDataVocabularyAPI(metadataAPIPath).get());
+    const {
+        data: vocabulary = [],
+        loading: vocabularyLoading,
+        error: vocabularyError
+    } = useAsync(() => new LinkedDataVocabularyAPI(metadataAPIPath).get());
 
     return (
         <VocabularyContext.Provider

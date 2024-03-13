@@ -10,11 +10,12 @@ import UserContext from '../users/UserContext';
 import DomainInfo from './DomainInfo';
 import {APPLICATION_NAME, METADATA_VIEW_MENU_LABEL} from '../constants';
 
-const DashboardPage = (props) => {
+const DashboardPage = props => {
     const {currentUser, classes} = props;
     const {views} = useContext(MetadataViewContext);
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
-    const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
+    const canViewMetadata =
+        currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
 
     return (
         <Grid container justifyContent="center" spacing="5">
@@ -34,16 +35,16 @@ const DashboardPage = (props) => {
                     <Grid container justifyContent="left" spacing="20" className={classes.textRow}>
                         <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
-                                {APPLICATION_NAME} contains your research metadata. Click on one of the domains and start exploring.
+                                {APPLICATION_NAME} contains your research metadata. Click on one of
+                                the domains and start exploring.
                             </Typography>
                         </Grid>
                         <Grid item xs={6} md={2} />
                         <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
-                                For more details on how to use Fairspace, e.g. how to query the API, please refer the {' '}
-                                <Link href="https://docs.fairway.app/">
-                                    user manual
-                                </Link>.
+                                For more details on how to use Fairspace, e.g. how to query the API,
+                                please refer the{' '}
+                                <Link href="https://docs.fairway.app/">user manual</Link>.
                             </Typography>
                         </Grid>
                     </Grid>
@@ -55,13 +56,14 @@ const DashboardPage = (props) => {
                                 key="metadata-views"
                             />
                         )}
-                        {canViewMetadata && externalMetadataSources.map((source) => (
-                            <DomainInfo
-                                domainName={source.label}
-                                domainLink={'/metadata-sources/' + source.name}
-                                key={source.name}
-                            />
-                        ))}
+                        {canViewMetadata &&
+                            externalMetadataSources.map(source => (
+                                <DomainInfo
+                                    domainName={source.label}
+                                    domainLink={'/metadata-sources/' + source.name}
+                                    key={source.name}
+                                />
+                            ))}
                     </Grid>
                 </Grid>
             </Paper>
@@ -69,7 +71,7 @@ const DashboardPage = (props) => {
     );
 };
 
-const ContextualDashboardPage = (props) => {
+const ContextualDashboardPage = props => {
     const {currentUser} = useContext(UserContext);
 
     return <DashboardPage currentUser={currentUser} {...props} />;

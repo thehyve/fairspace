@@ -5,7 +5,7 @@ import {Link, Paper, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import styles from './DomainInfo.styles';
 
-const DomainInfo = (props) => {
+const DomainInfo = props => {
     const {domainName, domainLink, classes} = props;
     return (
         <div className={classes.outerMargin}>

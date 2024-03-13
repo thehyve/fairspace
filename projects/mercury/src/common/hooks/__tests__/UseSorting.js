@@ -87,7 +87,13 @@ describe('useSorting custom hook', () => {
     });
 
     it('should sort the items based on the selected column', () => {
-        expect(sorting.orderedItems.map(i => i.label)).toEqual(['item 1', 'item 2', 'item 3', 'item 4', 'item 5']);
+        expect(sorting.orderedItems.map(i => i.label)).toEqual([
+            'item 1',
+            'item 2',
+            'item 3',
+            'item 4',
+            'item 5'
+        ]);
     });
 
     it('should sort the items on given order if values are the same', () => {
@@ -101,6 +107,12 @@ describe('useSorting custom hook', () => {
         act(() => {
             sorting.toggleSort('random');
         });
-        expect(sorting.orderedItems.map(i => i.label)).toEqual(['item 1', 'item 3', 'item 5', 'item 4', 'item 2']);
+        expect(sorting.orderedItems.map(i => i.label)).toEqual([
+            'item 1',
+            'item 3',
+            'item 5',
+            'item 4',
+            'item 2'
+        ]);
     });
 });

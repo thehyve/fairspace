@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {useHistory} from 'react-router-dom';
 
-const UseNavigationBlocker = (shouldBlock) => {
+const UseNavigationBlocker = shouldBlock => {
     const history = useHistory();
     const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
     const [locationToNavigateTo, setLocationToNavigateTo] = useState(null);
@@ -11,7 +11,7 @@ const UseNavigationBlocker = (shouldBlock) => {
         // Taken from: https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
         // This will show the default browser dialog,
         // there's no other way to stop navigation AND show custom dialog at the same time.
-        const beforeunloadHandler = (e) => {
+        const beforeunloadHandler = e => {
             // Cancel the event
             e.preventDefault();
             // Chrome requires returnValue to be set
@@ -78,7 +78,7 @@ const UseNavigationBlocker = (shouldBlock) => {
         confirmationShown: showCloseConfirmation,
         hideConfirmation,
         showConfirmation,
-        executeNavigation,
+        executeNavigation
     };
 };
 

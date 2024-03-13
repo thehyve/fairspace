@@ -7,21 +7,23 @@ import LoadingOverlay from '../common/components/LoadingOverlay';
 
 const styles = theme => ({
     textHelperBasic: {
-        color: theme.palette.grey['600'],
+        color: theme.palette.grey['600']
     },
     textHelperWarning: {
-        color: theme.palette.warning.dark,
+        color: theme.palette.warning.dark
     }
 });
 
 const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}) => {
     const [value, setValue] = useState(null);
 
-    const isCodeLengthWarning = () => (!!value && value.trim().length > 10);
-    const isWorkspaceCodeUnique = (workspaceName) => !workspaces.some(workspace => workspace.code === workspaceName);
-    const isCodeValid = () => value === null || (!!value && !!value.trim() && isWorkspaceCodeUnique(value.trim()));
+    const isCodeLengthWarning = () => !!value && value.trim().length > 10;
+    const isWorkspaceCodeUnique = workspaceName =>
+        !workspaces.some(workspace => workspace.code === workspaceName);
+    const isCodeValid = () =>
+        value === null || (!!value && !!value.trim() && isWorkspaceCodeUnique(value.trim()));
 
-    const onDialogSubmit = (e) => {
+    const onDialogSubmit = e => {
         e.preventDefault();
         e.stopPropagation();
         if (value && isCodeValid()) {
@@ -32,12 +34,20 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
     const renderCodeHelperText = () => (
         <span>
             Workspace code. Has to be unique.
-            <span className={!isCodeLengthWarning() ? classes.textHelperBasic : classes.textHelperWarning}>
+            <span
+                className={
+                    !isCodeLengthWarning() ? classes.textHelperBasic : classes.textHelperWarning
+                }
+            >
                 <br />
                 {isCodeLengthWarning() && (
-                    <span><b>Warning!</b> Code is longer than 10 characters!<br /></span>
+                    <span>
+                        <b>Warning!</b> Code is longer than 10 characters!
+                        <br />
+                    </span>
                 )}
-                The code will prefix all collections of the workspace - preferred length is maximum 10 characters
+                The code will prefix all collections of the workspace - preferred length is maximum
+                10 characters
                 <br />
             </span>
         </span>
@@ -54,7 +64,9 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
             >
                 <DialogTitle id="form-dialog-title">
                     <div>
-                        <Typography variant="h5" component="h2">Create workspace</Typography>
+                        <Typography variant="h5" component="h2">
+                            Create workspace
+                        </Typography>
                     </div>
                 </DialogTitle>
                 <DialogContent style={{overflowX: 'hidden'}}>
@@ -67,7 +79,7 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
                         helperText={renderCodeHelperText()}
                         value={value}
                         name="code"
-                        onChange={(event) => setValue(event.target.value)}
+                        onChange={event => setValue(event.target.value)}
                         fullWidth
                         required
                         error={!isCodeValid()}
@@ -95,4 +107,4 @@ const WorkspaceDialog = ({onSubmit, onClose, creating, workspaces, classes = {}}
     );
 };
 
-export default (withStyles(styles))(WorkspaceDialog);
+export default withStyles(styles)(WorkspaceDialog);

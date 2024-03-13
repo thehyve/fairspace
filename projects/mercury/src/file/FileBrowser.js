@@ -15,7 +15,7 @@ import {generateUuid} from '../metadata/common/metadataUtils';
 import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import type {Collection} from '../collections/CollectionAPI';
 
-const styles = (theme) => ({
+const styles = theme => ({
     container: {
         height: '100%'
     },
@@ -54,13 +54,12 @@ const getConflictingFolders: string[] = (newFiles, existingFolderNames) => {
     return Array.from(droppedFolderNames).filter(f => existingFolderNames.includes(f));
 };
 
-const getConflictingFiles: string[] = (newFiles, existingFileNames) => (
-    newFiles.filter(f => existingFileNames.includes(f.path)).map(c => c.name)
-);
+const getConflictingFiles: string[] = (newFiles, existingFileNames) =>
+    newFiles.filter(f => existingFileNames.includes(f.path)).map(c => c.name);
 
 type ContextualFileBrowserProperties = {
-    history: History;
-    openedCollection: Collection;
+    history: History,
+    openedCollection: Collection,
     openedPath: string,
     isOpenedPathDeleted: boolean,
     showDeleted: boolean,
@@ -69,12 +68,12 @@ type ContextualFileBrowserProperties = {
     selection: any,
     preselectedFile: File,
     classes: any
-}
+};
 
 type FileBrowserProperties = ContextualFileBrowserProperties & {
-    files: File[];
-    refreshFiles: () => void;
-    fileActions: any;
+    files: File[],
+    refreshFiles: () => void,
+    fileActions: any
 };
 
 export const FileBrowser = (props: FileBrowserProperties) => {
@@ -93,11 +92,17 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
 
-    const existingFileNames = files ? files.filter(file => file.type === 'file').map(file => file.basename) : [];
-    const existingFolderNames = files ? files.filter(file => file.type === 'directory').map(file => file.basename) : [];
+    const existingFileNames = files
+        ? files.filter(file => file.type === 'file').map(file => file.basename)
+        : [];
+    const existingFolderNames = files
+        ? files.filter(file => file.type === 'directory').map(file => file.basename)
+        : [];
 
     const isOverwriteCandidateDeleted = (filenames: string[]) => {
-        const fileCandidates = files ? files.filter(file => filenames.some(name => name === file.basename)) : [];
+        const fileCandidates = files
+            ? files.filter(file => filenames.some(name => name === file.basename))
+            : [];
         return fileCandidates.length > 0 && fileCandidates.some(f => f.dateDeleted);
     };
 
@@ -108,34 +113,49 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     const [overwriteFolderCandidateNames, setOverwriteFolderCandidateNames] = useState([]);
     const [currentUpload, setCurrentUpload] = useState({});
 
-    const useFairspaceDropzone = () => useDropzone({
-        noClick: true,
-        noKeyboard: true,
-        multiple: true,
-        useFsAccessApi: false,
-        onDropAccepted: (droppedFiles) => {
-            const newUpload = {
-                id: generateUuid(),
-                files: droppedFiles,
-                destinationPath: openedPath,
-            };
-            const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
-            const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
+    const useFairspaceDropzone = () =>
+        useDropzone({
+            noClick: true,
+            noKeyboard: true,
+            multiple: true,
+            useFsAccessApi: false,
+            onDropAccepted: droppedFiles => {
+                const newUpload = {
+                    id: generateUuid(),
+                    files: droppedFiles,
+                    destinationPath: openedPath
+                };
+                const newOverwriteFolderCandidates = getConflictingFolders(
+                    droppedFiles,
+                    existingFolderNames
+                );
+                const newOverwriteFileCandidates = getConflictingFiles(
+                    droppedFiles,
+                    existingFileNames
+                );
 
-            if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
-                setOverwriteFileCandidateNames(newOverwriteFileCandidates);
-                setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
-                if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
-                    setShowCannotOverwriteWarning(true);
-                    return;
+                if (
+                    newOverwriteFileCandidates.length > 0 ||
+                    newOverwriteFolderCandidates.length > 0
+                ) {
+                    setOverwriteFileCandidateNames(newOverwriteFileCandidates);
+                    setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
+                    if (
+                        isOverwriteCandidateDeleted([
+                            ...newOverwriteFileCandidates,
+                            ...newOverwriteFolderCandidates
+                        ])
+                    ) {
+                        setShowCannotOverwriteWarning(true);
+                        return;
+                    }
+                    setCurrentUpload(newUpload);
+                    setShowOverwriteConfirmation(true);
+                } else {
+                    startUpload(newUpload).then(refreshFiles);
                 }
-                setCurrentUpload(newUpload);
-                setShowOverwriteConfirmation(true);
-            } else {
-                startUpload(newUpload).then(refreshFiles);
             }
-        }
-    });
+        });
 
     const fileDropzoneProperties = useFairspaceDropzone();
     const folderDropzoneProperties = useFairspaceDropzone();
@@ -164,7 +184,9 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     useEffect(() => {
         if (showCannotOverwriteWarning) {
             setShowCannotOverwriteWarning(false);
-            showCannotOverwriteDeletedError([...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length);
+            showCannotOverwriteDeletedError(
+                [...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length
+            );
         }
     }, [overwriteFileCandidateNames, overwriteFolderCandidateNames, showCannotOverwriteWarning]);
 
@@ -196,7 +218,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         }
     };
 
-    const handlePathDoubleClick = (path) => {
+    const handlePathDoubleClick = path => {
         if (path.type === 'directory') {
             /* TODO Remove additional encoding (encodeURI) after upgrading to history to version>=4.10
              *      This version contains this fix: https://github.com/ReactTraining/history/pull/656
@@ -214,32 +236,41 @@ export const FileBrowser = (props: FileBrowserProperties) => {
 
     const renderOverwriteConfirmationMessage = () => (
         <Typography variant="body2" component="span">
-            {(overwriteFolderCandidateNames.length > 1) && (
+            {overwriteFolderCandidateNames.length > 1 && (
                 <span>
-                    Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist <br />
-                    and their content might be overwritten.<br />
+                    Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist{' '}
+                    <br />
+                    and their content might be overwritten.
+                    <br />
                 </span>
             )}
-            {(overwriteFolderCandidateNames.length === 1) && (
+            {overwriteFolderCandidateNames.length === 1 && (
                 <span>
                     Folder <em>{overwriteFolderCandidateNames[0]} </em>
-                    already exists and its content might be overwritten.<br />
+                    already exists and its content might be overwritten.
+                    <br />
                 </span>
             )}
-            {(overwriteFileCandidateNames.length > 1) && (
+            {overwriteFileCandidateNames.length > 1 && (
                 <span>
-                    Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.<br />
+                    Files: <em>{overwriteFileCandidateNames.join(', ')}</em> already exist.
+                    <br />
                 </span>
             )}
-            {(overwriteFileCandidateNames.length === 1) && (
+            {overwriteFileCandidateNames.length === 1 && (
                 <span>
-                    File <em>{overwriteFileCandidateNames[0]}</em> already exists.<br />
+                    File <em>{overwriteFileCandidateNames[0]}</em> already exists.
+                    <br />
                 </span>
             )}
-            {(overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1) ? (
-                <span>Do you want to <b>overwrite</b> it?</span>
+            {overwriteFolderCandidateNames.length + overwriteFileCandidateNames.length === 1 ? (
+                <span>
+                    Do you want to <b>overwrite</b> it?
+                </span>
             ) : (
-                <span>Do you want to <b>overwrite</b> them?</span>
+                <span>
+                    Do you want to <b>overwrite</b> them?
+                </span>
             )}
         </Typography>
     );
@@ -290,11 +321,18 @@ export const FileBrowser = (props: FileBrowserProperties) => {
                 <input {...folderDropzoneProperties.getInputProps({webkitdirectory: ''})} />
                 <FileList
                     selectionEnabled={openedCollection.canRead}
-                    files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                    files={files.map(item => ({
+                        ...item,
+                        selected: selection.isSelected(item.filename)
+                    }))}
                     onPathCheckboxClick={path => selection.toggle(path.filename)}
                     onPathHighlight={handlePathHighlight}
                     onPathDoubleClick={handlePathDoubleClick}
-                    onAllSelection={shouldSelectAll => (shouldSelectAll ? selection.selectAll(files.map(file => file.filename)) : selection.deselectAll())}
+                    onAllSelection={shouldSelectAll =>
+                        shouldSelectAll
+                            ? selection.selectAll(files.map(file => file.filename))
+                            : selection.deselectAll()
+                    }
                     showDeleted={showDeleted}
                     preselectedFile={preselectedFile}
                 />
@@ -303,17 +341,23 @@ export const FileBrowser = (props: FileBrowserProperties) => {
             <div className={classes.uploadProgress}>
                 <UploadProgressComponent />
             </div>
-            {showOverwriteConfirmation && (renderOverwriteConfirmation())}
+            {showOverwriteConfirmation && renderOverwriteConfirmation()}
         </div>
     );
 };
 
 const ContextualFileBrowser = (props: ContextualFileBrowserProperties) => {
     const {openedPath, showDeleted, loading, error} = props;
-    const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
+    const {
+        files,
+        loading: filesLoading,
+        error: filesError,
+        refresh,
+        fileActions
+    } = useFiles(openedPath, showDeleted);
 
     if (error || filesError) {
-        return (<MessageDisplay message="An error occurred while loading files" />);
+        return <MessageDisplay message="An error occurred while loading files" />;
     }
     if (loading || filesLoading) {
         return <LoadingInlay />;

@@ -12,9 +12,12 @@ describe('ReferringValue', () => {
         const entry = {
             id: 'https://thehyve.nl'
         };
-        expect(ReferringValue({
-            property, entry
-        })).toEqual(<a href="https://thehyve.nl">https://thehyve.nl</a>);
+        expect(
+            ReferringValue({
+                property,
+                entry
+            })
+        ).toEqual(<a href="https://thehyve.nl">https://thehyve.nl</a>);
     });
 
     it('should render a generic iri resource as link to editor', () => {
@@ -26,9 +29,12 @@ describe('ReferringValue', () => {
             id: 'https://thehyve.nl'
         };
 
-        expect(ReferringValue({
-            property, entry
-        })).toEqual(<LinkedDataLink uri="https://thehyve.nl">https://thehyve.nl</LinkedDataLink>);
+        expect(
+            ReferringValue({
+                property,
+                entry
+            })
+        ).toEqual(<LinkedDataLink uri="https://thehyve.nl">https://thehyve.nl</LinkedDataLink>);
     });
 
     it('should render a regular links with the label of the resource', () => {
@@ -38,9 +44,12 @@ describe('ReferringValue', () => {
             label: 'My resource'
         };
 
-        expect(ReferringValue({
-            property, entry
-        })).toEqual(<LinkedDataLink uri="https://my-resource">My resource</LinkedDataLink>);
+        expect(
+            ReferringValue({
+                property,
+                entry
+            })
+        ).toEqual(<LinkedDataLink uri="https://my-resource">My resource</LinkedDataLink>);
     });
 
     it('should render a values without URI as its label', () => {
@@ -49,8 +58,11 @@ describe('ReferringValue', () => {
             label: 'My resource'
         };
 
-        expect(ReferringValue({
-            property, entry
-        })).toEqual('My resource');
+        expect(
+            ReferringValue({
+                property,
+                entry
+            })
+        ).toEqual('My resource');
     });
 });

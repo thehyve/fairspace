@@ -39,17 +39,23 @@ const styles = {
     }
 };
 
-export const WorkspacePermissionsComponent = ({permissions, setPermission, collection, workspaces, classes}) => {
+export const WorkspacePermissionsComponent = ({
+    permissions,
+    setPermission,
+    collection,
+    workspaces,
+    classes
+}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [selectedWorkspace, setSelectedWorkspace] = useState();
     const [showWorkspacePermissionsDialog, setShowWorkspacePermissionsDialog] = useState(false);
 
-    const sortedPermissions: PrincipalPermission[] = sortPermissions(permissions.filter(p => p.iri !== collection.ownerWorkspace));
-    const permissionCandidates: PrincipalPermission[] = workspaces.filter(
-        w => !sortedPermissions.some(p => p.iri === w.iri)
-    ).map(
-        w => ({...w, name: w.code})
+    const sortedPermissions: PrincipalPermission[] = sortPermissions(
+        permissions.filter(p => p.iri !== collection.ownerWorkspace)
     );
+    const permissionCandidates: PrincipalPermission[] = workspaces
+        .filter(w => !sortedPermissions.some(p => p.iri === w.iri))
+        .map(w => ({...w, name: w.code}));
 
     const handleDeletePermission = (permission: PrincipalPermission) => {
         setShowConfirmDeleteDialog(true);
@@ -147,7 +153,7 @@ WorkspacePermissionsComponent.propTypes = {
     workspaces: PropTypes.array
 };
 
-const ContextualWorkspacePermissionsComponent = (props) => {
+const ContextualWorkspacePermissionsComponent = props => {
     const {workspaces, workspaceLoading, workspaceError} = useContext(WorkspaceContext);
 
     return (

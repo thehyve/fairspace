@@ -12,7 +12,7 @@ import {
     DATE_DELETED_URI,
     DELETED_BY_URI,
     DIRECTORY_URI,
-    FILE_URI,
+    FILE_URI
 } from '../../../constants';
 import VocabularyContext from '../../vocabulary/VocabularyContext';
 import theme from '../../../App.theme';
@@ -27,7 +27,11 @@ describe('LinkedDataEntityHeader', () => {
     type DeleteButtonState = 'Enabled' | 'Disabled' | 'NotPresent';
 
     describe('delete button', () => {
-        const testDeleteButtonDeletableState = (values, expectedState: DeleteButtonState, editingEnabled = true) => {
+        const testDeleteButtonDeletableState = (
+            values,
+            expectedState: DeleteButtonState,
+            editingEnabled = true
+        ) => {
             const wrapper = mount(
                 <ThemeProvider theme={theme}>
                     <VocabularyContext.Provider
@@ -55,18 +59,24 @@ describe('LinkedDataEntityHeader', () => {
         };
 
         it('should show a delete button for regular entities', () => {
-            testDeleteButtonDeletableState({
-                '@type': [{id: 'http://random-type'}],
-                [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}]
-            }, 'Enabled');
+            testDeleteButtonDeletableState(
+                {
+                    '@type': [{id: 'http://random-type'}],
+                    [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}]
+                },
+                'Enabled'
+            );
         });
 
         it('should show a disabled delete button for deleted entities', () => {
-            testDeleteButtonDeletableState({
-                [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
-                [DELETED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
-                [DATE_DELETED_URI]: [{value: '2000-01-01'}]
-            }, 'Disabled');
+            testDeleteButtonDeletableState(
+                {
+                    [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
+                    [DELETED_BY_URI]: [{id: 'http://some-person', label: 'John'}],
+                    [DATE_DELETED_URI]: [{value: '2000-01-01'}]
+                },
+                'Disabled'
+            );
         });
 
         it('should show a disabled delete button for collections, files and directories', () => {
@@ -76,10 +86,14 @@ describe('LinkedDataEntityHeader', () => {
         });
 
         it('should not show a delete button when editing is disabled', () => {
-            testDeleteButtonDeletableState({
-                '@type': [{id: 'http://random-type'}],
-                [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}]
-            }, 'NotPresent', false);
+            testDeleteButtonDeletableState(
+                {
+                    '@type': [{id: 'http://random-type'}],
+                    [CREATED_BY_URI]: [{id: 'http://some-person', label: 'John'}]
+                },
+                'NotPresent',
+                false
+            );
         });
     });
 });
