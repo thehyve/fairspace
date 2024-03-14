@@ -9,7 +9,12 @@ const GlobalRoutes = () => (
         <Route
             path="/login"
             render={() => {
-                window.location.href = new URLSearchParams(window.location.search).get('redirectUrl');
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirectUrl');
+                if (redirectUrl && redirectUrl.startsWith(window.location.origin)) {
+                    window.location.href = redirectUrl;
+                } else {
+                    window.location.href = window.location.origin;
+                }
             }}
         />
 
