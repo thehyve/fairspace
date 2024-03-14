@@ -142,7 +142,7 @@ export function generateUniqueFileName(fileName, usedNames = []) {
 
 export const decodeHTMLEntities = (htmlSource: string) => {
     const element = document.createElement('textarea');
-    element.innerHTML = htmlSource;
+    element.textContent = htmlSource;
     return element.textContent;
 };
 
