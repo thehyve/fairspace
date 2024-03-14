@@ -48,9 +48,8 @@ const isNameValid = (name: string) =>
  */
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
-export const formatPrefix = (prefix: string) => (
-    prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : ''
-);
+export const formatPrefix = (prefix: string) =>
+    prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : '';
 
 const styles = theme => ({
     textHelperBasic: {
