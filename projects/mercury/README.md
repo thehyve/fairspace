@@ -63,18 +63,18 @@ In Keycloak, one setting needs to be configured manually: the permissions of the
 -   [webdav](https://github.com/perry-mitchell/webdav-client) is used for connecting to WebDAV servers.
 -   [jsonld](https://github.com/digitalbazaar/jsonld.js) is used for unpacking JSON-LD responses.
 
-### Testing
+### Code style
 
-The project has extended the eslint configuration by React and AirBnb. At the moment it is enforced and executed at project building
-and therefore it is recommended to use a plugin for eslint in your favorite IDE. The rules are in the .eslintrc.js file.
+The project has extended the eslint configuration by React and AirBnb. At the moment it is enforced and executed at project building,
+and therefore it is recommended to use a plugin for eslint in your favorite IDE. The rules are in the _.eslintrc.js_ file.
 
-You can also run ESlint manually by doing:
+You can also run [ESLint] manually by doing:
 
 ```bash
 yarn lint
 ```
 
-Besides ESlint, the project uses [Prettier] for code formatting. The rules are in the .prettierrc file.
+Besides ESlint, the project uses [Prettier] for code formatting. The rules are defined in the _.prettierrc.js_ config file. Auto code formatting is executed at project building. To run it manually, use the following command:
 
 ```bash
 yarn format
@@ -85,6 +85,8 @@ Some types have been added using [flow]. To run the flow type checker:
 ```bash
 yarn flow
 ```
+
+### Testing
 
 [Jest] is the main testing framework and runner for unit tests.
 It is encouraged to use the [React Testing Library] for testing React components.
@@ -101,3 +103,4 @@ yarn test
 [Enzyme]: https://airbnb.io/enzyme/
 [React Testing Library]: https://github.com/testing-library/react-testing-library
 [Prettier]: https://prettier.io/
+[ESLint]: https://eslint.org/
