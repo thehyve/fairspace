@@ -1,0 +1,37 @@
+# Pluto
+
+The service is a Spring Boot service playing role of a lightweight API gateway using Spring Cloud Gateway.
+
+For a detailed description of the service, see the [Fairspace documentation](../../README.adoc).
+
+## Development
+
+### Running the app in development mode
+
+Prerequisites:
+
+- Java 21
+- Gradle
+- Running Saturn service
+- Running Keycloak instance
+- Running PostgresQL instance (optional)
+- Environment variable `KEYCLOAK_CLIENT_SECRET` set to `**********`
+
+To run the application, execute the following command:
+
+```bash
+./gradlew bootRun --args='--spring.profiles.active=local'
+```
+
+### Code style
+
+To ensure a consistent code style, we use the Spotless Gradle plugin. The plugin config is based on Palantir's code style with a few modifications. See the [Gradle file](build.gradle) for the exact configuration.
+To format the code, run the following command:
+
+```bash
+./gradlew :spotlessApply
+```
+
+NOTE: The Spotless plugin also runs as part of the CI pipeline. Build will fail if the code is not formatted correctly.
+
+
