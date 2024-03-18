@@ -1,6 +1,6 @@
 # Pluto
 
-The service is a Spring Boot service playing role of a lightweight API gateway using Spring Cloud Gateway.
+The service is a Spring Boot application playing role of a lightweight API gateway using Spring Cloud Gateway.
 
 For a detailed description of the service, see the [Fairspace documentation](../../README.adoc).
 
@@ -15,7 +15,7 @@ Prerequisites:
 - Running Saturn service
 - Running Keycloak instance
 - Running PostgreSQL instance (optional)
-- Environment variable `KEYCLOAK_CLIENT_SECRET` set to `**********`
+- Environment variable `KEYCLOAK_CLIENT_SECRET` set to `**********` for local run (or an appropriate value for other environments)
 
 To run the application, execute the following command:
 

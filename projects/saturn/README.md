@@ -14,9 +14,10 @@ Prerequisites:
 - Java 21
 - Gradle
 - PostgreSQL instance running (optional)
-- Keycloak instance running
+- Keycloak instance running 
+- Environment variable `KEYCLOAK_CLIENT_SECRET` set to `**********` for local run (or an appropriate value for other environments)
 
-To run the application, execute the main method in the [App](src/main/java/io/fairspace/saturn/App.java) class or execute the following command:
+To run the application, execute the following command:
 
 ```bash
 ./gradlew run
