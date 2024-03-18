@@ -69,10 +69,7 @@ class LinkedDataAPI {
         // eslint-disable-next-line array-callback-return
         const requests = subjects.map(subject =>
             axios
-                .get(
-                    `${this.getStatementsUrl()}?subject=${encodeURIComponent(subject)}`,
-                    requestOptions
-                )
+                .get(`${this.getStatementsUrl()}?subject=${encodeURIComponent(subject)}`, requestOptions)
                 .catch(() => null)
         );
         return axios

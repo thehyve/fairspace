@@ -16,8 +16,7 @@ const labelForKey = (key, typeShape) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const filterProperties = ([key, value]) =>
-    !['iri', 'type', 'contains', 'label', 'comment'].includes(key);
+const filterProperties = ([key, value]) => !['iri', 'type', 'contains', 'label', 'comment'].includes(key);
 
 /**
  * Renders the highlighted matches for the given hit

@@ -81,9 +81,7 @@ export const AlterUserPermissionsDialog = ({
     };
 
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
-        const reducedPermissions = selectedPermissions.filter(
-            p => selectedPermission.iri !== p.iri
-        );
+        const reducedPermissions = selectedPermissions.filter(p => selectedPermission.iri !== p.iri);
         setSelectedPermissions(reducedPermissions);
     };
 
@@ -123,8 +121,7 @@ export const AlterUserPermissionsDialog = ({
             permissionCandidates={permissionCandidates}
             onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
             filter={p =>
-                (!currentUser || p.iri !== currentUser.iri) &&
-                !selectedPermissions.some(sp => sp.iri === p.iri)
+                (!currentUser || p.iri !== currentUser.iri) && !selectedPermissions.some(sp => sp.iri === p.iri)
             }
             label="Select user"
             autoFocus

@@ -14,11 +14,7 @@ import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from '../common/components/ErrorDialog';
-import {
-    fileNameContainsInvalidCharacter,
-    isUnsafeFileName,
-    isValidFileName
-} from '../file/fileUtils';
+import {fileNameContainsInvalidCharacter, isUnsafeFileName, isValidFileName} from '../file/fileUtils';
 import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 const fields = ['name', 'description', 'ownerWorkspace'];
@@ -29,15 +25,12 @@ const copyProperties = (properties: CollectionProperties): CollectionProperties 
         return copy;
     }, {}): any): CollectionProperties);
 
-const havePropertiesChanged = (
-    collection: CollectionProperties,
-    properties: CollectionProperties
-) => !collection || fields.some(field => collection[field] !== properties[field]);
+const havePropertiesChanged = (collection: CollectionProperties, properties: CollectionProperties) =>
+    !collection || fields.some(field => collection[field] !== properties[field]);
 
 const MAX_LOCATION_LENGTH = 127;
 
-const isNameValid = (name: string) =>
-    !!name && isValidFileName(name) && name.trim().length <= MAX_LOCATION_LENGTH;
+const isNameValid = (name: string) => !!name && isValidFileName(name) && name.trim().length <= MAX_LOCATION_LENGTH;
 
 /**
  * Checks whether the input is valid. Check whether the name is not empty.
@@ -48,8 +41,7 @@ const isNameValid = (name: string) =>
  */
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
-export const formatPrefix = (prefix: string) =>
-    prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : '';
+export const formatPrefix = (prefix: string) => (prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : '');
 
 const styles = theme => ({
     textHelperBasic: {
@@ -84,10 +76,7 @@ type CollectionEditorState = {
     properties: CollectionProperties
 };
 
-export class CollectionEditor extends React.Component<
-    CollectionEditorProps,
-    CollectionEditorState
-> {
+export class CollectionEditor extends React.Component<CollectionEditorProps, CollectionEditorState> {
     static defaultProps = {
         setBusy: () => {},
         updateExisting: false,
@@ -143,10 +132,7 @@ export class CollectionEditor extends React.Component<
             })
             .catch((err: Error) => {
                 this.onSaveComplete();
-                if (
-                    err.message.includes('name already exists') ||
-                    err.message.includes('status code 409')
-                ) {
+                if (err.message.includes('name already exists') || err.message.includes('status code 409')) {
                     ErrorDialog.showError(
                         'Collection name must be unique',
                         'Collection name is already in use. Please choose a unique name.'
@@ -251,22 +237,16 @@ export class CollectionEditor extends React.Component<
                     <br />
                     {!this.validateNameStartsWithWorkspaceCode() && (
                         <span>
-                            <b>Warning!</b> Name does not start with the suggested form of a
-                            workspace code:
+                            <b>Warning!</b> Name does not start with the suggested form of a workspace code:
                             <i> {formatPrefix(this.props.workspace.code)}</i>
                             <br />
                         </span>
                     )}
-                    Keep the workspace code prefix. It ensures collection uniqueness between
-                    workspaces.
+                    Keep the workspace code prefix. It ensures collection uniqueness between workspaces.
                     <br />
                 </span>
-                {isUnsafeFileName(this.state.properties.name.trim())
-                    ? "Name cannot equal '.' or '..'"
-                    : ''}
-                {fileNameContainsInvalidCharacter(this.state.properties.name)
-                    ? "Name cannot contain '/' or '\\'."
-                    : ''}
+                {isUnsafeFileName(this.state.properties.name.trim()) ? "Name cannot equal '.' or '..'" : ''}
+                {fileNameContainsInvalidCharacter(this.state.properties.name) ? "Name cannot contain '/' or '\\'." : ''}
                 {this.state.properties.name.trim().length > MAX_LOCATION_LENGTH
                     ? `Maximum length: ${MAX_LOCATION_LENGTH}.`
                     : ''}
@@ -276,11 +256,7 @@ export class CollectionEditor extends React.Component<
 
     render() {
         return (
-            <Dialog
-                open={this.state.editing}
-                onClose={this.props.onClose}
-                aria-labelledby="form-dialog-title"
-            >
+            <Dialog open={this.state.editing} onClose={this.props.onClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">
                     {this.props.collection ? 'Edit collection' : 'Add collection'}
                 </DialogTitle>
@@ -311,9 +287,7 @@ export class CollectionEditor extends React.Component<
                         label="Description"
                         name="description"
                         value={this.state.properties.description}
-                        onChange={event =>
-                            this.handleInputChange('description', event.target.value)
-                        }
+                        onChange={event => this.handleInputChange('description', event.target.value)}
                         fullWidth
                     />
                 </DialogContent>

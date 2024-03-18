@@ -7,14 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import {Close} from '@mui/icons-material';
 import styles from './WithRightDrawer.styles';
 
-function WithRightDrawer({
-    classes,
-    mainContents,
-    drawerContents,
-    collapsible,
-    drawerOpened,
-    onCloseDrawer
-}) {
+function WithRightDrawer({classes, mainContents, drawerContents, collapsible, drawerOpened, onCloseDrawer}) {
     return (
         <div>
             <main
@@ -35,11 +28,7 @@ function WithRightDrawer({
                 {collapsible ? (
                     <div>
                         <div className={classes.toolbar} />
-                        <IconButton
-                            onClick={onCloseDrawer}
-                            title="Close drawer"
-                            className={classes.closeButton}
-                        >
+                        <IconButton onClick={onCloseDrawer} title="Close drawer" className={classes.closeButton}>
                             <Close />
                         </IconButton>
                     </div>

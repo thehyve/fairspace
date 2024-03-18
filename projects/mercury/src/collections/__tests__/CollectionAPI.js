@@ -11,11 +11,7 @@ describe('CollectionAPI', () => {
     describe('Retrieving', () => {
         beforeEach(() => {
             LocalFileAPI.list = jest.fn(() =>
-                Promise.resolve([
-                    {basename: 'collection1'},
-                    {basename: 'collection2'},
-                    {basename: 'collection3'}
-                ])
+                Promise.resolve([{basename: 'collection1'}, {basename: 'collection2'}, {basename: 'collection3'}])
             );
             LocalFileAPI.stat = jest.fn(() => Promise.resolve({iri: 'c_iri'}));
         });

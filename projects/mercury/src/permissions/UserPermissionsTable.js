@@ -1,14 +1,6 @@
 // @flow
 import React from 'react';
-import {
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableRow,
-    Tooltip,
-    Typography
-} from '@mui/material';
+import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Close, Person} from '@mui/icons-material';
 import FormControl from '@mui/material/FormControl';
@@ -73,9 +65,7 @@ export const UserPermissionsTable = ({
         );
     }
 
-    const availableWorkspaceMemberAccessLevels = accessLevels.filter(
-        a => a !== 'None' && a !== 'List'
-    );
+    const availableWorkspaceMemberAccessLevels = accessLevels.filter(a => a !== 'None' && a !== 'List');
     const getAccessLevelsForPrincipal: AccessLevel[] = (selectedPrincipal: Principal) => {
         if (workspaceUsers.some(wu => wu.iri === selectedPrincipal.iri)) {
             return availableWorkspaceMemberAccessLevels;
@@ -86,10 +76,7 @@ export const UserPermissionsTable = ({
     const canManagePermission: boolean = (permission: Permission) =>
         canManage && currentUser && permission.iri !== currentUser.iri;
 
-    const renderAccessLevelDropdown = (
-        selectedPermission: Permission,
-        accessLevelOptions: AccessLevel[]
-    ) => (
+    const renderAccessLevelDropdown = (selectedPermission: Permission, accessLevelOptions: AccessLevel[]) => (
         <FormControl>
             <Select
                 value={selectedPermission.access}
@@ -134,9 +121,7 @@ export const UserPermissionsTable = ({
                                     renderAccessLevelDropdown(p, accessLevelOptions)
                                 ) : (
                                     <div>
-                                        <span className={classes.accessIcon}>
-                                            {collectionAccessIcon(p.access)}
-                                        </span>
+                                        <span className={classes.accessIcon}>{collectionAccessIcon(p.access)}</span>
                                         <span>{p.access}</span>
                                     </div>
                                 )}

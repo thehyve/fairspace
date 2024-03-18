@@ -15,8 +15,7 @@ import WorkspaceDialog from './WorkspaceDialog';
 const WorkspaceBrowser = () => {
     const history = useHistory();
     const {currentUser, currentUserError, currentUserLoading} = useContext(UserContext);
-    const {workspaces, workspacesLoading, workspacesError, createWorkspace} =
-        useContext(WorkspaceContext);
+    const {workspaces, workspacesLoading, workspacesError, createWorkspace} = useContext(WorkspaceContext);
 
     const loading = currentUserLoading || workspacesLoading;
     const error = currentUserError || workspacesError;

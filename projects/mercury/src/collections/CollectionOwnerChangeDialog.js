@@ -39,11 +39,7 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
     };
 
     return (
-        <Dialog
-            open={openDialog}
-            data-testid="owner-workspace-change-dialog"
-            onClose={handleCancel}
-        >
+        <Dialog open={openDialog} data-testid="owner-workspace-change-dialog" onClose={handleCancel}>
             <DialogTitle id="property-change-dialog-title">
                 Transfer the collection ownership to another workspace
             </DialogTitle>
@@ -66,8 +62,7 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
                     message={
                         <span>
                             Are you sure you want to <b>transfer the ownership</b> on collection{' '}
-                            <em>{collection.name}</em> to workspace{' '}
-                            <em>{selectedValue && selectedValue.label}</em>?
+                            <em>{collection.name}</em> to workspace <em>{selectedValue && selectedValue.label}</em>?
                         </span>
                     }
                     agreeButtonText="Yes"

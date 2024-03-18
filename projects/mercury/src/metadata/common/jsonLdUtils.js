@@ -19,23 +19,14 @@ export const getFirstPredicateProperty = (
         ? metadataEntry[predicate][0][property]
         : defaultValue;
 
-export const getFirstPredicateValue = (
-    metadataEntry: any,
-    predicate: string,
-    defaultValue: any
-): any => getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
+export const getFirstPredicateValue = (metadataEntry: any, predicate: string, defaultValue: any): any =>
+    getFirstPredicateProperty(metadataEntry, predicate, '@value', defaultValue);
 
-export const getFirstPredicateId = (
-    metadataEntry: any,
-    predicate: string,
-    defaultValue: any
-): any => getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
+export const getFirstPredicateId = (metadataEntry: any, predicate: string, defaultValue: any): any =>
+    getFirstPredicateProperty(metadataEntry, predicate, '@id', defaultValue);
 
-export const getFirstPredicateList = (
-    metadataEntry: any,
-    predicate: string,
-    defaultValue: any
-): any => getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
+export const getFirstPredicateList = (metadataEntry: any, predicate: string, defaultValue: any): any =>
+    getFirstPredicateProperty(metadataEntry, predicate, '@list', defaultValue);
 
 /**
  * Normalize a JSON-LD resource by converting the values or iris into a single object

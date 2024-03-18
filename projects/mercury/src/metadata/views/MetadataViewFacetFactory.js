@@ -70,12 +70,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
     );
 
     const clearFiltersAction = activeFilterValues.length > 0 && (
-        <IconButton
-            onClick={clearFilter}
-            aria-label="Clear"
-            className={classes.headerIcon}
-            size="medium"
-        >
+        <IconButton onClick={clearFilter} aria-label="Clear" className={classes.headerIcon} size="medium">
             <Clear fontSize="small" color="primary" />
         </IconButton>
     );
@@ -90,9 +85,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
                 action={clearFiltersAction}
             />
             <Collapse in={expanded} timeout="auto">
-                <CardContent className={classes.content}>
-                    {getFacet({...props, classes})}
-                </CardContent>
+                <CardContent className={classes.content}>{getFacet({...props, classes})}</CardContent>
             </Collapse>
         </Card>
     );

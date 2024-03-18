@@ -1,14 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TableSortLabel
-} from '@mui/material';
+import {Paper, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel} from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
 import {HighlightOffSharp} from '@mui/icons-material';
@@ -28,9 +19,7 @@ import usePagination from '../common/hooks/UsePagination';
 import ConfirmationButton from '../common/components/ConfirmationButton';
 import MessageDisplay from '../common/components/MessageDisplay';
 import LoadingInlay from '../common/components/LoadingInlay';
-import WorkspaceUserRolesContext, {
-    WorkspaceUserRolesProvider
-} from '../workspaces/WorkspaceUserRolesContext';
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from '../workspaces/WorkspaceUserRolesContext';
 import UserContext from './UserContext';
 import {getWorkspaceUsersWithRoles, isAdmin} from './userUtils';
 import ErrorDialog from '../common/components/ErrorDialog';
@@ -66,22 +55,12 @@ type UserListProps = {
 };
 
 const UserList = (props: UserListProps) => {
-    const {
-        currentUser,
-        workspace,
-        workspaceRoles,
-        workspaceRolesError,
-        workspaceRolesLoading,
-        setWorkspaceRole
-    } = props;
+    const {currentUser, workspace, workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole} =
+        props;
     const {canManage} = workspace;
     const {users} = useContext(UsersContext);
     const workspaceUsersWithRoles = getWorkspaceUsersWithRoles(users, workspaceRoles);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(
-        workspaceUsersWithRoles,
-        columns,
-        'name'
-    );
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaceUsersWithRoles, columns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
     const [showAddUserDialog, setShowAddUserDialog] = useState(false);
     const [userToAdd, setUserToAdd] = useState(null);
@@ -96,18 +75,14 @@ const UserList = (props: UserListProps) => {
     const grantUserRole = (userIri, role) => {
         setWorkspaceRole(userIri, role)
             .catch(err => {
-                const message =
-                    err && err.message
-                        ? err.message
-                        : 'An error occurred while updating a workspace users';
+                const message = err && err.message ? err.message : 'An error occurred while updating a workspace users';
                 ErrorDialog.showError(message);
             })
             .finally(() => setShowAddUserDialog(false));
     };
 
     const permissionCandidateFilter = (u: User) =>
-        (u.iri !== currentUser.iri || isAdmin(u)) &&
-        workspaceUsersWithRoles.find(wu => wu.iri === u.iri) === undefined;
+        (u.iri !== currentUser.iri || isAdmin(u)) && workspaceUsersWithRoles.find(wu => wu.iri === u.iri) === undefined;
 
     const renderAddUserDialog = () => (
         <Dialog open={showAddUserDialog} onClose={() => setShowAddUserDialog(false)}>
@@ -122,11 +97,7 @@ const UserList = (props: UserListProps) => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button
-                    onClick={() => grantUserRole(userToAdd.iri, 'Member')}
-                    color="primary"
-                    disabled={!userToAdd}
-                >
+                <Button onClick={() => grantUserRole(userToAdd.iri, 'Member')} color="primary" disabled={!userToAdd}>
                     Add
                 </Button>
                 <Button onClick={() => setShowAddUserDialog(false)}>Cancel</Button>
@@ -250,12 +221,7 @@ const ContextualUserList = props => {
     return (
         <WorkspaceUserRolesProvider iri={workspace.iri}>
             <WorkspaceUserRolesContext.Consumer>
-                {({
-                    workspaceRoles,
-                    workspaceRolesError,
-                    workspaceRolesLoading,
-                    setWorkspaceRole
-                }) => (
+                {({workspaceRoles, workspaceRolesError, workspaceRolesLoading, setWorkspaceRole}) => (
                     <UserList
                         currentUser={currentUser}
                         workspace={workspace}

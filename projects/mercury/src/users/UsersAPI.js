@@ -37,6 +37,4 @@ export const getUsers = (): User[] =>
         .catch(handleHttpError('Error while loading users'));
 
 export const setUserRole = (id: string, role, enable: boolean) =>
-    axios
-        .patch('/api/users/', {id, [role]: enable})
-        .catch(handleHttpError("Error altering user's role"));
+    axios.patch('/api/users/', {id, [role]: enable}).catch(handleHttpError("Error altering user's role"));

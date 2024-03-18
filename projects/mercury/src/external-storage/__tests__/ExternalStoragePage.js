@@ -67,17 +67,11 @@ describe('ExternalStoragePage', () => {
             search: '?selection=%2Fcollection%202021-05-27_13_39-2%2Fdir_0%2Fcoffee_139.jpg'
         };
         act(() => {
-            wrapper = shallowRender(
-                '/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0',
-                'xyz',
-                location
-            );
+            wrapper = shallowRender('/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0', 'xyz', location);
         });
 
         const externalStorageBrowserProps = wrapper.find(ExternalStorageBrowser).first().props();
-        expect(externalStorageBrowserProps.preselectedFile).toBe(
-            '/collection 2021-05-27_13_39-2/dir_0/coffee_139.jpg'
-        );
+        expect(externalStorageBrowserProps.preselectedFile).toBe('/collection 2021-05-27_13_39-2/dir_0/coffee_139.jpg');
     });
 
     it('displays an error if storage does not exist', () => {
@@ -86,8 +80,6 @@ describe('ExternalStoragePage', () => {
         });
 
         expect(wrapper.find(ExternalStorageBrowser).length).toBe(0);
-        expect(wrapper.find(MessageDisplay).first().props().message).toBe(
-            'Storage "test" not found.'
-        );
+        expect(wrapper.find(MessageDisplay).first().props().message).toBe('Storage "test" not found.');
     });
 });

@@ -9,11 +9,7 @@ const MetadataViewContext = React.createContext({});
 
 const SESSION_STORAGE_METADATA_FILTERS_KEY = 'FAIRSPACE_METADATA_FILTERS';
 
-export const MetadataViewProvider = ({
-    children,
-    metadataViewAPI = MetadataViewAPI,
-    sourceName = ''
-}) => {
+export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAPI, sourceName = ''}) => {
     const {data = {}, error, loading, refresh} = useAsync(() => metadataViewAPI.getViews(), []);
 
     const [filters: MetadataViewFilter[], setFilters] = useStateWithSessionStorage(

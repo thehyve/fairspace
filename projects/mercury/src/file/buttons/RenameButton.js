@@ -25,9 +25,7 @@ const RenameButton = ({disabled, currentName, onRename, children}) => {
     };
 
     const handleRename = () => {
-        onRename(nameControl.value).then(
-            shouldClose => isMounted() && shouldClose && setOpened(false)
-        );
+        onRename(nameControl.value).then(shouldClose => isMounted() && shouldClose && setOpened(false));
     };
 
     const validateAndRename = () => nameControl.valid && handleRename();

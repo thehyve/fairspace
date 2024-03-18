@@ -9,11 +9,7 @@ import {File} from '../file/FileAPI';
 import {splitPathIntoArray} from '../file/fileUtils';
 import FileOperations from '../file/FileOperations';
 import type {ExternalStorage} from './externalStorageUtils';
-import {
-    getExternalStorageAbsolutePath,
-    getExternalStoragePathPrefix,
-    getRelativePath
-} from './externalStorageUtils';
+import {getExternalStorageAbsolutePath, getExternalStoragePathPrefix, getRelativePath} from './externalStorageUtils';
 import * as consts from '../constants';
 
 const styles = () => ({
@@ -88,11 +84,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
     };
 
     if (error) {
-        return (
-            <MessageDisplay
-                message={`An error occurred while loading data from ${storage.label}.`}
-            />
-        );
+        return <MessageDisplay message={`An error occurred while loading data from ${storage.label}.`} />;
     }
     if (loading) {
         return <LoadingInlay />;

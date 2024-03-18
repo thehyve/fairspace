@@ -45,11 +45,9 @@ export const getSearchPathSegments = (context, storageName = '') => {
 };
 
 export const getSearchQueryFromString = searchString => queryString.parse(searchString).q || '';
-export const getLocationContextFromString = searchString =>
-    queryString.parse(searchString).context || '';
+export const getLocationContextFromString = searchString => queryString.parse(searchString).context || '';
 export const getStorageFromString = searchString => queryString.parse(searchString).storage || '';
-export const getMetadataViewNameFromString = searchString =>
-    queryString.parse(searchString).view || '';
+export const getMetadataViewNameFromString = searchString => queryString.parse(searchString).view || '';
 
 /**
  * Error handler for search queries. Handles HTTP statuses 400 and 401 separately
@@ -58,9 +56,7 @@ export const getMetadataViewNameFromString = searchString =>
 export const handleSearchError = e => {
     switch (e.status) {
         case 400:
-            throw new Error(
-                "Oops, we're unable to parse this query. Please only use alphanumeric characters."
-            );
+            throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
         case 401:
         case 403:
             handleAuthError(e.status);

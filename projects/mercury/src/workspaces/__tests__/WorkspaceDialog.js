@@ -26,12 +26,7 @@ beforeEach(() => {
     onClose = jest.fn();
     workspaceDialog = (
         <ThemeProvider theme={theme}>
-            <WorkspaceDialog
-                onSubmit={onSubmit}
-                onClose={onClose}
-                creating={false}
-                workspaces={[{code: 'w1'}]}
-            />
+            <WorkspaceDialog onSubmit={onSubmit} onClose={onClose} creating={false} workspaces={[{code: 'w1'}]} />
         </ThemeProvider>
     );
     wrapper = mount(workspaceDialog);

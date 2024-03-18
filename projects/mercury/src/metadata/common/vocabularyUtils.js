@@ -29,8 +29,7 @@ export const isGenericIriResource = propertyShape =>
  * @param propertyShape
  * @returns {boolean}
  */
-export const isRelationShape = propertyShape =>
-    getFirstPredicateValue(propertyShape, constants.SHACL_CLASS) != null;
+export const isRelationShape = propertyShape => getFirstPredicateValue(propertyShape, constants.SHACL_CLASS) != null;
 
 /**
  * Returns the maxCount value for the given shape
@@ -50,8 +49,7 @@ export const getMaxCount = propertyShape =>
  * @param propertyShape
  * @returns {boolean}
  */
-const isExternalLink = propertyShape =>
-    !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
+const isExternalLink = propertyShape => !!getFirstPredicateValue(propertyShape, constants.EXTERNAL_LINK_URI, false);
 
 /**
  * Returns a list of classes marked as fairspace entities.
@@ -78,9 +76,7 @@ export const getClassesInCatalog = vocabulary =>
  */
 export const getNamespaces = (vocabulary, namespaceFilter = () => true) =>
     vocabulary
-        .filter(
-            entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION)
-        )
+        .filter(entry => entry['@type'] && entry['@type'].includes(constants.SHACL_PREFIX_DECLARATION))
         .filter(namespaceFilter)
         .map(namespace => ({
             id: namespace['@id'],
@@ -184,9 +180,7 @@ const determinePropertyShapesForNodeShape = (vocabulary, shape) => {
     }
 
     const propertyShapes = shape[constants.SHACL_PROPERTY];
-    const propertyShapeIds = propertyShapes
-        ? propertyShapes.map(propertyShape => propertyShape['@id'])
-        : [];
+    const propertyShapeIds = propertyShapes ? propertyShapes.map(propertyShape => propertyShape['@id']) : [];
 
     return vocabulary.filter(entry => propertyShapeIds.includes(entry['@id']));
 };
@@ -218,16 +212,13 @@ const generatePropertyEntry = (vocabulary, predicate, shape) => {
     const datatype = getFirstPredicateId(shape, constants.SHACL_DATATYPE);
     const className = getFirstPredicateId(shape, constants.SHACL_CLASS);
     const multiLine =
-        (datatype === constants.STRING_URI &&
-            !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false)) ||
+        (datatype === constants.STRING_URI && !getFirstPredicateValue(shape, constants.DASH_SINGLE_LINE, false)) ||
         datatype === constants.MARKDOWN_URI;
     const description = getFirstPredicateValue(shape, constants.SHACL_DESCRIPTION);
     const path = getFirstPredicateId(shape, constants.SHACL_PATH);
     const shapeIsRelationShape = isRelationShape(shape);
     const importantPropertyShapes =
-        shapeIsRelationShape && className
-            ? determineImportantPropertyShapes(vocabulary, className)
-            : [];
+        shapeIsRelationShape && className ? determineImportantPropertyShapes(vocabulary, className) : [];
 
     return {
         key: predicate,
@@ -291,9 +282,7 @@ export const getPropertiesForNodeShape = (vocabulary, nodeShape) => {
 };
 
 export const getChildSubclasses = (vocabulary, type) =>
-    vocabulary
-        .filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type)
-        .map(e => e['@id']);
+    vocabulary.filter(e => getFirstPredicateId(e, constants.SUBCLASS_URI) === type).map(e => e['@id']);
 
 /**
  * Returns an array of the types that are subclasses of the provided type including indirect subclasses

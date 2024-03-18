@@ -1,14 +1,6 @@
 // @flow
 import React from 'react';
-import {
-    IconButton,
-    Table,
-    TableBody,
-    TableCell,
-    TableRow,
-    Tooltip,
-    Typography
-} from '@mui/material';
+import {IconButton, Table, TableBody, TableCell, TableRow, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {Close, Widgets} from '@mui/icons-material';
 import PropTypes from 'prop-types';
@@ -71,10 +63,7 @@ export const WorkspacePermissionsTable = ({
                         </TableCell>
                         <TableCell width={40} className={classes.iconCell} align="right">
                             {canManage && (
-                                <IconButton
-                                    onClick={() => handleDeleteSelectedPermission(p)}
-                                    size="medium"
-                                >
+                                <IconButton onClick={() => handleDeleteSelectedPermission(p)} size="medium">
                                     <Close />
                                 </IconButton>
                             )}

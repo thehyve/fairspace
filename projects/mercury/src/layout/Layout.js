@@ -22,9 +22,7 @@ const Layout = ({
     renderMain = () => {},
     renderTopbar = () => <TopBar title={versionInfo.name} />
 }) => {
-    const [menuExpanded, setMenuExpanded] = useState(
-        window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false'
-    );
+    const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
     const {currentUserLoading} = useContext(UserContext);

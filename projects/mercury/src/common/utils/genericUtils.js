@@ -83,8 +83,7 @@ export function comparePrimitives(x, y) {
     return 0;
 }
 export function compareBy(valueExtractor, ascending = true) {
-    const transform =
-        typeof valueExtractor === 'function' ? valueExtractor : x => x[valueExtractor];
+    const transform = typeof valueExtractor === 'function' ? valueExtractor : x => x[valueExtractor];
     return (x, y) => (ascending ? 1 : -1) * comparePrimitives(transform(x), transform(y));
 }
 

@@ -30,10 +30,7 @@ describe('MetadataViewActiveFacetFilters', () => {
                 filters={[
                     {
                         field: 'Subject_gender',
-                        values: [
-                            'http://example.com/gender#male',
-                            'http://example.com/gender#female'
-                        ]
+                        values: ['http://example.com/gender#male', 'http://example.com/gender#female']
                     },
                     {
                         field: 'Subject_species',

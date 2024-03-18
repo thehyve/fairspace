@@ -31,12 +31,7 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
                     {idx === allSegments.length - 1 ? (
                         label
                     ) : (
-                        <Link
-                            component={RouterLink}
-                            className={classes.link}
-                            color="inherit"
-                            to={href}
-                        >
+                        <Link component={RouterLink} className={classes.link} color="inherit" to={href}>
                             {label}
                         </Link>
                     )}

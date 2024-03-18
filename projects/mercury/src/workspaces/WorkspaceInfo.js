@@ -18,8 +18,7 @@ type WorkspaceInfoProps = {
 const WorkspaceInfo = (props: WorkspaceInfoProps) => {
     const {workspace} = props;
     const {iri} = workspace;
-    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} =
-        useLinkedData(iri);
+    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(iri);
     const {currentUser} = useContext(UserContext);
     const {refreshWorkspaces} = useContext(WorkspaceContext);
 

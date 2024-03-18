@@ -1,6 +1,6 @@
 module.exports = {
     // Global Prettier options
-    printWidth: 100,
+    printWidth: 120,
     singleQuote: true,
     trailingComma: 'none',
     bracketSpacing: false,

@@ -12,8 +12,6 @@ describe('ShortText', () => {
     it('should correctly limit lines', () => {
         expect(limitLines('This fits\nperfectly.', 2)).toBe('This fits\nperfectly.');
         expect(limitLines('Just trims\nthe new line\n', 2)).toBe('Just trims\nthe new line');
-        expect(limitLines('These are\nway too\nmany lines\nof text.', 2)).toBe(
-            'These are\nway too'
-        );
+        expect(limitLines('These are\nway too\nmany lines\nof text.', 2)).toBe('These are\nway too');
     });
 });

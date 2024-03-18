@@ -50,11 +50,7 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
                 title={
                     <div>
                         Metadata for {entity.label}
-                        <CopyButton
-                            style={{marginLeft: 10}}
-                            value={textFilterLink}
-                            labelPreCopy="Copy the link"
-                        />
+                        <CopyButton style={{marginLeft: 10}} value={textFilterLink} labelPreCopy="Copy the link" />
                     </div>
                 }
                 avatar={viewIcon}

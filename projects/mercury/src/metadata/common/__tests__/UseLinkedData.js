@@ -142,9 +142,7 @@ describe('useLinkedData', () => {
             shapes: [{[SHACL_TARGET_CLASS]: [{'@id': 'http://type'}]}]
         };
 
-        const {result, waitForNextUpdate} = renderHook(() =>
-            useLinkedDataNoContext('http://subject', context)
-        );
+        const {result, waitForNextUpdate} = renderHook(() => useLinkedDataNoContext('http://subject', context));
 
         await waitForNextUpdate();
 

@@ -4,11 +4,7 @@ import {configure, mount} from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import {act} from '@testing-library/react';
-import UploadsContext, {
-    UPLOAD_STATUS_FINISHED,
-    UPLOAD_STATUS_IN_PROGRESS,
-    UploadsProvider
-} from '../UploadsContext';
+import UploadsContext, {UPLOAD_STATUS_FINISHED, UPLOAD_STATUS_IN_PROGRESS, UploadsProvider} from '../UploadsContext';
 import {LocalFileAPI} from '../FileAPI';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -62,9 +58,7 @@ describe('UploadsProvider', () => {
         await uploadPromise;
 
         context = getContext();
-        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(
-            UPLOAD_STATUS_FINISHED
-        );
+        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
     });
 
     it('should handle upload errors', async () => {
@@ -152,8 +146,6 @@ describe('UploadsProvider', () => {
 
         context = getContext();
         expect(context.uploads.find(u => u.file === upload.file).progress).toEqual(100);
-        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(
-            UPLOAD_STATUS_FINISHED
-        );
+        expect(context.uploads.find(u => u.file === upload.file).status).toEqual(UPLOAD_STATUS_FINISHED);
     });
 });

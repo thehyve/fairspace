@@ -78,19 +78,13 @@ export const canAlterPermission = (canManage, user, currentLoggedUser) => {
     return canManage && (isSomeoneElsePermission || !!isAdmin(user));
 };
 
-export const mapPrincipalPermission: PrincipalPermission = (
-    principalProperties,
-    access: AccessLevel = null
-) => ({
+export const mapPrincipalPermission: PrincipalPermission = (principalProperties, access: AccessLevel = null) => ({
     iri: principalProperties.iri,
     name: principalProperties.code ? principalProperties.code : principalProperties.name,
     access
 });
 
-export const getPrincipalsWithCollectionAccess: PrincipalPermission = (
-    principals,
-    permissions: Permission[]
-) => {
+export const getPrincipalsWithCollectionAccess: PrincipalPermission = (principals, permissions: Permission[]) => {
     const results = [];
     principals.forEach(u => {
         const permission = permissions.find(p => p.iri === u.iri);
@@ -115,9 +109,7 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
 };
 
 const parsePermissions = value =>
-    (typeof value !== 'string' ? [] : value.split(',').map(s => s.split(' '))).map(
-        ([iri, access]) => ({iri, access})
-    );
+    (typeof value !== 'string' ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
 
 const parseToArray = value => (typeof value !== 'string' ? [] : value.split(','));
 

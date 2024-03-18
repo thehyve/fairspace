@@ -65,9 +65,7 @@ describe('ExternalStorageBrowser', () => {
             </ThemeProvider>
         );
 
-        expect(
-            getByText('An error occurred while loading data from Test storage.')
-        ).toBeInTheDocument();
+        expect(getByText('An error occurred while loading data from Test storage.')).toBeInTheDocument();
     });
 
     it('show loading inlay as long as the files are pending', () => {

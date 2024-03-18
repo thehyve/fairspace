@@ -9,16 +9,11 @@ const FeaturesContext = React.createContext({});
 
 export const FeaturesProvider = ({children}) => {
     const {data = []} = useAsync(() =>
-        axios
-            .get('/api/features/')
-            .then(extractJsonData)
-            .catch(handleHttpError('Connection error.'))
+        axios.get('/api/features/').then(extractJsonData).catch(handleHttpError('Connection error.'))
     );
 
     return (
-        <FeaturesContext.Provider
-            value={{isFeatureEnabled: (feature: Feature) => data.includes(feature)}}
-        >
+        <FeaturesContext.Provider value={{isFeatureEnabled: (feature: Feature) => data.includes(feature)}}>
             {children}
         </FeaturesContext.Provider>
     );

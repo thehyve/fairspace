@@ -84,11 +84,7 @@ const UserMenu = ({classes}) => {
                 onClick={handleClick}
                 className={classes.row}
             >
-                <Avatar
-                    alt={currentUser.name}
-                    src="/public/images/avatar.png"
-                    className={classes.avatar}
-                />
+                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
                 <span>{getDisplayName(currentUser)}</span>
             </Button>
             <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
@@ -103,17 +99,10 @@ const UserMenu = ({classes}) => {
                         <Paper>
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
-                                    <MenuItem
-                                        className={classes.userMenu}
-                                        disablefocusonhover="true"
-                                    >
+                                    <MenuItem className={classes.userMenu} disablefocusonhover="true">
                                         <Card sx={{minWidth: 275}}>
                                             <CardContent>
-                                                <Typography
-                                                    sx={{fontSize: 12}}
-                                                    color="text.secondary"
-                                                    gutterBottom
-                                                >
+                                                <Typography sx={{fontSize: 12}} color="text.secondary" gutterBottom>
                                                     Welcome
                                                 </Typography>
                                                 <Typography variant="h5" component="div">

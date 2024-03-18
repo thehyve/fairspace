@@ -48,12 +48,7 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
             >
                 <FirstPage />
             </IconButton>
-            <IconButton
-                onClick={handleBackButtonClick}
-                disabled={page === 0}
-                aria-label="previous page"
-                size="medium"
-            >
+            <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page" size="medium">
                 <KeyboardArrowLeft />
             </IconButton>
             <Typography variant="body2" component="span" display="inline">

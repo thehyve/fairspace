@@ -1,14 +1,7 @@
 import React, {useContext, useState} from 'react';
 import {Badge, IconButton, ListItemText} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {
-    BorderColor,
-    CloudUpload,
-    CreateNewFolder,
-    Delete,
-    Restore,
-    RestoreFromTrash
-} from '@mui/icons-material';
+import {BorderColor, CloudUpload, CreateNewFolder, Delete, Restore, RestoreFromTrash} from '@mui/icons-material';
 import ContentCopy from 'mdi-material-ui/ContentCopy';
 import ContentCut from 'mdi-material-ui/ContentCut';
 import ContentPaste from 'mdi-material-ui/ContentPaste';
@@ -71,9 +64,7 @@ export const FileOperations = ({
     const isClipboardItemsOnOpenedPath =
         !clipboard.isEmpty() && clipboard.filenames.map(f => getParentPath(f)).includes(openedPath);
     const isPasteDisabled =
-        !isWritingEnabled ||
-        clipboard.isEmpty() ||
-        (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
+        !isWritingEnabled || clipboard.isEmpty() || (isClipboardItemsOnOpenedPath && clipboard.method === CUT);
 
     const fileOperation = (operationCode, operationPromise) => {
         setActiveOperation(operationCode);
@@ -115,19 +106,14 @@ export const FileOperations = ({
         if (operation) {
             return fileOperation(Operations.PASTE, operation)
                 .then(clipboard.clear)
-                .catch(err =>
-                    ErrorDialog.showError('An error occurred while pasting your contents', err)
-                );
+                .catch(err => ErrorDialog.showError('An error occurred while pasting your contents', err));
         }
 
         return Promise.resolve();
     };
 
     const handleCreateDirectory = name =>
-        fileOperation(
-            Operations.MKDIR,
-            fileActions.createDirectory(joinPaths(openedPath, name))
-        ).catch(err => {
+        fileOperation(Operations.MKDIR, fileActions.createDirectory(joinPaths(openedPath, name))).catch(err => {
             if (err.message.includes('status code 409')) {
                 ErrorDialog.showError(
                     'Directory name must be unique',
@@ -136,33 +122,22 @@ export const FileOperations = ({
                 );
                 return true;
             }
-            ErrorDialog.showError('An error occurred while creating directory', err, () =>
-                handleCreateDirectory(name)
-            );
+            ErrorDialog.showError('An error occurred while creating directory', err, () => handleCreateDirectory(name));
             return true;
         });
 
     const handlePathRename = (path, newName) =>
-        fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName)).catch(
-            err => {
-                ErrorDialog.showError(
-                    'An error occurred while renaming file or directory',
-                    err,
-                    () => handlePathRename(path, newName)
-                );
-                return false;
-            }
-        );
+        fileOperation(Operations.RENAME, fileActions.renameFile(path.basename, newName)).catch(err => {
+            ErrorDialog.showError('An error occurred while renaming file or directory', err, () =>
+                handlePathRename(path, newName)
+            );
+            return false;
+        });
 
     const handleRevert = versionToRevert =>
-        fileOperation(
-            Operations.REVERT,
-            fileActions.revertToVersion(selectedItem, versionToRevert)
-        ).catch(err => {
-            ErrorDialog.showError(
-                'An error occurred while reverting a file to a previous version',
-                err,
-                () => handleRevert(versionToRevert)
+        fileOperation(Operations.REVERT, fileActions.revertToVersion(selectedItem, versionToRevert)).catch(err => {
+            ErrorDialog.showError('An error occurred while reverting a file to a previous version', err, () =>
+                handleRevert(versionToRevert)
             );
             return false;
         });
@@ -198,9 +173,7 @@ export const FileOperations = ({
 
     const handleDelete = () =>
         fileOperation(Operations.DELETE, fileActions.deleteMultiple(selectedPaths)).catch(err => {
-            ErrorDialog.showError('An error occurred while deleting file or directory', err, () =>
-                handleDelete()
-            );
+            ErrorDialog.showError('An error occurred while deleting file or directory', err, () => handleDelete());
         });
 
     const getDeletionConfirmationMessage = () => {
@@ -218,15 +191,9 @@ export const FileOperations = ({
     };
 
     const handleUndelete = () =>
-        fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths)).catch(
-            err => {
-                ErrorDialog.showError(
-                    'An error occurred while undeleting file or directory',
-                    err,
-                    () => handleUndelete()
-                );
-            }
-        );
+        fileOperation(Operations.UNDELETE, fileActions.undeleteMultiple(selectedPaths)).catch(err => {
+            ErrorDialog.showError('An error occurred while undeleting file or directory', err, () => handleUndelete());
+        });
 
     return (
         <>
@@ -234,10 +201,7 @@ export const FileOperations = ({
                 {isWritingEnabled && (
                     <>
                         <ProgressButton active={activeOperation === Operations.MKDIR}>
-                            <CreateDirectoryButton
-                                onCreate={name => handleCreateDirectory(name)}
-                                disabled={busy}
-                            >
+                            <CreateDirectoryButton onCreate={name => handleCreateDirectory(name)} disabled={busy}>
                                 <IconButton
                                     aria-label="Create directory"
                                     title="Create directory"
@@ -303,20 +267,12 @@ export const FileOperations = ({
                             <RenameButton
                                 currentName={selectedItem.basename}
                                 onRename={newName => handlePathRename(selectedItem, newName)}
-                                disabled={
-                                    isDisabledForMoreThanOneSelection ||
-                                    isDeletedItemSelected ||
-                                    busy
-                                }
+                                disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
                             >
                                 <IconButton
                                     title={`Rename ${selectedItem.basename}`}
                                     aria-label={`Rename ${selectedItem.basename}`}
-                                    disabled={
-                                        isDisabledForMoreThanOneSelection ||
-                                        isDeletedItemSelected ||
-                                        busy
-                                    }
+                                    disabled={isDisabledForMoreThanOneSelection || isDeletedItemSelected || busy}
                                     size="medium"
                                 >
                                     <BorderColor />
@@ -349,9 +305,7 @@ export const FileOperations = ({
                                     dangerous
                                     onClick={handleUndelete}
                                     disabled={
-                                        noPathSelected ||
-                                        selectedDeletedItems.length !== selectedItems.length ||
-                                        busy
+                                        noPathSelected || selectedDeletedItems.length !== selectedItems.length || busy
                                     }
                                 >
                                     <IconButton

@@ -1,11 +1,5 @@
 import React, {useContext, useState} from 'react';
-import type {
-    AccessLevel,
-    AccessMode,
-    Collection,
-    CollectionProperties,
-    Status
-} from './CollectionAPI';
+import type {AccessLevel, AccessMode, Collection, CollectionProperties, Status} from './CollectionAPI';
 import CollectionAPI from './CollectionAPI';
 import useAsync from '../common/hooks/UseAsync';
 import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
@@ -32,24 +26,17 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const updateCollection = (collection: Collection) =>
         collectionApi.updateCollection(collection, vocabulary).then(refresh);
     const deleteCollection = (collection: CollectionProperties) =>
-        collectionApi
-            .deleteCollection(collection, showDeleted)
-            .then(refresh)
-            .then(refreshWorkspaces);
+        collectionApi.deleteCollection(collection, showDeleted).then(refresh).then(refreshWorkspaces);
     const undeleteCollection = (collection: CollectionProperties) =>
         collectionApi.undeleteCollection(collection).then(refresh).then(refreshWorkspaces);
-    const unpublish = (collection: CollectionProperties) =>
-        collectionApi.unpublish(collection).then(refresh);
+    const unpublish = (collection: CollectionProperties) => collectionApi.unpublish(collection).then(refresh);
     const renameCollection = (name: string, target: string) =>
         collectionApi.renameCollection(name, target).then(refresh);
     const setPermission = (name: string, principal: string, access: AccessLevel) =>
         collectionApi.setPermission(name, principal, access).then(refresh);
-    const setAccessMode = (name: string, mode: AccessMode) =>
-        collectionApi.setAccessMode(name, mode).then(refresh);
-    const setStatus = (name: string, status: Status) =>
-        collectionApi.setStatus(name, status).then(refresh);
-    const setOwnedBy = (name: string, owner: string) =>
-        collectionApi.setOwnedBy(name, owner).then(refresh);
+    const setAccessMode = (name: string, mode: AccessMode) => collectionApi.setAccessMode(name, mode).then(refresh);
+    const setStatus = (name: string, status: Status) => collectionApi.setStatus(name, status).then(refresh);
+    const setOwnedBy = (name: string, owner: string) => collectionApi.setOwnedBy(name, owner).then(refresh);
 
     return (
         <CollectionsContext.Provider

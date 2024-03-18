@@ -30,11 +30,7 @@ const defaultProperty = {
     isRelationShape: true
 };
 
-const defaultValues = [
-    {value: 'More info'},
-    {value: 'My first collection'},
-    {value: 'My second collection'}
-];
+const defaultValues = [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}];
 
 describe('LinkedDataProperty elements', () => {
     it('shows a table with relations for relationShapes', () => {
@@ -70,9 +66,7 @@ describe('LinkedDataProperty elements', () => {
 
     describe('canEdit', () => {
         const verifyCanEdit = (property, expectedCanEdit) => {
-            const wrapper = shallow(
-                <LinkedDataProperty property={property} values={defaultValues} />
-            );
+            const wrapper = shallow(<LinkedDataProperty property={property} values={defaultValues} />);
             const table = wrapper.find(LinkedDataRelationTable);
             expect(table.length).toEqual(1);
             expect(table.prop('canEdit')).toBe(expectedCanEdit);

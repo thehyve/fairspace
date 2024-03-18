@@ -85,11 +85,7 @@ class FileAPI {
         }
         return this.client()
             .getDirectoryContents(path, options)
-            .then(result =>
-                result.data
-                    .sort(comparing(compareBy('type'), compareBy('filename')))
-                    .map(this.mapToFile)
-            );
+            .then(result => result.data.sort(comparing(compareBy('type'), compareBy('filename'))).map(this.mapToFile));
     }
 
     /**
@@ -149,9 +145,7 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error(
-                                'You are not authorized to add files \nto this storage.'
-                            );
+                            throw new Error('You are not authorized to add files \nto this storage.');
                         case 413:
                             throw new Error('Payload too large');
                     }
@@ -161,12 +155,7 @@ class FileAPI {
             });
     }
 
-    uploadMulti(
-        destinationPath,
-        files: File[],
-        maxFileSizeBytes: number,
-        onUploadProgress = () => {}
-    ) {
+    uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
         const totalSize = files.reduce((size, file) => size + file.size, 0);
         if (totalSize > maxFileSizeBytes) {
             return Promise.reject(new Error('Payload too large'));
@@ -236,9 +225,7 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error(
-                                'Could not delete file or directory. Only admins can delete them.'
-                            );
+                            throw new Error('Could not delete file or directory. Only admins can delete them.');
                     }
                 }
 
@@ -315,14 +302,10 @@ class FileAPI {
                                 'Could not move one or more files. Possibly the filename contains special characters.'
                             );
                         case 403:
-                            throw new Error(
-                                'Could not move one or more files. Only admins can move files.'
-                            );
+                            throw new Error('Could not move one or more files. Only admins can move files.');
                         case 409:
                         case 412:
-                            throw new Error(
-                                'Could not move one or more files. The destination file already exists.'
-                            );
+                            throw new Error('Could not move one or more files. The destination file already exists.');
                     }
                 }
 
@@ -359,9 +342,7 @@ class FileAPI {
                                 'Could not copy one or more files. \nThe destination can not be copied to.'
                             );
                         case 412:
-                            throw new Error(
-                                'Could not copy one or more files. \nThe destination file already exists.'
-                            );
+                            throw new Error('Could not copy one or more files. \nThe destination file already exists.');
                     }
                 }
 
@@ -403,9 +384,7 @@ class FileAPI {
                                 'Could not copy one or more files. \nThe destination can not be copied to.'
                             );
                         case 412:
-                            throw new Error(
-                                'Could not copy one or more files. \nThe destination file already exists.'
-                            );
+                            throw new Error('Could not copy one or more files. \nThe destination file already exists.');
                     }
                 }
 
@@ -424,10 +403,7 @@ class FileAPI {
             .then(files => files.map(f => f.basename))
             .then(usedNames =>
                 filePaths.map(sourceFile => {
-                    const destinationFilename = generateUniqueFileName(
-                        getFileName(sourceFile),
-                        usedNames
-                    );
+                    const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
                     usedNames.push(destinationFilename);
                     const destinationFile = joinPaths(destinationDir, destinationFilename);
                     return [sourceFile, destinationFile];
@@ -488,9 +464,7 @@ class FileAPI {
             responseType: 'text',
             data: formData
         };
-        return this.client()
-            .customRequest(path, requestOptions)
-            .catch(handleHttpError('Error uploading metadata'));
+        return this.client().customRequest(path, requestOptions).catch(handleHttpError('Error uploading metadata'));
     }
 
     showFileHistory(file, startIndex, endIndex) {

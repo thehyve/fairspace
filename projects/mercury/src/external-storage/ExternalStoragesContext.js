@@ -7,17 +7,10 @@ const ExternalStoragesContext = React.createContext({});
 
 export const ExternalStoragesProvider = ({children}) => {
     const {data: externalStorages = []} = useAsync(() =>
-        axios
-            .get('/api/storages/')
-            .then(extractJsonData)
-            .catch(handleHttpError('Connection error.'))
+        axios.get('/api/storages/').then(extractJsonData).catch(handleHttpError('Connection error.'))
     );
 
-    return (
-        <ExternalStoragesContext.Provider value={{externalStorages}}>
-            {children}
-        </ExternalStoragesContext.Provider>
-    );
+    return <ExternalStoragesContext.Provider value={{externalStorages}}>{children}</ExternalStoragesContext.Provider>;
 };
 
 export default ExternalStoragesContext;

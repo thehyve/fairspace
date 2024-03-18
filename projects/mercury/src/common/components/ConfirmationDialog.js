@@ -1,13 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle
-} from '@mui/material';
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 
 const confirmationDialog = ({
     title = 'Confirmation',
@@ -30,11 +23,7 @@ const confirmationDialog = ({
             <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={onAgree}
-                color={dangerous ? 'secondary' : 'primary'}
-                autoFocus={!dangerous}
-            >
+            <Button onClick={onAgree} color={dangerous ? 'secondary' : 'primary'} autoFocus={!dangerous}>
                 {agreeButtonText}
             </Button>
             <Button onClick={onDisagree}>{disagreeButtonText}</Button>

@@ -15,8 +15,7 @@ export const getStrippedPath = path => {
 
 export const splitPathIntoArray = path => path.split(PATH_SEPARATOR).filter(s => s.length > 0);
 
-export const joinPaths = (...paths) =>
-    paths.map(p => (p && p !== PATH_SEPARATOR ? p : '')).join(PATH_SEPARATOR);
+export const joinPaths = (...paths) => paths.map(p => (p && p !== PATH_SEPARATOR ? p : '')).join(PATH_SEPARATOR);
 
 export const joinPathsAvoidEmpty = (...paths) => {
     const strippedPaths = [];
@@ -63,11 +62,9 @@ export const getPathHierarchy = (fullPath, skipRootFolder = true) => {
     return paths.reverse();
 };
 
-export const encodePath = path =>
-    path.split(PATH_SEPARATOR).map(encodeURIComponent).join(PATH_SEPARATOR);
+export const encodePath = path => path.split(PATH_SEPARATOR).map(encodeURIComponent).join(PATH_SEPARATOR);
 
-export const decodePath = path =>
-    path.split(PATH_SEPARATOR).map(decodeURIComponent).join(PATH_SEPARATOR);
+export const decodePath = path => path.split(PATH_SEPARATOR).map(decodeURIComponent).join(PATH_SEPARATOR);
 
 /**
  * Workaround for a bug in 'history', see
@@ -105,9 +102,7 @@ export const getPathInfoFromParams = ({collection, path}) => ({
 });
 
 export function getFileName(path) {
-    const normalizedPath = path.endsWith(PATH_SEPARATOR)
-        ? path.substring(0, path.length - 1)
-        : path;
+    const normalizedPath = path.endsWith(PATH_SEPARATOR) ? path.substring(0, path.length - 1) : path;
     const pos = normalizedPath.lastIndexOf(PATH_SEPARATOR);
     return pos > 0 ? normalizedPath.substring(pos + 1) : normalizedPath;
 }
@@ -161,5 +156,4 @@ export const isValidFileName = fileName => {
     return name.length > 0 && !fileNameContainsInvalidCharacter(name) && !isUnsafeFileName(name);
 };
 
-export const isListOnlyFile = (file: File) =>
-    file && file.type === 'file' && file.access === 'List';
+export const isListOnlyFile = (file: File) => file && file.type === 'file' && file.access === 'List';

@@ -49,18 +49,8 @@ const CUSTOM_RESOURCE_COLUMNS = ['access', 'path'];
 const RESOURCE_TYPE_COLUMN = `${RESOURCES_VIEW}_type`;
 
 export const MetadataViewTable = (props: MetadataViewTableProperties) => {
-    const {
-        columns,
-        visibleColumnNames,
-        loading,
-        data,
-        toggleRow,
-        selected,
-        view,
-        idColumn,
-        history,
-        collections
-    } = props;
+    const {columns, visibleColumnNames, loading, data, toggleRow, selected, view, idColumn, history, collections} =
+        props;
     const classes = useStyles();
     const {textFiltersObject, setTextFiltersObject} = props;
     const visibleColumns = columns.filter(column => visibleColumnNames.includes(column.name));
@@ -69,9 +59,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     const {checkboxes, setCheckboxState} = props;
 
     const isCustomResourceColumn = (column: MetadataViewColumn) =>
-        isResourcesView &&
-        CUSTOM_RESOURCE_COLUMNS.includes(column.name) &&
-        column.type === 'Custom';
+        isResourcesView && CUSTOM_RESOURCE_COLUMNS.includes(column.name) && column.type === 'Custom';
 
     const getAccess = (iri: string) => {
         const col = collections.find(c => c.iri === iri || iri.startsWith(c.iri + '/'));
@@ -84,15 +72,9 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
     };
 
     const getResourceType = (row: Map<string, any>) =>
-        row[RESOURCE_TYPE_COLUMN] &&
-        row[RESOURCE_TYPE_COLUMN][0] &&
-        row[RESOURCE_TYPE_COLUMN][0].value;
+        row[RESOURCE_TYPE_COLUMN] && row[RESOURCE_TYPE_COLUMN][0] && row[RESOURCE_TYPE_COLUMN][0].value;
 
-    const handleResultSingleClick = (
-        iri: string,
-        label: string,
-        linkedFiles: MetadataViewEntity[]
-    ) => {
+    const handleResultSingleClick = (iri: string, label: string, linkedFiles: MetadataViewEntity[]) => {
         if (selected && selected.iri === iri) {
             toggleRow();
         } else {
@@ -100,11 +82,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         }
     };
     useEffect(() => {
-        if (
-            !textFiltersObject ||
-            !textFiltersObject.keys ||
-            !textFiltersObject.keys.includes(idColumn)
-        ) {
+        if (!textFiltersObject || !textFiltersObject.keys || !textFiltersObject.keys.includes(idColumn)) {
             const idColumnTextFilter = getIdColumnFilterFromSearchParams();
             if (idColumnTextFilter) {
                 setTextFiltersObject({...textFiltersObject, [idColumn.name]: idColumnTextFilter});
@@ -173,8 +151,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = textFiltersObject[columnName];
-        const setFilterValue = value =>
-            setTextFiltersObject({...textFiltersObject, [columnName]: value});
+        const setFilterValue = value => setTextFiltersObject({...textFiltersObject, [columnName]: value});
         return (
             <ColumnFilterInput
                 placeholder="Filter"
@@ -226,8 +203,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                     {visibleColumns.map(column => (
                         <TableCell key={column.name} className={classes.headerCellContents}>
                             {column.title}
-                            {TextualValueTypes.includes(column.type) &&
-                                renderColumnFilter(column.name)}
+                            {TextualValueTypes.includes(column.type) && renderColumnFilter(column.name)}
                         </TableCell>
                     ))}
                 </TableRow>
@@ -242,9 +218,7 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                             key={row[idColumn.name][0].value}
                             hover
                             selected={selected && selected.iri === row[idColumn.name][0].value}
-                            onDoubleClick={() =>
-                                handleResultDoubleClick(row[idColumn.name][0].value, row)
-                            }
+                            onDoubleClick={() => handleResultDoubleClick(row[idColumn.name][0].value, row)}
                         >
                             <TableCell style={{padding: 0}}>
                                 <Checkbox

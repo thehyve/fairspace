@@ -39,13 +39,7 @@ const styles = {
     }
 };
 
-export const WorkspacePermissionsComponent = ({
-    permissions,
-    setPermission,
-    collection,
-    workspaces,
-    classes
-}) => {
+export const WorkspacePermissionsComponent = ({permissions, setPermission, collection, workspaces, classes}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
     const [selectedWorkspace, setSelectedWorkspace] = useState();
     const [showWorkspacePermissionsDialog, setShowWorkspacePermissionsDialog] = useState(false);

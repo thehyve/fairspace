@@ -6,21 +6,13 @@ describe('FileAPI', () => {
         it('retrieves files', async () => {
             const getDirectoryContents = jest.fn(() =>
                 Promise.resolve({
-                    data: [
-                        {basename: 'file.ext'},
-                        {basename: 'file (1).ext'},
-                        {basename: 'file (2).ext'}
-                    ]
+                    data: [{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]
                 })
             );
             LocalFileAPI.client = () => ({getDirectoryContents});
             const result = await LocalFileAPI.list('/src');
 
-            expect(result).toEqual([
-                {basename: 'file.ext'},
-                {basename: 'file (1).ext'},
-                {basename: 'file (2).ext'}
-            ]);
+            expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith('/src', {
                 details: true,
@@ -33,21 +25,13 @@ describe('FileAPI', () => {
         it('retrieves files including deleted', async () => {
             const getDirectoryContents = jest.fn(() =>
                 Promise.resolve({
-                    data: [
-                        {basename: 'file.ext'},
-                        {basename: 'file (1).ext'},
-                        {basename: 'file (2).ext'}
-                    ]
+                    data: [{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]
                 })
             );
             LocalFileAPI.client = () => ({getDirectoryContents});
             const result = await LocalFileAPI.list('/src', true);
 
-            expect(result).toEqual([
-                {basename: 'file.ext'},
-                {basename: 'file (1).ext'},
-                {basename: 'file (2).ext'}
-            ]);
+            expect(result).toEqual([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}]);
             expect(getDirectoryContents).toHaveBeenCalledTimes(1);
             expect(getDirectoryContents).toHaveBeenCalledWith('/src', {
                 details: true,
@@ -83,9 +67,7 @@ describe('FileAPI', () => {
             const copyFile = jest.fn(() => Promise.reject({response: {status: 403}}));
             LocalFileAPI.client = () => ({copyFile});
 
-            return expect(LocalFileAPI.copy('/test', 'special-characters')).rejects.toThrow(
-                /write permission/
-            );
+            return expect(LocalFileAPI.copy('/test', 'special-characters')).rejects.toThrow(/write permission/);
         });
 
         it('should result in a clear error on 409 response', () => {
@@ -101,9 +83,7 @@ describe('FileAPI', () => {
             const copyFile = jest.fn(() => Promise.reject({response: {status: 412}}));
             LocalFileAPI.client = () => ({copyFile});
 
-            return expect(LocalFileAPI.copy('/test', 'special-characters')).rejects.toThrow(
-                /already exists/
-            );
+            return expect(LocalFileAPI.copy('/test', 'special-characters')).rejects.toThrow(/already exists/);
         });
     });
 
@@ -144,16 +124,9 @@ describe('FileAPI', () => {
     describe('uniqueDestinationPaths', () => {
         it('generates unique names', async () => {
             LocalFileAPI.list = jest.fn(() =>
-                Promise.resolve([
-                    {basename: 'file.ext'},
-                    {basename: 'file (1).ext'},
-                    {basename: 'file (2).ext'}
-                ])
+                Promise.resolve([{basename: 'file.ext'}, {basename: 'file (1).ext'}, {basename: 'file (2).ext'}])
             );
-            const result = await LocalFileAPI.uniqueDestinationPaths(
-                ['/src/file.ext', '/src/file (2).ext'],
-                '/dst'
-            );
+            const result = await LocalFileAPI.uniqueDestinationPaths(['/src/file.ext', '/src/file (2).ext'], '/dst');
 
             expect(result).toEqual([
                 ['/src/file.ext', '/dst/file (3).ext'],
@@ -170,10 +143,7 @@ describe('FileAPI', () => {
 
         it('handles multiple files with smae name', async () => {
             LocalFileAPI.list = jest.fn(() => Promise.resolve([{basename: 'file.ext'}]));
-            const result = await LocalFileAPI.uniqueDestinationPaths(
-                ['/src1/file.ext', '/src2/file.ext'],
-                '/dst'
-            );
+            const result = await LocalFileAPI.uniqueDestinationPaths(['/src1/file.ext', '/src2/file.ext'], '/dst');
 
             expect(result).toEqual([
                 ['/src1/file.ext', '/dst/file (1).ext'],
@@ -188,9 +158,7 @@ describe('FileAPI', () => {
                 createDirectory: () => Promise.reject({response: {status: 400}})
             });
 
-            return expect(LocalFileAPI.createDirectory('/test')).rejects.toThrow(
-                /contain special characters/
-            );
+            return expect(LocalFileAPI.createDirectory('/test')).rejects.toThrow(/contain special characters/);
         });
 
         it('should result in clear error on 403 response', () => {
@@ -198,9 +166,7 @@ describe('FileAPI', () => {
                 createDirectory: () => Promise.reject({response: {status: 403}})
             });
 
-            return expect(LocalFileAPI.createDirectory('/test')).rejects.toThrow(
-                /authorization to create/
-            );
+            return expect(LocalFileAPI.createDirectory('/test')).rejects.toThrow(/authorization to create/);
         });
 
         it('should result in clear error on 405 response', () => {

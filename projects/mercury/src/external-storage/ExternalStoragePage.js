@@ -68,9 +68,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
 
     const getSearchPlaceholder = () => {
         const openedPath = getRelativePath(location.pathname, storage.name);
-        const parentFolderName = openedPath
-            ? openedPath.substring(openedPath.lastIndexOf('/') + 1)
-            : null;
+        const parentFolderName = openedPath ? openedPath.substring(openedPath.lastIndexOf('/') + 1) : null;
         return parentFolderName ? `Search in ${parentFolderName}` : 'Search in all folders';
     };
 
@@ -80,11 +78,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
             {isSearchAvailable && (
                 <Grid container justifyContent="space-between" spacing={1}>
                     <Grid item className={classes.topBar}>
-                        <SearchBar
-                            placeholder={getSearchPlaceholder()}
-                            onSearchChange={handleSearch}
-                            width="50%"
-                        />
+                        <SearchBar placeholder={getSearchPlaceholder()} onSearchChange={handleSearch} width="50%" />
                     </Grid>
                 </Grid>
             )}

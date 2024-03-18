@@ -79,10 +79,7 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
     const handleCancelSwitchCollection = () => setShowConfirmDialog(false);
 
     const showMetadataSearchButton =
-        currentUser &&
-        currentUser.canViewPublicMetadata &&
-        views &&
-        views.some(v => v.name === RESOURCES_VIEW);
+        currentUser && currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW);
 
     return (
         <CollectionBreadcrumbsContextProvider>
@@ -95,21 +92,14 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
                                 placeholder="Search in all collections"
                                 onSearchChange={handleSearch}
                                 disabled={
-                                    collectionsLoading ||
-                                    collectionsError ||
-                                    !collections ||
-                                    collections.length === 0
+                                    collectionsLoading || collectionsError || !collections || collections.length === 0
                                 }
                             />
                         </Grid>
                         {showMetadataSearchButton && (
                             <Grid item container xs={4} justifyContent="flex-end">
                                 <Grid item>
-                                    <Button
-                                        variant="text"
-                                        color="primary"
-                                        href={getMetadataViewsPath(RESOURCES_VIEW)}
-                                    >
+                                    <Button variant="text" color="primary" href={getMetadataViewsPath(RESOURCES_VIEW)}>
                                         Collection metadata search
                                     </Button>
                                 </Grid>
@@ -124,9 +114,7 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
                                     <Switch
                                         color="primary"
                                         checked={showDeletedCollections}
-                                        onChange={() =>
-                                            setShowDeletedCollections(!showDeletedCollections)
-                                        }
+                                        onChange={() => setShowDeletedCollections(!showDeletedCollections)}
                                     />
                                 }
                                 label="Show deleted"

@@ -28,9 +28,7 @@ describe.skip('UseFormSubmission', () => {
         const errorDialogMock = {
             showError: jest.fn()
         };
-        const {result, waitForNextUpdate} = renderHook(() =>
-            useFormSubmission(submitFunc, '', [], errorDialogMock)
-        );
+        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
 
         expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
 
@@ -47,9 +45,7 @@ describe.skip('UseFormSubmission', () => {
         const errorDialogMock = {
             showError: jest.fn()
         };
-        const {result, waitForNextUpdate} = renderHook(() =>
-            useFormSubmission(submitFunc, '', [], errorDialogMock)
-        );
+        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
 
         expect(errorDialogMock.showError).toHaveBeenCalledTimes(0);
 

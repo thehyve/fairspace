@@ -21,13 +21,7 @@ type PropertyType = {
     key: string
 };
 
-const systemProperties = [
-    CONTENT_TYPE_URI,
-    DATE_CREATED_URI,
-    CREATED_BY_URI,
-    DATE_MODIFIED_URI,
-    MODIFIED_BY_URI
-];
+const systemProperties = [CONTENT_TYPE_URI, DATE_CREATED_URI, CREATED_BY_URI, DATE_MODIFIED_URI, MODIFIED_BY_URI];
 
 const systemPropertiesLast = compareBy(x => systemProperties.indexOf(x.key));
 
@@ -95,11 +89,7 @@ export const LinkedDataEntityForm = ({
                 {properties
                     // Some properties are always hidden (e.g. @type) or hidden based on the type of entity (e.g. label for collection)
                     // Properties are also hidden when it is not editable and there is no value
-                    .filter(
-                        p =>
-                            !shouldPropertyBeHidden(p.key, typeIri) &&
-                            (p.isEditable || hasValue(values[p.key]))
-                    )
+                    .filter(p => !shouldPropertyBeHidden(p.key, typeIri) && (p.isEditable || hasValue(values[p.key])))
 
                     // Properties are sorted based on the sh:order property, or by its label otherwise
                     .sort(
@@ -107,9 +97,7 @@ export const LinkedDataEntityForm = ({
                             labelFirst,
                             descriptionFirst,
                             systemPropertiesLast,
-                            compareBy(p =>
-                                typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER
-                            ),
+                            compareBy(p => (typeof p.order === 'number' ? p.order : Number.MAX_SAFE_INTEGER)),
                             compareBy('label')
                         )
                     )
@@ -121,11 +109,7 @@ export const LinkedDataEntityForm = ({
                                 values={values[p.key]}
                                 validationErrors={validationErrors[p.key]}
                                 onAdd={editable ? value => onAdd(p, value) : () => {}}
-                                onChange={
-                                    editable
-                                        ? (value, index) => onChange(p, value, index)
-                                        : () => {}
-                                }
+                                onChange={editable ? (value, index) => onChange(p, value, index) : () => {}}
                                 onDelete={editable ? index => onDelete(p, index) : () => {}}
                             />
                         </ListItem>

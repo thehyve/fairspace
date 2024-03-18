@@ -23,13 +23,7 @@ describe('MetadataViewFacetFactory', () => {
     it('should properly handle invalid facet type', () => {
         const wrapper = mount(
             <ThemeProvider theme={theme}>
-                <Facet
-                    title="Facet1"
-                    options={[]}
-                    type="unknown_type"
-                    onChange={() => {}}
-                    activeFilterValues={[]}
-                />
+                <Facet title="Facet1" options={[]} type="unknown_type" onChange={() => {}} activeFilterValues={[]} />
             </ThemeProvider>
         );
 
@@ -41,13 +35,7 @@ describe('MetadataViewFacetFactory', () => {
         const options = mockFacets('Subject').find(v => v.title === title).values;
         const wrapper = mount(
             <ThemeProvider theme={theme}>
-                <Facet
-                    title={title}
-                    options={options}
-                    type="Term"
-                    onChange={() => {}}
-                    activeFilterValues={[]}
-                />
+                <Facet title={title} options={options} type="Term" onChange={() => {}} activeFilterValues={[]} />
             </ThemeProvider>
         );
 

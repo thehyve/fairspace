@@ -47,9 +47,7 @@ const styles = theme => ({
 
 const getConflictingFolders: string[] = (newFiles, existingFolderNames) => {
     const droppedFolderNames = new Set(
-        newFiles
-            .filter(f => splitPathIntoArray(f.path).length > 1)
-            .map(f => splitPathIntoArray(f.path)[0])
+        newFiles.filter(f => splitPathIntoArray(f.path).length > 1).map(f => splitPathIntoArray(f.path)[0])
     );
     return Array.from(droppedFolderNames).filter(f => existingFolderNames.includes(f));
 };
@@ -92,17 +90,11 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     } = props;
     const isWritingEnabled = openedCollection && openedCollection.canWrite && !isOpenedPathDeleted;
 
-    const existingFileNames = files
-        ? files.filter(file => file.type === 'file').map(file => file.basename)
-        : [];
-    const existingFolderNames = files
-        ? files.filter(file => file.type === 'directory').map(file => file.basename)
-        : [];
+    const existingFileNames = files ? files.filter(file => file.type === 'file').map(file => file.basename) : [];
+    const existingFolderNames = files ? files.filter(file => file.type === 'directory').map(file => file.basename) : [];
 
     const isOverwriteCandidateDeleted = (filenames: string[]) => {
-        const fileCandidates = files
-            ? files.filter(file => filenames.some(name => name === file.basename))
-            : [];
+        const fileCandidates = files ? files.filter(file => filenames.some(name => name === file.basename)) : [];
         return fileCandidates.length > 0 && fileCandidates.some(f => f.dateDeleted);
     };
 
@@ -125,27 +117,13 @@ export const FileBrowser = (props: FileBrowserProperties) => {
                     files: droppedFiles,
                     destinationPath: openedPath
                 };
-                const newOverwriteFolderCandidates = getConflictingFolders(
-                    droppedFiles,
-                    existingFolderNames
-                );
-                const newOverwriteFileCandidates = getConflictingFiles(
-                    droppedFiles,
-                    existingFileNames
-                );
+                const newOverwriteFolderCandidates = getConflictingFolders(droppedFiles, existingFolderNames);
+                const newOverwriteFileCandidates = getConflictingFiles(droppedFiles, existingFileNames);
 
-                if (
-                    newOverwriteFileCandidates.length > 0 ||
-                    newOverwriteFolderCandidates.length > 0
-                ) {
+                if (newOverwriteFileCandidates.length > 0 || newOverwriteFolderCandidates.length > 0) {
                     setOverwriteFileCandidateNames(newOverwriteFileCandidates);
                     setOverwriteFolderCandidateNames(newOverwriteFolderCandidates);
-                    if (
-                        isOverwriteCandidateDeleted([
-                            ...newOverwriteFileCandidates,
-                            ...newOverwriteFolderCandidates
-                        ])
-                    ) {
+                    if (isOverwriteCandidateDeleted([...newOverwriteFileCandidates, ...newOverwriteFolderCandidates])) {
                         setShowCannotOverwriteWarning(true);
                         return;
                     }
@@ -184,9 +162,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
     useEffect(() => {
         if (showCannotOverwriteWarning) {
             setShowCannotOverwriteWarning(false);
-            showCannotOverwriteDeletedError(
-                [...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length
-            );
+            showCannotOverwriteDeletedError([...overwriteFileCandidateNames, ...overwriteFolderCandidateNames].length);
         }
     }, [overwriteFileCandidateNames, overwriteFolderCandidateNames, showCannotOverwriteWarning]);
 
@@ -238,8 +214,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
         <Typography variant="body2" component="span">
             {overwriteFolderCandidateNames.length > 1 && (
                 <span>
-                    Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist{' '}
-                    <br />
+                    Folders: <em>{overwriteFolderCandidateNames.join(', ')}</em> already exist <br />
                     and their content might be overwritten.
                     <br />
                 </span>
@@ -348,13 +323,7 @@ export const FileBrowser = (props: FileBrowserProperties) => {
 
 const ContextualFileBrowser = (props: ContextualFileBrowserProperties) => {
     const {openedPath, showDeleted, loading, error} = props;
-    const {
-        files,
-        loading: filesLoading,
-        error: filesError,
-        refresh,
-        fileActions
-    } = useFiles(openedPath, showDeleted);
+    const {files, loading: filesLoading, error: filesError, refresh, fileActions} = useFiles(openedPath, showDeleted);
 
     if (error || filesError) {
         return <MessageDisplay message="An error occurred while loading files" />;

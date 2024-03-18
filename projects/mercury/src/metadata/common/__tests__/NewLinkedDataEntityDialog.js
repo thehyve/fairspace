@@ -59,10 +59,6 @@ describe('<NewLinkedDataEntityDialog />', () => {
         });
 
         expect(createLinkedDataEntity).toHaveBeenCalledTimes(1);
-        expect(createLinkedDataEntity).toHaveBeenCalledWith(
-            undefined,
-            {},
-            'http://xmlns.com/foaf/0.1/SomeClass'
-        );
+        expect(createLinkedDataEntity).toHaveBeenCalledWith(undefined, {}, 'http://xmlns.com/foaf/0.1/SomeClass');
     });
 });

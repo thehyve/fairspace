@@ -232,8 +232,7 @@ const ParentAwareFilesPage = (props: ParentAwareFilesPageProperties) => {
 };
 
 const ContextualFilesPage = (props: ContextualFilesPageProperties) => {
-    const {collections, loading, error, showDeleted, setShowDeleted} =
-        useContext(CollectionsContext);
+    const {collections, loading, error, showDeleted, setShowDeleted} = useContext(CollectionsContext);
     const {currentUser} = useContext(UserContext);
     const {views} = useContext(MetadataViewContext);
     const {params} = props.match;

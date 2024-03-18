@@ -116,9 +116,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                 {linkedMetadataEntitiesLoading ? (
                     <div>Loading linked metadata entities...</div>
                 ) : (
-                    Object.keys(linkedMetadataEntities).map(k =>
-                        renderLinkProperties(linkedMetadataEntities, k)
-                    )
+                    Object.keys(linkedMetadataEntities).map(k => renderLinkProperties(linkedMetadataEntities, k))
                 )}
             </List>
         );
@@ -157,9 +155,7 @@ type ExternalStorageInformationDrawerProperties = {
     storage: ExternalStorage
 };
 
-export const ExternalStorageInformationDrawer = (
-    props: ExternalStorageInformationDrawerProperties
-) => {
+export const ExternalStorageInformationDrawer = (props: ExternalStorageInformationDrawerProperties) => {
     const {atLeastSingleRootFileExists, path, selected, storage} = props;
 
     const paths = getPathHierarchy(path, false);

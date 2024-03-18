@@ -62,13 +62,7 @@ describe('FileList', () => {
         const onPathCheckboxClick = jest.fn();
 
         const {getByTestId} = render(
-            wrap(
-                <FileList
-                    onPathCheckboxClick={onPathCheckboxClick}
-                    selectionEnabled
-                    files={files}
-                />
-            )
+            wrap(<FileList onPathCheckboxClick={onPathCheckboxClick} selectionEnabled files={files} />)
         );
 
         const cell = getByTestId('checkbox-cell');

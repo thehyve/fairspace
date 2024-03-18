@@ -18,9 +18,7 @@ const requestOptions = {
 };
 
 export const getSessionStatus = () =>
-    axios
-        .get('/api/status', requestOptions)
-        .catch(handleHttpError("Failure when retrieving session's information"));
+    axios.get('/api/status', requestOptions).catch(handleHttpError("Failure when retrieving session's information"));
 
 export const getServerStatus = (): StatusResponse =>
     axios

@@ -124,31 +124,16 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
                 </TableHead>
                 <TableBody>
                     {items.map(item => (
-                        <TableRow
-                            hover
-                            key={item.id}
-                            onDoubleClick={() => handleResultDoubleClick(item)}
-                        >
+                        <TableRow hover key={item.id} onDoubleClick={() => handleResultDoubleClick(item)}>
                             <TableCell width={5}>{renderType(item)}</TableCell>
                             <TableCell style={{maxWidth: 500}}>
                                 <ListItemText
                                     primary={item.label}
-                                    secondary={
-                                        <ShortText
-                                            text={item.comment}
-                                            maxLength={200}
-                                            maxLines={3}
-                                        />
-                                    }
+                                    secondary={<ShortText text={item.comment} maxLength={200} maxLines={3} />}
                                 />
                             </TableCell>
                             <TableCell>
-                                <Link
-                                    to={link(item)}
-                                    component={RouterLink}
-                                    color="inherit"
-                                    underline="hover"
-                                >
+                                <Link to={link(item)} component={RouterLink} color="inherit" underline="hover">
                                     {getPathFromIri(item.id, storage.rootDirectoryIri)}
                                 </Link>
                             </TableCell>
@@ -173,9 +158,7 @@ export const SearchResultListContainer = ({
     const currentStorage = externalStorages.find(s => s.name === storage);
 
     const {data, loading, error} = useAsync(() => {
-        const searchAPI = currentStorage
-            ? new SearchAPI(currentStorage.searchPath)
-            : LocalSearchAPI;
+        const searchAPI = currentStorage ? new SearchAPI(currentStorage.searchPath) : LocalSearchAPI;
         return searchAPI.searchForFiles(query, context).catch(handleSearchError);
     }, [search, query, storage]);
 
@@ -189,12 +172,7 @@ export const SearchResultListContainer = ({
     const renderTextSearchResultList = () => (
         <div>
             <BreadCrumbs additionalSegments={getSearchPathSegments(context, storage)} />
-            <SearchBar
-                placeholder="Search"
-                onSearchChange={handleSearch}
-                query={query}
-                width="40%"
-            />
+            <SearchBar placeholder="Search" onSearchChange={handleSearch} query={query} width="40%" />
             <SearchResultList
                 items={items}
                 total={total}
@@ -212,9 +190,7 @@ export const SearchResultListContainer = ({
             {renderTextSearchResultList()}
         </ExternalStorageBreadcrumbsContextProvider>
     ) : (
-        <CollectionBreadcrumbsContextProvider>
-            {renderTextSearchResultList()}
-        </CollectionBreadcrumbsContextProvider>
+        <CollectionBreadcrumbsContextProvider>{renderTextSearchResultList()}</CollectionBreadcrumbsContextProvider>
     );
 };
 

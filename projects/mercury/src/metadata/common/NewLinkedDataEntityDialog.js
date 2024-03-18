@@ -1,14 +1,6 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Typography
-} from '@mui/material';
+import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 
 import {generateUuid, getLabel, isValidLinkedDataIdentifier} from './metadataUtils';
 import {getFirstPredicateId, getFirstPredicateValue} from './jsonLdUtils';
@@ -22,12 +14,7 @@ import useNavigationBlocker from '../../common/hooks/UseNavigationBlocker';
 import {getPropertiesForNodeShape} from './vocabularyUtils';
 import ConfirmationDialog from '../../common/components/ConfirmationDialog';
 
-const NewLinkedDataEntityDialog = ({
-    shape,
-    requireIdentifier = true,
-    onClose,
-    onCreate = () => {}
-}) => {
+const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
     const [namespace, setNamespace] = useState(null);
     const [formSubmitted, setFormSubmitted] = useState(false);

@@ -48,8 +48,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         return val >= minDate && val <= maxDate && fourDigitsYearEntered;
     };
 
-    const isValidInterval = (startDate: Date, endDate: Date): boolean =>
-        !startDate || !endDate || startDate <= endDate;
+    const isValidInterval = (startDate: Date, endDate: Date): boolean => !startDate || !endDate || startDate <= endDate;
 
     const handleChange = newDateInterval => {
         if (isValidInterval(newDateInterval)) {
@@ -119,25 +118,9 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <Grid container>
             <Grid item>
-                {renderDatePicker(
-                    value[0],
-                    handleMinDateChange,
-                    'Start date',
-                    minDate,
-                    value[1],
-                    minDate
-                )}
+                {renderDatePicker(value[0], handleMinDateChange, 'Start date', minDate, value[1], minDate)}
             </Grid>
-            <Grid item>
-                {renderDatePicker(
-                    value[1],
-                    handleMaxDateChange,
-                    'End date',
-                    value[0],
-                    maxDate,
-                    maxDate
-                )}
-            </Grid>
+            <Grid item>{renderDatePicker(value[1], handleMaxDateChange, 'End date', value[0], maxDate, maxDate)}</Grid>
         </Grid>
     );
 };

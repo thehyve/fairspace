@@ -29,10 +29,7 @@ describe('jsonLdConverter', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['https://fairspace.nl/ontology#Collection'],
-                [constants.COMMENT_URI]: [
-                    {'@value': 'My first collection'},
-                    {'@value': 'Some more info'}
-                ]
+                [constants.COMMENT_URI]: [{'@value': 'My first collection'}, {'@value': 'Some more info'}]
             };
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
@@ -64,10 +61,7 @@ describe('jsonLdConverter', () => {
 
                 const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
-                expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.id)).toEqual([
-                    'http://b',
-                    'http://a'
-                ]);
+                expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.id)).toEqual(['http://b', 'http://a']);
             });
 
             it('should return values sorted', () => {
@@ -86,10 +80,7 @@ describe('jsonLdConverter', () => {
 
                 const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-                expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual([
-                    'AAAA',
-                    'ZZZZ'
-                ]);
+                expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual(['AAAA', 'ZZZZ']);
             });
 
             it('should not sort rdf lists', () => {
@@ -131,16 +122,11 @@ describe('jsonLdConverter', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['https://fairspace.nl/ontology#Collection'],
-                'http://not-existing': [
-                    {'@value': 'My first collection'},
-                    {'@value': 'Some more info'}
-                ]
+                'http://not-existing': [{'@value': 'My first collection'}, {'@value': 'Some more info'}]
             };
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
-            expect(
-                Object.prototype.hasOwnProperty.call(valuesByPredicate, 'http://not-existing')
-            ).toEqual(false);
+            expect(Object.prototype.hasOwnProperty.call(valuesByPredicate, 'http://not-existing')).toEqual(false);
         });
 
         it('should return information about the other entry for reference', () => {
@@ -163,10 +149,7 @@ describe('jsonLdConverter', () => {
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
-            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.label)).toEqual([
-                'AAA',
-                'BBB'
-            ]);
+            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.label)).toEqual(['AAA', 'BBB']);
         });
     });
 
@@ -313,9 +296,7 @@ describe('jsonLdConverter', () => {
             const result = normalizeTypes([
                 {
                     '@id': 'http://example.com/1',
-                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [
-                        {'@id': 'http://example.com/Type'}
-                    ]
+                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]
                 },
                 {'@id': 'http://example.com/2', '@type': ['http://example.com/Type']},
                 {'@id': 'http://example.com/2', 'http://example.com/property': [123]}

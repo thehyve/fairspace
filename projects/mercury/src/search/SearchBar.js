@@ -8,14 +8,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import styles from './SearchBar.styles';
 
-const SearchBar = ({
-    classes,
-    query = '',
-    placeholder,
-    onSearchChange = () => {},
-    disabled = false,
-    width = '100%'
-}) => {
+const SearchBar = ({classes, query = '', placeholder, onSearchChange = () => {}, disabled = false, width = '100%'}) => {
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
 

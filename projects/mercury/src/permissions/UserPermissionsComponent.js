@@ -53,8 +53,7 @@ export const UserPermissionsComponent = ({
     const [showAlterUserPermissionsDialog, setShowAlterUserPermissionsDialog] = useState(false);
     const [selectedUser, setSelectedUser] = useState();
 
-    const isWorkspaceMember: boolean = (user: Principal) =>
-        user && workspaceUsers.some(u => u.iri === user.iri);
+    const isWorkspaceMember: boolean = (user: Principal) => user && workspaceUsers.some(u => u.iri === user.iri);
     const sortedPermissions = sortPermissions(permissions);
     const prioritizedSortedPermissions = [
         ...sortedPermissions.filter(p => isWorkspaceMember(p)),
@@ -205,14 +204,7 @@ UserPermissionsComponent.propTypes = {
 const ContextualUserPermissionsComponent = props => {
     const {users, usersLoading, usersError} = useContext(UsersContext);
 
-    return (
-        <UserPermissionsComponent
-            {...props}
-            loading={usersLoading}
-            error={usersError}
-            users={users}
-        />
-    );
+    return <UserPermissionsComponent {...props} loading={usersLoading} error={usersError} users={users} />;
 };
 
 export default withStyles(styles)(ContextualUserPermissionsComponent);

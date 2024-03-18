@@ -69,11 +69,7 @@ export type CollectionAuditInfo = {|
     statusModifiedBy?: string // iri
 |};
 
-export type Collection = Resource &
-    CollectionProperties &
-    CollectionType &
-    CollectionPermissions &
-    CollectionAuditInfo;
+export type Collection = Resource & CollectionProperties & CollectionType & CollectionPermissions & CollectionAuditInfo;
 
 class CollectionAPI {
     getCollectionProperties(name: string): Promise<Collection> {
@@ -108,9 +104,7 @@ class CollectionAPI {
     }
 
     undeleteCollection(collection: CollectionProperties): Promise<void> {
-        return LocalFileAPI.undelete(collection.name).catch(
-            handleHttpError('Failure while undeleting collection')
-        );
+        return LocalFileAPI.undelete(collection.name).catch(handleHttpError('Failure while undeleting collection'));
     }
 
     unpublish(collection: CollectionProperties): Promise<void> {

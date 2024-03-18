@@ -1,15 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TableSortLabel
-} from '@mui/material';
+import {Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel} from '@mui/material';
 
 import Checkbox from '@mui/material/Checkbox';
 import TableContainer from '@mui/material/TableContainer';
@@ -80,11 +72,7 @@ const UserRolesPage = () => {
     const {currentUser} = useContext(UserContext);
     const {users = [], usersLoading, usersError, refresh} = useContext(UsersContext);
     const [filteredUser, setFilteredUsers] = useState(users);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(
-        filteredUser,
-        columns,
-        'name'
-    );
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredUser, columns, 'name');
     const [filtersObject, setFiltersObject] = useState({});
 
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
@@ -104,18 +92,9 @@ const UserRolesPage = () => {
                 setFilteredUsers(
                     users.filter(
                         u =>
-                            isValueMatchingFilterValue(
-                                u.name,
-                                filtersObject[columns.name.valueExtractor]
-                            ) &&
-                            isValueMatchingFilterValue(
-                                u.username,
-                                filtersObject[columns.username.valueExtractor]
-                            ) &&
-                            isValueMatchingFilterValue(
-                                u.email,
-                                filtersObject[columns.email.valueExtractor]
-                            )
+                            isValueMatchingFilterValue(u.name, filtersObject[columns.name.valueExtractor]) &&
+                            isValueMatchingFilterValue(u.username, filtersObject[columns.username.valueExtractor]) &&
+                            isValueMatchingFilterValue(u.email, filtersObject[columns.email.valueExtractor])
                     )
                 );
             }
@@ -143,9 +122,7 @@ const UserRolesPage = () => {
         setUserRole(id, role, enable)
             .then(refresh)
             .catch(e => {
-                const message = Object.prototype.hasOwnProperty.call(e, 'message')
-                    ? e.message
-                    : null;
+                const message = Object.prototype.hasOwnProperty.call(e, 'message') ? e.message : null;
                 ErrorDialog.showError('Error assigning role', message);
             });
 
@@ -218,52 +195,34 @@ const UserRolesPage = () => {
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.isAdmin}
-                                        onChange={e =>
-                                            toggleRole(u.id, 'isAdmin', e.target.checked)
-                                        }
+                                        onChange={e => toggleRole(u.id, 'isAdmin', e.target.checked)}
                                         disabled={u.isSuperadmin || u.iri === currentUser.iri}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canViewPublicData}
-                                        onChange={e =>
-                                            toggleRole(u.id, 'canViewPublicData', e.target.checked)
-                                        }
+                                        onChange={e => toggleRole(u.id, 'canViewPublicData', e.target.checked)}
                                         disabled={u.isAdmin}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canViewPublicMetadata}
-                                        onChange={e =>
-                                            toggleRole(
-                                                u.id,
-                                                'canViewPublicMetadata',
-                                                e.target.checked
-                                            )
-                                        }
+                                        onChange={e => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
                                         disabled={u.canViewPublicData || u.canQueryMetadata}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canQueryMetadata}
-                                        onChange={e =>
-                                            toggleRole(u.id, 'canQueryMetadata', e.target.checked)
-                                        }
+                                        onChange={e => toggleRole(u.id, 'canQueryMetadata', e.target.checked)}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canAddSharedMetadata}
-                                        onChange={e =>
-                                            toggleRole(
-                                                u.id,
-                                                'canAddSharedMetadata',
-                                                e.target.checked
-                                            )
-                                        }
+                                        onChange={e => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
                                     />
                                 </TableCell>
                             </TableRow>

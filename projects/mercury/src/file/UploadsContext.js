@@ -40,8 +40,8 @@ export const showInvalidFilenames = invalidFilenames => {
     ErrorDialog.showError(
         'Invalid file name',
         <span>
-            Invalid file {invalidFilenames.length === 1 ? 'name' : 'names'}:{' '}
-            <em>{invalidFilenames.join(', ')}</em>.<br />
+            Invalid file {invalidFilenames.length === 1 ? 'name' : 'names'}: <em>{invalidFilenames.join(', ')}</em>.
+            <br />
         </span>
     );
 };
@@ -96,11 +96,9 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
     const setStateForUpload = (selected, newState) =>
         updateSpecificUpload(selected, upload => ({...upload, status: newState}));
 
-    const removeUpload = upload =>
-        setUploads(currentUploads => [...currentUploads.filter(u => u.id !== upload.id)]);
+    const removeUpload = upload => setUploads(currentUploads => [...currentUploads.filter(u => u.id !== upload.id)]);
 
-    const enqueueUploads = newUpload =>
-        setUploads(currentUploads => [...currentUploads, newUpload]);
+    const enqueueUploads = newUpload => setUploads(currentUploads => [...currentUploads, newUpload]);
 
     const startUpload = (upload: FileUpload) => {
         const newUpload = {...upload, status: UPLOAD_STATUS_INITIAL, progress: 0};
@@ -129,12 +127,7 @@ export const UploadsProvider = ({children, fileApi = LocalFileAPI}) => {
             }));
         setStateForUpload(newUpload, UPLOAD_STATUS_IN_PROGRESS);
         return fileApi
-            .uploadMulti(
-                newUpload.destinationPath,
-                newUpload.files,
-                maxFileSizeBytes,
-                onUploadProgress
-            )
+            .uploadMulti(newUpload.destinationPath, newUpload.files, maxFileSizeBytes, onUploadProgress)
             .then(() => {
                 setStateForUpload(newUpload, UPLOAD_STATUS_FINISHED);
                 setTimeout(() => removeUpload(newUpload), 5000);

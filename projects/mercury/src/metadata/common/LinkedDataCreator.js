@@ -9,14 +9,7 @@ import NewLinkedDataEntityDialog from './NewLinkedDataEntityDialog';
 const CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
 const CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';
 
-const LinkedDataCreator = ({
-    children,
-    shapesLoading,
-    shapesError,
-    shapes,
-    requireIdentifier,
-    onCreate
-}) => {
+const LinkedDataCreator = ({children, shapesLoading, shapesError, shapes, requireIdentifier, onCreate}) => {
     const [shape, setShape] = useState();
     const [creationState, setCreationState] = useState();
     const isMounted = useIsMounted();

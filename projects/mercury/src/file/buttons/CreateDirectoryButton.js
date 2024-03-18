@@ -21,9 +21,7 @@ const CreateDirectoryButton = ({children, disabled, onCreate}) => {
     };
 
     const createDirectory = () => {
-        onCreate(nameControl.value).then(
-            shouldClose => isMounted() && shouldClose && closeDialog()
-        );
+        onCreate(nameControl.value).then(shouldClose => isMounted() && shouldClose && closeDialog());
     };
 
     const validateAndCreate = () => nameControl.valid && createDirectory();

@@ -28,8 +28,7 @@ type SelectProperties = {
     showAccessFilter: boolean
 };
 
-export const SHOW_READABLE_COLLECTION_FACET_FILTER =
-    'FAIRSPACE_COLLECTION_FACET_SHOW_READABLE_FILTER';
+export const SHOW_READABLE_COLLECTION_FACET_FILTER = 'FAIRSPACE_COLLECTION_FACET_SHOW_READABLE_FILTER';
 
 const SelectMultiple = (props: SelectProperties) => {
     const {
@@ -47,8 +46,7 @@ const SelectMultiple = (props: SelectProperties) => {
     const [state, setState] = useState(defaultOptions);
 
     const textFilter = val =>
-        textFilterValue.trim() === '' ||
-        val.label.toLowerCase().includes(textFilterValue.toLowerCase());
+        textFilterValue.trim() === '' || val.label.toLowerCase().includes(textFilterValue.toLowerCase());
     const readAccessFilter = val => !accessFilterValue || val.access !== 'List';
     const filteredOptions = options.filter(readAccessFilter).filter(textFilter);
 
@@ -149,9 +147,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     useEffect(() => {
         const newAvailableOptions =
-            showAccessFilter && accessFilterValue
-                ? options.filter(o => o.access !== 'List')
-                : options;
+            showAccessFilter && accessFilterValue ? options.filter(o => o.access !== 'List') : options;
         setAvailableOptions(newAvailableOptions);
     }, [showAccessFilter, accessFilterValue]);
 
@@ -182,11 +178,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
             icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
             checkedIcon={<CheckBoxIcon fontSize="small" />}
             className={classes.checkbox}
-            title={
-                activeFilterValues.length === availableOptions.length
-                    ? 'Deselect all'
-                    : 'Select all'
-            }
+            title={activeFilterValues.length === availableOptions.length ? 'Deselect all' : 'Select all'}
         />
     );
 

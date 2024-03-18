@@ -29,9 +29,7 @@ const LinkedDataEntityFormContainer = ({
     ...otherProps
 }) => {
     const isDeleted = values[DATE_DELETED_URI];
-    const [editingEnabled, setEditingEnabled] = useState(
-        hasEditRight && !showEditButtons && !isDeleted
-    );
+    const [editingEnabled, setEditingEnabled] = useState(hasEditRight && !showEditButtons && !isDeleted);
     const {submitLinkedDataChanges, extendProperties} = useContext(LinkedDataContext);
 
     const {
@@ -173,13 +171,8 @@ LinkedDataEntityFormContainer.propTypes = {
     hasEditRight: PropTypes.bool
 };
 
-export const LinkedDataEntityFormWithLinkedData = ({
-    subject,
-    hasEditRight,
-    setHasCollectionMetadataUpdates
-}) => {
-    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} =
-        useLinkedData(subject);
+export const LinkedDataEntityFormWithLinkedData = ({subject, hasEditRight, setHasCollectionMetadataUpdates}) => {
+    const {typeInfo, properties, values, linkedDataLoading, linkedDataError, updateLinkedData} = useLinkedData(subject);
 
     return (
         <LinkedDataEntityFormContainer

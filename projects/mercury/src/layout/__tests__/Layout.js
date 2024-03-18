@@ -86,9 +86,7 @@ describe('Layout', () => {
 
         expect(wrapper.find(StatusAlert).length).toEqual(1);
         const alertProps = wrapper.find(StatusAlert).first().props();
-        expect(alertProps.children[0].props.children).toBe(
-            'Current user session is no longer active.'
-        );
+        expect(alertProps.children[0].props.children).toBe('Current user session is no longer active.');
     });
 
     it('should not render alert if server is up and session is valid', () => {

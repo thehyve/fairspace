@@ -92,35 +92,21 @@ type PermissionCardProperties = {
 };
 
 export const PermissionCard = (props: PermissionCardProperties) => {
-    const {
-        classes,
-        collection,
-        users,
-        workspaceUsers,
-        workspaces,
-        maxCollaboratorIcons = 5,
-        setBusy
-    } = props;
+    const {classes, collection, users, workspaceUsers, workspaces, maxCollaboratorIcons = 5, setBusy} = props;
     const [expanded, setExpanded] = useState(false);
     const [changingAccessMode, setChangingAccessMode] = useState(false);
     const [selectedAccessMode, setSelectedAccessMode] = useState(collection.accessMode);
 
-    const ownerWorkspaceAccess = collection.workspacePermissions.find(
-        p => p.iri === collection.ownerWorkspace
-    )
+    const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace)
         ? collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace).access
         : 'None';
     const [changingOwnerWorkspaceAccess, setChangingOwnerWorkspaceAccess] = useState(false);
-    const [selectedOwnerWorkspaceAccess, setSelectedOwnerWorkspaceAccess] =
-        useState(ownerWorkspaceAccess);
+    const [selectedOwnerWorkspaceAccess, setSelectedOwnerWorkspaceAccess] = useState(ownerWorkspaceAccess);
     const {setAccessMode, setPermission} = useContext(CollectionsContext);
 
     const toggleExpand = () => setExpanded(!expanded);
     const collaboratingUsers = getPrincipalsWithCollectionAccess(users, collection.userPermissions);
-    const collaboratingWorkspaces = getPrincipalsWithCollectionAccess(
-        workspaces,
-        collection.workspacePermissions
-    );
+    const collaboratingWorkspaces = getPrincipalsWithCollectionAccess(workspaces, collection.workspacePermissions);
 
     const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== 'List');
 
@@ -173,12 +159,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
     const permissionIcons = collaboratingUsers
         .slice(0, maxCollaboratorIcons)
         .map(({iri, name}) => (
-            <Avatar
-                key={iri}
-                title={name}
-                src="/public/images/avatar.png"
-                className={classes.avatar}
-            />
+            <Avatar key={iri} title={name} src="/public/images/avatar.png" className={classes.avatar} />
         ));
 
     const cardHeaderAction = (
@@ -211,32 +192,29 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             case 'Restricted':
                 return (
                     <span>
-                        Are you sure you want to change the view mode of collection{' '}
-                        <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br />
-                        Metadata and data files will only be findable and readable for users that
-                        have been granted access to the collection explicitly.
+                        Are you sure you want to change the view mode of collection <em>{collection.name}</em> to{' '}
+                        <b>{camelCaseToWords(accessMode)}</b>?<br />
+                        Metadata and data files will only be findable and readable for users that have been granted
+                        access to the collection explicitly.
                     </span>
                 );
             case 'MetadataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish the metadata</b> of collection{' '}
-                        <em>{collection.name}</em>?<br />
-                        The metadata will be findable and readable for all users with access to
-                        public data.
+                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?
+                        <br />
+                        The metadata will be findable and readable for all users with access to public data.
                     </span>
                 );
             case 'DataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish all data</b> of collection{' '}
-                        <em>{collection.name}</em>?<br />
-                        The data will be findable and readable for all users with access to public
-                        data.
+                        Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br />
+                        The data will be findable and readable for all users with access to public data.
                         <br />
                         <strong>
-                            Warning: This action cannot be reverted. Once published, the collection
-                            cannot be unpublished, moved or deleted.
+                            Warning: This action cannot be reverted. Once published, the collection cannot be
+                            unpublished, moved or deleted.
                         </strong>
                     </span>
                 );
@@ -339,9 +317,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                         >
                             {availableWorkspaceMembersAccessLevels.map(access => (
                                 <MenuItem key={access} value={access}>
-                                    <span className={classes.accessIcon}>
-                                        {collectionAccessIcon(access)}
-                                    </span>
+                                    <span className={classes.accessIcon}>{collectionAccessIcon(access)}</span>
                                     <span className={classes.accessName}>{access}</span>
                                 </MenuItem>
                             ))}

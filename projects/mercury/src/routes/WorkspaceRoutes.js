@@ -20,8 +20,7 @@ import ExternalStoragePage from '../external-storage/ExternalStoragePage';
 import ExternalMetadataSourcesView from '../metadata/external-sources/ExternalMetadataSourceView';
 import {METADATA_VIEW_MENU_LABEL} from '../constants';
 
-const getSubject = () =>
-    document.location.search ? queryString.parse(document.location.search).iri : null;
+const getSubject = () => (document.location.search ? queryString.parse(document.location.search).iri : null);
 
 // wrapping MetadataView in memo to prevent it from re-rendering
 const MetadataViewMemo = React.memo(MetadataView);
@@ -108,10 +107,7 @@ const WorkspaceRoutes = () => {
                     if (subject) {
                         return (
                             <MetadataWrapper>
-                                <LinkedDataEntityPage
-                                    title={METADATA_VIEW_MENU_LABEL}
-                                    subject={subject}
-                                />
+                                <LinkedDataEntityPage title={METADATA_VIEW_MENU_LABEL} subject={subject} />
                             </MetadataWrapper>
                         );
                     }

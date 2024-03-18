@@ -38,12 +38,7 @@ const DeleteEntityButton = ({subject, isDeletable, updateLinkedData}) => {
                 onClick={handleDelete}
                 disabled={!isDeletable}
             >
-                <IconButton
-                    aria-label="Delete this resource"
-                    title="Delete"
-                    disabled={!isDeletable}
-                    size="medium"
-                >
+                <IconButton aria-label="Delete this resource" title="Delete" disabled={!isDeletable} size="medium">
                     <Delete />
                 </IconButton>
             </ConfirmationButton>

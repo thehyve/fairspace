@@ -57,26 +57,14 @@ describe('comparison Utils', () => {
     describe('compareBy', () => {
         it('can compare by attribute', () => {
             expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a'))).toEqual([{a: 1}, {a: 2}, {a: 3}]);
-            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a', false))).toEqual([
-                {a: 3},
-                {a: 2},
-                {a: 1}
-            ]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 3}, {a: 2}, {a: 1}]);
             expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', true))).toEqual([{}, {a: 1}, {a: 2}]);
             expect([{a: 2}, {}, {a: 1}].sort(compareBy('a', false))).toEqual([{a: 2}, {a: 1}, {}]);
         });
 
         it('can compare by function', () => {
-            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy(obj => obj.a))).toEqual([
-                {a: 1},
-                {a: 2},
-                {a: 3}
-            ]);
-            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy(obj => obj.a, false))).toEqual([
-                {a: 3},
-                {a: 2},
-                {a: 1}
-            ]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy(obj => obj.a))).toEqual([{a: 1}, {a: 2}, {a: 3}]);
+            expect([{a: 2}, {a: 3}, {a: 1}].sort(compareBy(obj => obj.a, false))).toEqual([{a: 3}, {a: 2}, {a: 1}]);
         });
     });
 

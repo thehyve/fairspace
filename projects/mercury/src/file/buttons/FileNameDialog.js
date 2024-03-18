@@ -27,13 +27,7 @@ export default ({onClose, onSubmit, submitDisabled, title, control}) => (
             </form>
         </DialogContent>
         <DialogActions>
-            <Button
-                type="submit"
-                form="formId"
-                data-testid="submit-button"
-                color="primary"
-                disabled={submitDisabled}
-            >
+            <Button type="submit" form="formId" data-testid="submit-button" color="primary" disabled={submitDisabled}>
                 Submit
             </Button>
             <Button onClick={onClose}>Cancel</Button>

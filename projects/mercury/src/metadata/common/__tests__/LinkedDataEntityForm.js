@@ -64,9 +64,7 @@ describe('LinkedDataEntityForm', () => {
         };
 
         const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-        const wrapper = shallow(
-            <LinkedDataEntityForm properties={metadata} values={values} subject={subject} />
-        );
+        const wrapper = shallow(<LinkedDataEntityForm properties={metadata} values={values} subject={subject} />);
         expect(wrapper.find(List).children().length).toBe(1);
     });
 
@@ -76,11 +74,7 @@ describe('LinkedDataEntityForm', () => {
         };
 
         const wrapper = shallow(
-            <LinkedDataEntityForm
-                properties={defaultMetadata}
-                values={defaultValues}
-                subject={collection.iri}
-            />
+            <LinkedDataEntityForm properties={defaultMetadata} values={defaultValues} subject={collection.iri} />
         );
 
         expect(wrapper.find(List).length).toEqual(1);
@@ -130,17 +124,11 @@ describe('LinkedDataEntityForm', () => {
                 ]
             };
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(
-                <LinkedDataEntityForm properties={metadata} values={values} subject={subject} />
-            );
+            const wrapper = shallow(<LinkedDataEntityForm properties={metadata} values={values} subject={subject} />);
 
             const renderedProperties = wrapper.find(LinkedDataProperty);
-            expect(renderedProperties.at(0).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#BBB'
-            );
-            expect(renderedProperties.at(1).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#AAA'
-            );
+            expect(renderedProperties.at(0).prop('property').key).toEqual('https://fairspace.nl/ontology#BBB');
+            expect(renderedProperties.at(1).prop('property').key).toEqual('https://fairspace.nl/ontology#AAA');
         });
 
         it('should move properties without order to the end', () => {
@@ -167,17 +155,11 @@ describe('LinkedDataEntityForm', () => {
                 ]
             };
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(
-                <LinkedDataEntityForm properties={metadata} values={values} subject={subject} />
-            );
+            const wrapper = shallow(<LinkedDataEntityForm properties={metadata} values={values} subject={subject} />);
 
             const renderedProperties = wrapper.find(LinkedDataProperty);
-            expect(renderedProperties.at(0).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#BBB'
-            );
-            expect(renderedProperties.at(1).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#AAA'
-            );
+            expect(renderedProperties.at(0).prop('property').key).toEqual('https://fairspace.nl/ontology#BBB');
+            expect(renderedProperties.at(1).prop('property').key).toEqual('https://fairspace.nl/ontology#AAA');
         });
 
         it('should sort by label if no order is specified', () => {
@@ -194,17 +176,11 @@ describe('LinkedDataEntityForm', () => {
                 }
             ];
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(
-                <LinkedDataEntityForm properties={metadata} subject={subject} />
-            );
+            const wrapper = shallow(<LinkedDataEntityForm properties={metadata} subject={subject} />);
 
             const renderedProperties = wrapper.find(LinkedDataProperty);
-            expect(renderedProperties.at(0).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#BBB'
-            );
-            expect(renderedProperties.at(1).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#AAA'
-            );
+            expect(renderedProperties.at(0).prop('property').key).toEqual('https://fairspace.nl/ontology#BBB');
+            expect(renderedProperties.at(1).prop('property').key).toEqual('https://fairspace.nl/ontology#AAA');
         });
     });
 
@@ -229,18 +205,12 @@ describe('LinkedDataEntityForm', () => {
             ];
 
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(
-                <LinkedDataEntityForm properties={metadata} values={{}} subject={subject} />
-            );
+            const wrapper = shallow(<LinkedDataEntityForm properties={metadata} values={{}} subject={subject} />);
 
             const renderedProperties = wrapper.find(LinkedDataProperty);
             expect(renderedProperties.length).toEqual(2);
-            expect(renderedProperties.at(0).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#AAA'
-            );
-            expect(renderedProperties.at(1).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#BBB'
-            );
+            expect(renderedProperties.at(0).prop('property').key).toEqual('https://fairspace.nl/ontology#AAA');
+            expect(renderedProperties.at(1).prop('property').key).toEqual('https://fairspace.nl/ontology#BBB');
         });
 
         it('should hide readonly properties without any data', () => {
@@ -265,21 +235,15 @@ describe('LinkedDataEntityForm', () => {
             };
 
             const subject = 'https://workspace.ci.test.fairdev.app/iri/collections/500';
-            const wrapper = shallow(
-                <LinkedDataEntityForm properties={metadata} values={values} subject={subject} />
-            );
+            const wrapper = shallow(<LinkedDataEntityForm properties={metadata} values={values} subject={subject} />);
 
             // We expect AAA to be hidden (not editable, no values)
             // We expect BBB to be shown (not editable, has values)
             // We expect CCC to be shown (is editable, no values)
             const renderedProperties = wrapper.find(LinkedDataProperty);
             expect(renderedProperties.length).toEqual(2);
-            expect(renderedProperties.at(0).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#BBB'
-            );
-            expect(renderedProperties.at(1).prop('property').key).toEqual(
-                'https://fairspace.nl/ontology#CCC'
-            );
+            expect(renderedProperties.at(0).prop('property').key).toEqual('https://fairspace.nl/ontology#BBB');
+            expect(renderedProperties.at(1).prop('property').key).toEqual('https://fairspace.nl/ontology#CCC');
         });
     });
 });

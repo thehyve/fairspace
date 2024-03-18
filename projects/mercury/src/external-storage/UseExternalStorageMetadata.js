@@ -95,10 +95,7 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
     return {...defaultProperties, ...otherProperties};
 };
 
-const mapLinkedMetadataProperties = (
-    values: any[],
-    vocabulary: any[]
-): Map<string, LinkedEntityProperty> => {
+const mapLinkedMetadataProperties = (values: any[], vocabulary: any[]): Map<string, LinkedEntityProperty> => {
     const metadataEntities: LinkedEntityProperty[] = values
         .map(value => ({
             id: value['@id'],
@@ -124,8 +121,10 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
         MetadataAPI.getForAllSubjects(subjects)
             .then(results => {
                 if (results) {
-                    const entityMap: Map<string, LinkedEntityProperty> =
-                        mapLinkedMetadataProperties(results, vocabulary);
+                    const entityMap: Map<string, LinkedEntityProperty> = mapLinkedMetadataProperties(
+                        results,
+                        vocabulary
+                    );
                     setLinkedMetadataEntities(entityMap);
                 }
             })

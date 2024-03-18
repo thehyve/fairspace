@@ -60,8 +60,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
         getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI)
     );
 
-    const shapesError =
-        !vocabularyLoading && vocabularyError && 'An error occurred while loading the vocabulary';
+    const shapesError = !vocabularyLoading && vocabularyError && 'An error occurred while loading the vocabulary';
 
     return (
         <LinkedDataContext.Provider

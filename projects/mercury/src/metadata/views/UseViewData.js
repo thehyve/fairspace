@@ -53,11 +53,7 @@ const useViewData = (
 
     const allFilters = !locationContext
         ? [...filters, ...textFilters]
-        : [
-              ...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)),
-              locationFilter,
-              ...textFilters
-          ];
+        : [...filters.filter(f => ![LOCATION_FILTER_FIELD].includes(f.field)), locationFilter, ...textFilters];
 
     const fetchCount = () => {
         setCount({count: -1});
@@ -80,9 +76,7 @@ const useViewData = (
 
     const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
         if (viewDataRequestCancelToken) {
-            viewDataRequestCancelToken.cancel(
-                'Fetching data operation canceled due to new request.'
-            );
+            viewDataRequestCancelToken.cancel('Fetching data operation canceled due to new request.');
         }
         const token = axios.CancelToken.source();
         setViewDataRequestCancelToken(token);
@@ -98,9 +92,7 @@ const useViewData = (
                 if (d) {
                     if (!d.hasNext) {
                         if (viewDataRequestCancelToken) {
-                            viewDataRequestCancelToken.cancel(
-                                'Fetching count operation canceled due to new data.'
-                            );
+                            viewDataRequestCancelToken.cancel('Fetching count operation canceled due to new data.');
                         }
                         setCount({count: d.rows.length, timeout: false});
                         setLoadingCount(false);

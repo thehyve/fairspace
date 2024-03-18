@@ -1,23 +1,9 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    Collapse,
-    DialogContentText,
-    IconButton,
-    Typography
-} from '@mui/material';
+import {Card, CardContent, CardHeader, Collapse, DialogContentText, IconButton, Typography} from '@mui/material';
 import {withRouter} from 'react-router-dom';
 
-import {
-    CloudUpload,
-    ExpandMore,
-    Folder,
-    FolderOpenOutlined,
-    InsertDriveFileOutlined
-} from '@mui/icons-material';
+import {CloudUpload, ExpandMore, Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
 import {useDropzone} from 'react-dropzone';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -49,10 +35,7 @@ import {
     SHACL_NAME,
     SHACL_PATH
 } from '../constants';
-import {
-    determinePropertyShapesForTypes,
-    determineShapeForTypes
-} from '../metadata/common/vocabularyUtils';
+import {determinePropertyShapesForTypes, determineShapeForTypes} from '../metadata/common/vocabularyUtils';
 import {getFirstPredicateId, getFirstPredicateValue} from '../metadata/common/jsonLdUtils';
 import {getPathHierarchy} from '../file/fileUtils';
 
@@ -86,14 +69,12 @@ const useStyles = makeStyles(theme => ({
 
 const generateTemplate = vocabulary => {
     const userProps = flatMap(
-        [FILE_URI, DIRECTORY_URI, COLLECTION_URI].map(uri =>
-            determinePropertyShapesForTypes(vocabulary, [uri])
-        )
+        [FILE_URI, DIRECTORY_URI, COLLECTION_URI].map(uri => determinePropertyShapesForTypes(vocabulary, [uri]))
     ).filter(ps => !getFirstPredicateValue(ps, MACHINE_ONLY_URI));
 
-    const uniqueProps = [
-        ...new Set(userProps.map(ps => getFirstPredicateId(ps, SHACL_PATH))).values()
-    ].map(iri => userProps.find(ps => getFirstPredicateId(ps, SHACL_PATH) === iri));
+    const uniqueProps = [...new Set(userProps.map(ps => getFirstPredicateId(ps, SHACL_PATH))).values()].map(iri =>
+        userProps.find(ps => getFirstPredicateId(ps, SHACL_PATH) === iri)
+    );
 
     const typename = ps => {
         const datatype = getFirstPredicateId(ps, SHACL_DATATYPE);
@@ -114,9 +95,7 @@ const generateTemplate = vocabulary => {
     };
 
     const cardinality = ps =>
-        getFirstPredicateValue(ps, SHACL_MIN_COUNT, 0) +
-        '..' +
-        getFirstPredicateValue(ps, SHACL_MAX_COUNT, '*');
+        getFirstPredicateValue(ps, SHACL_MIN_COUNT, 0) + '..' + getFirstPredicateValue(ps, SHACL_MAX_COUNT, '*');
 
     const doc = uniqueProps.map(ps => [
         '# ',
@@ -133,9 +112,7 @@ const generateTemplate = vocabulary => {
     const sampleEntityNames =
         entityNames.length > 2 ? entityNames.slice(0, 2).join(' and ') : entityNames.join(' and ');
     const sampleRow = suffix =>
-        uniqueProps.map(prop =>
-            type(prop) === 'string' ? '"Sample text value"' : `${type(prop)}${suffix}`
-        );
+        uniqueProps.map(prop => (type(prop) === 'string' ? '"Sample text value"' : `${type(prop)}${suffix}`));
 
     return (
         '#   This section describes the CSV-based format used for bulk metadata uploads.\n' +
@@ -198,21 +175,20 @@ const MetadataCard = props => {
             .finally(() => setUploadingMetadata(false));
     };
 
-    const {getRootProps, getInputProps, open, isDragActive, isDragAccept, isDragReject} =
-        useDropzone({
-            noClick: true,
-            noKeyboard: true,
-            accept: {
-                'text/csv': ['.csv']
-            },
-            onDropAccepted: files => {
-                if (files.length === 1) {
-                    uploadMetadata(files[0]);
-                } else {
-                    ErrorDialog.showError('Please upload metadata files one by one');
-                }
+    const {getRootProps, getInputProps, open, isDragActive, isDragAccept, isDragReject} = useDropzone({
+        noClick: true,
+        noKeyboard: true,
+        accept: {
+            'text/csv': ['.csv']
+        },
+        onDropAccepted: files => {
+            if (files.length === 1) {
+                uploadMetadata(files[0]);
+            } else {
+                ErrorDialog.showError('Please upload metadata files one by one');
             }
-        });
+        }
+    });
 
     const rootProps = metadataUploadPath && getRootProps();
     const inputProps = metadataUploadPath && getInputProps();
@@ -281,44 +257,40 @@ const MetadataCard = props => {
     );
 };
 
-const PathMetadata = React.forwardRef(
-    ({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
-        const {data, error, loading} = useAsync(() => LocalFileAPI.stat(path, showDeleted), [path]);
+const PathMetadata = React.forwardRef(({path, showDeleted, hasEditRight = false, forceExpand}, ref) => {
+    const {data, error, loading} = useAsync(() => LocalFileAPI.stat(path, showDeleted), [path]);
 
-        let body;
-        let isDirectory;
-        let avatar = <FolderOpenOutlined />;
-        if (error) {
-            body = (
-                <MessageDisplay message="An error occurred while determining metadata subject" />
-            );
-        } else if (loading) {
-            body = <div>Loading...</div>;
-        } else if (!data || !data.iri) {
-            body = <div>No metadata found</div>;
-        } else {
-            const {iri, iscollection} = data;
-            isDirectory = iscollection && iscollection.toLowerCase() === 'true';
-            body = <LinkedDataEntityFormWithLinkedData subject={iri} hasEditRight={hasEditRight} />;
-            if (!isDirectory) {
-                avatar = <InsertDriveFileOutlined />;
-            }
+    let body;
+    let isDirectory;
+    let avatar = <FolderOpenOutlined />;
+    if (error) {
+        body = <MessageDisplay message="An error occurred while determining metadata subject" />;
+    } else if (loading) {
+        body = <div>Loading...</div>;
+    } else if (!data || !data.iri) {
+        body = <div>No metadata found</div>;
+    } else {
+        const {iri, iscollection} = data;
+        isDirectory = iscollection && iscollection.toLowerCase() === 'true';
+        body = <LinkedDataEntityFormWithLinkedData subject={iri} hasEditRight={hasEditRight} />;
+        if (!isDirectory) {
+            avatar = <InsertDriveFileOutlined />;
         }
-        const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
-
-        return (
-            <MetadataCard
-                ref={ref}
-                title={`Metadata for ${relativePath(path)}`}
-                avatar={avatar}
-                forceExpand={forceExpand}
-                metadataUploadPath={hasEditRight && forceExpand && isDirectory && path}
-            >
-                {body}
-            </MetadataCard>
-        );
     }
-);
+    const relativePath = fullPath => fullPath.split('/').slice(2).join('/');
+
+    return (
+        <MetadataCard
+            ref={ref}
+            title={`Metadata for ${relativePath(path)}`}
+            avatar={avatar}
+            forceExpand={forceExpand}
+            metadataUploadPath={hasEditRight && forceExpand && isDirectory && path}
+        >
+            {body}
+        </MetadataCard>
+    );
+});
 
 type CollectionInformationDrawerProps = {
     path: string,
@@ -347,9 +319,7 @@ export const CollectionInformationDrawer = (props: CollectionInformationDrawerPr
     if (!collection) {
         return (
             atLeastSingleCollectionExists &&
-            inCollectionsBrowser && (
-                <EmptyInformationDrawer message="Select a collection to display its metadata" />
-            )
+            inCollectionsBrowser && <EmptyInformationDrawer message="Select a collection to display its metadata" />
         );
     }
 

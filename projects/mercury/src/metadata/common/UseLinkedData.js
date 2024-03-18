@@ -33,14 +33,9 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
                         setTypeInfo(getTypeInfo(linkedDataItem, shapes));
 
                         if (!Array.isArray(linkedDataItem['@type'])) {
-                            console.warn(
-                                'Can not get values from metadata without a type or that is not expanded'
-                            );
+                            console.warn('Can not get values from metadata without a type or that is not expanded');
                         } else {
-                            const propertyShapes = determinePropertyShapesForTypes(
-                                shapes,
-                                linkedDataItem['@type']
-                            );
+                            const propertyShapes = determinePropertyShapesForTypes(shapes, linkedDataItem['@type']);
                             setProperties(getProperties(shapes, propertyShapes));
                             setValues(fromJsonLd(linkedDataItem, propertyShapes, ld, shapes));
                         }

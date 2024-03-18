@@ -2,15 +2,7 @@ import React, {useContext} from 'react';
 import withStyles from '@mui/styles/withStyles';
 import {NavLink} from 'react-router-dom';
 import {Divider, List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
-import {
-    Search,
-    SavedSearch,
-    Folder,
-    FolderSpecial,
-    OpenInNew,
-    VerifiedUser,
-    Widgets
-} from '@mui/icons-material';
+import {Search, SavedSearch, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from '../common/contexts/ServicesContext';
 import UserContext from '../users/UserContext';
@@ -81,9 +73,7 @@ const MainMenu = ({classes}) => {
                             key={getExternalStoragePathPrefix(storage.name)}
                             component={NavLink}
                             to={getExternalStoragePathPrefix(storage.name)}
-                            selected={pathname.startsWith(
-                                getExternalStoragePathPrefix(storage.name)
-                            )}
+                            selected={pathname.startsWith(getExternalStoragePathPrefix(storage.name))}
                         >
                             <ListItemIcon>
                                 <FolderSpecial />
@@ -113,9 +103,7 @@ const MainMenu = ({classes}) => {
                             key={getExternalMetadataSourcePathPrefix(source.name)}
                             component={NavLink}
                             to={getExternalMetadataSourcePathPrefix(source.name)}
-                            selected={pathname.startsWith(
-                                getExternalMetadataSourcePathPrefix(source.name)
-                            )}
+                            selected={pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name))}
                         >
                             <ListItemIcon>
                                 <SavedSearch />

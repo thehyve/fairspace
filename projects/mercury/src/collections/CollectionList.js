@@ -77,11 +77,7 @@ const CollectionList = ({
 
     const [filterValue, setFilterValue] = useState('');
     const [filteredCollections, setFilteredCollections] = useState(collections);
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(
-        filteredCollections,
-        allColumns,
-        'name'
-    );
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(filteredCollections, allColumns, 'name');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     useEffect(() => {
@@ -93,8 +89,7 @@ const CollectionList = ({
                     collections.filter(
                         c =>
                             c.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-                            (c.description &&
-                                c.description.toLowerCase().includes(filterValue.toLowerCase()))
+                            (c.description && c.description.toLowerCase().includes(filterValue.toLowerCase()))
                     )
                 );
             }
@@ -116,11 +111,7 @@ const CollectionList = ({
     }
 
     const renderCollectionFilter = () => (
-        <ColumnFilterInput
-            placeholder="Filter by name"
-            filterValue={filterValue}
-            setFilterValue={setFilterValue}
-        />
+        <ColumnFilterInput placeholder="Filter by name" filterValue={filterValue} setFilterValue={setFilterValue} />
     );
 
     return (
@@ -166,14 +157,9 @@ const CollectionList = ({
                                     onClick={() => onCollectionClick(collection)}
                                     onDoubleClick={() => onCollectionDoubleClick(collection)}
                                     selected={selected}
-                                    className={
-                                        collection.dateDeleted && classes.deletedCollectionRow
-                                    }
+                                    className={collection.dateDeleted && classes.deletedCollectionRow}
                                 >
-                                    <TableCell
-                                        style={{overflowWrap: 'break-word', maxWidth: 160}}
-                                        scope="row"
-                                    >
+                                    <TableCell style={{overflowWrap: 'break-word', maxWidth: 160}} scope="row">
                                         <ListItemText
                                             style={{margin: 0}}
                                             primary={
@@ -206,18 +192,12 @@ const CollectionList = ({
                                             {collection.ownerWorkspaceCode}
                                         </TableCell>
                                     )}
-                                    <TableCell>
-                                        {camelCaseToWords(collection.status, '-')}
-                                    </TableCell>
+                                    <TableCell>{camelCaseToWords(collection.status, '-')}</TableCell>
                                     <TableCell>{camelCaseToWords(collection.accessMode)}</TableCell>
                                     <TableCell>{collectionAccessIcon(accessLevel)}</TableCell>
                                     <TableCell>{formatDateTime(collection.dateCreated)}</TableCell>
                                     <TableCell>{collection.creatorDisplayName}</TableCell>
-                                    {showDeleted && (
-                                        <TableCell>
-                                            {formatDateTime(collection.dateDeleted)}
-                                        </TableCell>
-                                    )}
+                                    {showDeleted && <TableCell>{formatDateTime(collection.dateDeleted)}</TableCell>}
                                 </TableRow>
                             );
                         })}

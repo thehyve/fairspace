@@ -8,11 +8,8 @@ const useSelection = allowMultiple => {
     const [selected, setSelected] = useState([]);
 
     const select = item =>
-        allowMultiple
-            ? setSelected(currentSelection => [...currentSelection, item])
-            : setSelected([item]);
-    const deselect = item =>
-        setSelected(currentSelection => currentSelection.filter(el => el !== item));
+        allowMultiple ? setSelected(currentSelection => [...currentSelection, item]) : setSelected([item]);
+    const deselect = item => setSelected(currentSelection => currentSelection.filter(el => el !== item));
     const isSelected = item => selected.some(el => el === item);
     const toggle = item => (isSelected(item) ? deselect(item) : select(item));
     const selectAll = items => {

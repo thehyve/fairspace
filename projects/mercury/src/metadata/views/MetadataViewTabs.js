@@ -85,12 +85,7 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                 ))}
             </Tabs>
             {views.map((view, index) => (
-                <TabPanel
-                    value={currentViewIndex}
-                    index={index}
-                    {...a11yProps(index)}
-                    className={classes.tab}
-                >
+                <TabPanel value={currentViewIndex} index={index} {...a11yProps(index)} className={classes.tab}>
                     <MetadataViewTableContainer
                         columns={appendCustomColumns(view)}
                         idColumn={idColumn}

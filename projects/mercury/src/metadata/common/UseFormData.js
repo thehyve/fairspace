@@ -91,10 +91,7 @@ const useFormData = (values, initialProperties = []) => {
     };
 
     const updateValue = (property, value, index) => {
-        if (
-            !first(initialFormValues[property.key]) ||
-            first(initialFormValues[property.key]).value !== value.value
-        ) {
+        if (!first(initialFormValues[property.key]) || first(initialFormValues[property.key]).value !== value.value) {
             const newValue = current(property.key).map((el, idx) => (idx === index ? value : el));
             save(property, newValue);
         } else if (updates[property.key]) {
@@ -117,8 +114,7 @@ const useFormData = (values, initialProperties = []) => {
 
     const clearForm = () => setUpdates({});
 
-    const validateAll = properties =>
-        !!properties.map(p => validateProperty(p, current(p.key))).find(v => v);
+    const validateAll = properties => !!properties.map(p => validateProperty(p, current(p.key))).find(v => v);
 
     return {
         addValue,

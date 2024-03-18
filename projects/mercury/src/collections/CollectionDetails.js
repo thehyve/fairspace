@@ -31,9 +31,7 @@ import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import PermissionCard from '../permissions/PermissionCard';
 import MessageDisplay from '../common/components/MessageDisplay';
 import UsersContext from '../users/UsersContext';
-import WorkspaceUserRolesContext, {
-    WorkspaceUserRolesProvider
-} from '../workspaces/WorkspaceUserRolesContext';
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from '../workspaces/WorkspaceUserRolesContext';
 import CollectionStatusChangeDialog from './CollectionStatusChangeDialog';
 import CollectionOwnerChangeDialog from './CollectionOwnerChangeDialog';
 import {descriptionForStatus, isCollectionPage} from './collectionUtils';
@@ -226,10 +224,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                 }
             })
             .catch(err =>
-                ErrorDialog.showError(
-                    'An error occurred while changing an owner of a collection',
-                    err,
-                    () => this.handleCollectionOwnerChange(collection, selectedOwner)
+                ErrorDialog.showError('An error occurred while changing an owner of a collection', err, () =>
+                    this.handleCollectionOwnerChange(collection, selectedOwner)
                 )
             );
     };
@@ -282,9 +278,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <FormLabel>Deleted by</FormLabel>
                     <FormGroup>
                         <Typography variant="body2">
-                            <LinkedDataLink uri={deletedBy.iri}>
-                                {getDisplayName(deletedBy)}
-                            </LinkedDataLink>
+                            <LinkedDataLink uri={deletedBy.iri}>{getDisplayName(deletedBy)}</LinkedDataLink>
                         </Typography>
                     </FormGroup>
                 </FormControl>
@@ -293,17 +287,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     render() {
         const {loading, error, collection, users, workspaceRoles, workspaces} = this.props;
-        const {
-            anchorEl,
-            editing,
-            changingStatus,
-            changingOwner,
-            deleting,
-            undeleting,
-            unpublishing
-        } = this.state;
-        const iconName =
-            collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
+        const {anchorEl, editing, changingStatus, changingOwner, deleting, undeleting, unpublishing} = this.state;
+        const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (error) {
             return <MessageDisplay message="An error occurred loading collection details." />;
@@ -328,11 +313,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
         if (collection.canManage) {
             menuItems.push([
-                <MenuItem
-                    key="ownership"
-                    onClick={this.handleChangeOwner}
-                    disabled={workspaces.length <= 1}
-                >
+                <MenuItem key="ownership" onClick={this.handleChangeOwner} disabled={workspaces.length <= 1}>
                     Transfer ownership &hellip;
                 </MenuItem>,
                 <MenuItem
@@ -407,9 +388,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                             {collection.description}
                         </Typography>
                         <List>
-                            <ListItem disableGutters>
-                                {this.renderCollectionOwner(ownerWorkspace)}
-                            </ListItem>
+                            <ListItem disableGutters>{this.renderCollectionOwner(ownerWorkspace)}</ListItem>
                             <ListItem disableGutters>{this.renderCollectionStatus()}</ListItem>
                             {this.renderDeleted(collection.dateDeleted, deletedBy)}
                         </List>
@@ -458,8 +437,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         title="Confirmation"
                         content={
                             <span>
-                                Are you sure you want to <b>undelete</b> collection{' '}
-                                <em>{collection.name}</em>?
+                                Are you sure you want to <b>undelete</b> collection <em>{collection.name}</em>?
                             </span>
                         }
                         dangerous
@@ -493,8 +471,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         title="Confirmation"
                         content={
                             <span>
-                                Are you sure you want to <b>delete</b> collection{' '}
-                                <em>{collection.name}</em>?
+                                Are you sure you want to <b>delete</b> collection <em>{collection.name}</em>?
                             </span>
                         }
                         dangerous
@@ -511,12 +488,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         content={
                             <span>
                                 <b>
-                                    Warning: The action is not recommended! Collection (meta)data
-                                    may already be referenced in other systems.
+                                    Warning: The action is not recommended! Collection (meta)data may already be
+                                    referenced in other systems.
                                 </b>
                                 <br />
-                                Are you sure you want to <b>unpublish</b> collection{' '}
-                                <em>{collection.name}</em>?<br />
+                                Are you sure you want to <b>unpublish</b> collection <em>{collection.name}</em>?<br />
                                 Collection view mode will be changed to <em>Metadata published</em>.
                             </span>
                         }
@@ -536,8 +512,7 @@ const ContextualCollectionDetails = props => {
     const history = useHistory();
     const {users} = useContext(UsersContext);
     const {currentUser} = useContext(UserContext);
-    const {deleteCollection, undeleteCollection, setStatus, setOwnedBy, unpublish} =
-        useContext(CollectionsContext);
+    const {deleteCollection, undeleteCollection, setStatus, setOwnedBy, unpublish} = useContext(CollectionsContext);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
 
     return (

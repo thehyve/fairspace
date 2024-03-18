@@ -63,11 +63,7 @@ describe('FileBrowser', () => {
     it('renders proper view', () => {
         const {queryByTestId} = renderWithProviders(
             <ThemeProvider theme={theme}>
-                <FileBrowser
-                    openedCollection={openedCollection}
-                    fileActions={fileActionsMock}
-                    {...initialProps}
-                />
+                <FileBrowser openedCollection={openedCollection} fileActions={fileActionsMock} {...initialProps} />
             </ThemeProvider>
         );
 
@@ -82,9 +78,7 @@ describe('FileBrowser', () => {
     });
 
     it('show no open collection error when no collection is provided even when another error is given', () => {
-        const {getByText} = renderWithProviders(
-            <FileBrowser {...initialProps} error="some error" />
-        );
+        const {getByText} = renderWithProviders(<FileBrowser {...initialProps} error="some error" />);
 
         expect(getByText(/collection does not exist/i)).toBeInTheDocument();
     });

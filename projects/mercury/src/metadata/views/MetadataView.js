@@ -7,19 +7,11 @@ import {Assignment, Close} from '@mui/icons-material';
 import queryString from 'query-string';
 
 import styles from './MetadataView.styles';
-import type {
-    MetadataViewFacet,
-    MetadataViewFilter,
-    MetadataViewOptions,
-    ValueType
-} from './MetadataViewAPI';
+import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from './MetadataViewAPI';
 import BreadCrumbs from '../../common/components/BreadCrumbs';
 import MetadataViewContext from './MetadataViewContext';
 import BreadcrumbsContext from '../../common/contexts/BreadcrumbsContext';
-import {
-    getLocationContextFromString,
-    getMetadataViewNameFromString
-} from '../../search/searchUtils';
+import {getLocationContextFromString, getMetadataViewNameFromString} from '../../search/searchUtils';
 import type {MetadataViewEntity} from './metadataViewUtils';
 import {
     getMetadataViewsPath,
@@ -57,16 +49,8 @@ type MetadataViewProperties = ContextualMetadataViewProperties & {
 };
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {
-        views,
-        facets,
-        filters,
-        currentViewName,
-        locationContext,
-        classes,
-        handleViewChangeRedirect,
-        pathPrefix
-    } = props;
+    const {views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix} =
+        props;
 
     usePageTitleUpdater('Metadata');
 
@@ -86,9 +70,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
-    const currentViewIdColumn = currentView.columns.find(
-        c => c.type === 'Identifier' && c.name === currentView.name
-    );
+    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier' && c.name === currentView.name);
 
     const changeTab = useCallback(
         (event, tabIndex) => {
@@ -204,8 +186,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
     };
 
     const areFacetFiltersNonEmpty = useMemo(
-        () =>
-            filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field)),
+        () => filters && filters.some(filter => facetsEx.some(facet => facet.name === filter.field)),
         [filters, facetsEx]
     );
     const areTextFiltersNonEmpty = useMemo(
@@ -217,8 +198,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
         if (!selected) {
             return '';
         }
-        const metadataURL =
-            window.location.host + getMetadataViewsPath(currentView.name, pathPrefix);
+        const metadataURL = window.location.host + getMetadataViewsPath(currentView.name, pathPrefix);
         const prefilteringQueryString = queryString.stringify({
             view: currentView.name,
             [currentViewIdColumn.name.toLowerCase()]: selected.label
@@ -251,20 +231,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
                         </Button>
                     </Grid>
                     {areFacetFiltersNonEmpty && (
-                        <Grid
-                            item
-                            container
-                            xs
-                            alignItems="center"
-                            spacing={1}
-                            className={classes.activeFilters}
-                        >
+                        <Grid item container xs alignItems="center" spacing={1} className={classes.activeFilters}>
                             <Grid item>
-                                <Typography
-                                    variant="overline"
-                                    component="span"
-                                    color="textSecondary"
-                                >
+                                <Typography variant="overline" component="span" color="textSecondary">
                                     Active filters:
                                 </Typography>
                             </Grid>
@@ -280,10 +249,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                 </Grid>
             )}
             <Grid container direction="row" spacing={1} wrap="nowrap">
-                <Grid
-                    item
-                    className={`${classes.overallPanel} ${isClosedPanel && classes.overallPanelFullWidth}`}
-                >
+                <Grid item className={`${classes.overallPanel} ${isClosedPanel && classes.overallPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.leftPanel}>
                             <MetadataViewFacets
@@ -330,12 +296,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
     const {views = [], filters, loading, error} = useContext(MetadataViewContext);
-    const {
-        facets = [],
-        facetsLoading,
-        facetsError,
-        initialLoad
-    } = useContext(MetadataViewFacetsContext);
+    const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();

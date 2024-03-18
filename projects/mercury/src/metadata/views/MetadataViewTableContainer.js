@@ -111,10 +111,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         `${SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX}_${view.toUpperCase()}`,
         columns.map(c => c.name)
     );
-    const [rowsPerPage, setRowsPerPage] = useStateWithLocalStorage(
-        LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY,
-        10
-    );
+    const [rowsPerPage, setRowsPerPage] = useStateWithLocalStorage(LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY, 10);
     const [anchorEl, setAnchorEl] = useState(null);
 
     const columnSelectorOpen = Boolean(anchorEl);
@@ -238,9 +235,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         ExtraLocalStorage.deleteAllInDirectory(ANALYSIS_EXPORT_SUBPATH)
             .then(() => ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true))
             .then(() => setCurrentSelectionExported(true))
-            .catch((err: Error) =>
-                ErrorDialog.showError('Could not export the selection to analysis', err.message)
-            )
+            .catch((err: Error) => ErrorDialog.showError('Could not export the selection to analysis', err.message))
             .finally(() => setExportToAnalysisLoading(false));
     };
 
@@ -309,15 +304,8 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             <Typography variant="body2" component="span" display="inline">
                 {from}-{to} of{' '}
             </Typography>
-            <Typography
-                variant="body2"
-                component="span"
-                display="inline"
-                style={{fontWeight: 'bold'}}
-            >
-                {totalCount !== undefined && totalCount !== -1
-                    ? totalCount.toLocaleString()
-                    : 'more than ' + to}
+            <Typography variant="body2" component="span" display="inline" style={{fontWeight: 'bold'}}>
+                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : 'more than ' + to}
                 {countIsLoading && <CircularProgress size={14} style={{marginLeft: 3}} />}
             </Typography>
         </span>
@@ -359,11 +347,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     }, [data]);
 
     useDeepCompareEffect(() => {
-        if (
-            rowCheckboxes &&
-            Object.keys(rowCheckboxes).length > 0 &&
-            Object.values(rowCheckboxes).includes(true)
-        ) {
+        if (rowCheckboxes && Object.keys(rowCheckboxes).length > 0 && Object.values(rowCheckboxes).includes(true)) {
             setCurrentSelectionExported(false);
         }
     }, [rowCheckboxes]);
@@ -436,9 +420,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                         className={classes.tableFooter}
-                        labelDisplayedRows={d =>
-                            labelDisplayedRows({...d, countIsLoading: loadingCount})
-                        }
+                        labelDisplayedRows={d => labelDisplayedRows({...d, countIsLoading: loadingCount})}
                         ActionsComponent={TablePaginationActions}
                     />
                 </div>

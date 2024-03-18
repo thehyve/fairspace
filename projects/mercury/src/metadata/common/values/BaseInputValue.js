@@ -1,14 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import TextField from '@mui/material/TextField';
 
-const BaseInputValue = ({
-    entry: {value},
-    property,
-    currentValues,
-    style,
-    onChange = null,
-    ...otherProps
-}) => {
+const BaseInputValue = ({entry: {value}, property, currentValues, style, onChange = null, ...otherProps}) => {
     const [localValue, setLocalValue] = useState(value);
 
     useEffect(() => {

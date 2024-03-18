@@ -9,14 +9,7 @@ import MessageDisplay from '../../../common/components/MessageDisplay';
 import {canAddSharedMetadata} from '../../../users/userUtils';
 import UserContext from '../../../users/UserContext';
 
-const InputWithAddition = ({
-    children,
-    onChange,
-    pending,
-    error,
-    shape,
-    requireIdentifier = true
-}) => {
+const InputWithAddition = ({children, onChange, pending, error, shape, requireIdentifier = true}) => {
     const {currentUser} = useContext(UserContext);
     const [adding, setAdding] = useState(false);
 
@@ -38,12 +31,7 @@ const InputWithAddition = ({
 
         return (
             <>
-                <IconButton
-                    aria-label="Add"
-                    title="Add a new"
-                    onClick={() => setAdding(true)}
-                    size="medium"
-                >
+                <IconButton aria-label="Add" title="Add a new" onClick={() => setAdding(true)} size="medium">
                     <Add />
                 </IconButton>
                 {adding && (

@@ -45,9 +45,7 @@ describe('Http Utils', () => {
             const data = {dummy: true};
 
             expect(() => extractJsonData({headers: {}, data})).toThrow();
-            expect(() =>
-                extractJsonData({headers: {'content-type': 'application/html'}, data})
-            ).toThrow();
+            expect(() => extractJsonData({headers: {'content-type': 'application/html'}, data})).toThrow();
         });
     });
 });

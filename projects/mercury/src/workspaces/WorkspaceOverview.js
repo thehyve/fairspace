@@ -71,9 +71,7 @@ const WorkspaceOverview = props => {
         return <MessageDisplay message="Workspace does not exist." />;
     }
     if (!workspace.canCollaborate) {
-        return (
-            <MessageDisplay message="You don't have sufficient permissions to access the workspace." />
-        );
+        return <MessageDisplay message="You don't have sufficient permissions to access the workspace." />;
     }
     if (workspacesError || !workspace.iri) {
         return <MessageDisplay message="Error loading workspace." />;
@@ -122,11 +120,7 @@ const WorkspaceOverview = props => {
             </TabPanel>
             <TabPanel value={selectedTab} index={2}>
                 <LinkedDataMetadataProvider>
-                    <Collections
-                        history={props.history}
-                        workspaceIri={workspace.iri}
-                        documentTitle={workspace.code}
-                    />
+                    <Collections history={props.history} workspaceIri={workspace.iri} documentTitle={workspace.code} />
                 </LinkedDataMetadataProvider>
             </TabPanel>
         </BreadcrumbsContext.Provider>

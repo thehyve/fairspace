@@ -104,9 +104,7 @@ describe('getPathInfoFromParams', () => {
             openedPath: '/'
         });
 
-        expect(
-            getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})
-        ).toEqual({
+        expect(getPathInfoFromParams({collection: 'collectionX', path: 'something/something'})).toEqual({
             collectionName: 'collectionX',
             openedPath: '/collectionX/something/something'
         });
@@ -148,22 +146,14 @@ describe('joinPathsAvoidEmpty', () => {
 describe('getPathFromIri', () => {
     it('gets a path from IRI', () => {
         expect(getPathFromIri('http://localhost:8080/api/webdav/')).toEqual('');
-        expect(
-            getPathFromIri('http://localhost:8080/api/webdav/', 'http://localhost:8080/api/webdav/')
-        ).toEqual('');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/', 'http://localhost:8080/api/webdav/')).toEqual('');
         expect(getPathFromIri('http://localhost:8080/api/webdav/test')).toEqual('test');
-        expect(
-            getPathFromIri(
-                'http://localhost:8080/api/webdav/test',
-                'http://localhost:8080/api/webdav/'
-            )
-        ).toEqual('test');
+        expect(getPathFromIri('http://localhost:8080/api/webdav/test', 'http://localhost:8080/api/webdav/')).toEqual(
+            'test'
+        );
         expect(getPathFromIri('http://localhost:8080/api/webdav/a/b/')).toEqual('a/b');
         expect(
-            getPathFromIri(
-                'http://localhost:8080/api/test/webdav/a/b/',
-                'http://localhost:8080/api/test/webdav/'
-            )
+            getPathFromIri('http://localhost:8080/api/test/webdav/a/b/', 'http://localhost:8080/api/test/webdav/')
         ).toEqual('a/b');
     });
 });
@@ -181,10 +171,7 @@ describe('redirectLink', () => {
     });
     it('gets a directory redirection link', () => {
         expect(
-            redirectLink(
-                'http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/',
-                DIRECTORY_URI
-            )
+            redirectLink('http://localhost:8080/api/webdav/collection%202021-05-27_13_39-0/dir_1/', DIRECTORY_URI)
         ).toEqual('/collections/collection%202021-05-27_13_39-0/dir_1');
     });
     it('gets a file redirection link for external storage', () => {

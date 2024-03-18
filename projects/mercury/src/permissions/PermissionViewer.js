@@ -60,8 +60,7 @@ export const PermissionViewer = ({
             <Box className={classes.root}>
                 {renderUserPermissionComponent()}
                 <FormHelperText>
-                    Members of the owner workspace can have modify rights, all others have read-only
-                    rights.
+                    Members of the owner workspace can have modify rights, all others have read-only rights.
                 </FormHelperText>
             </Box>
             <FormLabel>Share with workspaces</FormLabel>
@@ -79,12 +78,7 @@ PermissionViewer.defaultProps = {
     setPermission: PropTypes.func
 };
 
-const ContextualPermissionViewer = ({
-    collection,
-    workspaceUsers,
-    collaboratingUsers,
-    collaboratingWorkspaces
-}) => {
+const ContextualPermissionViewer = ({collection, workspaceUsers, collaboratingUsers, collaboratingWorkspaces}) => {
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const {setPermission, loading, error} = useContext(CollectionsContext);
 

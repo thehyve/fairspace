@@ -56,8 +56,7 @@ describe('FileOperations', () => {
 
         wrapper = renderFileOperations(clipboardMock, fileActionsMock);
 
-        clickHandler = ariaLabel =>
-            wrapper.find('[aria-label="' + ariaLabel + '"]').prop('onClick');
+        clickHandler = ariaLabel => wrapper.find('[aria-label="' + ariaLabel + '"]').prop('onClick');
     });
 
     it('should disable all buttons on when file operation is not finished yet', () => {
@@ -95,13 +94,9 @@ describe('FileOperations', () => {
     }
 
     it('should clear selection and refresh files after all successful file operations', async () => {
-        await performOperation(() =>
-            wrapper.find('CreateDirectoryButton').prop('onCreate')('some-dir')
-        );
+        await performOperation(() => wrapper.find('CreateDirectoryButton').prop('onCreate')('some-dir'));
         await performOperation(() => clickHandler('Paste')({stopPropagation: () => {}}));
-        await performOperation(() =>
-            wrapper.find('[aria-label="Delete"]').parent().prop('onClick')()
-        );
+        await performOperation(() => wrapper.find('[aria-label="Delete"]').parent().prop('onClick')());
     });
 
     describe('paste button', () => {

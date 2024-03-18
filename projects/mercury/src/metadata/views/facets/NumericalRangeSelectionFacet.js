@@ -7,8 +7,7 @@ import {Typography} from '@mui/material';
 import type {MetadataViewFacetProperties} from '../MetadataViewFacetFactory';
 import {isNonEmptyValue} from '../../../common/utils/genericUtils';
 
-const nonEmptyNumber = (value, alternative) =>
-    isNonEmptyValue(value) ? Number(value) : alternative;
+const nonEmptyNumber = (value, alternative) => (isNonEmptyValue(value) ? Number(value) : alternative);
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
@@ -133,11 +132,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const renderSlider = () => (
         <Slider
             value={getSliderValue()}
-            track={
-                dynamicSliderValue[1] === null && isNonEmptyValue(dynamicSliderValue[0])
-                    ? 'inverted'
-                    : 'normal'
-            }
+            track={dynamicSliderValue[1] === null && isNonEmptyValue(dynamicSliderValue[0]) ? 'inverted' : 'normal'}
             onChange={handleSliderChange}
             onChangeCommitted={() => commitChange(dynamicSliderValue)}
             valueLabelDisplay="auto"
@@ -164,25 +159,12 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
                     </Grid>
                 </Grid>
             ) : (
-                <Grid
-                    container
-                    spacing={3}
-                    alignItems="center"
-                    className={classes.numericalContent}
-                >
+                <Grid container spacing={3} alignItems="center" className={classes.numericalContent}>
                     <Grid item xs={6}>
-                        {renderInput(
-                            value[0],
-                            handleMinValueInputChange,
-                            nonEmptyNumber(minValue, 'min')
-                        )}
+                        {renderInput(value[0], handleMinValueInputChange, nonEmptyNumber(minValue, 'min'))}
                     </Grid>
                     <Grid item xs={6}>
-                        {renderInput(
-                            value[1],
-                            handleMaxValueInputChange,
-                            nonEmptyNumber(maxValue, 'max')
-                        )}
+                        {renderInput(value[1], handleMaxValueInputChange, nonEmptyNumber(maxValue, 'max'))}
                     </Grid>
                 </Grid>
             )}

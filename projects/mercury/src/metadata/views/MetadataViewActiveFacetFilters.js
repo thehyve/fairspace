@@ -74,9 +74,7 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
                         style={{marginLeft: 5}}
                         onDelete={() => {
                             const index = filters.indexOf(filter);
-                            filters[index].values = [
-                                ...filter.values.filter(v => v !== value.value)
-                            ];
+                            filters[index].values = [...filter.values.filter(v => v !== value.value)];
                             setFilters(filters);
                         }}
                     />
@@ -86,14 +84,7 @@ export const MetadataViewActiveFacetFilters = (props: MetadataViewActiveFacetFil
     };
 
     return (
-        <Grid
-            container
-            item
-            direction="row"
-            justifyContent="flex-start"
-            alignItems="stretch"
-            spacing={1}
-        >
+        <Grid container item direction="row" justifyContent="flex-start" alignItems="stretch" spacing={1}>
             {filters &&
                 filters.map(filter => {
                     if (

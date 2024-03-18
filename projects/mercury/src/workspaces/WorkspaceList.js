@@ -59,13 +59,7 @@ const columns = {
 };
 
 const EmailChip = ({email, label}) => {
-    const chip = (
-        <Chip
-            style={{margin: 1, cursor: email ? 'pointer' : 'default'}}
-            size="small"
-            label={label}
-        />
-    );
+    const chip = <Chip style={{margin: 1, cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
     if (email) {
         return (
             <Link underline="hover" color="inherit" title={email} href={`mailto:${email}`}>
@@ -86,11 +80,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
             history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
         }
     };
-    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(
-        workspaces,
-        columns,
-        'code'
-    );
+    const {orderedItems, orderAscending, orderBy, toggleSort} = useSorting(workspaces, columns, 'code');
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
     if (!props.workspaces || props.workspaces.length === 0) {
@@ -113,10 +103,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                         <TableHead>
                             <TableRow>
                                 {Object.entries(columns).map(([key, column]) => (
-                                    <TableCell
-                                        key={key}
-                                        align={column.align ? column.align : 'inherit'}
-                                    >
+                                    <TableCell key={key} align={column.align ? column.align : 'inherit'}>
                                         <TableSortLabel
                                             active={orderBy === key}
                                             direction={orderAscending ? 'asc' : 'desc'}
@@ -135,18 +122,10 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     hover
                                     onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                                 >
-                                    <TableCell
-                                        style={{maxWidth: 32, width: 32}}
-                                        scope="row"
-                                        key="canCollaborate"
-                                    >
+                                    <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
                                         {!workspace.canCollaborate && <Lock />}
                                     </TableCell>
-                                    <TableCell
-                                        style={{minWidth: 250, maxWidth: 350}}
-                                        scope="row"
-                                        key="code"
-                                    >
+                                    <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="code">
                                         <ListItemText
                                             style={{margin: 0}}
                                             primary={
@@ -176,9 +155,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                         scope="row"
                                         key="collectionCount"
                                     >
-                                        {workspace.summary
-                                            ? workspace.summary.nonDeletedCollectionCount
-                                            : ''}
+                                        {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
                                     </TableCell>
                                     <TableCell
                                         align="right"
@@ -188,29 +165,15 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     >
                                         {workspace.summary ? workspace.summary.memberCount : ''}
                                     </TableCell>
-                                    <TableCell
-                                        style={{maxWidth: 150, width: 150}}
-                                        scope="row"
-                                        key="managers"
-                                    >
+                                    <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
                                         {workspace.managers
                                             ? workspace.managers.map(m => (
-                                                  <EmailChip
-                                                      key={m.iri}
-                                                      email={m.email}
-                                                      label={m.name}
-                                                  />
+                                                  <EmailChip key={m.iri} email={m.email} label={m.name} />
                                               ))
                                             : ''}
                                     </TableCell>
-                                    <TableCell
-                                        style={{maxWidth: 32, width: 32}}
-                                        scope="row"
-                                        key="menu"
-                                    >
-                                        {isAdmin(currentUser) && (
-                                            <WorkspaceActionMenu small workspace={workspace} />
-                                        )}
+                                    <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
+                                        {isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} />}
                                     </TableCell>
                                 </TableRow>
                             ))}

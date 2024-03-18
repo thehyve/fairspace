@@ -27,11 +27,7 @@ describe('LinkedDataEntityHeader', () => {
     type DeleteButtonState = 'Enabled' | 'Disabled' | 'NotPresent';
 
     describe('delete button', () => {
-        const testDeleteButtonDeletableState = (
-            values,
-            expectedState: DeleteButtonState,
-            editingEnabled = true
-        ) => {
+        const testDeleteButtonDeletableState = (values, expectedState: DeleteButtonState, editingEnabled = true) => {
             const wrapper = mount(
                 <ThemeProvider theme={theme}>
                     <VocabularyContext.Provider

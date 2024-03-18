@@ -39,9 +39,7 @@ export const useFormSubmission = (submitFunc, subject, namespaces, errorDialog =
             const entityErrors = partitionedErrors.entityErrors.map(withNamespacedProperties);
             const otherErrors = partitionedErrors.otherErrors.map(withNamespacedProperties);
 
-            errorDialog.showError(
-                <ValidationErrorsDisplay otherErrors={otherErrors} entityErrors={entityErrors} />
-            );
+            errorDialog.showError(<ValidationErrorsDisplay otherErrors={otherErrors} entityErrors={entityErrors} />);
         } else {
             errorDialog.showError('Error saving entity.', error);
         }

@@ -12,8 +12,7 @@ export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) =>
         loading: workspacesLoading,
         refresh: refreshWorkspaces
     } = useAsync(workspacesAPI.getWorkspaces);
-    const createWorkspace = (workspace: Workspace) =>
-        workspacesAPI.createWorkspace(workspace).then(refreshWorkspaces);
+    const createWorkspace = (workspace: Workspace) => workspacesAPI.createWorkspace(workspace).then(refreshWorkspaces);
     const deleteWorkspace = (workspace: Workspace) =>
         workspacesAPI.deleteWorkspace(workspace.iri).then(refreshWorkspaces);
 

@@ -19,25 +19,11 @@ type AddValueToListProps = {
 };
 
 const AddValueToList = (props: AddValueToListProps) => {
-    const {
-        serialNumber,
-        classes,
-        property,
-        values,
-        onAdd,
-        labelId,
-        addComponent: AddComponent
-    } = props;
+    const {serialNumber, classes, property, values, onAdd, labelId, addComponent: AddComponent} = props;
     const [newValue, setNewValue] = useState('');
     const isStringValue = AddComponent === StringValue;
     return (
-        <Grid
-            container
-            spacing={1}
-            alignItems="center"
-            className={classes.addValue}
-            data-testid={'' + labelId}
-        >
+        <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={'' + labelId}>
             <Grid item xs={isStringValue ? 10 : 12}>
                 <AddComponent
                     data-testid="add-value-input"
@@ -120,16 +106,14 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
 
     const [hoveredIndex, setHoveredIndex] = useState(null);
 
-    const showRowDividers =
-        property.maxValuesCount !== 1 && !(property.isEditable && property.datatype === STRING_URI);
+    const showRowDividers = property.maxValuesCount !== 1 && !(property.isEditable && property.datatype === STRING_URI);
 
     // The serial number is used to initialise a fresh 'add component' after adding or
     // deleting an item, in order to update the list of options correctly.
     const [serialNumber, setSerialNumber] = useState(0);
 
     const incrementSerialNumber = () => setSerialNumber(serialNumber + 1);
-    const maxValuesReached =
-        (property.maxValuesCount && values.length >= property.maxValuesCount) || false;
+    const maxValuesReached = (property.maxValuesCount && values.length >= property.maxValuesCount) || false;
 
     // Delete button is enabled, if given entry can be deleted for the property specified and the entry can be edited
     const isDeleteButtonEnabled = () => property.isEditable && canEdit;
@@ -141,9 +125,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
             <Grid item xs={property.isEditable ? 10 : 12} className={classes.values}>
                 <div style={{overflow: 'hidden', textOverflow: 'ellipsis'}}>
                     {columnDefinition.id === LABEL_URI ? (
-                        <Typography variant="h6">
-                            {columnDefinition.getValue(entry, index)}
-                        </Typography>
+                        <Typography variant="h6">{columnDefinition.getValue(entry, index)}</Typography>
                     ) : (
                         <Typography noWrap>{columnDefinition.getValue(entry, index)}</Typography>
                     )}
@@ -187,9 +169,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
             >
-                {index === MAX_LIST_LENGTH
-                    ? renderListLimitMessage(entry)
-                    : renderListItem(entry, index)}
+                {index === MAX_LIST_LENGTH ? renderListLimitMessage(entry) : renderListItem(entry, index)}
                 {property.isEditable && isDeleteButtonEnabled(entry) && (
                     <Grid item xs={2}>
                         <IconButton
@@ -210,9 +190,7 @@ export const LinkedDataValuesList = (props: LinkedDataValuesListProps) => {
             </Grid>
         );
 
-    const renderValueWindowed = ({index, style}) => (
-        <div style={style}>{renderValue(values[index], index)}</div>
-    );
+    const renderValueWindowed = ({index, style}) => <div style={style}>{renderValue(values[index], index)}</div>;
 
     const renderValues = () => {
         if (values.length > 20) {

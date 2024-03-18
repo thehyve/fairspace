@@ -18,11 +18,7 @@ export type ExternalMetadataSourceViewProperties = {
 };
 const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties) => {
     const {match} = props;
-    const {
-        externalMetadataSources = [],
-        loading,
-        error
-    } = useContext(ExternalMetadataSourceContext);
+    const {externalMetadataSources = [], loading, error} = useContext(ExternalMetadataSourceContext);
 
     if (error && error.message) {
         return <MessageDisplay message={error.message} />;
@@ -31,23 +27,15 @@ const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties)
         return <LoadingInlay />;
     }
 
-    const source: ExternalMetadataSource = externalMetadataSources.find(
-        s => s.name === match.params.source
-    );
+    const source: ExternalMetadataSource = externalMetadataSources.find(s => s.name === match.params.source);
 
     return (
         <MetadataAPIPathContext.Provider value={{path: source.path}}>
-            <MetadataViewProvider
-                metadataViewAPI={new MetadataViewAPI(source.path)}
-                sourceName={source.name}
-            >
+            <MetadataViewProvider metadataViewAPI={new MetadataViewAPI(source.path)} sourceName={source.name}>
                 <MetadataViewFacetsProvider>
                     <VocabularyProvider>
                         <LinkedDataMetadataProvider>
-                            <MetadataView
-                                {...props}
-                                pathPrefix={getExternalMetadataSourcePathPrefix(source.name)}
-                            />
+                            <MetadataView {...props} pathPrefix={getExternalMetadataSourcePathPrefix(source.name)} />
                         </LinkedDataMetadataProvider>
                     </VocabularyProvider>
                 </MetadataViewFacetsProvider>

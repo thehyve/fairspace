@@ -12,10 +12,7 @@ export const ExternalMetadataSourceProvider = ({children}) => {
         loading,
         refresh
     } = useAsync(() =>
-        axios
-            .get('/api/metadata-sources/')
-            .then(extractJsonData)
-            .catch(handleHttpError('Connection error.'))
+        axios.get('/api/metadata-sources/').then(extractJsonData).catch(handleHttpError('Connection error.'))
     );
 
     return (

@@ -1,22 +1,10 @@
 /* eslint-disable no-unused-vars */
 import axios, {CancelTokenSource} from 'axios';
-import {
-    extractJsonData,
-    handleHttpError,
-    handleRemoteSourceHttpError
-} from '../../common/utils/httpUtils';
+import {extractJsonData, handleHttpError, handleRemoteSourceHttpError} from '../../common/utils/httpUtils';
 import type {AccessLevel} from '../../collections/CollectionAPI';
 import FileAPI from '../../file/FileAPI';
 
-export type ValueType =
-    | 'Identifier'
-    | 'Text'
-    | 'Number'
-    | 'Date'
-    | 'Term'
-    | 'Set'
-    | 'TermSet'
-    | 'Boolean';
+export type ValueType = 'Identifier' | 'Text' | 'Number' | 'Date' | 'Term' | 'Set' | 'TermSet' | 'Boolean';
 export const TextualValueTypes: ValueType[] = ['Identifier', 'Text', 'Set'];
 
 export type MetadataViewFilter = {

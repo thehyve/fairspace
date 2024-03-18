@@ -26,13 +26,7 @@ const BooleanSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     return (
         <div className={classes.booleanContent}>
-            <ToggleButtonGroup
-                size="small"
-                value={booleanFilterValue}
-                fullWidth
-                exclusive
-                onChange={handleChange}
-            >
+            <ToggleButtonGroup size="small" value={booleanFilterValue} fullWidth exclusive onChange={handleChange}>
                 <ToggleButton color="success" variant="contained" value="true">
                     True
                 </ToggleButton>

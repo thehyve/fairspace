@@ -13,9 +13,9 @@ describe('External Storage Utils', () => {
     });
     describe('getRelativePath', () => {
         it('should return valid relative path', () => {
-            expect(
-                getRelativePath('/external-storages/testStorage/Jan_Smit_s_file', 'testStorage')
-            ).toBe('/Jan_Smit_s_file');
+            expect(getRelativePath('/external-storages/testStorage/Jan_Smit_s_file', 'testStorage')).toBe(
+                '/Jan_Smit_s_file'
+            );
             expect(getRelativePath('/external-storages/testStorage', 'testStorage')).toBe('');
         });
     });

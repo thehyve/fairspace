@@ -5,13 +5,7 @@ import {Chip, Divider, Grid, Tooltip, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import IriTooltip from '../../common/components/IriTooltip';
 import CollectionBrowserLink from './CollectionBrowserLink';
-import {
-    COLLECTION_URI,
-    DATE_DELETED_URI,
-    DIRECTORY_URI,
-    FILE_PATH_URI,
-    FILE_URI
-} from '../../constants';
+import {COLLECTION_URI, DATE_DELETED_URI, DIRECTORY_URI, FILE_PATH_URI, FILE_URI} from '../../constants';
 import DeleteEntityButton from './DeleteEntityButton';
 import CopyButton from '../../common/components/CopyButton';
 import UseNamespacedIri from '../../common/hooks/UseNamespacedIri';
@@ -58,10 +52,7 @@ const LinkedDataEntityHeader = ({
             <>
                 <Grid container justifyContent="space-between" style={{alignItems: 'center'}}>
                     <Grid item style={{display: 'flex', alignItems: 'center'}}>
-                        <Typography
-                            variant="h5"
-                            className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}
-                        >
+                        <Typography variant="h5" className={`${classes.iri} ${isDeleted ? classes.deletedIri : ''}`}>
                             <IriTooltip title={subject}>
                                 <span>{namespacedIri}</span>
                             </IriTooltip>
@@ -78,19 +69,12 @@ const LinkedDataEntityHeader = ({
                             />
                         )}
 
-                        <CollectionBrowserLink
-                            type={typeInfo.typeIri}
-                            filePath={values[FILE_PATH_URI]}
-                        />
+                        <CollectionBrowserLink type={typeInfo.typeIri} filePath={values[FILE_PATH_URI]} />
 
                         {typeInfo.description ? (
                             <Tooltip
                                 title={
-                                    <Typography
-                                        variant="caption"
-                                        color="inherit"
-                                        style={{whiteSpace: 'pre-line'}}
-                                    >
+                                    <Typography variant="caption" color="inherit" style={{whiteSpace: 'pre-line'}}>
                                         {typeInfo.description}
                                     </Typography>
                                 }
@@ -104,11 +88,7 @@ const LinkedDataEntityHeader = ({
                     </Grid>
                 </Grid>
 
-                {isDeleted ? (
-                    <span className={classes.deleteText}>This entity has been deleted</span>
-                ) : (
-                    ''
-                )}
+                {isDeleted ? <span className={classes.deleteText}>This entity has been deleted</span> : ''}
 
                 <Divider style={{marginTop: 16}} />
             </>

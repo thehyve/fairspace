@@ -26,11 +26,7 @@ describe('LinkedDataRelationTable elements', () => {
         };
 
         const wrapper = shallow(
-            <LinkedDataRelationTable
-                history={historyMock}
-                property={defaultProperty}
-                editorPath="/metadata"
-            />
+            <LinkedDataRelationTable history={historyMock} property={defaultProperty} editorPath="/metadata" />
         );
         const table = wrapper.find(LinkedDataValuesTable);
 

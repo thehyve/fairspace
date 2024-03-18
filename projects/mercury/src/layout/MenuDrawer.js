@@ -8,21 +8,11 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import styles from './MenuDrawer.styles';
 
-const MenuDrawer = ({
-    open,
-    renderMenu,
-    toggleMenuExpansion,
-    onMouseEnter,
-    onMouseLeave,
-    classes
-}) => (
+const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMouseLeave, classes}) => (
     <Drawer
         variant="permanent"
         classes={{
-            paper: classNames(
-                classes.drawerPaper,
-                open ? classes.drawerPaperOpen : classes.drawerPaperClose
-            )
+            paper: classNames(classes.drawerPaper, open ? classes.drawerPaperOpen : classes.drawerPaperClose)
         }}
     >
         <div className={classes.toolbar}>

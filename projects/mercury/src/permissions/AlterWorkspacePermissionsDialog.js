@@ -47,9 +47,7 @@ export const AlterWorkspacePermissionsDialog = ({
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
-        const reducedPermissions = selectedPermissions.filter(
-            p => selectedPermission.iri !== p.iri
-        );
+        const reducedPermissions = selectedPermissions.filter(p => selectedPermission.iri !== p.iri);
         setSelectedPermissions(reducedPermissions);
     };
 
@@ -88,10 +86,7 @@ export const AlterWorkspacePermissionsDialog = ({
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
             onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
-            filter={p =>
-                p.iri !== collection.ownerWorkspace &&
-                !selectedPermissions.some(sp => sp.iri === p.iri)
-            }
+            filter={p => p.iri !== collection.ownerWorkspace && !selectedPermissions.some(sp => sp.iri === p.iri)}
             label="Select workspace"
             autoFocus
         />

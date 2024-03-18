@@ -47,12 +47,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ColumnFilterInput = ({
-    setFilterValue,
-    filterValue = '',
-    placeholder,
-    useApplyButton = false
-}) => {
+const ColumnFilterInput = ({setFilterValue, filterValue = '', placeholder, useApplyButton = false}) => {
     const classes = useStyles();
     const [value, setValue] = useState(filterValue);
 
@@ -95,9 +90,7 @@ const ColumnFilterInput = ({
                 InputProps={{
                     classes: {
                         input: classes.inputInput,
-                        adornedEnd: useApplyButton
-                            ? classes.adornedEnd
-                            : classes.adornedEndNoPadding
+                        adornedEnd: useApplyButton ? classes.adornedEnd : classes.adornedEndNoPadding
                     },
                     endAdornment: (
                         <InputAdornment position="end">

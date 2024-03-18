@@ -10,12 +10,7 @@ export const ServicesProvider = ({children}) => {
         data: services = [],
         loading: servicesLoading,
         error: servicesError
-    } = useAsync(() =>
-        axios
-            .get('/api/services/')
-            .then(extractJsonData)
-            .catch(handleHttpError('Connection error.'))
-    );
+    } = useAsync(() => axios.get('/api/services/').then(extractJsonData).catch(handleHttpError('Connection error.')));
 
     return (
         <ServicesContext.Provider

@@ -14,8 +14,7 @@ const DashboardPage = props => {
     const {currentUser, classes} = props;
     const {views} = useContext(MetadataViewContext);
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
-    const canViewMetadata =
-        currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
+    const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
 
     return (
         <Grid container justifyContent="center" spacing="5">
@@ -35,15 +34,14 @@ const DashboardPage = props => {
                     <Grid container justifyContent="left" spacing="20" className={classes.textRow}>
                         <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
-                                {APPLICATION_NAME} contains your research metadata. Click on one of
-                                the domains and start exploring.
+                                {APPLICATION_NAME} contains your research metadata. Click on one of the domains and
+                                start exploring.
                             </Typography>
                         </Grid>
                         <Grid item xs={6} md={2} />
                         <Grid item xs={6} md={5}>
                             <Typography variant="body1" paragraph>
-                                For more details on how to use Fairspace, e.g. how to query the API,
-                                please refer the{' '}
+                                For more details on how to use Fairspace, e.g. how to query the API, please refer the{' '}
                                 <Link href="https://docs.fairway.app/">user manual</Link>.
                             </Typography>
                         </Grid>

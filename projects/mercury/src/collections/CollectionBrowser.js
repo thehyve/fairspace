@@ -62,9 +62,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
 
     const renderCollectionList = () => {
         collections.forEach(collection => {
-            collection.creatorDisplayName = getDisplayName(
-                users.find(u => u.iri === collection.createdBy)
-            );
+            collection.creatorDisplayName = getDisplayName(users.find(u => u.iri === collection.createdBy));
         });
         return (
             <>
@@ -76,11 +74,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
                     showDeleted={showDeleted}
                 />
                 {addingNewCollection ? (
-                    <CollectionEditor
-                        setBusy={setBusy}
-                        onClose={handleCancelAddCollection}
-                        workspace={workspace}
-                    />
+                    <CollectionEditor setBusy={setBusy} onClose={handleCancelAddCollection} workspace={workspace} />
                 ) : null}
             </>
         );
@@ -124,10 +118,7 @@ const ContextualCollectionBrowser = (props: ContextualCollectionBrowserPropertie
         ? collections.filter(c => c.ownerWorkspace === props.workspaceIri)
         : collections;
 
-    useEffect(
-        () => setShowDeleted(showDeletedCollections),
-        [setShowDeleted, showDeletedCollections]
-    );
+    useEffect(() => setShowDeleted(showDeletedCollections), [setShowDeleted, showDeletedCollections]);
 
     return (
         <CollectionBrowser

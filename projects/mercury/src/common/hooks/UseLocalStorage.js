@@ -10,9 +10,7 @@ import {useEffect, useState} from 'react';
  * @returns A stateful value, and a function to update it.
  */
 const useStateWithLocalStorage = (localStorageKey, defaultValue) => {
-    const [value, setValue] = useState(
-        JSON.parse(localStorage.getItem(localStorageKey)) || defaultValue
-    );
+    const [value, setValue] = useState(JSON.parse(localStorage.getItem(localStorageKey)) || defaultValue);
 
     useEffect(() => {
         localStorage.setItem(localStorageKey, JSON.stringify(value));

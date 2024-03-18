@@ -1,13 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    Collapse,
-    IconButton,
-    TableHead,
-    Typography
-} from '@mui/material';
+import {Card, CardContent, CardHeader, Collapse, IconButton, TableHead, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {ExpandMore, FolderOpen, HighlightOffOutlined, NoteOutlined} from '@mui/icons-material';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -86,16 +78,12 @@ export const UploadProgressComponent = ({classes}) => {
     );
 
     const renderFolderUploadName = (upload, folderName) => {
-        const additionalFilesOrFolders = upload.files.filter(
-            f => !f.path.startsWith(`${folderName}${PATH_SEPARATOR}`)
-        );
+        const additionalFilesOrFolders = upload.files.filter(f => !f.path.startsWith(`${folderName}${PATH_SEPARATOR}`));
         return (
             <Typography variant="body2" className={classes.wrapIcon} component="span">
                 <FolderOpen fontSize="small" />
                 &nbsp;{upload.destinationPath}/{folderName}
-                {additionalFilesOrFolders.length > 0 && (
-                    <em>&nbsp;and {additionalFilesOrFolders.length} other(s)</em>
-                )}
+                {additionalFilesOrFolders.length > 0 && <em>&nbsp;and {additionalFilesOrFolders.length} other(s)</em>}
             </Typography>
         );
     };
@@ -154,11 +142,7 @@ export const UploadProgressComponent = ({classes}) => {
 
     return (
         <Card>
-            <CardHeader
-                action={cardHeaderAction}
-                titleTypographyProps={{variant: 'h6'}}
-                title="Uploads"
-            />
+            <CardHeader action={cardHeaderAction} titleTypographyProps={{variant: 'h6'}} title="Uploads" />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent style={{paddingTop: 0}}>{renderUploadList()}</CardContent>
             </Collapse>

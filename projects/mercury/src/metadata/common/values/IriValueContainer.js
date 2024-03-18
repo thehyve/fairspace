@@ -13,16 +13,7 @@ export const noNamespace = {
 };
 
 export const IriValue = React.forwardRef(
-    (
-        {
-            namespace,
-            namespaces = [],
-            localPart = '',
-            onNamespaceChange = () => {},
-            onLocalPartChange = () => {}
-        },
-        ref
-    ) => {
+    ({namespace, namespaces = [], localPart = '', onNamespaceChange = () => {}, onLocalPartChange = () => {}}, ref) => {
         const namespaceOptions = [
             noNamespace,
             ...namespaces.map(n => ({

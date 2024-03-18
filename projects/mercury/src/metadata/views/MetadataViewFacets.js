@@ -3,12 +3,7 @@ import withStyles from '@mui/styles/withStyles';
 import {Button, Grid} from '@mui/material';
 import {ofBooleanValueType, ofRangeValueType} from './metadataViewUtils';
 import Facet from './MetadataViewFacetFactory';
-import type {
-    MetadataViewFacet,
-    MetadataViewFilter,
-    MetadataViewOptions,
-    ValueType
-} from './MetadataViewAPI';
+import type {MetadataViewFacet, MetadataViewFilter, MetadataViewOptions, ValueType} from './MetadataViewAPI';
 
 type MetadataViewFacetsProperties = {
     views: MetadataViewOptions[],
@@ -83,9 +78,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
 
     const renderSingleFacet = (facet: MetadataViewFacet) => {
         const facetOptions = getFilterValues(facet.type, facet);
-        const activeFilter = [...filterCandidates, ...filters].find(
-            filter => filter.field === facet.name
-        );
+        const activeFilter = [...filterCandidates, ...filters].find(filter => filter.field === facet.name);
         let activeFilterValues = [];
         if (activeFilter) {
             activeFilterValues = getFilterValues(facet.type, activeFilter);
@@ -109,9 +102,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
     };
 
     const renderFacets = (view: MetadataViewOptions) => {
-        const viewFacets = facetsEx.filter(facet =>
-            facet.name.toLowerCase().startsWith(view.name.toLowerCase())
-        );
+        const viewFacets = facetsEx.filter(facet => facet.name.toLowerCase().startsWith(view.name.toLowerCase()));
         return (
             viewFacets.length > 0 && (
                 <Grid
@@ -124,13 +115,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                 >
                     <div className={classes.facetGroupHeader}>{view.title}</div>
                     {viewFacets.map(facet =>
-                        renderSingleFacet(
-                            facet,
-                            filters,
-                            filterCandidates,
-                            updateFilterCandidates,
-                            handleClearFilter
-                        )
+                        renderSingleFacet(facet, filters, filterCandidates, updateFilterCandidates, handleClearFilter)
                     )}
                     {
                         // location is the collection location, which we will group under resources

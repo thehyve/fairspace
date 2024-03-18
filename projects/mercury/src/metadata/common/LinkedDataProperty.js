@@ -33,11 +33,9 @@ const LinkedDataProperty = ({
     // - the property is machineOnly
     // - the field refers to a url (marked as RESOURCE_URI)
     // - the value is taken from a set of allowed values
-    const disallowEditingOfExistingValues =
-        machineOnly || property.isGenericIriResource || property.allowedValues;
+    const disallowEditingOfExistingValues = machineOnly || property.isGenericIriResource || property.allowedValues;
 
-    const getCount = () =>
-        '(' + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + '+' : values.length) + ')';
+    const getCount = () => '(' + (values.length > MAX_LIST_LENGTH ? MAX_LIST_LENGTH + '+' : values.length) + ')';
 
     // The edit component should not actually allow editing the value if editable is set to false
     // or if the property contains settings that disallow editing existing values
@@ -104,9 +102,7 @@ const LinkedDataProperty = ({
             </FormGroup>
             {formEditable &&
                 (hasErrors ? (
-                    <FormHelperText color="primary">
-                        {validationErrors.map(e => `${e}. `)}
-                    </FormHelperText>
+                    <FormHelperText color="primary">{validationErrors.map(e => `${e}. `)}</FormHelperText>
                 ) : null)}
         </FormControl>
     );

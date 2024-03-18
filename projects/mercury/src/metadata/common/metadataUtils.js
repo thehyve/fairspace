@@ -11,9 +11,7 @@ import {isNonEmptyValue} from '../../common/utils/genericUtils';
  * @returns {string}
  */
 export const getLocalPart = uri =>
-    uri.includes('#')
-        ? uri.substring(uri.lastIndexOf('#') + 1)
-        : uri.substring(uri.lastIndexOf('/') + 1);
+    uri.includes('#') ? uri.substring(uri.lastIndexOf('#') + 1) : uri.substring(uri.lastIndexOf('/') + 1);
 
 /**
  *
@@ -155,8 +153,7 @@ export const shouldPropertyBeHidden = (key, domain) => {
  */
 export const propertiesToShow = (properties = []) => {
     const domainKey = properties.find(property => property.key === '@type');
-    const domainValue =
-        domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
+    const domainValue = domainKey && domainKey.values && domainKey.values[0] ? domainKey.values[0].id : undefined;
     return properties.filter(p => !shouldPropertyBeHidden(p.key, domainValue));
 };
 
@@ -283,8 +280,4 @@ export const valuesContainsValueOrId = (values, value, id) => {
  * @returns {boolean}
  */
 export const hasValue = values =>
-    !!(
-        values &&
-        Array.isArray(values) &&
-        values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0
-    );
+    !!(values && Array.isArray(values) && values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);

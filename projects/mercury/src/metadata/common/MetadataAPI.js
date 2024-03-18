@@ -26,9 +26,7 @@ export class MetadataAPI extends LinkedDataAPI {
             return Promise.reject(Error('No subject or properties given'));
         }
 
-        const jsonLd = Object.keys(properties).map(p =>
-            toJsonLd(subject, p, properties[p], vocabulary)
-        );
+        const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
         if (type) {
             jsonLd.push({'@id': subject, '@type': type});
         }

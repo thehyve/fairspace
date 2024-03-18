@@ -76,11 +76,7 @@ const columns = [
 ];
 
 const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, classes}) => {
-    const {
-        data: selectedFileDetails,
-        error,
-        loading
-    } = useAsync(() => LocalFileAPI.stat(selectedFile.filename, false));
+    const {data: selectedFileDetails, error, loading} = useAsync(() => LocalFileAPI.stat(selectedFile.filename, false));
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
     const [loadedData, setLoadedData] = useState([selectedFile]);
@@ -231,9 +227,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                 rowGetter={({index}) => loadedData[index]}
                                 onRowsRendered={onRowsRendered}
                                 rowClassName={getRowClassName}
-                                onRowDoubleClick={({index}) =>
-                                    handleOpenVersion(loadedData[index].version)
-                                }
+                                onRowDoubleClick={({index}) => handleOpenVersion(loadedData[index].version)}
                             >
                                 {columns.map(col => (
                                     <Column
@@ -252,9 +246,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                     dataKey="download"
                                     headerRenderer={renderHeader}
                                     className={classes.flexContainer}
-                                    cellRenderer={({rowIndex}) =>
-                                        renderDownloadActionCell(rowIndex)
-                                    }
+                                    cellRenderer={({rowIndex}) => renderDownloadActionCell(rowIndex)}
                                     width={80}
                                 />
                                 {isWritingEnabled && (
@@ -263,9 +255,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                         dataKey="revert"
                                         headerRenderer={renderHeader}
                                         className={classes.flexContainer}
-                                        cellRenderer={({rowIndex}) =>
-                                            renderRevertActionCell(rowIndex)
-                                        }
+                                        cellRenderer={({rowIndex}) => renderRevertActionCell(rowIndex)}
                                         width={80}
                                     />
                                 )}

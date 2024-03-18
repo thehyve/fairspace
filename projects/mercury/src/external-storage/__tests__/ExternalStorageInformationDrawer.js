@@ -21,8 +21,6 @@ describe('ExternalStorageInformationDrawer', () => {
         const wrapper = shallow(<ExternalStorageInformationDrawer {...defaultProps} />);
 
         const collectionDetailsProps = wrapper.find(EmptyInformationDrawer).first().props();
-        expect(collectionDetailsProps.message).toBe(
-            'Select a file or a folder to display its metadata'
-        );
+        expect(collectionDetailsProps.message).toBe('Select a file or a folder to display its metadata');
     });
 });

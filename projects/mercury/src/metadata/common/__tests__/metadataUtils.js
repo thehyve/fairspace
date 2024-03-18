@@ -37,9 +37,7 @@ describe('Metadata Utils', () => {
         it('can shorten external URLs', () => {
             expect(linkLabel('http://example.com/path', false)).toEqual('http://example.com/path');
             expect(linkLabel('http://example.com/path', true)).toEqual('path');
-            expect(linkLabel('http://example.com/path#hash', false)).toEqual(
-                'http://example.com/path#hash'
-            );
+            expect(linkLabel('http://example.com/path#hash', false)).toEqual('http://example.com/path#hash');
             expect(linkLabel('http://example.com/path#hash', true)).toEqual('hash');
         });
 
@@ -56,9 +54,7 @@ describe('Metadata Utils', () => {
         });
 
         it('should return the shacl name if no label is present', () => {
-            expect(getLabel({'http://www.w3.org/ns/shacl#name': [{'@value': 'My label'}]})).toEqual(
-                'My label'
-            );
+            expect(getLabel({'http://www.w3.org/ns/shacl#name': [{'@value': 'My label'}]})).toEqual('My label');
         });
 
         it('should not fail if json-ld is not properly expanded', () => {
@@ -104,9 +100,7 @@ describe('Metadata Utils', () => {
         });
 
         it('should keep external urls intact if shortenExternalUris is set to false', () => {
-            expect(getLabel({'@id': 'http://test.nl/name#lastname'}, false)).toEqual(
-                'http://test.nl/name#lastname'
-            );
+            expect(getLabel({'@id': 'http://test.nl/name#lastname'}, false)).toEqual('http://test.nl/name#lastname');
         });
         it('should return part of the url after the pound sign', () => {
             expect(getLabel({'@id': 'http://test.nl/name#lastname'}, true)).toEqual('lastname');
@@ -133,8 +127,7 @@ describe('Metadata Utils', () => {
             global.crypto = {
                 getRandomValues: nodeCrypto.randomFillSync
             };
-            const UUID_REGEX =
-                /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
             expect(UUID_REGEX.test(generateUuid())).toBe(true);
         });
     });
@@ -154,49 +147,29 @@ describe('Metadata Utils', () => {
         it('should show comments for everything except to collections', () => {
             expect(shouldPropertyBeHidden(constants.COMMENT_URI, 'http://example.com')).toBe(false);
             expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.FILE_URI)).toBe(false);
-            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.DIRECTORY_URI)).toBe(
-                false
-            );
-            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.COLLECTION_URI)).toBe(
-                true
-            );
+            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.DIRECTORY_URI)).toBe(false);
+            expect(shouldPropertyBeHidden(constants.COMMENT_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should not show labels for managed entities', () => {
             expect(shouldPropertyBeHidden(constants.LABEL_URI, 'http://example.com')).toBe(false);
             expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.FILE_URI)).toBe(true);
             expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.DIRECTORY_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.COLLECTION_URI)).toBe(
-                true
-            );
+            expect(shouldPropertyBeHidden(constants.LABEL_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should never show fs:filePath', () => {
-            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, 'http://example.com')).toBe(
-                true
-            );
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, 'http://example.com')).toBe(true);
             expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.FILE_URI)).toBe(true);
-            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.DIRECTORY_URI)).toBe(
-                true
-            );
-            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.COLLECTION_URI)).toBe(
-                true
-            );
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.DIRECTORY_URI)).toBe(true);
+            expect(shouldPropertyBeHidden(constants.FILE_PATH_URI, constants.COLLECTION_URI)).toBe(true);
         });
 
         it('should always show regular properties', () => {
-            expect(
-                shouldPropertyBeHidden('http://example.com/property', 'http://example.com')
-            ).toBe(false);
-            expect(shouldPropertyBeHidden('http://example.com/property', constants.FILE_URI)).toBe(
-                false
-            );
-            expect(
-                shouldPropertyBeHidden('http://example.com/property', constants.DIRECTORY_URI)
-            ).toBe(false);
-            expect(
-                shouldPropertyBeHidden('http://example.com/property', constants.COLLECTION_URI)
-            ).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', 'http://example.com')).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', constants.FILE_URI)).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', constants.DIRECTORY_URI)).toBe(false);
+            expect(shouldPropertyBeHidden('http://example.com/property', constants.COLLECTION_URI)).toBe(false);
         });
     });
 
@@ -239,14 +212,10 @@ describe('Metadata Utils', () => {
 
     describe('url2iri', () => {
         it('returns http scheme regardless of the input scheme', () => {
-            expect(url2iri('scheme://example.com/some/path')).toEqual(
-                'http://example.com/some/path'
-            );
+            expect(url2iri('scheme://example.com/some/path')).toEqual('http://example.com/some/path');
         });
         it('removes the port number from the uri', () => {
-            expect(url2iri('http://example.com:1234/some/path')).toEqual(
-                'http://example.com/some/path'
-            );
+            expect(url2iri('http://example.com:1234/some/path')).toEqual('http://example.com/some/path');
         });
 
         it('handles urls with query and fragment', () => {
@@ -256,9 +225,7 @@ describe('Metadata Utils', () => {
         });
 
         it('removes empty fragment or query strings', () => {
-            expect(url2iri('scheme://example.com/some/path/?#')).toEqual(
-                'http://example.com/some/path/'
-            );
+            expect(url2iri('scheme://example.com/some/path/?#')).toEqual('http://example.com/some/path/');
         });
 
         it('return the unmodified uri if it is invalid', () => {
@@ -364,18 +331,14 @@ describe('Metadata Utils', () => {
         it('should return false if values list is empty', () => expect(hasValue([])).toBe(false));
         it('should return false if only an empty string is is present', () =>
             expect(hasValue([{value: ''}])).toBe(false));
-        it('should return true if an id is present', () =>
-            expect(hasValue([{id: 'http://a'}])).toBe(true));
-        it('should return true if a non-empty value is present', () =>
-            expect(hasValue([{value: 'label'}])).toBe(true));
+        it('should return true if an id is present', () => expect(hasValue([{id: 'http://a'}])).toBe(true));
+        it('should return true if a non-empty value is present', () => expect(hasValue([{value: 'label'}])).toBe(true));
     });
 
     describe('getLocalPart', () => {
         it('should return the last part of the url with hash', () => {
             expect(getLocalPart('http://iri/test#local')).toEqual('local');
-            expect(getLocalPart('http://iri/test#local/something-else')).toEqual(
-                'local/something-else'
-            );
+            expect(getLocalPart('http://iri/test#local/something-else')).toEqual('local/something-else');
         });
 
         it('should return the part after the last slash if no hash is present', () => {
@@ -406,30 +369,22 @@ describe('Metadata Utils', () => {
         ];
         it('should shorten the iri if a namespace exists', () => {
             expect(getNamespacedIri('http://prefix/blabla', namespaces)).toEqual('pr:blabla');
-            expect(
-                getNamespacedIri('http://prefix/blabla/additional/paths#test', namespaces)
-            ).toEqual('pr:blabla/additional/paths#test');
+            expect(getNamespacedIri('http://prefix/blabla/additional/paths#test', namespaces)).toEqual(
+                'pr:blabla/additional/paths#test'
+            );
             expect(getNamespacedIri('http://prefix/', namespaces)).toEqual('pr:');
         });
         it('should return the iri itself if no namespace is found', () => {
-            expect(getNamespacedIri('http://other/blabla', namespaces)).toEqual(
-                'http://other/blabla'
-            );
-            expect(getNamespacedIri('https://prefix/blabla', namespaces)).toEqual(
-                'https://prefix/blabla'
-            );
-            expect(getNamespacedIri('http://prefix#blabla', namespaces)).toEqual(
-                'http://prefix#blabla'
-            );
+            expect(getNamespacedIri('http://other/blabla', namespaces)).toEqual('http://other/blabla');
+            expect(getNamespacedIri('https://prefix/blabla', namespaces)).toEqual('https://prefix/blabla');
+            expect(getNamespacedIri('http://prefix#blabla', namespaces)).toEqual('http://prefix#blabla');
         });
         it('should handle missing iri or namespaces', () => {
             expect(getNamespacedIri(undefined, namespaces)).toBe('');
             expect(getNamespacedIri('http://prefix/blabla')).toEqual('http://prefix/blabla');
         });
         it('should shorten a uri with any of the prefixes if multiple namespaces apply', () => {
-            expect(getNamespacedIri('http://multiple/123', namespaces)).toEqual(
-                expect.stringContaining(':123')
-            );
+            expect(getNamespacedIri('http://multiple/123', namespaces)).toEqual(expect.stringContaining(':123'));
         });
     });
 });

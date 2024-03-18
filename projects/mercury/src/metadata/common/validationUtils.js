@@ -9,15 +9,11 @@ export const removeWhitespaceValues = values =>
     values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : [];
 
 export const maxLengthValidation = (maxLength, values) =>
-    values && values.some(v => v.length > maxLength)
-        ? `Please provide no more than ${maxLength} characters`
-        : null;
+    values && values.some(v => v.length > maxLength) ? `Please provide no more than ${maxLength} characters` : null;
 
 export const minCountValidation = (minCount, values) => {
     if (!values || values.length < minCount) {
-        return minCount === 1
-            ? 'Please provide a value'
-            : `Please specify at least ${minCount} values`;
+        return minCount === 1 ? 'Please provide a value' : `Please specify at least ${minCount} values`;
     }
     return null;
 };

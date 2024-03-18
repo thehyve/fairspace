@@ -11,9 +11,7 @@ describe('json-ld Utils', () => {
         });
 
         it('should support literal properties', () => {
-            expect(
-                getFirstPredicateValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')
-            ).toEqual(1);
+            expect(getFirstPredicateValue({numbers: [{'@value': 1}, {'@value': 2}]}, 'numbers')).toEqual(1);
         });
     });
 
