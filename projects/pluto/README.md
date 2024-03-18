@@ -14,7 +14,7 @@ Prerequisites:
 - Gradle
 - Running Saturn service
 - Running Keycloak instance
-- Running PostgresQL instance (optional)
+- Running PostgreSQL instance (optional)
 - Environment variable `KEYCLOAK_CLIENT_SECRET` set to `**********`
 
 To run the application, execute the following command:
