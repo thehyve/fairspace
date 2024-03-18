@@ -11,22 +11,21 @@ const ConfirmationButton = ({children, message, disabled, onClick, ...otherProps
         onClick();
     };
 
-    const dialog = isDialogOpen && !disabled ? (
-        <ConfirmationDialog
-            open
-            title="Confirmation"
-            content={message}
-            onAgree={agree}
-            onDisagree={() => showDialog(false)}
-            {...otherProps}
-        />
-    ) : null;
+    const dialog =
+        isDialogOpen && !disabled ? (
+            <ConfirmationDialog
+                open
+                title="Confirmation"
+                content={message}
+                onAgree={agree}
+                onDisagree={() => showDialog(false)}
+                {...otherProps}
+            />
+        ) : null;
 
     return (
         <>
-            <span onClick={() => !disabled && showDialog(true)}>
-                {children}
-            </span>
+            <span onClick={() => !disabled && showDialog(true)}>{children}</span>
             {dialog}
         </>
     );

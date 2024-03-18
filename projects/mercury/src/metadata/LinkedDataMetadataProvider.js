@@ -15,38 +15,50 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
     const {path: metadataAPIPath} = useContext(MetadataAPIPathContext);
     const metadataAPI = new MetadataAPI(metadataAPIPath);
 
-    const fetchMetadataBySubject = useCallback((subject) => metadataAPI.getDict({subject, withValueProperties: true})
-        .catch(() => {
-            throw new Error('An error occurred while loading the metadata');
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-        }), []);
+    const fetchMetadataBySubject = useCallback(
+        subject =>
+            metadataAPI.getDict({subject, withValueProperties: true}).catch(() => {
+                throw new Error('An error occurred while loading the metadata');
+            }),
+        [] // eslint-disable-line react-hooks/exhaustive-deps
+    );
 
-    const submitLinkedDataChanges = useCallback((subject, values) => metadataAPI.get({subject})
-        .then(meta => (meta.length && getFirstPredicateValue(meta[0], '@type')))
-        .then(type => metadataAPI.updateEntity(subject, values, vocabulary, type)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vocabulary]);
+    const submitLinkedDataChanges = useCallback(
+        (subject, values) =>
+            metadataAPI
+                .get({subject})
+                .then(meta => meta.length && getFirstPredicateValue(meta[0], '@type'))
+                .then(type => metadataAPI.updateEntity(subject, values, vocabulary, type)),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [vocabulary]
+    );
 
-    const createLinkedDataEntity = useCallback((subject, values, type) => metadataAPI.get({subject})
-        .then((meta) => {
-            if (meta.length) {
-                throw Error(`Entity already exists: ${subject}`);
-            }
-        })
-        .then(() => metadataAPI.updateEntity(subject, values, vocabulary, type))
-        .then(() => ({subject, type, values})),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [vocabulary]);
+    const createLinkedDataEntity = useCallback(
+        (subject, values, type) =>
+            metadataAPI
+                .get({subject})
+                .then(meta => {
+                    if (meta.length) {
+                        throw Error(`Entity already exists: ${subject}`);
+                    }
+                })
+                .then(() => metadataAPI.updateEntity(subject, values, vocabulary, type))
+                .then(() => ({subject, type, values})),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [vocabulary]
+    );
 
-    const deleteLinkedDataEntity = (subject) => metadataAPI.delete(subject);
+    const deleteLinkedDataEntity = subject => metadataAPI.delete(subject);
 
-    const extendProperties = ({properties = [], isEntityEditable = true}) => properties
-        .map(p => ({
+    const extendProperties = ({properties = [], isEntityEditable = true}) =>
+        properties.map(p => ({
             ...p,
             isEditable: isEntityEditable && !p.machineOnly
         }));
 
-    const namespaces = getNamespaces(vocabulary, namespace => getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI));
+    const namespaces = getNamespaces(vocabulary, namespace =>
+        getFirstPredicateValue(namespace, USABLE_IN_METADATA_URI)
+    );
 
     const shapesError = !vocabularyLoading && vocabularyError && 'An error occurred while loading the vocabulary';
 
@@ -71,7 +83,7 @@ const LinkedDataMetadataProvider = ({children, ...otherProps}) => {
                 valueComponentFactory,
 
                 shapes: vocabulary,
-                shapesError,
+                shapesError
             }}
         >
             {children}

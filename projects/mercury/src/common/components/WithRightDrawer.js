@@ -7,43 +7,34 @@ import IconButton from '@mui/material/IconButton';
 import {Close} from '@mui/icons-material';
 import styles from './WithRightDrawer.styles';
 
-function WithRightDrawer({
-    classes, mainContents, drawerContents, collapsible, drawerOpened, onCloseDrawer
-}) {
+function WithRightDrawer({classes, mainContents, drawerContents, collapsible, drawerOpened, onCloseDrawer}) {
     return (
         <div>
-            <main className={classNames(
-                classes.content, {
+            <main
+                className={classNames(classes.content, {
                     [classes.contentShift]: drawerOpened
-                }
-            )}
+                })}
             >
-                <div>
-                    {mainContents}
-                </div>
+                <div>{mainContents}</div>
             </main>
             <Drawer
                 variant="persistent"
                 anchor="right"
                 open={drawerOpened || !collapsible}
                 classes={{
-                    paper: classes.infoDrawerPaper,
+                    paper: classes.infoDrawerPaper
                 }}
             >
+                {collapsible ? (
+                    <div>
+                        <div className={classes.toolbar} />
+                        <IconButton onClick={onCloseDrawer} title="Close drawer" className={classes.closeButton}>
+                            <Close />
+                        </IconButton>
+                    </div>
+                ) : null}
 
-                {collapsible
-                    ? (
-                        <div>
-                            <div className={classes.toolbar} />
-                            <IconButton onClick={onCloseDrawer} title="Close drawer" className={classes.closeButton}>
-                                <Close />
-                            </IconButton>
-                        </div>
-                    ) : null}
-
-                <div className={classes.drawerContents}>
-                    {drawerContents}
-                </div>
+                <div className={classes.drawerContents}>{drawerContents}</div>
             </Drawer>
         </div>
     );

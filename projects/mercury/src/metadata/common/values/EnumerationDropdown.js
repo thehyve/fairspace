@@ -4,7 +4,7 @@ import Dropdown from './Dropdown';
 import {getLabel, valuesContainsValueOrId} from '../metadataUtils';
 
 function EnumerationDropdown({property, currentValues, ...otherProps}) {
-    const options = property.allowedValues.map((entity) => {
+    const options = property.allowedValues.map(entity => {
         const id = entity['@id'];
         const value = entity['@value'];
         const label = getLabel(entity) || value;
@@ -19,12 +19,7 @@ function EnumerationDropdown({property, currentValues, ...otherProps}) {
     });
 
     return (
-        <Dropdown
-            clearTextOnSelection
-            options={options}
-            isOptionDisabled={({disabled}) => disabled}
-            {...otherProps}
-        />
+        <Dropdown clearTextOnSelection options={options} isOptionDisabled={({disabled}) => disabled} {...otherProps} />
     );
 }
 

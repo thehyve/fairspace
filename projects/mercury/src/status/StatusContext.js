@@ -14,25 +14,27 @@ export const StatusProvider = ({children}) => {
     const [serverStatus, setServerStatus] = useState(SERVER_STATUS_UP);
     const [userSessionStatus, setUserSessionStatus] = useState();
 
-    const handleGetStatus = async () => getServerStatus()
-        .then((response: StatusResponse) => {
-            if (response.status) {
-                setServerStatus(response.status);
-            } else {
+    const handleGetStatus = async () =>
+        getServerStatus()
+            .then((response: StatusResponse) => {
+                if (response.status) {
+                    setServerStatus(response.status);
+                } else {
+                    setServerStatus(SERVER_STATUS_DOWN);
+                }
+            })
+            .catch(() => {
                 setServerStatus(SERVER_STATUS_DOWN);
-            }
-        })
-        .catch(() => {
-            setServerStatus(SERVER_STATUS_DOWN);
-        });
+            });
 
-    const handleGetSession = async () => getSessionStatus()
-        .then(() => {
-            setUserSessionStatus(VALID_USER_SESSION);
-        })
-        .catch(() => {
-            setUserSessionStatus();
-        });
+    const handleGetSession = async () =>
+        getSessionStatus()
+            .then(() => {
+                setUserSessionStatus(VALID_USER_SESSION);
+            })
+            .catch(() => {
+                setUserSessionStatus();
+            });
 
     useEffect(() => {
         handleGetSession();

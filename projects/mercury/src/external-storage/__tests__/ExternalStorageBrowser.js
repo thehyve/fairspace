@@ -37,9 +37,11 @@ const initialProps = {
         listen: () => {}
     },
     storage: storageMock,
-    files: [{
-        filename: 'a'
-    }],
+    files: [
+        {
+            filename: 'a'
+        }
+    ],
     fileActions: fileActionsMock,
     selection: selectionMock,
     classes: {}
@@ -49,9 +51,7 @@ describe('ExternalStorageBrowser', () => {
     it('renders proper view', () => {
         const {queryByTestId} = render(
             <ThemeProvider theme={theme}>
-                <ExternalStorageBrowser
-                    {...initialProps}
-                />
+                <ExternalStorageBrowser {...initialProps} />
             </ThemeProvider>
         );
 
@@ -61,10 +61,7 @@ describe('ExternalStorageBrowser', () => {
     it('show data loading error when ehn error on fetching files occurs', () => {
         const {getByText} = render(
             <ThemeProvider theme={theme}>
-                <ExternalStorageBrowser
-                    {...initialProps}
-                    error="some error"
-                />
+                <ExternalStorageBrowser {...initialProps} error="some error" />
             </ThemeProvider>
         );
 
@@ -74,10 +71,7 @@ describe('ExternalStorageBrowser', () => {
     it('show loading inlay as long as the files are pending', () => {
         render(
             <ThemeProvider theme={theme}>
-                <ExternalStorageBrowser
-                    {...initialProps}
-                    loading
-                />
+                <ExternalStorageBrowser {...initialProps} loading />
             </ThemeProvider>
         );
 

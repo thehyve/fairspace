@@ -12,8 +12,10 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
     // not to dynamically add single-value fields when these values are updated.
     initialProperties.forEach(p => {
         const defaultValue = [{value: ''}];
-        const newValues = !values[p.key] && p.maxValuesCount === 1 && DEFAULTABLE_DATATYPES.includes(p.datatype)
-            ? defaultValue : values[p.key];
+        const newValues =
+            !values[p.key] && p.maxValuesCount === 1 && DEFAULTABLE_DATATYPES.includes(p.datatype)
+                ? defaultValue
+                : values[p.key];
         setFormValues(prev => ({
             ...prev,
             [p.key]: newValues
@@ -50,15 +52,16 @@ const useFormData = (values, initialProperties = []) => {
 
     let updatesToReturn = updates;
 
-    const deleteUpdate = (propertyKey) => {
+    const deleteUpdate = propertyKey => {
         const newUpdates = {...updates};
         delete newUpdates[propertyKey];
         setUpdates(newUpdates);
     };
 
     const save = (property, newValue: any[]) => {
-        const equalToInitialValue = ((!initialFormValues[property.key]) && newValue.length === 0)
-            || _.isEqual(newValue, initialFormValues[property.key]);
+        const equalToInitialValue =
+            (!initialFormValues[property.key] && newValue.length === 0) ||
+            _.isEqual(newValue, initialFormValues[property.key]);
         if (equalToInitialValue) {
             // Remove property from updated values if the current value equals its initial value.
             updatesToReturn = {...updates};
@@ -89,7 +92,7 @@ const useFormData = (values, initialProperties = []) => {
 
     const updateValue = (property, value, index) => {
         if (!first(initialFormValues[property.key]) || first(initialFormValues[property.key]).value !== value.value) {
-            const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
+            const newValue = current(property.key).map((el, idx) => (idx === index ? value : el));
             save(property, newValue);
         } else if (updates[property.key]) {
             deleteUpdate(property.key);

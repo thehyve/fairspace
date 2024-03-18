@@ -18,7 +18,7 @@ import BreadCrumbs from '../common/components/BreadCrumbs';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 
-export const TabPanel = (props) => {
+export const TabPanel = props => {
     const {children, value, index, ...other} = props;
 
     return (
@@ -38,15 +38,15 @@ export const TabPanel = (props) => {
 TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.any.isRequired,
-    value: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired
 };
 
-const a11yProps = (index) => ({
+const a11yProps = index => ({
     id: `workspace-tab-${index}`,
-    'aria-controls': `workspace-tabpanel-${index}`,
+    'aria-controls': `workspace-tabpanel-${index}`
 });
 
-const WorkspaceOverview = (props) => {
+const WorkspaceOverview = props => {
     const [selectedTab, setSelectedTab] = useState(0);
     const {workspaces, workspacesError, workspacesLoading} = useContext(WorkspaceContext);
     const [workspace, setWorkspace] = useState(workspaces.find(w => w.iri === currentWorkspace()));
@@ -54,25 +54,27 @@ const WorkspaceOverview = (props) => {
     usePageTitleUpdater(workspace ? workspace.code : '');
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-        const updated = workspaces.find(w => w.iri === currentWorkspace());
-        if (updated && workspace !== updated) {
-            setWorkspace(updated);
-        }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    [workspaces]);
+    useEffect(
+        () => {
+            const updated = workspaces.find(w => w.iri === currentWorkspace());
+            if (updated && workspace !== updated) {
+                setWorkspace(updated);
+            }
+        }, // eslint-disable-next-line react-hooks/exhaustive-deps
+        [workspaces]
+    );
 
     if (workspacesLoading) {
-        return (<LoadingInlay />);
+        return <LoadingInlay />;
     }
     if (!workspace) {
-        return (<MessageDisplay message="Workspace does not exist." />);
+        return <MessageDisplay message="Workspace does not exist." />;
     }
     if (!workspace.canCollaborate) {
-        return (<MessageDisplay message="You don't have sufficient permissions to access the workspace." />);
+        return <MessageDisplay message="You don't have sufficient permissions to access the workspace." />;
     }
     if (workspacesError || !workspace.iri) {
-        return (<MessageDisplay message="Error loading workspace." />);
+        return <MessageDisplay message="Error loading workspace." />;
     }
 
     const changeTab = (event, tabIndex) => {
@@ -80,18 +82,24 @@ const WorkspaceOverview = (props) => {
     };
 
     return (
-        <BreadcrumbsContext.Provider value={{segments: [
-            {
-                label: 'Workspaces',
-                icon: <Widgets />,
-                href: '/workspaces'
-            }
-        ]}}
+        <BreadcrumbsContext.Provider
+            value={{
+                segments: [
+                    {
+                        label: 'Workspaces',
+                        icon: <Widgets />,
+                        href: '/workspaces'
+                    }
+                ]
+            }}
         >
-            <BreadCrumbs additionalSegments={[{
-                label: workspace.code,
-                href: workspacePrefix()
-            }]}
+            <BreadCrumbs
+                additionalSegments={[
+                    {
+                        label: workspace.code,
+                        href: workspacePrefix()
+                    }
+                ]}
             />
             <Tabs
                 value={selectedTab}

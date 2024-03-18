@@ -16,10 +16,7 @@ const FileVersionsDialog = ({onClose, selectedFile, isWritingEnabled, onRevertVe
             />
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={onClose}
-                color="secondary"
-            >
+            <Button onClick={onClose} color="secondary">
                 Cancel
             </Button>
         </DialogActions>

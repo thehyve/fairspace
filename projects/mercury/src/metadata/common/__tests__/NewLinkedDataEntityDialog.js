@@ -9,9 +9,7 @@ import LinkedDataContext from '../../LinkedDataContext';
 import VocabularyContext from '../../vocabulary/VocabularyContext';
 
 const shape = {
-    '@type': [
-        'https://fairspace.nl/ontology#ClassShape'
-    ],
+    '@type': ['https://fairspace.nl/ontology#ClassShape'],
     '@id': 'http://xmlns.com/foaf/0.1/SomeClass',
     'http://www.w3.org/ns/shacl#targetClass': [
         {

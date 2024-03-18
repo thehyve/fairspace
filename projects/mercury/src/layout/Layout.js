@@ -45,10 +45,12 @@ const Layout = ({
     // in state makes sure that the timeout can still be cancelled when
     // the user leaves the menu
     const handleMouseEnter = () => {
-        setTimeoutId(setTimeout(() => {
-            setMenuOpenDueToHover(true);
-            setTimeoutId();
-        }, LEFT_MENU_EXPANSION_DELAY));
+        setTimeoutId(
+            setTimeout(() => {
+                setMenuOpenDueToHover(true);
+                setTimeoutId();
+            }, LEFT_MENU_EXPANSION_DELAY)
+        );
     };
 
     const handleMouseLeave = () => {
@@ -61,13 +63,21 @@ const Layout = ({
 
     const renderAlert = () => {
         if (serverStatus !== SERVER_STATUS_UP) {
-            return <StatusAlert><strong>A server-side error occurred.</strong> Please try again later.</StatusAlert>;
+            return (
+                <StatusAlert>
+                    <strong>A server-side error occurred.</strong> Please try again later.
+                </StatusAlert>
+            );
         }
         if (userSessionStatus !== VALID_USER_SESSION) {
             return (
                 <StatusAlert>
                     <strong>Current user session is no longer active.</strong>
-                    Please <Link href="#" onClick={() => window.location.assign('/logout')}>log in</Link> again.
+                    Please{' '}
+                    <Link href="#" onClick={() => window.location.assign('/logout')}>
+                        log in
+                    </Link>{' '}
+                    again.
                 </StatusAlert>
             );
         }

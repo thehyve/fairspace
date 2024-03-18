@@ -16,22 +16,22 @@ import {getCollectionAbsolutePath} from './collectionUtils';
 import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 type ContextualCollectionBrowserProperties = {
-    history: History;
-    workspaceIri: string;
-    isSelected: (any) => boolean;
-    toggleCollection: (any) => void;
-    setBusy: () => void;
-}
+    history: History,
+    workspaceIri: string,
+    isSelected: any => boolean,
+    toggleCollection: any => void,
+    setBusy: () => void
+};
 
 type CollectionBrowserProperties = ContextualCollectionBrowserProperties & {
-    loading: boolean;
-    error: Error;
-    collections: Collection[];
-    users: User[];
-    workspace: Workspace;
-    showDeleted: boolean;
-    canAddCollection: boolean;
-}
+    loading: boolean,
+    error: Error,
+    collections: Collection[],
+    users: User[],
+    workspace: Workspace,
+    showDeleted: boolean,
+    canAddCollection: boolean
+};
 
 export const CollectionBrowser = (props: CollectionBrowserProperties) => {
     const {
@@ -42,16 +42,19 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
         users = [],
         canAddCollection = true,
         setBusy = () => {},
-        showDeleted, history, error, workspace
+        showDeleted,
+        history,
+        error,
+        workspace
     } = props;
 
     const [addingNewCollection, setAddingNewCollection] = useState(false);
     const handleAddCollectionClick = () => setAddingNewCollection(true);
-    const handleCollectionClick = (collection) => {
+    const handleCollectionClick = collection => {
         toggleCollection(collection);
     };
 
-    const handleCollectionDoubleClick = (collection) => {
+    const handleCollectionDoubleClick = collection => {
         history.push(encodeURI(getCollectionAbsolutePath(collection.name)));
     };
 
@@ -71,11 +74,7 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
                     showDeleted={showDeleted}
                 />
                 {addingNewCollection ? (
-                    <CollectionEditor
-                        setBusy={setBusy}
-                        onClose={handleCancelAddCollection}
-                        workspace={workspace}
-                    />
+                    <CollectionEditor setBusy={setBusy} onClose={handleCancelAddCollection} workspace={workspace} />
                 ) : null}
             </>
         );
@@ -88,21 +87,18 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
     return (
         <>
             {loading ? <LoadingInlay /> : renderCollectionList()}
-            {
-                canAddCollection
-                && (
-                    <Button
-                        style={{marginTop: 8}}
-                        color="primary"
-                        variant="contained"
-                        aria-label="Add"
-                        title="Create a new collection"
-                        onClick={handleAddCollectionClick}
-                    >
+            {canAddCollection && (
+                <Button
+                    style={{marginTop: 8}}
+                    color="primary"
+                    variant="contained"
+                    aria-label="Add"
+                    title="Create a new collection"
+                    onClick={handleAddCollectionClick}
+                >
                     New
-                    </Button>
-                )
-            }
+                </Button>
+            )}
         </>
     );
 };
@@ -110,7 +106,8 @@ export const CollectionBrowser = (props: CollectionBrowserProperties) => {
 const ContextualCollectionBrowser = (props: ContextualCollectionBrowserProperties) => {
     const {currentUserError, currentUserLoading} = useContext(UserContext);
     const {users, usersLoading, usersError} = useContext(UsersContext);
-    const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} = useContext(CollectionsContext);
+    const {collections, collectionsLoading, collectionsError, showDeleted, setShowDeleted} =
+        useContext(CollectionsContext);
     const {workspacesLoading, workspacesError, workspaces} = useContext(WorkspaceContext);
     const workspace = props.workspaceIri ? workspaces.find(w => w.iri === props.workspaceIri) : {};
     const {showDeletedCollections} = props;

@@ -13,14 +13,14 @@ import {VocabularyProvider} from '../vocabulary/VocabularyContext';
 import LinkedDataMetadataProvider from '../LinkedDataMetadataProvider';
 
 export type ExternalMetadataSourceViewProperties = {
-    classes: any;
-    match: any;
-}
+    classes: any,
+    match: any
+};
 const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties) => {
     const {match} = props;
     const {externalMetadataSources = [], loading, error} = useContext(ExternalMetadataSourceContext);
 
-    if ((error && error.message)) {
+    if (error && error.message) {
         return <MessageDisplay message={error.message} />;
     }
     if (loading) {
@@ -35,10 +35,7 @@ const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties)
                 <MetadataViewFacetsProvider>
                     <VocabularyProvider>
                         <LinkedDataMetadataProvider>
-                            <MetadataView
-                                {...props}
-                                pathPrefix={getExternalMetadataSourcePathPrefix(source.name)}
-                            />
+                            <MetadataView {...props} pathPrefix={getExternalMetadataSourcePathPrefix(source.name)} />
                         </LinkedDataMetadataProvider>
                     </VocabularyProvider>
                 </MetadataViewFacetsProvider>

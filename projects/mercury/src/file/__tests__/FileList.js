@@ -15,11 +15,7 @@ configure({adapter: new Adapter()});
 
 afterEach(cleanup);
 
-const wrap = (element) => (
-    <ThemeProvider theme={theme}>
-        {element}
-    </ThemeProvider>
-);
+const wrap = element => <ThemeProvider theme={theme}>{element}</ThemeProvider>;
 
 describe('FileList', () => {
     const files = [
@@ -65,11 +61,9 @@ describe('FileList', () => {
     it('calls onPathCheckboxClick when the checkbox container is clicked', () => {
         const onPathCheckboxClick = jest.fn();
 
-        const {getByTestId} = render(wrap(<FileList
-            onPathCheckboxClick={onPathCheckboxClick}
-            selectionEnabled
-            files={files}
-        />));
+        const {getByTestId} = render(
+            wrap(<FileList onPathCheckboxClick={onPathCheckboxClick} selectionEnabled files={files} />)
+        );
 
         const cell = getByTestId('checkbox-cell');
 
@@ -79,10 +73,7 @@ describe('FileList', () => {
     });
 
     it('does not render the checkbox when selection is disabled', () => {
-        const {queryByTestId} = render(wrap(<FileList
-            selectionEnabled={false}
-            files={files}
-        />));
+        const {queryByTestId} = render(wrap(<FileList selectionEnabled={false} files={files} />));
 
         expect(queryByTestId('checkbox-cell')).not.toBeInTheDocument();
     });
@@ -106,12 +97,10 @@ describe('FileList', () => {
                 type: 'file',
                 etag: null,
                 selected: false
-            }];
+            }
+        ];
 
-        const wrapper = mount(wrap(<FileList
-            selectionEnabled={false}
-            files={allFiles}
-        />));
+        const wrapper = mount(wrap(<FileList selectionEnabled={false} files={allFiles} />));
         expect(wrapper.find(TableRow).length).toBe(3);
 
         const nameField = wrapper.find('input#filter').first();

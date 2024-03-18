@@ -6,7 +6,7 @@ const LinkedDataContext = React.createContext({
     valueComponentFactory: {
         addComponent: () => StringValue,
         editComponent: () => StringValue,
-        readOnlyComponent: () => StringValue,
+        readOnlyComponent: () => StringValue
     }
 });
 

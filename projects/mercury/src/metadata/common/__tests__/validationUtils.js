@@ -161,7 +161,9 @@ describe('Validation Utils', () => {
         });
         it('should return nothing on valid URIs', () => {
             // values from https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples
-            expect(iriValidation(['https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top'])).toBeNull();
+            expect(
+                iriValidation(['https://john.doe@www.example.com:123/forum/questions/?tag=networking&order=newest#top'])
+            ).toBeNull();
             expect(iriValidation(['ldap://[2001:db8::7]/c=GB?objectClass?one'])).toBeNull();
             expect(iriValidation(['mailto:John.Doe@example.com'])).toBeNull();
             expect(iriValidation(['news:comp.infosystems.www.servers.unix'])).toBeNull();

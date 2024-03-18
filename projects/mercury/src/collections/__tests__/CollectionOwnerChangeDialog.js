@@ -8,7 +8,7 @@ describe('CollectionOwnerChangeDialog', () => {
     const mockCollection = {
         iri: 'http://localhost/iri/c1',
         name: 'c1',
-        ownerWorkspace: 'http://localhost/iri/w1',
+        ownerWorkspace: 'http://localhost/iri/w1'
     };
 
     const mockWorkspaces = [
@@ -18,12 +18,14 @@ describe('CollectionOwnerChangeDialog', () => {
     ];
 
     it('should render initial state of the dialog correctly', () => {
-        render(<CollectionOwnerChangeDialog
-            collection={mockCollection}
-            workspaces={mockWorkspaces}
-            setOwnedBy={mockSetOwnedByFn}
-            onClose={() => {}}
-        />);
+        render(
+            <CollectionOwnerChangeDialog
+                collection={mockCollection}
+                workspaces={mockWorkspaces}
+                setOwnedBy={mockSetOwnedByFn}
+                onClose={() => {}}
+            />
+        );
 
         // expect(screen.getByRole("table")).toBeInTheDocument();
         // render available values

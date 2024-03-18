@@ -20,7 +20,6 @@ const styles = () => ({
     sidePanel: {
         width: consts.SIDE_PANEL_WIDTH
     }
-
 });
 
 export default styles;

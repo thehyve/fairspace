@@ -15,36 +15,36 @@ import ConfirmationDialog from '../common/components/ConfirmationDialog';
 import {formatDateTime} from '../common/utils/genericUtils';
 import {LocalFileAPI} from './FileAPI';
 
-const styles = (theme) => ({
+const styles = theme => ({
     fileVersionDialog: {
         height: 300,
         width: 500,
         '& .ReactVirtualized__Table__headerRow': {
             flip: false,
-            paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined,
+            paddingRight: theme.direction === 'rtl' ? '0 !important' : undefined
         },
         '& .ReactVirtualized__Table__row': {
             outline: 0
         },
         '& .ReactVirtualized__Table__Grid': {
             outline: 0
-        },
+        }
     },
     flexContainer: {
         display: 'flex',
-        boxSizing: 'border-box',
+        boxSizing: 'border-box'
     },
     tableRow: {
-        cursor: 'pointer',
+        cursor: 'pointer'
     },
     tableRowHover: {
         '&:hover': {
-            backgroundColor: theme.palette.grey[200],
-        },
+            backgroundColor: theme.palette.grey[200]
+        }
     },
     tableCell: {
         flex: 1,
-        borderBottom: 'none',
+        borderBottom: 'none'
     },
     tableActionCell: {
         margin: 0,
@@ -65,41 +65,39 @@ const columns = [
         width: 300,
         label: 'Modified',
         dataKey: 'lastmod',
-        renderValue: (value) => (value ? formatDateTime(value) : '')
+        renderValue: value => (value ? formatDateTime(value) : '')
     },
     {
         width: 100,
         label: 'Size',
         dataKey: 'size',
-        renderValue: (value) => (value ? filesize(value, {base: 10}) : '')
+        renderValue: value => (value ? filesize(value, {base: 10}) : '')
     }
 ];
 
 const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, classes}) => {
-    const {data: selectedFileDetails, error, loading} = useAsync(
-        () => LocalFileAPI.stat(selectedFile.filename, false)
-    );
+    const {data: selectedFileDetails, error, loading} = useAsync(() => LocalFileAPI.stat(selectedFile.filename, false));
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedVersion, setSelectedVersion] = useState();
     const [loadedData, setLoadedData] = useState([selectedFile]);
 
     if (error) {
-        return (<MessageDisplay message="An error occurred while fetching file history." />);
+        return <MessageDisplay message="An error occurred while fetching file history." />;
     }
     if (loading) {
-        return (<LoadingInlay />);
+        return <LoadingInlay />;
     }
 
     const selectedFileVersion = selectedFileDetails && parseInt(selectedFileDetails.version, 10);
     if (!selectedFileVersion) {
-        return (<div>No version found.</div>);
+        return <div>No version found.</div>;
     }
 
-    const handleOpenVersion = (version) => {
+    const handleOpenVersion = version => {
         LocalFileAPI.open(selectedFile.filename, version);
     };
 
-    const handleRevertToVersion = (version) => {
+    const handleRevertToVersion = version => {
         setSelectedVersion(version);
         setShowConfirmDialog(true);
     };
@@ -129,11 +127,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
     };
 
     const renderCell = (cellData, column) => (
-        <TableCell
-            component="div"
-            variant="body"
-            className={classes.tableCell}
-        >
+        <TableCell component="div" variant="body" className={classes.tableCell}>
             {column.renderValue ? column.renderValue(cellData) : cellData}
         </TableCell>
     );
@@ -142,8 +136,13 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
         return LocalFileAPI.getDownloadLink(selectedFile.filename) + `?version=${version}`;
     }
 
-    const renderDownloadActionCell = (rowIndex) => (
-        <TableCell align="right" className={`${classes.tableCell} ${classes.tableActionCell}`} variant="body" component="div">
+    const renderDownloadActionCell = rowIndex => (
+        <TableCell
+            align="right"
+            className={`${classes.tableCell} ${classes.tableActionCell}`}
+            variant="body"
+            component="div"
+        >
             <IconButton
                 title="Download this version"
                 aria-label="Download this version"
@@ -157,8 +156,13 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
         </TableCell>
     );
 
-    const renderRevertActionCell = (rowIndex) => (
-        <TableCell align="right" className={`${classes.tableCell} ${classes.tableActionCell}`} variant="body" component="div">
+    const renderRevertActionCell = rowIndex => (
+        <TableCell
+            align="right"
+            className={`${classes.tableCell} ${classes.tableActionCell}`}
+            variant="body"
+            component="div"
+        >
             <IconButton
                 aria-label="Revert to this version"
                 title="Revert to this version"
@@ -182,21 +186,24 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
         </TableCell>
     );
 
-    const getRowClassName = ({index}) => ([classes.tableRow, classes.flexContainer, {
-        [classes.tableRowHover]: index !== -1
-    }]);
+    const getRowClassName = ({index}) => [
+        classes.tableRow,
+        classes.flexContainer,
+        {
+            [classes.tableRowHover]: index !== -1
+        }
+    ];
 
     const isRowLoaded = ({index}) => !!loadedData[index];
 
     const loadMoreRows = ({startIndex, stopIndex}) => {
         const fromVersion = startIndex === 1 ? startIndex : startIndex + 1;
         const toVersion = stopIndex + 1;
-        LocalFileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion)
-            .then(res => {
-                if (res) {
-                    setLoadedData([...loadedData, ...res]);
-                }
-            });
+        LocalFileAPI.showFileHistory(selectedFileDetails, fromVersion, toVersion).then(res => {
+            if (res) {
+                setLoadedData([...loadedData, ...res]);
+            }
+        });
     };
 
     return (
@@ -222,7 +229,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                                 rowClassName={getRowClassName}
                                 onRowDoubleClick={({index}) => handleOpenVersion(loadedData[index].version)}
                             >
-                                {columns.map((col) => (
+                                {columns.map(col => (
                                     <Column
                                         key={col.dataKey}
                                         label={col.label}
@@ -255,7 +262,6 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
                             </Table>
                         )}
                     </InfiniteLoader>
-
                 )}
             </AutoSizer>
             {renderConfirmationDialog()}

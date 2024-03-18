@@ -8,26 +8,26 @@ describe('Http Utils', () => {
             window.location = {assign: jest.fn()};
             handleHttpError('')({response: {status: 401}});
             expect(window.location.assign).toHaveBeenCalledTimes(1);
-            expect(window.location.assign).toHaveBeenCalledWith(
-                '/login?redirectUrl=undefined',
-            );
+            expect(window.location.assign).toHaveBeenCalledWith('/login?redirectUrl=undefined');
         });
 
         it('Should show an error on 403', () => {
             Object.defineProperty(window.location, 'assign', jest.fn());
             ErrorDialog.showError = jest.fn();
             handleHttpError('Default error')({response: {status: 403}});
-            expect(ErrorDialog.showError).toHaveBeenCalledWith('You have no access to this resource. Ask your administrator to grant you access.', null, expect.anything());
+            expect(ErrorDialog.showError).toHaveBeenCalledWith(
+                'You have no access to this resource. Ask your administrator to grant you access.',
+                null,
+                expect.anything()
+            );
         });
 
         it('Should throw an exception with the backend error on responses other than 401', () => {
-            expect(
-                () => {
-                    handleHttpError('Default error')({
-                        response: {status: 500, data: {message: 'Internal server error'}}
-                    });
-                }
-            ).toThrow(new Error('Default error'));
+            expect(() => {
+                handleHttpError('Default error')({
+                    response: {status: 500, data: {message: 'Internal server error'}}
+                });
+            }).toThrow(new Error('Default error'));
         });
     });
 

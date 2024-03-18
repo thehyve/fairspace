@@ -1,15 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TablePagination,
-    TableRow,
-    TableSortLabel,
-} from '@mui/material';
+import {Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TableSortLabel} from '@mui/material';
 
 import Checkbox from '@mui/material/Checkbox';
 import TableContainer from '@mui/material/TableContainer';
@@ -85,20 +77,26 @@ const UserRolesPage = () => {
 
     const {page, setPage, rowsPerPage, setRowsPerPage, pagedItems} = usePagination(orderedItems);
 
-    const isValueMatchingFilterValue: boolean = (value: string, filterValue: string) => (
-        !filterValue || (value && value.toLowerCase().includes(filterValue.toLowerCase()))
-    );
+    const isValueMatchingFilterValue: boolean = (value: string, filterValue: string) =>
+        !filterValue || (value && value.toLowerCase().includes(filterValue.toLowerCase()));
 
     const updateFilteredUsers = () => {
         if (users && users.length > 0) {
-            if (!filtersObject || Object.keys(filtersObject).length === 0 || Object.values(filtersObject).every(v => v === '')) {
+            if (
+                !filtersObject ||
+                Object.keys(filtersObject).length === 0 ||
+                Object.values(filtersObject).every(v => v === '')
+            ) {
                 setFilteredUsers(users);
             } else {
-                setFilteredUsers(users.filter(u => (
-                    isValueMatchingFilterValue(u.name, filtersObject[columns.name.valueExtractor])
-                    && isValueMatchingFilterValue(u.username, filtersObject[columns.username.valueExtractor])
-                    && isValueMatchingFilterValue(u.email, filtersObject[columns.email.valueExtractor])
-                )));
+                setFilteredUsers(
+                    users.filter(
+                        u =>
+                            isValueMatchingFilterValue(u.name, filtersObject[columns.name.valueExtractor]) &&
+                            isValueMatchingFilterValue(u.username, filtersObject[columns.username.valueExtractor]) &&
+                            isValueMatchingFilterValue(u.email, filtersObject[columns.email.valueExtractor])
+                    )
+                );
             }
         }
     };
@@ -114,27 +112,33 @@ const UserRolesPage = () => {
     }, [filtersObject]);
 
     if (usersError) {
-        return (<MessageDisplay message="An error occurred loading users" />);
-    } if (usersLoading) {
-        return (<LoadingInlay />);
+        return <MessageDisplay message="An error occurred loading users" />;
+    }
+    if (usersLoading) {
+        return <LoadingInlay />;
     }
 
-    const toggleRole = (id, role, enable) => setUserRole(id, role, enable)
-        .then(refresh)
-        .catch(e => {
-            const message = Object.prototype.hasOwnProperty.call(e, 'message') ? e.message : null;
-            ErrorDialog.showError('Error assigning role', message);
-        });
+    const toggleRole = (id, role, enable) =>
+        setUserRole(id, role, enable)
+            .then(refresh)
+            .catch(e => {
+                const message = Object.prototype.hasOwnProperty.call(e, 'message') ? e.message : null;
+                ErrorDialog.showError('Error assigning role', message);
+            });
 
     const renderColumnFilter = (columnName: string) => {
         const filterValue = filtersObject[columnName];
         const setFilterValue = value => setFiltersObject({...filtersObject, [columnName]: value});
         return (
-            <ColumnFilterInput placeholder={`Filter by ${columnName}`} filterValue={filterValue} setFilterValue={setFilterValue} />
+            <ColumnFilterInput
+                placeholder={`Filter by ${columnName}`}
+                filterValue={filterValue}
+                setFilterValue={setFilterValue}
+            />
         );
     };
 
-    const renderHeaderCellWithFilter = (column) => (
+    const renderHeaderCellWithFilter = column => (
         <TableCell key={column.valueExtractor}>
             <TableSortLabel
                 active={orderBy === column.valueExtractor}
@@ -174,11 +178,8 @@ const UserRolesPage = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {pagedItems.map((u) => (
-                            <TableRow
-                                key={u.iri}
-                                hover
-                            >
+                        {pagedItems.map(u => (
+                            <TableRow key={u.iri} hover>
                                 <TableCell style={{minWidth: 220}} component="th" scope="row">
                                     {u.name}
                                 </TableCell>
@@ -189,42 +190,39 @@ const UserRolesPage = () => {
                                     {u.email}
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
-                                    <Checkbox
-                                        checked={u.isSuperadmin}
-                                        disabled
-                                    />
+                                    <Checkbox checked={u.isSuperadmin} disabled />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.isAdmin}
-                                        onChange={(e) => toggleRole(u.id, 'isAdmin', e.target.checked)}
+                                        onChange={e => toggleRole(u.id, 'isAdmin', e.target.checked)}
                                         disabled={u.isSuperadmin || u.iri === currentUser.iri}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canViewPublicData}
-                                        onChange={(e) => toggleRole(u.id, 'canViewPublicData', e.target.checked)}
+                                        onChange={e => toggleRole(u.id, 'canViewPublicData', e.target.checked)}
                                         disabled={u.isAdmin}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canViewPublicMetadata}
-                                        onChange={(e) => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
+                                        onChange={e => toggleRole(u.id, 'canViewPublicMetadata', e.target.checked)}
                                         disabled={u.canViewPublicData || u.canQueryMetadata}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canQueryMetadata}
-                                        onChange={(e) => toggleRole(u.id, 'canQueryMetadata', e.target.checked)}
+                                        onChange={e => toggleRole(u.id, 'canQueryMetadata', e.target.checked)}
                                     />
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
                                     <Checkbox
                                         checked={u.canAddSharedMetadata}
-                                        onChange={(e) => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
+                                        onChange={e => toggleRole(u.id, 'canAddSharedMetadata', e.target.checked)}
                                     />
                                 </TableCell>
                             </TableRow>

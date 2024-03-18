@@ -20,7 +20,7 @@ describe('useValidation', () => {
             key: 'a',
             shape: {[SHACL_MIN_COUNT]: [{'@value': 1}]},
             datatype: '',
-            isGenericIriResource: false,
+            isGenericIriResource: false
         };
 
         act(() => {
@@ -36,7 +36,7 @@ describe('useValidation', () => {
             key: 'a',
             shape: {[SHACL_MIN_COUNT]: [{'@value': 1}]},
             datatype: '',
-            isGenericIriResource: false,
+            isGenericIriResource: false
         };
 
         act(() => {

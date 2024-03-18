@@ -8,27 +8,26 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import styles from './SearchBar.styles';
 
-const SearchBar = ({
-    classes, query = '', placeholder, onSearchChange = () => {}, disabled = false, width = '100%'
-}) => {
+const SearchBar = ({classes, query = '', placeholder, onSearchChange = () => {}, disabled = false, width = '100%'}) => {
     const [origQuery, setOrigQuery] = useState(query);
     const [value, setValue] = useState(query);
 
-    if (query !== origQuery) { // check if query was reset by the owner
+    if (query !== origQuery) {
+        // check if query was reset by the owner
         setOrigQuery(query);
         setValue(query);
     }
 
-    const handleSearch = (e) => {
+    const handleSearch = e => {
         e.preventDefault();
         onSearchChange(value);
     };
 
-    const handleChange = (event) => {
+    const handleChange = event => {
         setValue(event.target.value);
     };
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = e => {
         if (e.keyCode === 13) {
             handleSearch(e);
         }
@@ -39,7 +38,7 @@ const SearchBar = ({
             <TextField
                 placeholder={placeholder}
                 classes={{
-                    root: classes.inputRoot,
+                    root: classes.inputRoot
                 }}
                 style={{width}}
                 value={value}

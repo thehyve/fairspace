@@ -10,7 +10,7 @@ const confirmationDialog = ({
     dangerous = false,
     open = false,
     onAgree = () => {},
-    onDisagree = () => {},
+    onDisagree = () => {}
 }) => (
     <Dialog
         open={open}
@@ -18,25 +18,15 @@ const confirmationDialog = ({
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
     >
-        <DialogTitle id="alert-dialog-title">
-            {title}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
         <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-                {content}
-            </DialogContentText>
+            <DialogContentText id="alert-dialog-description">{content}</DialogContentText>
         </DialogContent>
         <DialogActions>
-            <Button
-                onClick={onAgree}
-                color={dangerous ? 'secondary' : 'primary'}
-                autoFocus={!dangerous}
-            >
+            <Button onClick={onAgree} color={dangerous ? 'secondary' : 'primary'} autoFocus={!dangerous}>
                 {agreeButtonText}
             </Button>
-            <Button onClick={onDisagree}>
-                {disagreeButtonText}
-            </Button>
+            <Button onClick={onDisagree}>{disagreeButtonText}</Button>
         </DialogActions>
     </Dialog>
 );
@@ -48,7 +38,7 @@ confirmationDialog.propTypes = {
     agreeButtonText: PropTypes.string,
     disagreeButtonText: PropTypes.string,
     onAgree: PropTypes.func,
-    onDisagree: PropTypes.func,
+    onDisagree: PropTypes.func
 };
 
 export default confirmationDialog;

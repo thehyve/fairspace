@@ -14,25 +14,23 @@ import CollectionsContext from './CollectionsContext';
 import {getCollectionAbsolutePath, isCollectionPage} from './collectionUtils';
 import type {Match, History} from '../types';
 import ErrorDialog from '../common/components/ErrorDialog';
-import {
-    fileNameContainsInvalidCharacter, isUnsafeFileName,
-    isValidFileName
-} from '../file/fileUtils';
+import {fileNameContainsInvalidCharacter, isUnsafeFileName, isValidFileName} from '../file/fileUtils';
 import type {Workspace} from '../workspaces/WorkspacesAPI';
 
 const fields = ['name', 'description', 'ownerWorkspace'];
 
-const copyProperties = (properties: CollectionProperties): CollectionProperties => ((fields
-    .reduce((copy, field) => { copy[field] = properties ? properties[field] || '' : ''; return copy; }, {}): any): CollectionProperties);
+const copyProperties = (properties: CollectionProperties): CollectionProperties =>
+    ((fields.reduce((copy, field) => {
+        copy[field] = properties ? properties[field] || '' : '';
+        return copy;
+    }, {}): any): CollectionProperties);
 
-const havePropertiesChanged = (collection: CollectionProperties, properties: CollectionProperties) => !collection
-    || fields.some(field => collection[field] !== properties[field]);
+const havePropertiesChanged = (collection: CollectionProperties, properties: CollectionProperties) =>
+    !collection || fields.some(field => collection[field] !== properties[field]);
 
 const MAX_LOCATION_LENGTH = 127;
 
-const isNameValid = (name: string) => (
-    !!name && isValidFileName(name) && name.trim().length <= MAX_LOCATION_LENGTH
-);
+const isNameValid = (name: string) => !!name && isValidFileName(name) && name.trim().length <= MAX_LOCATION_LENGTH;
 
 /**
  * Checks whether the input is valid. Check whether the name is not empty.
@@ -43,31 +41,29 @@ const isNameValid = (name: string) => (
  */
 export const isInputValid = (properties: CollectionProperties) => isNameValid(properties.name);
 
-export const formatPrefix = (prefix: string) => (
-    prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : ''
-);
+export const formatPrefix = (prefix: string) => (prefix ? `[${prefix.replace(/[/\\]/g, '')}] ` : '');
 
 const styles = theme => ({
     textHelperBasic: {
-        color: theme.palette.grey['600'],
+        color: theme.palette.grey['600']
     },
     textHelperWarning: {
-        color: theme.palette.warning.dark,
+        color: theme.palette.warning.dark
     }
 });
 
 type PathParam = {
-    path: string;
-}
+    path: string
+};
 
 type CollectionEditorProps = {
     collection: Collection,
     updateExisting: boolean,
-    addCollection: (CollectionProperties) => Promise<void>,
-    updateCollection: (Collection) => Promise<void>,
-    renameCollection: (Collection) => Promise<void>,
+    addCollection: CollectionProperties => Promise<void>,
+    updateCollection: Collection => Promise<void>,
+    renameCollection: Collection => Promise<void>,
     onClose: () => void,
-    setBusy: (boolean) => void,
+    setBusy: boolean => void,
     match: Match<PathParam>,
     history: History,
     workspace: Workspace,
@@ -93,16 +89,19 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         properties: this.props.collection
             ? copyProperties(this.props.collection)
             : {
-                name: formatPrefix(this.props.workspace.code),
-                description: '',
-                ownerWorkspace: this.props.workspace.iri
-            }
+                  name: formatPrefix(this.props.workspace.code),
+                  description: '',
+                  ownerWorkspace: this.props.workspace.iri
+              }
     };
 
     unmounting = false;
 
-    editNameEnabled = (!this.props.collection) || (
-        (this.props.collection && this.props.collection.canManage && this.props.collection.accessMode !== 'DataPublished'));
+    editNameEnabled =
+        !this.props.collection ||
+        (this.props.collection &&
+            this.props.collection.canManage &&
+            this.props.collection.accessMode !== 'DataPublished');
 
     componentWillUnmount() {
         this.unmounting = true;
@@ -140,10 +139,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     );
                     return;
                 }
-                ErrorDialog.showError(
-                    'Could not create collection',
-                    err.message
-                );
+                ErrorDialog.showError('Could not create collection', err.message);
             });
     };
 
@@ -154,7 +150,12 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                 this.onSaveComplete();
                 if (isCollectionPage()) {
                     // If the collection location changes, the URI for the current page should change as well
-                    const {history, match: {params: {path}}} = this.props;
+                    const {
+                        history,
+                        match: {
+                            params: {path}
+                        }
+                    } = this.props;
                     history.push(`${getCollectionAbsolutePath(target)}/${path || ''}`);
                 } else {
                     this.close();
@@ -169,10 +170,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                     );
                     return;
                 }
-                ErrorDialog.showError(
-                    'Could not rename collection',
-                    err.message
-                );
+                ErrorDialog.showError('Could not rename collection', err.message);
             });
     };
 
@@ -216,9 +214,10 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
         this.setState(state);
     };
 
-    isSaveEnabled = () => (!this.state.saveInProgress)
-        && isInputValid(this.state.properties)
-        && havePropertiesChanged(this.props.collection, this.state.properties);
+    isSaveEnabled = () =>
+        !this.state.saveInProgress &&
+        isInputValid(this.state.properties) &&
+        havePropertiesChanged(this.props.collection, this.state.properties);
 
     validateNameStartsWithWorkspaceCode() {
         return this.state.properties.name.startsWith(`[${this.props.workspace.code}]`);
@@ -227,34 +226,37 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
     renderCollectionNameHelperText() {
         return (
             <span>
-                <span className={this.props.classes.textHelperBasic}>
-                    Unique collection name.
-                </span>
-                <span className={this.validateNameStartsWithWorkspaceCode() ? this.props.classes.textHelperBasic : this.props.classes.textHelperWarning}>
+                <span className={this.props.classes.textHelperBasic}>Unique collection name.</span>
+                <span
+                    className={
+                        this.validateNameStartsWithWorkspaceCode()
+                            ? this.props.classes.textHelperBasic
+                            : this.props.classes.textHelperWarning
+                    }
+                >
                     <br />
                     {!this.validateNameStartsWithWorkspaceCode() && (
                         <span>
                             <b>Warning!</b> Name does not start with the suggested form of a workspace code:
-                            <i> {formatPrefix(this.props.workspace.code)}</i><br />
+                            <i> {formatPrefix(this.props.workspace.code)}</i>
+                            <br />
                         </span>
                     )}
                     Keep the workspace code prefix. It ensures collection uniqueness between workspaces.
                     <br />
                 </span>
-                {(isUnsafeFileName(this.state.properties.name.trim()) ? "Name cannot equal '.' or '..'" : '')}
-                {(fileNameContainsInvalidCharacter(this.state.properties.name) ? "Name cannot contain '/' or '\\'." : '')}
-                {(this.state.properties.name.trim().length > MAX_LOCATION_LENGTH ? `Maximum length: ${MAX_LOCATION_LENGTH}.` : '')}
+                {isUnsafeFileName(this.state.properties.name.trim()) ? "Name cannot equal '.' or '..'" : ''}
+                {fileNameContainsInvalidCharacter(this.state.properties.name) ? "Name cannot contain '/' or '\\'." : ''}
+                {this.state.properties.name.trim().length > MAX_LOCATION_LENGTH
+                    ? `Maximum length: ${MAX_LOCATION_LENGTH}.`
+                    : ''}
             </span>
         );
     }
 
     render() {
         return (
-            <Dialog
-                open={this.state.editing}
-                onClose={this.props.onClose}
-                aria-labelledby="form-dialog-title"
-            >
+            <Dialog open={this.state.editing} onClose={this.props.onClose} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">
                     {this.props.collection ? 'Edit collection' : 'Add collection'}
                 </DialogTitle>
@@ -272,7 +274,7 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         helperText={this.renderCollectionNameHelperText()}
                         value={this.state.properties.name}
                         name="name"
-                        onChange={(event) => this.handleInputChange('name', event.target.value)}
+                        onChange={event => this.handleInputChange('name', event.target.value)}
                         fullWidth
                         required
                         disabled={!this.editNameEnabled}
@@ -285,20 +287,29 @@ export class CollectionEditor extends React.Component<CollectionEditorProps, Col
                         label="Description"
                         name="description"
                         value={this.state.properties.description}
-                        onChange={(event) => this.handleInputChange('description', event.target.value)}
+                        onChange={event => this.handleInputChange('description', event.target.value)}
                         fullWidth
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.handleSave} disabled={!this.isSaveEnabled()} aria-label="Save" color="primary">Save</Button>
-                    <Button onClick={this.close} aria-label="Cancel" color="inherit">Cancel</Button>
+                    <Button
+                        onClick={this.handleSave}
+                        disabled={!this.isSaveEnabled()}
+                        aria-label="Save"
+                        color="primary"
+                    >
+                        Save
+                    </Button>
+                    <Button onClick={this.close} aria-label="Cancel" color="inherit">
+                        Cancel
+                    </Button>
                 </DialogActions>
             </Dialog>
         );
     }
 }
 
-const ContextualCollectionEditor = (props) => {
+const ContextualCollectionEditor = props => {
     const history = useHistory();
     const {addCollection, updateCollection, renameCollection} = useContext(CollectionsContext);
 

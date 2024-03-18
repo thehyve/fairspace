@@ -1,11 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
-import {
-    Checkbox,
-    FormControl,
-    FormControlLabel,
-    FormGroup
-} from '@mui/material';
+import {Checkbox, FormControl, FormControlLabel, FormGroup} from '@mui/material';
 
 // react-window https://react-window.vercel.app/#/examples/
 import {FixedSizeList as List} from 'react-window';
@@ -26,22 +21,33 @@ import useStateWithSessionStorage from '../../../common/hooks/UseSessionStorage'
 import {collectionAccessIcon} from '../../../collections/collectionUtils';
 
 type SelectProperties = {
-    options: Option[];
-    onChange: (string[]) => void;
-    textFilterValue: string;
-    activeFilterValues: any[];
-    showAccessFilter: boolean;
-}
+    options: Option[],
+    onChange: (string[]) => void,
+    textFilterValue: string,
+    activeFilterValues: any[],
+    showAccessFilter: boolean
+};
 
 export const SHOW_READABLE_COLLECTION_FACET_FILTER = 'FAIRSPACE_COLLECTION_FACET_SHOW_READABLE_FILTER';
 
 const SelectMultiple = (props: SelectProperties) => {
-    const {options, onChange, textFilterValue, activeFilterValues = [], accessFilterValue, showAccessFilter, classes} = props;
-    const defaultOptions = Object.fromEntries(options.map(option => [option.value, activeFilterValues.includes(option.value)]));
+    const {
+        options,
+        onChange,
+        textFilterValue,
+        activeFilterValues = [],
+        accessFilterValue,
+        showAccessFilter,
+        classes
+    } = props;
+    const defaultOptions = Object.fromEntries(
+        options.map(option => [option.value, activeFilterValues.includes(option.value)])
+    );
     const [state, setState] = useState(defaultOptions);
 
-    const textFilter = (val) => (textFilterValue.trim() === '' || val.label.toLowerCase().includes(textFilterValue.toLowerCase()));
-    const readAccessFilter = (val) => (!accessFilterValue || val.access !== 'List');
+    const textFilter = val =>
+        textFilterValue.trim() === '' || val.label.toLowerCase().includes(textFilterValue.toLowerCase());
+    const readAccessFilter = val => !accessFilterValue || val.access !== 'List';
     const filteredOptions = options.filter(readAccessFilter).filter(textFilter);
 
     useDeepCompareEffect(() => {
@@ -52,14 +58,20 @@ const SelectMultiple = (props: SelectProperties) => {
     useEffect(() => {
         if (accessFilterValue) {
             const selectedReadableOnly = Object.entries(state)
-                .filter(([option, checked]) => (options.filter(readAccessFilter).map(o => o.value).includes(option) && checked))
+                .filter(
+                    ([option, checked]) =>
+                        options
+                            .filter(readAccessFilter)
+                            .map(o => o.value)
+                            .includes(option) && checked
+                )
                 .map(([option, checked]) => option);
             onChange(selectedReadableOnly);
         }
     }, [accessFilterValue]);
 
     /* eslint-disable no-unused-vars */
-    const handleChange = (event) => {
+    const handleChange = event => {
         const newState = {...state, [event.target.name]: event.target.checked};
         const selected = Object.entries(newState)
             .filter(([option, checked]) => checked)
@@ -71,7 +83,7 @@ const SelectMultiple = (props: SelectProperties) => {
         <FormControlLabel
             key={option.value}
             style={style}
-            control={(
+            control={
                 <Checkbox
                     checked={!!state[option.value]}
                     onChange={handleChange}
@@ -80,18 +92,17 @@ const SelectMultiple = (props: SelectProperties) => {
                     checkedIcon={<CheckBoxIcon fontSize="small" />}
                     className={classes.checkbox}
                 />
-            )}
-            label={(
+            }
+            label={
                 <Tooltip title={<Iri iri={option.value} />}>
-                    <Typography variant="body2">
-                        {option.label}
-                    </Typography>
+                    <Typography variant="body2">{option.label}</Typography>
                 </Tooltip>
-            )}
+            }
         />
     );
 
-    const renderCheckboxListElementWindowed = ({index, style}) => renderCheckboxListElement(filteredOptions[index], style);
+    const renderCheckboxListElementWindowed = ({index, style}) =>
+        renderCheckboxListElement(filteredOptions[index], style);
 
     const renderCheckboxList = () => {
         if (showAccessFilter) {
@@ -112,11 +123,7 @@ const SelectMultiple = (props: SelectProperties) => {
             // Solution is windowed rendering. For really small lists the fixed height of 150 is not suitable,
             // therefor only windowed rendering large lists
             return (
-                <List
-                    height={150}
-                    itemCount={filteredOptions.length}
-                    itemSize={35}
-                >
+                <List height={150} itemCount={filteredOptions.length} itemSize={35}>
                     {renderCheckboxListElementWindowed}
                 </List>
             );
@@ -125,33 +132,27 @@ const SelectMultiple = (props: SelectProperties) => {
         return filteredOptions.map(option => renderCheckboxListElement(option));
     };
 
-    return (
-        <FormGroup className={classes.multiselectList}>
-            {renderCheckboxList()}
-        </FormGroup>
-    );
+    return <FormGroup className={classes.multiselectList}>{renderCheckboxList()}</FormGroup>;
 };
 
 const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues = [], classes} = props;
     const [textFilterValue, setTextFilterValue] = useState('');
     const [accessFilterValue, setAccessFilterValue] = useStateWithSessionStorage(
-        SHOW_READABLE_COLLECTION_FACET_FILTER, false
+        SHOW_READABLE_COLLECTION_FACET_FILTER,
+        false
     );
     const showAccessFilter = options.some(o => o.access);
     const [availableOptions, setAvailableOptions] = useState(options);
 
     useEffect(() => {
-        const newAvailableOptions = showAccessFilter && accessFilterValue ? options.filter(o => o.access !== 'List') : options;
+        const newAvailableOptions =
+            showAccessFilter && accessFilterValue ? options.filter(o => o.access !== 'List') : options;
         setAvailableOptions(newAvailableOptions);
     }, [showAccessFilter, accessFilterValue]);
 
     if (!availableOptions || availableOptions.length === 0) {
-        return (
-            <Typography variant="body2">
-                No filter available.
-            </Typography>
-        );
+        return <Typography variant="body2">No filter available.</Typography>;
     }
 
     const selectAll = () => {
@@ -162,7 +163,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
         onChange([]);
     };
 
-    const handleChangeSelectAll = (event) => {
+    const handleChangeSelectAll = event => {
         if (event.target.checked) {
             selectAll();
         } else {
@@ -184,14 +185,14 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
     const renderAccessFilter = () => (
         <FormGroup className={classes.accessFilter}>
             <FormControlLabel
-                control={(
+                control={
                     <Switch
                         size="small"
                         color="primary"
                         checked={accessFilterValue}
                         onChange={() => setAccessFilterValue(!accessFilterValue)}
                     />
-                )}
+                }
                 label="Show only readable"
             />
         </FormGroup>
@@ -221,7 +222,7 @@ const TextSelectionFacet = (props: MetadataViewFacetProperties) => {
                             </IconButton>
                         )}
                     </InputAdornment>
-                ),
+                )
             }}
         />
     );

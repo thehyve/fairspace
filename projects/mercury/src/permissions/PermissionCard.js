@@ -17,7 +17,7 @@ import {
     ListItemText,
     MenuItem,
     TextField,
-    Typography,
+    Typography
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import classnames from 'classnames';
@@ -43,11 +43,11 @@ const styles = theme => ({
         transform: 'rotate(0deg)',
         marginLeft: 'auto',
         transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
+            duration: theme.transitions.duration.shortest
+        })
     },
     expandOpen: {
-        transform: 'rotate(180deg)',
+        transform: 'rotate(180deg)'
     },
     permissionsCard: {
         marginTop: 10
@@ -82,14 +82,14 @@ const styles = theme => ({
 });
 
 type PermissionCardProperties = {
-    classes?: any;
-    collection: Collection;
-    users: User[];
-    workspaceUsers: User[];
-    workspaces: Workspace[];
-    maxCollaboratorIcons?: number;
-    setBusy?: (boolean) => void;
-}
+    classes?: any,
+    collection: Collection,
+    users: User[],
+    workspaceUsers: User[],
+    workspaces: Workspace[],
+    maxCollaboratorIcons?: number,
+    setBusy?: boolean => void
+};
 
 export const PermissionCard = (props: PermissionCardProperties) => {
     const {classes, collection, users, workspaceUsers, workspaces, maxCollaboratorIcons = 5, setBusy} = props;
@@ -98,7 +98,8 @@ export const PermissionCard = (props: PermissionCardProperties) => {
     const [selectedAccessMode, setSelectedAccessMode] = useState(collection.accessMode);
 
     const ownerWorkspaceAccess = collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace)
-        ? collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace).access : 'None';
+        ? collection.workspacePermissions.find(p => p.iri === collection.ownerWorkspace).access
+        : 'None';
     const [changingOwnerWorkspaceAccess, setChangingOwnerWorkspaceAccess] = useState(false);
     const [selectedOwnerWorkspaceAccess, setSelectedOwnerWorkspaceAccess] = useState(ownerWorkspaceAccess);
     const {setAccessMode, setPermission} = useContext(CollectionsContext);
@@ -109,7 +110,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
 
     const availableWorkspaceMembersAccessLevels = accessLevels.filter(a => a !== 'List');
 
-    const handleSetAccessMode = (event) => {
+    const handleSetAccessMode = event => {
         if (collection.canManage) {
             setSelectedAccessMode(event.target.value);
             setChangingAccessMode(true);
@@ -124,14 +125,15 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         setBusy(true);
         setAccessMode(collection.name, selectedAccessMode)
             .then(handleCancelSetAccessMode)
-            .catch(() => ErrorDialog.showError(
-                'An error occurred while setting an access mode',
-                () => handleConfirmSetAccessMode()
-            ))
+            .catch(() =>
+                ErrorDialog.showError('An error occurred while setting an access mode', () =>
+                    handleConfirmSetAccessMode()
+                )
+            )
             .finally(setBusy(false));
     };
 
-    const handleSetOwnerWorkspaceAccess = (event) => {
+    const handleSetOwnerWorkspaceAccess = event => {
         if (collection.canManage) {
             setSelectedOwnerWorkspaceAccess(event.target.value);
             setChangingOwnerWorkspaceAccess(true);
@@ -146,22 +148,18 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         setBusy(true);
         setPermission(collection.name, collection.ownerWorkspace, selectedOwnerWorkspaceAccess)
             .then(handleCancelSetOwnerWorkspaceAccess)
-            .catch(() => ErrorDialog.showError(
-                'An error occurred while setting an access level',
-                () => handleConfirmSetOwnerWorkspaceAccess()
-            ))
+            .catch(() =>
+                ErrorDialog.showError('An error occurred while setting an access level', () =>
+                    handleConfirmSetOwnerWorkspaceAccess()
+                )
+            )
             .finally(setBusy(false));
     };
 
     const permissionIcons = collaboratingUsers
         .slice(0, maxCollaboratorIcons)
         .map(({iri, name}) => (
-            <Avatar
-                key={iri}
-                title={name}
-                src="/public/images/avatar.png"
-                className={classes.avatar}
-            />
+            <Avatar key={iri} title={name} src="/public/images/avatar.png" className={classes.avatar} />
         ));
 
     const cardHeaderAction = (
@@ -171,10 +169,12 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 <div className={classes.additionalCollaborators}>
                     + {collaboratingUsers.length - maxCollaboratorIcons}
                 </div>
-            ) : ''}
+            ) : (
+                ''
+            )}
             <IconButton
                 className={classnames(classes.expand, {
-                    [classes.expandOpen]: expanded,
+                    [classes.expandOpen]: expanded
                 })}
                 onClick={toggleExpand}
                 aria-expanded={expanded}
@@ -192,16 +192,17 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             case 'Restricted':
                 return (
                     <span>
-                        Are you sure you want to change the view mode of
-                        collection <em>{collection.name}</em> to <b>{camelCaseToWords(accessMode)}</b>?<br />
-                        Metadata and data files will only be findable and readable for users
-                        that have been granted access to the collection explicitly.
+                        Are you sure you want to change the view mode of collection <em>{collection.name}</em> to{' '}
+                        <b>{camelCaseToWords(accessMode)}</b>?<br />
+                        Metadata and data files will only be findable and readable for users that have been granted
+                        access to the collection explicitly.
                     </span>
                 );
             case 'MetadataPublished':
                 return (
                     <span>
-                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?<br />
+                        Are you sure you want to <b>publish the metadata</b> of collection <em>{collection.name}</em>?
+                        <br />
                         The metadata will be findable and readable for all users with access to public data.
                     </span>
                 );
@@ -209,10 +210,11 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 return (
                     <span>
                         Are you sure you want to <b>publish all data</b> of collection <em>{collection.name}</em>?<br />
-                        The data will be findable and readable for all users with access to public data.<br />
+                        The data will be findable and readable for all users with access to public data.
+                        <br />
                         <strong>
-                            Warning: This action cannot be reverted.
-                            Once published, the collection cannot be unpublished, moved or deleted.
+                            Warning: This action cannot be reverted. Once published, the collection cannot be
+                            unpublished, moved or deleted.
                         </strong>
                     </span>
                 );
@@ -247,7 +249,8 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     </MenuItem>
                 ))}
                 {/* show not available modes as disabled menu item, so user knows it exists */}
-                {accessModes.filter(mode => collection.availableAccessModes.indexOf(mode) < 0)
+                {accessModes
+                    .filter(mode => collection.availableAccessModes.indexOf(mode) < 0)
                     .map(unavailableMode => (
                         <MenuItem key={unavailableMode} value={unavailableMode} disabled>
                             <ListItemText
@@ -279,8 +282,9 @@ export const PermissionCard = (props: PermissionCardProperties) => {
             <FormLabel>Public access</FormLabel>
             <Box className={classes.group}>
                 <FormGroup>
-                    {(collection.canManage && collection.availableAccessModes.length > 1)
-                        ? showMultipleAccessModes() : showSingleAccessMode()}
+                    {collection.canManage && collection.availableAccessModes.length > 1
+                        ? showMultipleAccessModes()
+                        : showSingleAccessMode()}
                 </FormGroup>
             </Box>
         </FormControl>
@@ -318,7 +322,9 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                                 </MenuItem>
                             ))}
                         </TextField>
-                    ) : <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>}
+                    ) : (
+                        <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>
+                    )}
                 </FormGroup>
                 <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
             </Box>
@@ -356,12 +362,8 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 <CardContent style={{paddingTop: 0}}>
                     <div style={{overflowX: 'auto'}}>
                         <List>
-                            <ListItem disableGutters>
-                                {renderAccessMode()}
-                            </ListItem>
-                            <ListItem disableGutters>
-                                {renderOwnerWorkspaceAccess()}
-                            </ListItem>
+                            <ListItem disableGutters>{renderAccessMode()}</ListItem>
+                            <ListItem disableGutters>{renderOwnerWorkspaceAccess()}</ListItem>
                         </List>
                         <PermissionViewer
                             collection={collection}

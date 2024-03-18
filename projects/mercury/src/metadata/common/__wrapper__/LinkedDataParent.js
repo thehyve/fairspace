@@ -10,7 +10,7 @@ const WrapperWithPushToHistory = ({children}) => {
     return children;
 };
 
-const LinkedDataParent = (props) => {
+const LinkedDataParent = props => {
     const {iri, context} = props;
     context.result = useLinkedDataNoContext(iri, context);
 

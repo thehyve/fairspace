@@ -7,7 +7,12 @@ import type {ExternalStorage} from '../external-storage/externalStorageUtils';
 import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
 import {isEmptyObject} from '../common/utils/genericUtils';
 
-export const handleTextSearchRedirect = (history: History, value: string, context: string = '', storage: ExternalStorage = {}) => {
+export const handleTextSearchRedirect = (
+    history: History,
+    value: string,
+    context: string = '',
+    storage: ExternalStorage = {}
+) => {
     if (value) {
         const queryParams = {q: value, context};
         if (!isEmptyObject(storage)) {
@@ -15,7 +20,9 @@ export const handleTextSearchRedirect = (history: History, value: string, contex
         }
         history.push('/text-search/?' + queryString.stringify(queryParams));
     } else if (!isEmptyObject(storage)) {
-        history.push(`/external-storages/${storage.name}/${context ? getPathFromIri(context, storage.rootDirectoryIri) : ''}`);
+        history.push(
+            `/external-storages/${storage.name}/${context ? getPathFromIri(context, storage.rootDirectoryIri) : ''}`
+        );
     } else {
         history.push(`/collections/${context ? getPathFromIri(context) : ''}`);
     }
@@ -37,23 +44,25 @@ export const getSearchPathSegments = (context, storageName = '') => {
     return result;
 };
 
-export const getSearchQueryFromString = (searchString) => queryString.parse(searchString).q || '';
-export const getLocationContextFromString = (searchString) => queryString.parse(searchString).context || '';
-export const getStorageFromString = (searchString) => queryString.parse(searchString).storage || '';
-export const getMetadataViewNameFromString = (searchString) => queryString.parse(searchString).view || '';
+export const getSearchQueryFromString = searchString => queryString.parse(searchString).q || '';
+export const getLocationContextFromString = searchString => queryString.parse(searchString).context || '';
+export const getStorageFromString = searchString => queryString.parse(searchString).storage || '';
+export const getMetadataViewNameFromString = searchString => queryString.parse(searchString).view || '';
 
 /**
  * Error handler for search queries. Handles HTTP statuses 400 and 401 separately
  * @param e
  */
-export const handleSearchError = (e) => {
+export const handleSearchError = e => {
     switch (e.status) {
-        case 400: throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
+        case 400:
+            throw new Error("Oops, we're unable to parse this query. Please only use alphanumeric characters.");
         case 401:
         case 403:
             handleAuthError(e.status);
             break;
-        default: throw new Error('Error retrieving search results');
+        default:
+            throw new Error('Error retrieving search results');
     }
 };
 

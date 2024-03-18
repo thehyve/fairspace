@@ -15,11 +15,8 @@ export const WorkspaceUserRolesProvider = ({iri, children, workspacesAPI = Works
 
     const {refreshWorkspaces} = useContext(WorkspaceContext);
 
-    const setWorkspaceRole = (userIri: string, role: string) => (
-        workspacesAPI.setWorkspaceRole(iri, userIri, role)
-            .then(refreshWorkspaceRoles)
-            .then(refreshWorkspaces)
-    );
+    const setWorkspaceRole = (userIri: string, role: string) =>
+        workspacesAPI.setWorkspaceRole(iri, userIri, role).then(refreshWorkspaceRoles).then(refreshWorkspaces);
 
     return (
         <WorkspaceUserRolesContext.Provider

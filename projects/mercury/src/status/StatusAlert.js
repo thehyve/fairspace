@@ -15,11 +15,7 @@ const styles = theme => ({
 });
 
 const StatusAlert = ({children, classes}) => (
-    <Snackbar
-        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-        className={classes.snackbarRoot}
-        open
-    >
+    <Snackbar anchorOrigin={{vertical: 'top', horizontal: 'right'}} className={classes.snackbarRoot} open>
         <Alert severity="error" className={classes.alertRoot}>
             {children}
         </Alert>

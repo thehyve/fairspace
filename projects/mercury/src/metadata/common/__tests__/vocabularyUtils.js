@@ -4,13 +4,15 @@ import {
     determineShapeForProperty,
     getChildSubclasses,
     getClassesInCatalog,
-    getDescendants, getLabelForType,
+    getDescendants,
+    getLabelForType,
     getMaxCount,
     getNamespaces,
     getProperties,
     isGenericIriResource,
     isRdfList,
-    isRelationShape, typeShapeWithProperties,
+    isRelationShape,
+    typeShapeWithProperties
 } from '../vocabularyUtils';
 import vocabularyJsonLd from './test.vocabulary.json';
 import * as constants from '../../../constants';
@@ -35,7 +37,9 @@ describe('getLabelForType', () => {
 
 describe('typeShapeWithProperties', () => {
     it('collects shape information with properties for a type', () => {
-        const researchProjectShape = typeShapeWithProperties(vocabularyJsonLd, ['https://fairspace.nl/ontology#ResearchProject']);
+        const researchProjectShape = typeShapeWithProperties(vocabularyJsonLd, [
+            'https://fairspace.nl/ontology#ResearchProject'
+        ]);
         expect(researchProjectShape[SHACL_NAME][0]['@value']).toEqual('Research project');
         expect(researchProjectShape[SHACL_PROPERTY].map(property => property[SHACL_NAME][0]['@value'])).toEqual([
             'Label',
@@ -47,23 +51,28 @@ describe('typeShapeWithProperties', () => {
 
 describe('determineShapeForProperty', () => {
     it('returns the correct shape given a url', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#comment')[SHACL_PATH][0]['@id'])
-            .toEqual('http://www.w3.org/2000/01/rdf-schema#comment');
+        expect(
+            determineShapeForProperty(vocabularyJsonLd, 'http://www.w3.org/2000/01/rdf-schema#comment')[SHACL_PATH][0][
+                '@id'
+            ]
+        ).toEqual('http://www.w3.org/2000/01/rdf-schema#comment');
     });
     it('returns the correct shape if there is also a blank node pointing to it', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'https://fairspace.nl/ontology#list')[SHACL_PATH][0]['@id'])
-            .toEqual('https://fairspace.nl/ontology#list');
+        expect(
+            determineShapeForProperty(vocabularyJsonLd, 'https://fairspace.nl/ontology#list')[SHACL_PATH][0]['@id']
+        ).toEqual('https://fairspace.nl/ontology#list');
     });
 
     it('is undefined if there is only a blank node for a property', () => {
-        expect(determineShapeForProperty(vocabularyJsonLd, 'https://fairspace.nl/ontology#only-blank'))
-            .toBe(undefined);
+        expect(determineShapeForProperty(vocabularyJsonLd, 'https://fairspace.nl/ontology#only-blank')).toBe(undefined);
     });
 });
 
 describe('vocabulary contains', () => {
-    it('should return true if the given id is present in the vocabulary', () => expect(contains(vocabularyJsonLd, vocabularyJsonLd[0]['@id'])).toBe(true));
-    it('should return false if the given id is not present in the vocabulary', () => expect(contains(vocabularyJsonLd, 'http://not-present')).toBe(false));
+    it('should return true if the given id is present in the vocabulary', () =>
+        expect(contains(vocabularyJsonLd, vocabularyJsonLd[0]['@id'])).toBe(true));
+    it('should return false if the given id is not present in the vocabulary', () =>
+        expect(contains(vocabularyJsonLd, 'http://not-present')).toBe(false));
     it('should return false on empty vocabulary', () => expect(contains([], vocabularyJsonLd[0]['@id'])).toBe(false));
     it('should return false on invalid URI', () => expect(contains(vocabularyJsonLd, 'invalid-uri')).toBe(false));
     it('should return false on invalid parameter', () => expect(contains(vocabularyJsonLd)).toBe(false));
@@ -79,7 +88,8 @@ describe('isRdfList', () => {
     };
 
     it('should return true if the given shape is an rdf list', () => expect(isRdfList(rdfListShape)).toBe(true));
-    it('should return false if the given shape is not an rdf list', () => expect(isRdfList(nonRdfListShape)).toBe(false));
+    it('should return false if the given shape is not an rdf list', () =>
+        expect(isRdfList(nonRdfListShape)).toBe(false));
     it('should return false on an empty shape', () => expect(isRdfList({})).toBe(false));
 });
 
@@ -94,7 +104,8 @@ describe('getMaxCount', () => {
         [constants.SHACL_MAX_COUNT]: [{'@value': 10}]
     };
 
-    it('should return the max count value for a non list property', () => expect(getMaxCount(nonRdfListShape)).toEqual(10));
+    it('should return the max count value for a non list property', () =>
+        expect(getMaxCount(nonRdfListShape)).toEqual(10));
     it('should be falsy for an RDF list, regardless of its value', () => expect(getMaxCount(rdfListShape)).toBeFalsy());
 });
 
@@ -107,8 +118,10 @@ describe('isGenericResourceIri', () => {
         [constants.SHACL_NODEKIND]: [{'@id': constants.STRING_URI}]
     };
 
-    it('should return true if the given shape represents a generic iri resource', () => expect(isGenericIriResource(genericResourceShape)).toBe(true));
-    it('should return false if the given shape does not represent a generic iri resource', () => expect(isGenericIriResource(nonGenericResourceShape)).toBe(false));
+    it('should return true if the given shape represents a generic iri resource', () =>
+        expect(isGenericIriResource(genericResourceShape)).toBe(true));
+    it('should return false if the given shape does not represent a generic iri resource', () =>
+        expect(isGenericIriResource(nonGenericResourceShape)).toBe(false));
     it('should return false on an empty shape', () => expect(isGenericIriResource({})).toBe(false));
 });
 
@@ -130,7 +143,9 @@ describe('getClassesInCatalog', () => {
     });
 
     it('should not return properties', () => {
-        expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#comment']));
+        expect(shapesIdsInCatalog).not.toEqual(
+            expect.arrayContaining(['http://www.w3.org/2000/01/rdf-schema#comment'])
+        );
         expect(shapesIdsInCatalog).not.toEqual(expect.arrayContaining(['http://www.schema.org/creator']));
     });
 
@@ -196,7 +211,9 @@ describe('getProperties', () => {
 
         expect(result.length).toBeGreaterThan(propertyShapes.length);
         expect(result.map(entry => entry.key)).toEqual(
-            expect.arrayContaining(propertyShapes.map(propertyShape => getFirstPredicateId(propertyShape, constants.SHACL_PATH)))
+            expect.arrayContaining(
+                propertyShapes.map(propertyShape => getFirstPredicateId(propertyShape, constants.SHACL_PATH))
+            )
         );
     });
 

@@ -1,6 +1,6 @@
 import * as consts from '../constants';
 
-const styles = (theme) => ({
+const styles = theme => ({
     mainPage: {
         width: consts.MAIN_CONTENT_WIDTH,
         maxWidth: '700px',
@@ -10,14 +10,14 @@ const styles = (theme) => ({
     },
     header: {
         borderBottom: '2px solid ' + theme.palette.primary.main,
-        marginBottom: 50,
+        marginBottom: 50
     },
     textRow: {
         minHeight: '250px'
     },
     customFont: {
-        fontFamily: 'sans-serif',
-    },
+        fontFamily: 'sans-serif'
+    }
 });
 
 export default styles;

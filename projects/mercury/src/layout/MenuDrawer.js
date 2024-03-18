@@ -21,10 +21,7 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
             </IconButton>
         </div>
         <Divider />
-        <div
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-        >
+        <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             {renderMenu()}
         </div>
     </Drawer>

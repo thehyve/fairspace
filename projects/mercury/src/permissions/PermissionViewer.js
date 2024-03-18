@@ -14,20 +14,26 @@ const useStyles = makeStyles({
     root: {
         marginLeft: 20,
         marginBottom: 5
-    },
+    }
 });
 
 export const PermissionViewer = ({
-    collection, workspaceUsers, collaboratingWorkspaces,
-    collaboratingUsers, currentUser, setPermission, error, loading
+    collection,
+    workspaceUsers,
+    collaboratingWorkspaces,
+    collaboratingUsers,
+    currentUser,
+    setPermission,
+    error,
+    loading
 }) => {
     const classes = useStyles();
 
     if (error) {
-        return (<MessageDisplay message="An error occurred loading permissions" />);
+        return <MessageDisplay message="An error occurred loading permissions" />;
     }
     if (loading) {
-        return (<LoadingInlay />);
+        return <LoadingInlay />;
     }
 
     const renderUserPermissionComponent = () => (
@@ -53,12 +59,12 @@ export const PermissionViewer = ({
             <FormLabel>Share with users</FormLabel>
             <Box className={classes.root}>
                 {renderUserPermissionComponent()}
-                <FormHelperText>Members of the owner workspace can have modify rights, all others have read-only rights.</FormHelperText>
+                <FormHelperText>
+                    Members of the owner workspace can have modify rights, all others have read-only rights.
+                </FormHelperText>
             </Box>
             <FormLabel>Share with workspaces</FormLabel>
-            <Box className={classes.root}>
-                {renderWorkspacePermissionComponent()}
-            </Box>
+            <Box className={classes.root}>{renderWorkspacePermissionComponent()}</Box>
         </div>
     );
 };

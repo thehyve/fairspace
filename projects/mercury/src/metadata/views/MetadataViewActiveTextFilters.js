@@ -18,10 +18,10 @@ const styles = theme => ({
 });
 
 type MetadataViewActiveTextFiltersProperties = {
-    textFiltersObject: Object;
-    setTextFiltersObject: () => {};
-    columns: MetadataViewColumn[];
-    classes: any;
+    textFiltersObject: Object,
+    setTextFiltersObject: () => {},
+    columns: MetadataViewColumn[],
+    classes: any
 };
 
 export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFiltersProperties) => {
@@ -52,9 +52,12 @@ export const MetadataViewActiveTextFilters = (props: MetadataViewActiveTextFilte
             >
                 <Grid container item xs>
                     <Grid key="activeTextFilters" item>
-                        <Typography variant="overline" component="span" color="textSecondary">Active text filters: </Typography>
+                        <Typography variant="overline" component="span" color="textSecondary">
+                            Active text filters:{' '}
+                        </Typography>
                     </Grid>
-                    {Object.entries(textFiltersObject).filter(([, value]) => value !== null && value !== '')
+                    {Object.entries(textFiltersObject)
+                        .filter(([, value]) => value !== null && value !== '')
                         .map(([field, value]) => (
                             <Grid key={`activeTextFilters_${field}`} item>
                                 <Chip

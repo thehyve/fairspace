@@ -23,14 +23,15 @@ export const isCollectionPage = () => {
     if (parts.length > 0 && parts[0] === '') {
         parts.splice(0, 1);
     }
-    return (parts.length > 1 && parts[0] === 'collections');
+    return parts.length > 1 && parts[0] === 'collections';
 };
 
-export const getCollectionAbsolutePath = (path: string) => (
-    `/collections/${encodePath(path)}`
-);
+export const getCollectionAbsolutePath = (path: string) => `/collections/${encodePath(path)}`;
 
-export const collectionAccessIcon = (access: AccessLevel, fontSize: 'inherit' | 'default' | 'small' | 'large' = 'default') => {
+export const collectionAccessIcon = (
+    access: AccessLevel,
+    fontSize: 'inherit' | 'default' | 'small' | 'large' = 'default'
+) => {
     switch (access) {
         case 'List':
             return <Toc titleAccess={`${access} access`} fontSize={fontSize} />;
@@ -60,14 +61,11 @@ export const accessLevelForCollection = (collection: CollectionPermissions): Acc
 };
 
 const permissionLevel = p => accessLevels.indexOf(p.access);
-export const sortPermissions = (permissions) => {
+export const sortPermissions = permissions => {
     if (!permissions) {
         return [];
     }
-    return permissions.sort(comparing(
-        compareBy(permissionLevel, false),
-        compareBy('name')
-    ));
+    return permissions.sort(comparing(compareBy(permissionLevel, false), compareBy('name')));
 };
 
 /**
@@ -110,12 +108,12 @@ export const descriptionForAccessMode = (accessMode: AccessMode) => {
     }
 };
 
-const parsePermissions = (value) => ((typeof value !== 'string')
-    ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
+const parsePermissions = value =>
+    (typeof value !== 'string' ? [] : value.split(',').map(s => s.split(' '))).map(([iri, access]) => ({iri, access}));
 
-const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(','));
+const parseToArray = value => (typeof value !== 'string' ? [] : value.split(','));
 
-export const mapFilePropertiesToCollection: Collection = (properties) => ({
+export const mapFilePropertiesToCollection: Collection = properties => ({
     iri: properties.iri,
     name: properties.basename,
     ownerWorkspace: properties.ownedBy,
@@ -128,9 +126,9 @@ export const mapFilePropertiesToCollection: Collection = (properties) => ({
     deletedBy: properties.deletedBy,
     accessMode: properties.accessMode,
     status: properties.status,
-    canRead: (properties.canRead?.toLowerCase() === 'true'),
-    canWrite: (properties.canWrite?.toLowerCase() === 'true'),
-    canManage: (properties.canManage?.toLowerCase() === 'true'),
+    canRead: properties.canRead?.toLowerCase() === 'true',
+    canWrite: properties.canWrite?.toLowerCase() === 'true',
+    canManage: properties.canManage?.toLowerCase() === 'true',
     canDelete: properties.canDelete?.toLowerCase() === 'true',
     canUndelete: properties.canUndelete?.toLowerCase() === 'true',
     canUnpublish: properties.canUnpublish?.toLowerCase() === 'true',

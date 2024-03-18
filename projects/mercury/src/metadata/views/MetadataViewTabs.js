@@ -9,17 +9,17 @@ import MetadataViewTableContainer from './MetadataViewTableContainer';
 import CollectionsContext from '../../collections/CollectionsContext';
 
 type MetadataViewTabsProperties = {
-    currentViewIndex: Number;
-    idColumn: MetadataViewColumn;
-    changeTab: () => {};
-    views: MetadataViewOptions[];
-    filters: MetadataViewFilter[];
-    locationContext: string;
-    selected: [];
-    toggleRow: () => [];
-    hasInactiveFilters: Boolean;
-    collections: CollectionsContext;
-    classes: any;
+    currentViewIndex: Number,
+    idColumn: MetadataViewColumn,
+    changeTab: () => {},
+    views: MetadataViewOptions[],
+    filters: MetadataViewFilter[],
+    locationContext: string,
+    selected: [],
+    toggleRow: () => [],
+    hasInactiveFilters: Boolean,
+    collections: CollectionsContext,
+    classes: any
 };
 
 const styles = () => ({
@@ -28,18 +28,30 @@ const styles = () => ({
     },
     tab: {
         '& .MuiBox-root': {
-            padding: 0,
-        },
+            padding: 0
+        }
     }
 });
 
 export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
-    const {currentViewIndex, idColumn, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
+    const {
+        currentViewIndex,
+        idColumn,
+        changeTab,
+        views,
+        filters,
+        locationContext,
+        selected,
+        toggleRow,
+        hasInactiveFilters,
+        collections,
+        classes
+    } = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
-    const a11yProps = (index) => ({
+    const a11yProps = index => ({
         key: `metadata-view-tab-${index}`,
-        'aria-controls': `metadata-view-tab-${index}`,
+        'aria-controls': `metadata-view-tab-${index}`
     });
 
     const appendCustomColumns = (view: MetadataViewOptions) => {

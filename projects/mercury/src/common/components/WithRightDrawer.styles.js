@@ -8,7 +8,7 @@ const styles = theme => ({
         paddingRight: theme.spacing(3),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
+            duration: theme.transitions.duration.leavingScreen
         }),
         marginRight: 0
     },
@@ -16,7 +16,7 @@ const styles = theme => ({
     contentShift: {
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.enteringScreen,
+            duration: theme.transitions.duration.enteringScreen
         }),
         marginRight: drawerWidth + 3 * theme.spacing(1),
         minWidth: drawerWidth

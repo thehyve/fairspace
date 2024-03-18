@@ -4,11 +4,11 @@ import {extractJsonData, handleHttpError} from '../common/utils/httpUtils';
 import {joinPathsAvoidEmpty} from '../file/fileUtils';
 
 export type SearchResult = {|
-    id: string;
-    label: string;
-    type: string;
-    comment?: string;
-|}
+    id: string,
+    label: string,
+    type: string,
+    comment?: string
+|};
 
 export const HEADERS = {'Content-Type': 'application/json', Accept: 'application/json'};
 
@@ -21,7 +21,8 @@ class SearchAPI {
     }
 
     search(path: string, body): Promise<SearchResult[]> {
-        return axios.post(joinPathsAvoidEmpty(this.remoteURL, path), body, {headers: HEADERS})
+        return axios
+            .post(joinPathsAvoidEmpty(this.remoteURL, path), body, {headers: HEADERS})
             .catch(handleHttpError('Error while performing search'))
             .then(extractJsonData)
             .then(data => data.results);

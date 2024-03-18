@@ -20,11 +20,7 @@ const columnDefinition = {
     getValue: entry => entry.value
 };
 
-const defaultValues = [
-    {value: 'More info'},
-    {value: 'My first collection'},
-    {value: 'My second collection'}
-];
+const defaultValues = [{value: 'More info'}, {value: 'My first collection'}, {value: 'My second collection'}];
 
 describe('LinkedDataValuesList', () => {
     it('should render the title and values as specified', () => {

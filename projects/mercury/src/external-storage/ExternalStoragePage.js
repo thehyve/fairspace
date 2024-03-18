@@ -22,15 +22,15 @@ import {joinPathsAvoidEmpty} from '../file/fileUtils';
 import {PATH_SEPARATOR} from '../constants';
 
 type ContextualExternalStoragePageProperties = {
-    match: Match;
-    location: Location;
-    classes: any;
-}
+    match: Match,
+    location: Location,
+    classes: any
+};
 
 type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
-    externalStorages: ExternalStorage[];
-    history: History;
-}
+    externalStorages: ExternalStorage[],
+    history: History
+};
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
     const {externalStorages = [], match, location, history, classes = {}} = props;
@@ -40,7 +40,9 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
     const isSearchAvailable = storage && !!storage.searchPath;
-    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
+    const preselectedFile = location.search
+        ? decodeURIComponent(queryString.parse(location.search).selection)
+        : undefined;
 
     usePageTitleUpdater(storage ? storage.label : 'External storage');
 
@@ -76,11 +78,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
             {isSearchAvailable && (
                 <Grid container justifyContent="space-between" spacing={1}>
                     <Grid item className={classes.topBar}>
-                        <SearchBar
-                            placeholder={getSearchPlaceholder()}
-                            onSearchChange={handleSearch}
-                            width="50%"
-                        />
+                        <SearchBar placeholder={getSearchPlaceholder()} onSearchChange={handleSearch} width="50%" />
                     </Grid>
                 </Grid>
             )}
@@ -112,13 +110,7 @@ const ContextualExternalStoragePage = (props: ContextualExternalStoragePagePrope
     const {externalStorages = []} = useContext(ExternalStoragesContext);
     const history = useHistory();
 
-    return (
-        <ExternalStoragePage
-            {...props}
-            externalStorages={externalStorages}
-            history={history}
-        />
-    );
+    return <ExternalStoragePage {...props} externalStorages={externalStorages} history={history} />;
 };
 
 export default withStyles(styles)(ContextualExternalStoragePage);

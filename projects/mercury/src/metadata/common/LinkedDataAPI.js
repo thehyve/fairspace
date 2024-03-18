@@ -32,9 +32,12 @@ class LinkedDataAPI {
             return Promise.reject(new Error('Please provide a valid subject.'));
         }
 
-        const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
+        const query = Object.keys(params)
+            .map(key => `${key}=${encodeURIComponent(params[key])}`)
+            .join('&');
 
-        return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
+        return axios
+            .get(`${this.getStatementsUrl()}?${query}`, requestOptions)
             .then(extractJsonData)
             .then(expand)
             .then(normalizeTypes)
@@ -50,9 +53,12 @@ class LinkedDataAPI {
             return Promise.reject(new Error('Please provide a valid subject.'));
         }
 
-        const query = Object.keys(params).map(key => `${key}=${encodeURIComponent(params[key])}`).join('&');
+        const query = Object.keys(params)
+            .map(key => `${key}=${encodeURIComponent(params[key])}`)
+            .join('&');
 
-        return axios.get(`${this.getStatementsUrl()}?${query}`, requestOptions)
+        return axios
+            .get(`${this.getStatementsUrl()}?${query}`, requestOptions)
             .then(extractJsonData)
             .then(expand)
             .then(normalizeTypesBySubjectId)
@@ -61,11 +67,13 @@ class LinkedDataAPI {
 
     getForAllSubjects(subjects: string[]) {
         // eslint-disable-next-line array-callback-return
-        const requests = subjects.map(subject => (
-            axios.get(`${this.getStatementsUrl()}?subject=${encodeURIComponent(subject)}`, requestOptions)
+        const requests = subjects.map(subject =>
+            axios
+                .get(`${this.getStatementsUrl()}?subject=${encodeURIComponent(subject)}`, requestOptions)
                 .catch(() => null)
-        ));
-        return axios.all(requests)
+        );
+        return axios
+            .all(requests)
             .then(responses => responses.map(extractJsonData))
             .then(responses => Promise.all(responses.map(expand)))
             .then(flattenShallow)

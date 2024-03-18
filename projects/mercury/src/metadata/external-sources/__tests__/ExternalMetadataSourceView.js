@@ -12,11 +12,15 @@ jest.mock('../../views/MetadataView', () => ({pathPrefix}) => <div>{pathPrefix}<
 describe('ExternalMetadataSourceView', () => {
     it('renders MetadataView with proper path redirection', async () => {
         const mockMetadataSource = {
-            name: 'example', path: '/example/path',
+            name: 'example',
+            path: '/example/path'
         };
 
         useAsync.mockReturnValue({
-            data: [mockMetadataSource], error: null, loading: false, refresh: jest.fn(),
+            data: [mockMetadataSource],
+            error: null,
+            loading: false,
+            refresh: jest.fn()
         });
 
         render(

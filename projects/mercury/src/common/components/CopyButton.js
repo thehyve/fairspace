@@ -18,8 +18,11 @@ const clipboardSupported = 'clipboard' in navigator;
  * @param labelAfterCopy
  */
 const CopyButton = ({
-    value, style = {}, timeout = DEFAULT_TIMEOUT,
-    labelPreCopy = 'Copy full IRI', labelAfterCopy = 'Copied!',
+    value,
+    style = {},
+    timeout = DEFAULT_TIMEOUT,
+    labelPreCopy = 'Copy full IRI',
+    labelAfterCopy = 'Copied!'
 }) => {
     const [justCopied, setJustCopied] = useState(false);
     const isMounted = useIsMounted();
@@ -41,22 +44,17 @@ const CopyButton = ({
                 <span>
                     {justCopied ? (
                         <span data-testid="copied">
-                            <CheckOutlined
-                                color="action"
-                                fontSize="small"
-                            />
+                            <CheckOutlined color="action" fontSize="small" />
                         </span>
                     ) : (
                         <span data-testid="uncopied">
-                            <ContentCopy
-                                color="action"
-                                fontSize="small"
-                            />
+                            <ContentCopy color="action" fontSize="small" />
                         </span>
                     )}
                 </span>
             </Tooltip>
-        ));
+        )
+    );
 };
 
 export default CopyButton;

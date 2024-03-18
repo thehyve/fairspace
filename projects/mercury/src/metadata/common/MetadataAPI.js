@@ -31,8 +31,7 @@ export class MetadataAPI extends LinkedDataAPI {
             jsonLd.push({'@id': subject, '@type': type});
         }
 
-        return this.patch(jsonLd)
-            .catch(handleHttpError('Failure when updating entity'));
+        return this.patch(jsonLd).catch(handleHttpError('Failure when updating entity'));
     }
 
     /**
@@ -52,7 +51,8 @@ export class MetadataAPI extends LinkedDataAPI {
      * @returns {Promise<Response>}
      */
     delete(subject) {
-        return axios.delete(this.getStatementsUrl() + '?subject=' + encodeURIComponent(subject))
+        return axios
+            .delete(this.getStatementsUrl() + '?subject=' + encodeURIComponent(subject))
             .catch(handleHttpError('Failure when deleting subject'));
     }
 }

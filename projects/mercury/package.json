@@ -10,12 +10,14 @@
     "saturn": "wait-on http://localhost:5100/ && wait-on tcp:9432 && cd ../saturn/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew run",
     "pluto": "wait-on http://localhost:8090/api/health/ && cd ../pluto/ && KEYCLOAK_CLIENT_SECRET=********** ./gradlew bootRun --args='--spring.profiles.active=local'",
     "start": "craco start",
-    "build": "craco build",
+    "build": "yarn check-format && craco build",
     "test": "craco test --env=jsdom",
     "test:coverage": "craco test --env=jsdom --coverage --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint ./src",
-    "flow": "flow"
+    "flow": "flow",
+    "format": "prettier --write './**/*.{js,jsx,css,md,json}' --config ./.prettierrc.js",
+    "check-format": "prettier --check './**/*.{js,jsx,css,md,json}' --config ./.prettierrc.js"
   },
   "dependencies": {
     "@craco/craco": "^7.1.0",
@@ -68,10 +70,12 @@
     "enzyme": "^3.11.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-ft-flow": "^3.0.7",
     "eslint-plugin-jest": "^27.2.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-react-hooks": "^4.6.0",
     "express-session": "^1.17.1",
     "flow-bin": "^0.117.0",
@@ -80,6 +84,7 @@
     "keycloak-connect": "^21.0.1",
     "node-fetch": "^2.6.1",
     "nodemon": "^2.0.2",
+    "prettier": "^3.2.5",
     "react-test-renderer": "^18.2.0",
     "wait-on": "^3.3.0"
   },

@@ -47,8 +47,16 @@ const styles = {
     }
 };
 
-export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissionsText, workspaceUsers = [], currentUser,
-    handleChangePermission, handleDeletePermission, canManage, classes}) => {
+export const UserPermissionsTable = ({
+    selectedPermissions = [],
+    emptyPermissionsText,
+    workspaceUsers = [],
+    currentUser,
+    handleChangePermission,
+    handleDeletePermission,
+    canManage,
+    classes
+}) => {
     if (selectedPermissions.length === 0) {
         return (
             <Typography variant="body2" className={classes.emptyPermissions}>
@@ -65,18 +73,19 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
         return ['Read'];
     };
 
-    const canManagePermission:boolean = (permission: Permission) => (
-        canManage && currentUser && permission.iri !== currentUser.iri
-    );
+    const canManagePermission: boolean = (permission: Permission) =>
+        canManage && currentUser && permission.iri !== currentUser.iri;
 
     const renderAccessLevelDropdown = (selectedPermission: Permission, accessLevelOptions: AccessLevel[]) => (
         <FormControl>
             <Select
                 value={selectedPermission.access}
-                onChange={v => handleChangePermission({
-                    ...selectedPermission,
-                    access: v.target.value
-                })}
+                onChange={v =>
+                    handleChangePermission({
+                        ...selectedPermission,
+                        access: v.target.value
+                    })
+                }
                 className={classes.accessDropdown}
             >
                 {accessLevelOptions.map(access => (
@@ -92,45 +101,43 @@ export const UserPermissionsTable = ({selectedPermissions = [], emptyPermissions
     return (
         <Table size="small" className={classes.table}>
             <TableBody className={classes.tableBody}>
-                {
-                    selectedPermissions.map(p => {
-                        const accessLevelOptions: AccessLevel[] = getAccessLevelsForPrincipal(p);
-                        const canManageCurrentPermission = canManagePermission(p);
-                        return (
-                            <TableRow key={p.iri} className={classes.tableRow}>
-                                <TableCell width={25} className={classes.iconCell}>
-                                    <Person />
-                                </TableCell>
-                                <TableCell width="100%" data-testid="permission">
-                                    <Tooltip title={p.name} placement="left-start" arrow>
-                                        <Typography variant="body2" noWrap style={{width: 275}}>
-                                            {p.name}
-                                        </Typography>
-                                    </Tooltip>
-                                </TableCell>
-                                <TableCell className={classes.accessCell}>
-                                    {canManageCurrentPermission && accessLevelOptions.length > 1 ? (
-                                        renderAccessLevelDropdown(p, accessLevelOptions)
-                                    ) : (
-                                        <div>
-                                            <span className={classes.accessIcon}>{collectionAccessIcon(p.access)}</span>
-                                            <span>{p.access}</span>
-                                        </div>
-                                    )}
-                                </TableCell>
-                                <TableCell width={40} className={classes.iconCell} align="right">
-                                    <IconButton
-                                        onClick={() => handleDeletePermission(p)}
-                                        disabled={!canManageCurrentPermission}
-                                        size="medium"
-                                    >
-                                        <Close />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })
-                }
+                {selectedPermissions.map(p => {
+                    const accessLevelOptions: AccessLevel[] = getAccessLevelsForPrincipal(p);
+                    const canManageCurrentPermission = canManagePermission(p);
+                    return (
+                        <TableRow key={p.iri} className={classes.tableRow}>
+                            <TableCell width={25} className={classes.iconCell}>
+                                <Person />
+                            </TableCell>
+                            <TableCell width="100%" data-testid="permission">
+                                <Tooltip title={p.name} placement="left-start" arrow>
+                                    <Typography variant="body2" noWrap style={{width: 275}}>
+                                        {p.name}
+                                    </Typography>
+                                </Tooltip>
+                            </TableCell>
+                            <TableCell className={classes.accessCell}>
+                                {canManageCurrentPermission && accessLevelOptions.length > 1 ? (
+                                    renderAccessLevelDropdown(p, accessLevelOptions)
+                                ) : (
+                                    <div>
+                                        <span className={classes.accessIcon}>{collectionAccessIcon(p.access)}</span>
+                                        <span>{p.access}</span>
+                                    </div>
+                                )}
+                            </TableCell>
+                            <TableCell width={40} className={classes.iconCell} align="right">
+                                <IconButton
+                                    onClick={() => handleDeletePermission(p)}
+                                    disabled={!canManageCurrentPermission}
+                                    size="medium"
+                                >
+                                    <Close />
+                                </IconButton>
+                            </TableCell>
+                        </TableRow>
+                    );
+                })}
             </TableBody>
         </Table>
     );

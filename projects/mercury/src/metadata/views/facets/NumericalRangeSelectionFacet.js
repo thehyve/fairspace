@@ -38,7 +38,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         commitChange(val);
     };
 
-    const handleMinValueInputChange = (event) => {
+    const handleMinValueInputChange = event => {
         const newMinValue = event.target.value;
         setValue([newMinValue, value[1]]);
         if (isNonEmptyValue(newMinValue)) {
@@ -58,7 +58,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
         }
     };
 
-    const handleMaxValueInputChange = (event) => {
+    const handleMaxValueInputChange = event => {
         const newMaxValue = event.target.value;
         setValue([value[0], newMaxValue]);
         if (isNonEmptyValue(event.target.value)) {
@@ -168,9 +168,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
                     </Grid>
                 </Grid>
             )}
-            <Typography color="error">
-                {validationError}
-            </Typography>
+            <Typography color="error">{validationError}</Typography>
         </div>
     );
 };

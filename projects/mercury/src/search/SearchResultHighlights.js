@@ -24,25 +24,20 @@ const filterProperties = ([key, value]) => !['iri', 'type', 'contains', 'label',
  * @returns {*}
  * @constructor
  */
-const SearchResultHighlights = ({highlights, typeShape}) => highlights && (
-    <List dense>
-        {
-            highlights
-                .filter(filterProperties)
-                .map(([key, value]) => (
-                    <ListItem key={key} dense disableGutters style={{display: 'inline-table'}}>
-                        <Typography variant="overline">
-                            {labelForKey(key, typeShape)}
-                        </Typography>
-                        <Typography variant="body1">
-                            {/* eslint-disable-next-line react/no-danger */}
-                            <span dangerouslySetInnerHTML={{__html: value}} />
-                        </Typography>
-                    </ListItem>
-                ))
-        }
-    </List>
-);
+const SearchResultHighlights = ({highlights, typeShape}) =>
+    highlights && (
+        <List dense>
+            {highlights.filter(filterProperties).map(([key, value]) => (
+                <ListItem key={key} dense disableGutters style={{display: 'inline-table'}}>
+                    <Typography variant="overline">{labelForKey(key, typeShape)}</Typography>
+                    <Typography variant="body1">
+                        {/* eslint-disable-next-line react/no-danger */}
+                        <span dangerouslySetInnerHTML={{__html: value}} />
+                    </Typography>
+                </ListItem>
+            ))}
+        </List>
+    );
 
 SearchResultHighlights.propTypes = {
     highlights: PropTypes.array,

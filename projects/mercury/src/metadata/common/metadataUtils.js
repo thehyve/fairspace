@@ -10,11 +10,8 @@ import {isNonEmptyValue} from '../../common/utils/genericUtils';
  * @param uri
  * @returns {string}
  */
-export const getLocalPart = uri => (
-    uri.includes('#')
-        ? uri.substring(uri.lastIndexOf('#') + 1)
-        : uri.substring(uri.lastIndexOf('/') + 1)
-);
+export const getLocalPart = uri =>
+    uri.includes('#') ? uri.substring(uri.lastIndexOf('#') + 1) : uri.substring(uri.lastIndexOf('/') + 1);
 
 /**
  *
@@ -55,9 +52,11 @@ export function linkLabel(uri, shortenExternalUris = false) {
  * @returns string
  */
 export function getLabel(entity, shortenExternalUris = false) {
-    return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || getFirstPredicateValue(entity, consts.SHACL_NAME)
-        || (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris));
+    return (
+        getFirstPredicateValue(entity, consts.LABEL_URI) ||
+        getFirstPredicateValue(entity, consts.SHACL_NAME) ||
+        (entity && entity['@id'] && linkLabel(entity['@id'], shortenExternalUris))
+    );
 }
 
 /**
@@ -67,8 +66,7 @@ export function getLabel(entity, shortenExternalUris = false) {
  * @returns string
  */
 export function getLabelStrict(entity) {
-    return getFirstPredicateValue(entity, consts.LABEL_URI)
-        || '';
+    return getFirstPredicateValue(entity, consts.LABEL_URI) || '';
 }
 
 /**
@@ -93,9 +91,11 @@ export function relativeLink(link) {
 }
 
 export function generateUuid() {
-    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g,
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(
+        /[018]/g,
         // eslint-disable-next-line
-        c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
+        c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+    );
 }
 
 export function isValidLinkedDataIdentifier(uri) {
@@ -164,7 +164,7 @@ export const propertiesToShow = (properties = []) => {
  * @returns {{label: string, description: string}} object containing the type label and description
  */
 export const getTypeInfo = (linkedDataItem, vocabulary) => {
-    const types = (linkedDataItem && linkedDataItem['@type']);
+    const types = linkedDataItem && linkedDataItem['@type'];
 
     if (!types) {
         return {};
@@ -200,7 +200,7 @@ export const createIri = (id, infix) => `http://${window.location.hostname}/${in
  * @returns {string}
  * @see createIri
  */
-export const createMetadataIri = (id) => createIri(id, 'iri');
+export const createMetadataIri = id => createIri(id, 'iri');
 
 /**
  * Creates a new vocabulary IRI within this workspace
@@ -209,7 +209,7 @@ export const createMetadataIri = (id) => createIri(id, 'iri');
  * @returns {string}
  * @see createIri
  */
-export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
+export const createVocabularyIri = id => createIri(id, 'vocabulary');
 
 /**
  * Generates a compatible workspace IRI from the given iri.
@@ -222,7 +222,7 @@ export const createVocabularyIri = (id) => createIri(id, 'vocabulary');
  * @param iri
  * @returns {string}
  */
-export const url2iri = (iri) => {
+export const url2iri = iri => {
     try {
         const url = new URL(iri);
         return `http://${url.hostname}${url.pathname}${url.search}${url.hash}`;
@@ -256,7 +256,7 @@ export const getNamespacedIri = (iri, namespaces) => {
  * @returns {Object}
  */
 export const partitionErrors = (errors, subject) => {
-    const [entityErrors, otherErrors] = _.partition(errors, (e) => e.subject === subject);
+    const [entityErrors, otherErrors] = _.partition(errors, e => e.subject === subject);
     return {entityErrors, otherErrors};
 };
 
@@ -279,4 +279,5 @@ export const valuesContainsValueOrId = (values, value, id) => {
  * @param values
  * @returns {boolean}
  */
-export const hasValue = values => !!(values && Array.isArray(values) && values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);
+export const hasValue = values =>
+    !!(values && Array.isArray(values) && values.filter(v => v.id || isNonEmptyValue(v.value)).length > 0);

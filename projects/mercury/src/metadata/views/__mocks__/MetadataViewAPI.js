@@ -81,11 +81,13 @@ export const mockViews: MetadataViewOptions[] = () => [
                 name: 'Collection',
                 title: 'Collection',
                 type: 'Identifier'
-            }, {
+            },
+            {
                 name: 'Collection_analysisType',
                 title: 'Analysis type',
                 type: 'Term'
-            }, {
+            },
+            {
                 name: 'Collection_keyword',
                 title: 'Key words',
                 type: 'Set'
@@ -94,11 +96,9 @@ export const mockViews: MetadataViewOptions[] = () => [
     }
 ];
 
-export const mockGetViews: Promise<MetadataViewOptions[]> = () => (
-    new Promise(resolve => resolve(mockViews()))
-);
+export const mockGetViews: Promise<MetadataViewOptions[]> = () => new Promise(resolve => resolve(mockViews()));
 
-export const mockFacets = (name) => {
+export const mockFacets = name => {
     switch (name) {
         case 'Sample':
             return [
@@ -286,11 +286,9 @@ export const mockFacets = (name) => {
     }
 };
 
-export const mockGetFacets: Promise<MetadataViewFacet[]> = (name) => (
-    new Promise(resolve => resolve(mockFacets(name)))
-);
+export const mockGetFacets: Promise<MetadataViewFacet[]> = name => new Promise(resolve => resolve(mockFacets(name)));
 
-export const mockRows = (viewName) => {
+export const mockRows = viewName => {
     switch (viewName) {
         case 'Sample':
             return [
@@ -312,8 +310,8 @@ export const mockRows = (viewName) => {
                     Sample_topography: [{value: 'http://example.com/sampleType#tongue', label: 'Tongue'}],
                     Sample_tumorCellularity: [{value: 4, label: '4'}],
                     Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
-                    Sample_origin: [{value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}],
-                },
+                    Sample_origin: [{value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}]
+                }
             ];
         case 'Subject':
             return [
@@ -336,9 +334,7 @@ export const mockRows = (viewName) => {
                     Subject: [{value: 'http://example.com/sampleType/p03', label: 'P03'}],
                     Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
                     Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
-                    files: [
-                        {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'}
-                    ]
+                    files: [{value: 'http://localhost:8080/api/webdav/f01', label: 'f01'}]
                 },
                 {
                     Subject: [{value: 'http://example.com/sampleType/p04', label: 'P04'}],
@@ -354,7 +350,7 @@ export const mockRows = (viewName) => {
                     Subject: [{value: 'http://example.com/sampleType/p06', label: 'P06'}],
                     Subject_gender: [{value: 'http://example.com/sampleType#female', label: 'Female'}],
                     Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}]
-                },
+                }
             ];
         case 'Resource':
             return [
@@ -368,11 +364,13 @@ export const mockRows = (viewName) => {
     }
 };
 
-export const mockGetViewData: Promise<MetadataViewData> = (viewName) => {
+export const mockGetViewData: Promise<MetadataViewData> = viewName => {
     const rows = mockRows(viewName);
-    return new Promise(resolve => resolve({
-        page: 0,
-        rows,
-        totalCount: rows.length
-    }));
+    return new Promise(resolve =>
+        resolve({
+            page: 0,
+            rows,
+            totalCount: rows.length
+        })
+    );
 };

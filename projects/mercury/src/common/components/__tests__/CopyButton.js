@@ -12,10 +12,7 @@ describe('<CopyButton />', () => {
     });
 
     it('changes the icon and title after copying', () => {
-        render(<CopyButton
-            labelPreCopy="Copy full IRI"
-            labelAfterCopy="Copied!"
-        />);
+        render(<CopyButton labelPreCopy="Copy full IRI" labelAfterCopy="Copied!" />);
 
         const uncopiedIcon = screen.getByTestId('uncopied');
         expect(screen.getByLabelText(/Copy full IRI/i)).toBeInTheDocument();

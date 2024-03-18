@@ -12,7 +12,7 @@ import CopyButton from '../../common/components/CopyButton';
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
-        transform: 'rotate(180deg)',
+        transform: 'rotate(180deg)'
     },
     card: {
         marginTop: 10,
@@ -29,10 +29,10 @@ const useStyles = makeStyles(() => ({
 }));
 
 type MetadataViewInformationDrawerProps = {
-    entity: MetadataViewEntityWithLinkedFiles;
-    viewIcon: any;
-    handleCloseCard: () => {};
-    textFilterLink: string;
+    entity: MetadataViewEntityWithLinkedFiles,
+    viewIcon: any,
+    handleCloseCard: () => {},
+    textFilterLink: string
 };
 
 const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps) => {
@@ -47,33 +47,22 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
         <Card className={classes.card}>
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
-                title={(
+                title={
                     <div>
                         Metadata for {entity.label}
-                        <CopyButton
-                            style={{marginLeft: 10}}
-                            value={textFilterLink}
-                            labelPreCopy="Copy the link"
-                        />
+                        <CopyButton style={{marginLeft: 10}} value={textFilterLink} labelPreCopy="Copy the link" />
                     </div>
-                )}
+                }
                 avatar={viewIcon}
                 style={{wordBreak: 'break-word'}}
-                action={(
-                    <IconButton
-                        title="Close"
-                        onClick={handleCloseCard}
-                        size="medium"
-                    >
+                action={
+                    <IconButton title="Close" onClick={handleCloseCard} size="medium">
                         <Close />
                     </IconButton>
-                )}
+                }
             />
             <CardContent>
-                <LinkedDataEntityFormWithLinkedData
-                    subject={entity.iri}
-                    hasEditRight={false}
-                />
+                <LinkedDataEntityFormWithLinkedData subject={entity.iri} hasEditRight={false} />
             </CardContent>
         </Card>
     );

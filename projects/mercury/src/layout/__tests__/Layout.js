@@ -19,9 +19,7 @@ describe('Layout', () => {
     const wrap = (element, availableAuthorizations = []) => (
         <ThemeProvider theme={theme}>
             <UserContext.Provider value={{currentUser: {roles: availableAuthorizations}}}>
-                <MemoryRouter>
-                    {element}
-                </MemoryRouter>
+                <MemoryRouter>{element}</MemoryRouter>
             </UserContext.Provider>
         </ThemeProvider>
     );

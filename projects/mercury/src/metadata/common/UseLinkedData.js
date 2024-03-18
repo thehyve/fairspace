@@ -78,4 +78,4 @@ export const useLinkedDataNoContext = (subject, context = {}) => {
 };
 
 // Export a custom hook attached to the context by default
-export default (subject) => useLinkedDataNoContext(subject, useContext(LinkedDataContext));
+export default subject => useLinkedDataNoContext(subject, useContext(LinkedDataContext));

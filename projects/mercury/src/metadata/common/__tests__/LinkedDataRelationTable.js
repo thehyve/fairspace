@@ -25,7 +25,9 @@ describe('LinkedDataRelationTable elements', () => {
             push: jest.fn()
         };
 
-        const wrapper = shallow(<LinkedDataRelationTable history={historyMock} property={defaultProperty} editorPath="/metadata" />);
+        const wrapper = shallow(
+            <LinkedDataRelationTable history={historyMock} property={defaultProperty} editorPath="/metadata" />
+        );
         const table = wrapper.find(LinkedDataValuesTable);
 
         expect(table.length).toEqual(1);

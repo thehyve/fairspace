@@ -4,37 +4,37 @@ import {KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage} from '@mui/i
 import makeStyles from '@mui/styles/makeStyles';
 import {Typography} from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         flexShrink: 0,
-        marginLeft: theme.spacing(2.5),
-    },
+        marginLeft: theme.spacing(2.5)
+    }
 }));
 
 export type TablePaginationActionsProperties = {
-    count: number;
-    onPageChange: () => {};
-    page: number;
-    rowsPerPage: number;
-}
+    count: number,
+    onPageChange: () => {},
+    page: number,
+    rowsPerPage: number
+};
 
 const TablePaginationActions = (props: TablePaginationActionsProperties) => {
     const classes = useStyles();
     const {count, page, rowsPerPage, onPageChange} = props;
 
-    const handleFirstPageButtonClick = (event) => {
+    const handleFirstPageButtonClick = event => {
         onPageChange(event, 0);
     };
 
-    const handleBackButtonClick = (event) => {
+    const handleBackButtonClick = event => {
         onPageChange(event, page - 1);
     };
 
-    const handleNextButtonClick = (event) => {
+    const handleNextButtonClick = event => {
         onPageChange(event, page + 1);
     };
 
-    const handleLastPageButtonClick = (event) => {
+    const handleLastPageButtonClick = event => {
         onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
     };
 
@@ -48,15 +48,12 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
             >
                 <FirstPage />
             </IconButton>
-            <IconButton
-                onClick={handleBackButtonClick}
-                disabled={page === 0}
-                aria-label="previous page"
-                size="medium"
-            >
+            <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page" size="medium">
                 <KeyboardArrowLeft />
             </IconButton>
-            <Typography variant="body2" component="span" display="inline">{page + 1}</Typography>
+            <Typography variant="body2" component="span" display="inline">
+                {page + 1}
+            </Typography>
             <IconButton
                 onClick={handleNextButtonClick}
                 disabled={page >= Math.ceil(count / rowsPerPage) - 1}

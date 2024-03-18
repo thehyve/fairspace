@@ -13,16 +13,12 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
     const [selectedValue, setSelectedValue] = useState();
     const [openDialog, setOpenDialog] = useState(true);
 
-    const options = workspaces
-        .sort(compareBy('code'))
-        .map(workspace => (
-            {
-                label: workspace.code,
-                ...workspace
-            }
-        ));
+    const options = workspaces.sort(compareBy('code')).map(workspace => ({
+        label: workspace.code,
+        ...workspace
+    }));
 
-    const handleValueChange = (selectedOwnerWorkspace) => {
+    const handleValueChange = selectedOwnerWorkspace => {
         if (selectedOwnerWorkspace) {
             setSelectedValue({label: selectedOwnerWorkspace.code, ...selectedOwnerWorkspace});
         } else {
@@ -43,12 +39,10 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
     };
 
     return (
-        <Dialog
-            open={openDialog}
-            data-testid="owner-workspace-change-dialog"
-            onClose={handleCancel}
-        >
-            <DialogTitle id="property-change-dialog-title">Transfer the collection ownership to another workspace</DialogTitle>
+        <Dialog open={openDialog} data-testid="owner-workspace-change-dialog" onClose={handleCancel}>
+            <DialogTitle id="property-change-dialog-title">
+                Transfer the collection ownership to another workspace
+            </DialogTitle>
             <DialogContent>
                 <div>
                     <Dropdown
@@ -65,26 +59,20 @@ export const CollectionOwnerChangeDialog = ({collection, workspaces, changeOwner
                 <ConfirmationButton
                     onClick={handleSubmit}
                     disabled={Boolean(!selectedValue)}
-                    message={(
+                    message={
                         <span>
-                           Are you sure you want to <b>transfer the ownership</b> on
-                           collection <em>{collection.name}</em> to workspace <em>{selectedValue && selectedValue.label}</em>?
+                            Are you sure you want to <b>transfer the ownership</b> on collection{' '}
+                            <em>{collection.name}</em> to workspace <em>{selectedValue && selectedValue.label}</em>?
                         </span>
-                    )}
+                    }
                     agreeButtonText="Yes"
                     dangerous
                 >
-                    <Button
-                        color="primary"
-                        disabled={Boolean(!selectedValue)}
-                        data-testid="submit"
-                    >
+                    <Button color="primary" disabled={Boolean(!selectedValue)} data-testid="submit">
                         Save
                     </Button>
                 </ConfirmationButton>
-                <Button onClick={handleCancel}>
-                    Cancel
-                </Button>
+                <Button onClick={handleCancel}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

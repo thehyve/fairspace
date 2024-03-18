@@ -20,9 +20,7 @@ import ExternalStoragePage from '../external-storage/ExternalStoragePage';
 import ExternalMetadataSourcesView from '../metadata/external-sources/ExternalMetadataSourceView';
 import {METADATA_VIEW_MENU_LABEL} from '../constants';
 
-const getSubject = () => (
-    document.location.search ? queryString.parse(document.location.search).iri : null
-);
+const getSubject = () => (document.location.search ? queryString.parse(document.location.search).iri : null);
 
 // wrapping MetadataView in memo to prevent it from re-rendering
 const MetadataViewMemo = React.memo(MetadataView);
@@ -36,18 +34,12 @@ const WorkspaceRoutes = () => {
 
             <Route path="/workspace" exact component={WorkspaceOverview} />
 
-            <Route
-                path="/dashboard"
-                exact
-                render={() => (
-                    <Dashboard />
-                )}
-            />
+            <Route path="/dashboard" exact render={() => <Dashboard />} />
 
             <Route
                 path="/collections"
                 exact
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <Collections history={props.history} showBreadCrumbs />
                     </LinkedDataMetadataProvider>
@@ -56,7 +48,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/collections/:collection/:path(.*)?"
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <FilesPage {...props} />
                     </LinkedDataMetadataProvider>
@@ -65,7 +57,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/text-search"
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <CollectionSearchResultList {...props} />
                     </LinkedDataMetadataProvider>
@@ -74,7 +66,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/external-storages/:storage"
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <ExternalStoragePage {...props} />
                     </LinkedDataMetadataProvider>
@@ -94,7 +86,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/metadata-sources/:source"
-                render={(props) => (
+                render={props => (
                     <BreadcrumbsContext.Provider value={{segments: []}}>
                         <LinkedDataMetadataProvider>
                             <ExternalMetadataSourcesView {...props} />
@@ -123,11 +115,7 @@ const WorkspaceRoutes = () => {
                 }}
             />
 
-            <Route
-                path="/users"
-                exact
-                render={() => (isAdmin(currentUser) && (<UserRolesPage />))}
-            />
+            <Route path="/users" exact render={() => isAdmin(currentUser) && <UserRolesPage />} />
 
             <Redirect to="/dashboard" />
         </Switch>

@@ -10,13 +10,11 @@ const MetadataViewContext = React.createContext({});
 const SESSION_STORAGE_METADATA_FILTERS_KEY = 'FAIRSPACE_METADATA_FILTERS';
 
 export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAPI, sourceName = ''}) => {
-    const {data = {}, error, loading, refresh} = useAsync(
-        () => metadataViewAPI.getViews(),
-        []
-    );
+    const {data = {}, error, loading, refresh} = useAsync(() => metadataViewAPI.getViews(), []);
 
     const [filters: MetadataViewFilter[], setFilters] = useStateWithSessionStorage(
-        `${SESSION_STORAGE_METADATA_FILTERS_KEY}_${sourceName}`, []
+        `${SESSION_STORAGE_METADATA_FILTERS_KEY}_${sourceName}`,
+        []
     );
 
     const clearFilter = (facetName: string) => {
@@ -30,9 +28,14 @@ export const MetadataViewProvider = ({children, metadataViewAPI = MetadataViewAP
     const updateFilters = (filterCandidates: MetadataViewFilter[]) => {
         setFilters([
             ...filters.filter(f => !filterCandidates.some(u => u.field === f.field)),
-            ...filterCandidates.filter(f => (
-                (f.values && f.values.length > 0) || isNonEmptyValue(f.min) || isNonEmptyValue(f.max) || f.prefix != null || f.booleanValue != null
-            ))
+            ...filterCandidates.filter(
+                f =>
+                    (f.values && f.values.length > 0) ||
+                    isNonEmptyValue(f.min) ||
+                    isNonEmptyValue(f.max) ||
+                    f.prefix != null ||
+                    f.booleanValue != null
+            )
         ]);
     };
 

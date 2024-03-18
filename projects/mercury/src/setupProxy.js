@@ -5,17 +5,19 @@ const Keycloak = require('keycloak-connect');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const session = require('express-session');
 
-module.exports = (app) => {
+module.exports = app => {
     const store = new session.MemoryStore();
 
-    app.use(session({
-        secret: 'secret',
-        resave: false,
-        saveUninitialized: true,
-        // Uncomment to limit the session lifetime to 1 minute
-        // cookie: {maxAge: 60 * 1000 },
-        store
-    }));
+    app.use(
+        session({
+            secret: 'secret',
+            resave: false,
+            saveUninitialized: true,
+            // Uncomment to limit the session lifetime to 1 minute
+            // cookie: {maxAge: 60 * 1000 },
+            store
+        })
+    );
 
     const keycloak = new Keycloak(
         {
@@ -30,21 +32,26 @@ module.exports = (app) => {
     );
 
     // Return 401 Unauthorized for API requests
-    keycloak.redirectToLogin = (request) => !(request.baseUrl.startsWith('/api/'));
+    keycloak.redirectToLogin = request => !request.baseUrl.startsWith('/api/');
 
     app.use(keycloak.middleware({logout: '/logout'}));
 
     // The next statement enables debugging and setting breakpoints in Intellij and VSCode. Not fully understand it but don't remove :)
     app.use('/dev', keycloak.protect());
 
-    const addToken = (proxyReq, req) => req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
+    const addToken = (proxyReq, req) =>
+        req.kauth.grant && proxyReq.setHeader('Authorization', `Bearer ${req.kauth.grant.access_token.token}`);
 
-    app.use(createProxyMiddleware('/api', {
-        target: 'http://localhost:8080/',
-        onProxyReq: addToken
-    }));
+    app.use(
+        createProxyMiddleware('/api', {
+            target: 'http://localhost:8080/',
+            onProxyReq: addToken
+        })
+    );
 
-    app.use(createProxyMiddleware('/actuator/health', {
-        target: 'http://localhost:8080/'
-    }));
+    app.use(
+        createProxyMiddleware('/actuator/health', {
+            target: 'http://localhost:8080/'
+        })
+    );
 };

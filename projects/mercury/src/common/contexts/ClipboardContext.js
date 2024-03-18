@@ -8,7 +8,7 @@ const ClipboardContext = React.createContext({
     length: () => {},
     clear: () => {},
     method: '',
-    filenames: [],
+    filenames: []
 });
 
 export const ClipboardProvider = ({children}) => {

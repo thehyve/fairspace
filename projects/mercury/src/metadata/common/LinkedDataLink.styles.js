@@ -1,4 +1,4 @@
-const styles = (theme) => ({
+const styles = theme => ({
     modalDialog: {
         background: theme.palette.grey['200'],
         position: 'relative',
@@ -8,7 +8,7 @@ const styles = (theme) => ({
         border: '0px solid #000',
         boxShadow: 0,
         outline: 'none',
-        p: 4,
+        p: 4
     },
     modalContent: {
         position: 'relative',
@@ -19,13 +19,12 @@ const styles = (theme) => ({
         padding: 2,
         backgroundColor: theme.palette.primary.main,
         width: 800,
-        overflowY: 'auto',
+        overflowY: 'auto'
     },
     closeButton: {
         float: 'right',
         marginTop: 8,
         marginRight: 8
-
     },
     clickableDiv: {
         cursor: 'pointer',

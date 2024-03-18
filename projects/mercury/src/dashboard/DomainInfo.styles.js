@@ -1,4 +1,4 @@
-const styles = (theme) => ({
+const styles = theme => ({
     paper: {
         width: '200px',
         height: '100px',
@@ -15,7 +15,7 @@ const styles = (theme) => ({
         marginTop: 10
     },
     domainText: {
-        color: theme.palette.grey[700],
+        color: theme.palette.grey[700]
     }
 });
 

@@ -23,13 +23,7 @@ describe('MetadataViewFacetFactory', () => {
     it('should properly handle invalid facet type', () => {
         const wrapper = mount(
             <ThemeProvider theme={theme}>
-                <Facet
-                    title="Facet1"
-                    options={[]}
-                    type="unknown_type"
-                    onChange={() => {}}
-                    activeFilterValues={[]}
-                />
+                <Facet title="Facet1" options={[]} type="unknown_type" onChange={() => {}} activeFilterValues={[]} />
             </ThemeProvider>
         );
 
@@ -41,13 +35,7 @@ describe('MetadataViewFacetFactory', () => {
         const options = mockFacets('Subject').find(v => v.title === title).values;
         const wrapper = mount(
             <ThemeProvider theme={theme}>
-                <Facet
-                    title={title}
-                    options={options}
-                    type="Term"
-                    onChange={() => {}}
-                    activeFilterValues={[]}
-                />
+                <Facet title={title} options={options} type="Term" onChange={() => {}} activeFilterValues={[]} />
             </ThemeProvider>
         );
 
@@ -112,12 +100,21 @@ describe('MetadataViewFacetFactory', () => {
         expect(dateSelectionFacet.prop('title')).toEqual(title);
 
         const pad = (val, n) => `${val}`.padStart(n, '0');
-        const formatPlaceholderDate = (d: Date) => `${pad(d.getDate(), 2)}-${pad(d.getMonth() + 1, 2)}-${pad(d.getFullYear(), 4)}`;
+        const formatPlaceholderDate = (d: Date) =>
+            `${pad(d.getDate(), 2)}-${pad(d.getMonth() + 1, 2)}-${pad(d.getFullYear(), 4)}`;
 
         const facetValues = wrapper.find(DatePicker);
         expect(facetValues.length).toEqual(2);
 
-        const max = new Date(mockFacet.max.getFullYear(), mockFacet.max.getMonth(), mockFacet.max.getDate(), 23, 59, 59, 999);
+        const max = new Date(
+            mockFacet.max.getFullYear(),
+            mockFacet.max.getMonth(),
+            mockFacet.max.getDate(),
+            23,
+            59,
+            59,
+            999
+        );
 
         expect(facetValues.at(0).prop('placeholder')).toEqual(formatPlaceholderDate(mockFacet.min));
         expect(facetValues.at(1).prop('placeholder')).toEqual(formatPlaceholderDate(max));

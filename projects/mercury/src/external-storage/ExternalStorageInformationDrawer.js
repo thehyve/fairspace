@@ -11,7 +11,7 @@ import {
     IconButton,
     List,
     ListItem,
-    ListItemText,
+    ListItemText
 } from '@mui/material';
 import {withRouter} from 'react-router-dom';
 
@@ -29,7 +29,7 @@ import useExternalStorageMetadata from './UseExternalStorageMetadata';
 
 const useStyles = makeStyles(() => ({
     expandOpen: {
-        transform: 'rotate(180deg)',
+        transform: 'rotate(180deg)'
     },
     card: {
         marginTop: 10,
@@ -43,11 +43,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 type ExternalMetadataCardProperties = {
-    title: string;
-    forceExpand: boolean;
-    path: string;
-    storage: ExternalStorage;
-}
+    title: string,
+    forceExpand: boolean,
+    path: string,
+    storage: ExternalStorage
+};
 
 const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
     const {title, forceExpand, path, storage} = props;
@@ -55,18 +55,24 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
 
     const fileAPI = new FileAPI(storage.path);
     const {
-        metadata = {}, loading, error, linkedMetadataEntities = {}, linkedMetadataEntitiesLoading
+        metadata = {},
+        loading,
+        error,
+        linkedMetadataEntities = {},
+        linkedMetadataEntitiesLoading
     } = useExternalStorageMetadata(path, fileAPI);
 
-    const isDirectory = metadata.iscollection && (metadata.iscollection.toLowerCase() === 'true');
+    const isDirectory = metadata.iscollection && metadata.iscollection.toLowerCase() === 'true';
     const avatar = isDirectory ? <FolderOpenOutlined /> : <InsertDriveFileOutlined />;
 
     const [expandedManually, setExpandedManually] = useState(null); // true | false | null
-    const expanded = (expandedManually != null) ? expandedManually : forceExpand;
+    const expanded = expandedManually != null ? expandedManually : forceExpand;
     const toggleExpand = () => setExpandedManually(!expanded === forceExpand ? null : !expanded);
 
-    const renderProperty = (data: Map<string, DisplayProperty>, key: string) => (
-        data[key] && data[key].value != null && data[key].value !== '' && (
+    const renderProperty = (data: Map<string, DisplayProperty>, key: string) =>
+        data[key] &&
+        data[key].value != null &&
+        data[key].value !== '' && (
             <ListItem disableGutters key={key}>
                 <FormControl>
                     <FormLabel>{data[key].label || key}</FormLabel>
@@ -75,11 +81,11 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                     </FormGroup>
                 </FormControl>
             </ListItem>
-        )
-    );
+        );
 
-    const renderLinkProperties = (data: Map<string, DisplayProperty>, key: string) => (
-        data[key] && data[key].length > 0 && (
+    const renderLinkProperties = (data: Map<string, DisplayProperty>, key: string) =>
+        data[key] &&
+        data[key].length > 0 && (
             <ListItem disableGutters key={key}>
                 <FormControl>
                     <FormLabel>{key}</FormLabel>
@@ -92,8 +98,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                     </FormGroup>
                 </FormControl>
             </ListItem>
-        )
-    );
+        );
 
     const renderCardContent = () => {
         if (error) {
@@ -107,13 +112,11 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
         }
         return (
             <List>
-                {Object.keys(metadata).map(k => (
-                    renderProperty(metadata, k)
-                ))}
+                {Object.keys(metadata).map(k => renderProperty(metadata, k))}
                 {linkedMetadataEntitiesLoading ? (
                     <div>Loading linked metadata entities...</div>
                 ) : (
-                    Object.keys(linkedMetadataEntities).map(k => (renderLinkProperties(linkedMetadataEntities, k)))
+                    Object.keys(linkedMetadataEntities).map(k => renderLinkProperties(linkedMetadataEntities, k))
                 )}
             </List>
         );
@@ -126,7 +129,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                 title={title}
                 avatar={avatar}
                 style={{wordBreak: 'break-word'}}
-                action={(
+                action={
                     <IconButton
                         onClick={toggleExpand}
                         aria-expanded={expanded}
@@ -136,12 +139,10 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                     >
                         <ExpandMore />
                     </IconButton>
-                )}
+                }
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent style={{paddingTop: 0}}>
-                    {renderCardContent()}
-                </CardContent>
+                <CardContent style={{paddingTop: 0}}>{renderCardContent()}</CardContent>
             </Collapse>
         </Card>
     );
@@ -151,8 +152,8 @@ type ExternalStorageInformationDrawerProperties = {
     atLeastSingleRootFileExists: boolean,
     path: string,
     selected: string,
-    storage: ExternalStorage,
-}
+    storage: ExternalStorage
+};
 
 export const ExternalStorageInformationDrawer = (props: ExternalStorageInformationDrawerProperties) => {
     const {atLeastSingleRootFileExists, path, selected, storage} = props;
@@ -165,20 +166,20 @@ export const ExternalStorageInformationDrawer = (props: ExternalStorageInformati
     if (paths.length === 0 && !selected) {
         return atLeastSingleRootFileExists ? (
             <EmptyInformationDrawer message="Select a file or a folder to display its metadata" />
-        ) : <></>;
+        ) : (
+            <></>
+        );
     }
 
-    return (
-        paths.map((p, index) => (
-            <ExternalMetadataCard
-                key={p}
-                title={`Metadata for ${getPathToDisplay(p)}`}
-                forceExpand={index === paths.length - 1}
-                path={p}
-                storage={storage}
-            />
-        ))
-    );
+    return paths.map((p, index) => (
+        <ExternalMetadataCard
+            key={p}
+            title={`Metadata for ${getPathToDisplay(p)}`}
+            forceExpand={index === paths.length - 1}
+            path={p}
+            storage={storage}
+        />
+    ));
 };
 
 export default withRouter(ExternalStorageInformationDrawer);

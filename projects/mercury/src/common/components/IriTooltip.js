@@ -13,6 +13,10 @@ const styles = theme => ({
 });
 
 // This is to avoid the warning similar to: Invalid prop component supplied to ComponentName. Expected an element type that can hold a ref.
-const IriTooltip = React.forwardRef(({classes, children, ...otherProps}, ref) => (<Tooltip ref={ref} classes={classes} {...otherProps}>{children}</Tooltip>));
+const IriTooltip = React.forwardRef(({classes, children, ...otherProps}, ref) => (
+    <Tooltip ref={ref} classes={classes} {...otherProps}>
+        {children}
+    </Tooltip>
+));
 
 export default withStyles(styles)(IriTooltip);

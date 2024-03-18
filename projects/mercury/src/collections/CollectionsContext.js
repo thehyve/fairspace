@@ -14,18 +14,26 @@ export const CollectionsProvider = ({children, collectionApi = CollectionAPI}) =
     const {currentUser} = useContext(UserContext);
     const {refreshWorkspaces} = useContext(WorkspaceContext);
 
-    const {data: collections = [], error, loading, refresh} = useAsync(
-        () => collectionApi.getCollections(showDeleted),
-        [currentUser, showDeleted]
-    );
+    const {
+        data: collections = [],
+        error,
+        loading,
+        refresh
+    } = useAsync(() => collectionApi.getCollections(showDeleted), [currentUser, showDeleted]);
 
-    const addCollection = (collection: CollectionProperties) => collectionApi.addCollection(collection, vocabulary).then(refresh).then(refreshWorkspaces);
-    const updateCollection = (collection: Collection) => collectionApi.updateCollection(collection, vocabulary).then(refresh);
-    const deleteCollection = (collection: CollectionProperties) => collectionApi.deleteCollection(collection, showDeleted).then(refresh).then(refreshWorkspaces);
-    const undeleteCollection = (collection: CollectionProperties) => collectionApi.undeleteCollection(collection).then(refresh).then(refreshWorkspaces);
+    const addCollection = (collection: CollectionProperties) =>
+        collectionApi.addCollection(collection, vocabulary).then(refresh).then(refreshWorkspaces);
+    const updateCollection = (collection: Collection) =>
+        collectionApi.updateCollection(collection, vocabulary).then(refresh);
+    const deleteCollection = (collection: CollectionProperties) =>
+        collectionApi.deleteCollection(collection, showDeleted).then(refresh).then(refreshWorkspaces);
+    const undeleteCollection = (collection: CollectionProperties) =>
+        collectionApi.undeleteCollection(collection).then(refresh).then(refreshWorkspaces);
     const unpublish = (collection: CollectionProperties) => collectionApi.unpublish(collection).then(refresh);
-    const renameCollection = (name: string, target: string) => collectionApi.renameCollection(name, target).then(refresh);
-    const setPermission = (name: string, principal: string, access: AccessLevel) => collectionApi.setPermission(name, principal, access).then(refresh);
+    const renameCollection = (name: string, target: string) =>
+        collectionApi.renameCollection(name, target).then(refresh);
+    const setPermission = (name: string, principal: string, access: AccessLevel) =>
+        collectionApi.setPermission(name, principal, access).then(refresh);
     const setAccessMode = (name: string, mode: AccessMode) => collectionApi.setAccessMode(name, mode).then(refresh);
     const setStatus = (name: string, status: Status) => collectionApi.setStatus(name, status).then(refresh);
     const setOwnedBy = (name: string, owner: string) => collectionApi.setOwnedBy(name, owner).then(refresh);

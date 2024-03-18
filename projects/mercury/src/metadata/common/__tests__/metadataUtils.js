@@ -25,7 +25,9 @@ describe('Metadata Utils', () => {
         });
 
         it('handles local IRIs with query and hash', () => {
-            expect(linkLabel('http://localhost/iri/some-identifier/extra?query#hash')).toEqual('some-identifier/extra?query#hash');
+            expect(linkLabel('http://localhost/iri/some-identifier/extra?query#hash')).toEqual(
+                'some-identifier/extra?query#hash'
+            );
         });
 
         it('handles local collections', () => {
@@ -56,25 +58,45 @@ describe('Metadata Utils', () => {
         });
 
         it('should not fail if json-ld is not properly expanded', () => {
-            expect(getLabel({
-                '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: 'My label'
-            }, true)).toEqual('name');
+            expect(
+                getLabel(
+                    {
+                        '@id': 'http://test.com/name',
+                        [constants.LABEL_URI]: 'My label'
+                    },
+                    true
+                )
+            ).toEqual('name');
 
-            expect(getLabel({
-                '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: {'@value': 'My label'}
-            }, true)).toEqual('name');
+            expect(
+                getLabel(
+                    {
+                        '@id': 'http://test.com/name',
+                        [constants.LABEL_URI]: {'@value': 'My label'}
+                    },
+                    true
+                )
+            ).toEqual('name');
 
-            expect(getLabel({
-                '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: ['My label']
-            }, true)).toEqual('name');
+            expect(
+                getLabel(
+                    {
+                        '@id': 'http://test.com/name',
+                        [constants.LABEL_URI]: ['My label']
+                    },
+                    true
+                )
+            ).toEqual('name');
 
-            expect(getLabel({
-                '@id': 'http://test.com/name',
-                [constants.LABEL_URI]: []
-            }, true)).toEqual('name');
+            expect(
+                getLabel(
+                    {
+                        '@id': 'http://test.com/name',
+                        [constants.LABEL_URI]: []
+                    },
+                    true
+                )
+            ).toEqual('name');
         });
 
         it('should keep external urls intact if shortenExternalUris is set to false', () => {
@@ -90,13 +112,13 @@ describe('Metadata Utils', () => {
 
     describe('relativeLink', () => {
         it('should strip the base URL', () => {
-            expect(relativeLink('http://example.com:1234/some/path?query=value#bookmark'))
-                .toEqual('/some/path?query=value#bookmark');
+            expect(relativeLink('http://example.com:1234/some/path?query=value#bookmark')).toEqual(
+                '/some/path?query=value#bookmark'
+            );
         });
 
         it('should also handle simple URLs', () => {
-            expect(relativeLink('http://example.com'))
-                .toEqual('example.com');
+            expect(relativeLink('http://example.com')).toEqual('example.com');
         });
     });
 
@@ -153,25 +175,36 @@ describe('Metadata Utils', () => {
 
     describe('propertiesToShow', () => {
         it('should hide the type of an entity', () => {
-            const properties = [{
-                key: '@type',
-                values: [{id: 'https://fairspace.nl/ontology#Collection', comment: 'A specific collection in Fairspace.'}]
-            }, {
-                key: 'https://fairspace.nl/ontology#otherProp',
-                values: [{id: 'https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd'}]
-            }, {
-                key: 'https://fairspace.nl/ontology#additionalDate',
-                values: [{value: '2019-03-18T13:06:22.62Z'}]
-            }];
+            const properties = [
+                {
+                    key: '@type',
+                    values: [
+                        {
+                            id: 'https://fairspace.nl/ontology#Collection',
+                            comment: 'A specific collection in Fairspace.'
+                        }
+                    ]
+                },
+                {
+                    key: 'https://fairspace.nl/ontology#otherProp',
+                    values: [{id: 'https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd'}]
+                },
+                {
+                    key: 'https://fairspace.nl/ontology#additionalDate',
+                    values: [{value: '2019-03-18T13:06:22.62Z'}]
+                }
+            ];
 
             const expected = [
                 {
                     key: 'https://fairspace.nl/ontology#otherProp',
                     values: [{id: 'https://fairspace.nl/iri/6ae1ef15-ae67-4157-8fe2-79112f5a46fd'}]
-                }, {
+                },
+                {
                     key: 'https://fairspace.nl/ontology#additionalDate',
                     values: [{value: '2019-03-18T13:06:22.62Z'}]
-                }];
+                }
+            ];
 
             expect(propertiesToShow(properties)).toEqual(expected);
         });
@@ -186,7 +219,9 @@ describe('Metadata Utils', () => {
         });
 
         it('handles urls with query and fragment', () => {
-            expect(url2iri('scheme://example.com/some/path/?query#some-fragment')).toEqual('http://example.com/some/path/?query#some-fragment');
+            expect(url2iri('scheme://example.com/some/path/?query#some-fragment')).toEqual(
+                'http://example.com/some/path/?query#some-fragment'
+            );
         });
 
         it('removes empty fragment or query strings', () => {
@@ -200,16 +235,18 @@ describe('Metadata Utils', () => {
 
     // TODO: Could'nt fix this test!
     describe('getTypeInfo', () => {
-        const vocabulary = [{
-            [constants.SHACL_TARGET_CLASS]: [{'@id': 'http://example.com/123'}],
-            [constants.SHACL_NAME]: [{'@value': 'Name'}],
-            [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
-        }];
+        const vocabulary = [
+            {
+                [constants.SHACL_TARGET_CLASS]: [{'@id': 'http://example.com/123'}],
+                [constants.SHACL_NAME]: [{'@value': 'Name'}],
+                [constants.SHACL_DESCRIPTION]: [{'@value': 'Description'}]
+            }
+        ];
 
         it('retrieves information on the type of the entity', () => {
             const metadata = {
                 '@type': ['http://example.com/123'],
-                [constants.SHACL_TARGET_CLASS]: [{'@id': 'http://example.com/123'}],
+                [constants.SHACL_TARGET_CLASS]: [{'@id': 'http://example.com/123'}]
             };
 
             expect(getTypeInfo(metadata, vocabulary)).toEqual({
@@ -254,11 +291,10 @@ describe('Metadata Utils', () => {
             ];
             const allErrors = [...errorsSub1, ...errorsSub2];
 
-            expect(partitionErrors(allErrors, 'subject1'))
-                .toEqual({
-                    entityErrors: errorsSub1,
-                    otherErrors: errorsSub2
-                });
+            expect(partitionErrors(allErrors, 'subject1')).toEqual({
+                entityErrors: errorsSub1,
+                otherErrors: errorsSub2
+            });
         });
     });
 
@@ -293,7 +329,8 @@ describe('Metadata Utils', () => {
 
     describe('hasValue', () => {
         it('should return false if values list is empty', () => expect(hasValue([])).toBe(false));
-        it('should return false if only an empty string is is present', () => expect(hasValue([{value: ''}])).toBe(false));
+        it('should return false if only an empty string is is present', () =>
+            expect(hasValue([{value: ''}])).toBe(false));
         it('should return true if an id is present', () => expect(hasValue([{id: 'http://a'}])).toBe(true));
         it('should return true if a non-empty value is present', () => expect(hasValue([{value: 'label'}])).toBe(true));
     });
@@ -332,7 +369,9 @@ describe('Metadata Utils', () => {
         ];
         it('should shorten the iri if a namespace exists', () => {
             expect(getNamespacedIri('http://prefix/blabla', namespaces)).toEqual('pr:blabla');
-            expect(getNamespacedIri('http://prefix/blabla/additional/paths#test', namespaces)).toEqual('pr:blabla/additional/paths#test');
+            expect(getNamespacedIri('http://prefix/blabla/additional/paths#test', namespaces)).toEqual(
+                'pr:blabla/additional/paths#test'
+            );
             expect(getNamespacedIri('http://prefix/', namespaces)).toEqual('pr:');
         });
         it('should return the iri itself if no namespace is found', () => {

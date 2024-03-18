@@ -6,9 +6,15 @@ import useAsync from '../common/hooks/UseAsync';
 const WorkspaceContext = React.createContext({});
 
 export const WorkspacesProvider = ({children, workspacesAPI = WorkspacesAPI}) => {
-    const {data: workspaces = [], error: workspacesError, loading: workspacesLoading, refresh: refreshWorkspaces} = useAsync(workspacesAPI.getWorkspaces);
+    const {
+        data: workspaces = [],
+        error: workspacesError,
+        loading: workspacesLoading,
+        refresh: refreshWorkspaces
+    } = useAsync(workspacesAPI.getWorkspaces);
     const createWorkspace = (workspace: Workspace) => workspacesAPI.createWorkspace(workspace).then(refreshWorkspaces);
-    const deleteWorkspace = (workspace: Workspace) => workspacesAPI.deleteWorkspace(workspace.iri).then(refreshWorkspaces);
+    const deleteWorkspace = (workspace: Workspace) =>
+        workspacesAPI.deleteWorkspace(workspace.iri).then(refreshWorkspaces);
 
     return (
         <WorkspaceContext.Provider

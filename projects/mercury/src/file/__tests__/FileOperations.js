@@ -32,20 +32,23 @@ describe('FileOperations', () => {
         copyPaths: () => new Promise(resolve => setTimeout(resolve, 500))
     };
 
-    const renderFileOperations = (clipboard, fileActions, openedPath) => shallow(<FileOperations
-        classes={{}}
-        paste={() => Promise.resolve()}
-        files={[{filename: 'a'}]}
-        selectedPaths={['a']}
-        clipboard={clipboard}
-        fetchFilesIfNeeded={() => {}}
-        getDownloadLink={() => {}}
-        refreshFiles={refreshFiles}
-        clearSelection={clearSelection}
-        fileActions={fileActions}
-        openedPath={openedPath}
-        isWritingEnabled
-    />);
+    const renderFileOperations = (clipboard, fileActions, openedPath) =>
+        shallow(
+            <FileOperations
+                classes={{}}
+                paste={() => Promise.resolve()}
+                files={[{filename: 'a'}]}
+                selectedPaths={['a']}
+                clipboard={clipboard}
+                fetchFilesIfNeeded={() => {}}
+                getDownloadLink={() => {}}
+                refreshFiles={refreshFiles}
+                clearSelection={clearSelection}
+                fileActions={fileActions}
+                openedPath={openedPath}
+                isWritingEnabled
+            />
+        );
 
     beforeEach(() => {
         clearSelection.mockReset();
@@ -59,23 +62,22 @@ describe('FileOperations', () => {
     it('should disable all buttons on when file operation is not finished yet', () => {
         clickHandler('Paste')({stopPropagation: () => {}});
 
-        wrapper.find(IconButton)
-            .forEach(b => {
-                expect(b.props().disabled).toBe(true);
-            });
+        wrapper.find(IconButton).forEach(b => {
+            expect(b.props().disabled).toBe(true);
+        });
     });
 
     // eslint-disable-next-line arrow-body-style
     it('should enable all buttons after successful file operation', () => {
-        return clickHandler('Paste')({stopPropagation: () => {}})
-            .then(() => {
-                wrapper.find(IconButton)
-                    .not('[download]')
-                    .not('[aria-label="Show history"]')
-                    .forEach(b => {
-                        expect(b.props().disabled).toBe(false);
-                    });
-            });
+        return clickHandler('Paste')({stopPropagation: () => {}}).then(() => {
+            wrapper
+                .find(IconButton)
+                .not('[download]')
+                .not('[aria-label="Show history"]')
+                .forEach(b => {
+                    expect(b.props().disabled).toBe(false);
+                });
+        });
     });
 
     async function performOperation(operation) {
@@ -155,81 +157,93 @@ describe('FileOperations', () => {
             length: () => 0
         };
         it('should not be shown if not in showDeleted mode', () => {
-            const render = (fileActions) => shallow(<FileOperations
-                classes={{}}
-                paste={() => Promise.resolve()}
-                files={[{filename: 'a'}]}
-                selectedPaths={[]}
-                fetchFilesIfNeeded={() => {}}
-                getDownloadLink={() => {}}
-                refreshFiles={refreshFiles}
-                clearSelection={clearSelection}
-                fileActions={fileActions}
-                openedPath={{}}
-                isWritingEnabled
-                clipboard={emptyClipboard}
-                showDeleted={false}
-            />);
+            const render = fileActions =>
+                shallow(
+                    <FileOperations
+                        classes={{}}
+                        paste={() => Promise.resolve()}
+                        files={[{filename: 'a'}]}
+                        selectedPaths={[]}
+                        fetchFilesIfNeeded={() => {}}
+                        getDownloadLink={() => {}}
+                        refreshFiles={refreshFiles}
+                        clearSelection={clearSelection}
+                        fileActions={fileActions}
+                        openedPath={{}}
+                        isWritingEnabled
+                        clipboard={emptyClipboard}
+                        showDeleted={false}
+                    />
+                );
 
             wrapper = render(fileActionsMock);
             expect(wrapper.find('[aria-label="Undelete"]')).toEqual({});
         });
         it('should be disabled if no file selected', () => {
-            const render = (fileActions) => shallow(<FileOperations
-                classes={{}}
-                paste={() => Promise.resolve()}
-                files={[{filename: 'a'}]}
-                selectedPaths={[]}
-                fetchFilesIfNeeded={() => {}}
-                getDownloadLink={() => {}}
-                refreshFiles={refreshFiles}
-                clearSelection={clearSelection}
-                fileActions={fileActions}
-                openedPath={{}}
-                isWritingEnabled
-                clipboard={emptyClipboard}
-                showDeleted
-            />);
+            const render = fileActions =>
+                shallow(
+                    <FileOperations
+                        classes={{}}
+                        paste={() => Promise.resolve()}
+                        files={[{filename: 'a'}]}
+                        selectedPaths={[]}
+                        fetchFilesIfNeeded={() => {}}
+                        getDownloadLink={() => {}}
+                        refreshFiles={refreshFiles}
+                        clearSelection={clearSelection}
+                        fileActions={fileActions}
+                        openedPath={{}}
+                        isWritingEnabled
+                        clipboard={emptyClipboard}
+                        showDeleted
+                    />
+                );
 
             wrapper = render(fileActionsMock);
             expect(wrapper.find('[aria-label="Undelete"]').prop('disabled')).toEqual(true);
         });
         it('should be disabled if non-deleted file selected', () => {
-            const render = (fileActions) => shallow(<FileOperations
-                classes={{}}
-                paste={() => Promise.resolve()}
-                files={[{filename: 'a'}]}
-                selectedPaths={['a']}
-                fetchFilesIfNeeded={() => {}}
-                getDownloadLink={() => {}}
-                refreshFiles={refreshFiles}
-                clearSelection={clearSelection}
-                fileActions={fileActions}
-                openedPath={{}}
-                isWritingEnabled
-                clipboard={emptyClipboard}
-                showDeleted
-            />);
+            const render = fileActions =>
+                shallow(
+                    <FileOperations
+                        classes={{}}
+                        paste={() => Promise.resolve()}
+                        files={[{filename: 'a'}]}
+                        selectedPaths={['a']}
+                        fetchFilesIfNeeded={() => {}}
+                        getDownloadLink={() => {}}
+                        refreshFiles={refreshFiles}
+                        clearSelection={clearSelection}
+                        fileActions={fileActions}
+                        openedPath={{}}
+                        isWritingEnabled
+                        clipboard={emptyClipboard}
+                        showDeleted
+                    />
+                );
 
             wrapper = render(fileActionsMock);
             expect(wrapper.find('[aria-label="Undelete"]').prop('disabled')).toEqual(true);
         });
         it('should be enabled if deleted file selected', () => {
-            const render = (fileActions) => shallow(<FileOperations
-                classes={{}}
-                paste={() => Promise.resolve()}
-                files={[{filename: 'a', dateDeleted: '08-06-2020'}]}
-                selectedPaths={['a']}
-                fetchFilesIfNeeded={() => {}}
-                getDownloadLink={() => {}}
-                refreshFiles={refreshFiles}
-                clearSelection={clearSelection}
-                fileActions={fileActions}
-                openedPath={{}}
-                isWritingEnabled
-                clipboard={emptyClipboard}
-                showDeleted
-            />);
+            const render = fileActions =>
+                shallow(
+                    <FileOperations
+                        classes={{}}
+                        paste={() => Promise.resolve()}
+                        files={[{filename: 'a', dateDeleted: '08-06-2020'}]}
+                        selectedPaths={['a']}
+                        fetchFilesIfNeeded={() => {}}
+                        getDownloadLink={() => {}}
+                        refreshFiles={refreshFiles}
+                        clearSelection={clearSelection}
+                        fileActions={fileActions}
+                        openedPath={{}}
+                        isWritingEnabled
+                        clipboard={emptyClipboard}
+                        showDeleted
+                    />
+                );
 
             wrapper = render(fileActionsMock);
             expect(wrapper.find('[aria-label="Undelete"]').prop('disabled')).toEqual(false);
@@ -244,39 +258,45 @@ describe('FileOperations', () => {
             length: () => 0
         };
         it('should be disabled if no file selected', () => {
-            const render = (fileActions) => shallow(<FileOperations
-                classes={{}}
-                paste={() => Promise.resolve()}
-                files={[{filename: 'a', type: 'file'}]}
-                selectedPaths={[]}
-                fetchFilesIfNeeded={() => {}}
-                getDownloadLink={() => {}}
-                refreshFiles={refreshFiles}
-                clearSelection={clearSelection}
-                fileActions={fileActions}
-                openedPath={{}}
-                isWritingEnabled
-                clipboard={emptyClipboard}
-            />);
+            const render = fileActions =>
+                shallow(
+                    <FileOperations
+                        classes={{}}
+                        paste={() => Promise.resolve()}
+                        files={[{filename: 'a', type: 'file'}]}
+                        selectedPaths={[]}
+                        fetchFilesIfNeeded={() => {}}
+                        getDownloadLink={() => {}}
+                        refreshFiles={refreshFiles}
+                        clearSelection={clearSelection}
+                        fileActions={fileActions}
+                        openedPath={{}}
+                        isWritingEnabled
+                        clipboard={emptyClipboard}
+                    />
+                );
 
             wrapper = render(fileActionsMock);
             expect(wrapper.find('[aria-label="Show history"]').prop('disabled')).toEqual(true);
         });
         it('should be enabled if one file selected', () => {
-            const render = (fileActions) => shallow(<FileOperations
-                classes={{}}
-                paste={() => Promise.resolve()}
-                files={[{filename: 'a', type: 'file'}]}
-                selectedPaths={['a']}
-                fetchFilesIfNeeded={() => {}}
-                getDownloadLink={() => {}}
-                refreshFiles={refreshFiles}
-                clearSelection={clearSelection}
-                fileActions={fileActions}
-                openedPath={{}}
-                isWritingEnabled
-                clipboard={emptyClipboard}
-            />);
+            const render = fileActions =>
+                shallow(
+                    <FileOperations
+                        classes={{}}
+                        paste={() => Promise.resolve()}
+                        files={[{filename: 'a', type: 'file'}]}
+                        selectedPaths={['a']}
+                        fetchFilesIfNeeded={() => {}}
+                        getDownloadLink={() => {}}
+                        refreshFiles={refreshFiles}
+                        clearSelection={clearSelection}
+                        fileActions={fileActions}
+                        openedPath={{}}
+                        isWritingEnabled
+                        clipboard={emptyClipboard}
+                    />
+                );
 
             wrapper = render(fileActionsMock);
             expect(wrapper.find('[aria-label="Show history"]').prop('disabled')).toEqual(false);

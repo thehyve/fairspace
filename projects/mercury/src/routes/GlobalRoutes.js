@@ -18,15 +18,9 @@ const GlobalRoutes = () => (
             }}
         />
 
-        <Route
-            path="/logout"
-            render={() => logout()}
-        />
+        <Route path="/logout" render={() => logout()} />
 
-        <Route
-            path="/"
-            component={WorkspaceLayout}
-        />
+        <Route path="/" component={WorkspaceLayout} />
 
         <Redirect to="/workspaces" />
     </Switch>

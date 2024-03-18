@@ -8,7 +8,7 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
         setLocalValue(value);
     }, [value]);
 
-    const handleChange = (e) => {
+    const handleChange = e => {
         setLocalValue(e.target.value);
         if (onChange) {
             onChange({value: e.target.value});

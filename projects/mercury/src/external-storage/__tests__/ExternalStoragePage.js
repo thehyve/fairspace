@@ -64,7 +64,7 @@ describe('ExternalStoragePage', () => {
     it('renders a file browser with a preselected file', () => {
         const location = {
             pathname: '/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0',
-            search: '?selection=%2Fcollection%202021-05-27_13_39-2%2Fdir_0%2Fcoffee_139.jpg',
+            search: '?selection=%2Fcollection%202021-05-27_13_39-2%2Fdir_0%2Fcoffee_139.jpg'
         };
         act(() => {
             wrapper = shallowRender('/external-storages/xyz/collection 2021-05-27_13_39-2/dir_0', 'xyz', location);

@@ -9,15 +9,15 @@ export const LinkedDataIdentifierField = props => (
         required={props.required}
         style={{
             width: '100%',
-            margin: 4,
+            margin: 4
         }}
     >
-        <FormLabel component="legend">
-            Identifier
-        </FormLabel>
+        <FormLabel component="legend">Identifier</FormLabel>
         <IriValueContainer {...props} />
         <FormHelperText>
-            {props.required ? 'Enter a valid identifier for this entity' : 'If not provided, the identifier will be inferred from the other properties'}
+            {props.required
+                ? 'Enter a valid identifier for this entity'
+                : 'If not provided, the identifier will be inferred from the other properties'}
         </FormHelperText>
     </FormControl>
 );

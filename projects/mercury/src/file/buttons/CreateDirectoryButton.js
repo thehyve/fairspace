@@ -8,23 +8,20 @@ const CreateDirectoryButton = ({children, disabled, onCreate}) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
-    const nameControl = useFormField('', value => (
-        !!value && isValidFileName(value)
-    ));
-    const openDialog = (e) => {
+    const nameControl = useFormField('', value => !!value && isValidFileName(value));
+    const openDialog = e => {
         if (e) e.stopPropagation();
         nameControl.setValue('');
         setOpened(true);
     };
 
-    const closeDialog = (e) => {
+    const closeDialog = e => {
         if (e) e.stopPropagation();
         setOpened(false);
     };
 
     const createDirectory = () => {
-        onCreate(nameControl.value)
-            .then(shouldClose => isMounted() && shouldClose && closeDialog());
+        onCreate(nameControl.value).then(shouldClose => isMounted() && shouldClose && closeDialog());
     };
 
     const validateAndCreate = () => nameControl.valid && createDirectory();
@@ -37,7 +34,7 @@ const CreateDirectoryButton = ({children, disabled, onCreate}) => {
             {opened ? (
                 <FileNameDialog
                     onClose={closeDialog}
-                    onSubmit={(e) => {
+                    onSubmit={e => {
                         e.preventDefault();
                         e.stopPropagation();
                         validateAndCreate();

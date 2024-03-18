@@ -1,11 +1,16 @@
 import {
     compareBy,
     comparePrimitives,
-    comparing, first,
+    comparing,
+    first,
     flattenShallow,
     formatDateTime,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject
+    joinWithSeparator,
+    stableSort,
+    camelCaseToWords,
+    groupBy,
+    isEmptyObject
 } from '../genericUtils';
 
 describe('array Utils', () => {
@@ -19,16 +24,31 @@ describe('array Utils', () => {
         });
 
         it('goes only one level deep', () => {
-            expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([[1, 2, 3], [4, 5]]);
+            expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([
+                [1, 2, 3],
+                [4, 5]
+            ]);
         });
     });
 
     describe('groupBy', () => {
         it('group an array by key', () => {
-            expect(groupBy(
-                [{name: 'x', type: 'a'}, {name: 'y', type: 'a'}, {name: 'z', type: 'b'}],
-                'type'
-            )).toEqual({a: [{name: 'x', type: 'a'}, {name: 'y', type: 'a'}], b: [{name: 'z', type: 'b'}]});
+            expect(
+                groupBy(
+                    [
+                        {name: 'x', type: 'a'},
+                        {name: 'y', type: 'a'},
+                        {name: 'z', type: 'b'}
+                    ],
+                    'type'
+                )
+            ).toEqual({
+                a: [
+                    {name: 'x', type: 'a'},
+                    {name: 'y', type: 'a'}
+                ],
+                b: [{name: 'z', type: 'b'}]
+            });
         });
     });
 });
@@ -87,7 +107,7 @@ describe('isNonEmptyValue', () => {
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [undefined, null, '', NaN, "", ``]; // eslint-disable-line quotes
+        const values = [undefined, null, '', NaN, '', ``]; // eslint-disable-line quotes
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
@@ -148,9 +168,7 @@ describe('formatDateTime', () => {
     });
 
     it('should return the given value for invalid dates', () => {
-        const invalidDates = [
-            '2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN
-        ];
+        const invalidDates = ['2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN];
 
         invalidDates.forEach(date => {
             expect(formatDateTime(date)).toEqual(date);

@@ -22,18 +22,19 @@ export const flattenShallow = array => [].concat(...array);
  * @param separator
  * @returns {*[]}
  */
-export const joinWithSeparator = (items = [], separator) => items.reduce((prev, curr) => {
-    if (!prev || prev.length === 0) return [curr];
-    if (separator) return [...prev, separator, curr];
-    return [...prev, curr];
-}, []);
+export const joinWithSeparator = (items = [], separator) =>
+    items.reduce((prev, curr) => {
+        if (!prev || prev.length === 0) return [curr];
+        if (separator) return [...prev, separator, curr];
+        return [...prev, curr];
+    }, []);
 
 /**
  * Gets the first element of array if exists.
  * @param array
  * @returns The first element of array or undefined.
  */
-export const first = array => ((array && array.length) ? array[0] : undefined);
+export const first = array => (array && array.length ? array[0] : undefined);
 
 /**
  * Groups array of objects by property
@@ -41,11 +42,12 @@ export const first = array => ((array && array.length) ? array[0] : undefined);
  * @param key
  * @returns Map with property as a group key and list of objects in the group as a value
  */
-export const groupBy = (array, key) => array.reduce((objectsMap, obj) => {
-    const value = obj[key];
-    objectsMap[value] = (objectsMap[value] || []).concat(obj);
-    return objectsMap;
-}, {});
+export const groupBy = (array, key) =>
+    array.reduce((objectsMap, obj) => {
+        const value = obj[key];
+        objectsMap[value] = (objectsMap[value] || []).concat(obj);
+        return objectsMap;
+    }, {});
 
 //* *********************************
 //* COMPARISION
@@ -81,7 +83,7 @@ export function comparePrimitives(x, y) {
     return 0;
 }
 export function compareBy(valueExtractor, ascending = true) {
-    const transform = (typeof valueExtractor === 'function') ? valueExtractor : x => x[valueExtractor];
+    const transform = typeof valueExtractor === 'function' ? valueExtractor : x => x[valueExtractor];
     return (x, y) => (ascending ? 1 : -1) * comparePrimitives(transform(x), transform(y));
 }
 
@@ -97,17 +99,19 @@ export function comparing(...comparators) {
  * @param ascending
  * @returns {*}
  */
-export const stableSort = (array, cmp, ascending = true) => array.map((el, index) => [el, index])
-    .sort((a, b) => (cmp(a[0], b[0]) || (a[1] - b[1])) * (ascending ? 1 : -1))
-    .map(el => el[0]);
+export const stableSort = (array, cmp, ascending = true) =>
+    array
+        .map((el, index) => [el, index])
+        .sort((a, b) => (cmp(a[0], b[0]) || a[1] - b[1]) * (ascending ? 1 : -1))
+        .map(el => el[0]);
 
 /**
  * Returns true if the given value is truthy or zero or false
  * @param value
  */
-export const isNonEmptyValue = (value) => Boolean(value) || value === 0 || value === false;
+export const isNonEmptyValue = value => Boolean(value) || value === 0 || value === false;
 
-export const isEmptyObject = (obj) => !obj || Object.keys(obj).length === 0;
+export const isEmptyObject = obj => !obj || Object.keys(obj).length === 0;
 
 let defaultLocale;
 try {
@@ -133,7 +137,7 @@ const timeFormatter = new Intl.DateTimeFormat(defaultLocale, {
  * @param {string | number | Date} value - the date to be formatted
  * @return {string} the formatted date
  */
-export const formatDate = (value) => {
+export const formatDate = value => {
     const date = new Date(value);
     if (!value || !isValid(date)) {
         return value;
@@ -148,14 +152,14 @@ export const formatDate = (value) => {
  * @param {string | number | Date} value - the date to be formatted
  * @return {string} the formatted date
  */
-export const formatDateTime = (value) => {
+export const formatDateTime = value => {
     const date = new Date(value);
     if (!value || !isValid(date)) {
         return value;
     }
 
     const today = new Date();
-    const isToday = (today.toDateString() === date.toDateString());
+    const isToday = today.toDateString() === date.toDateString();
     return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
 
@@ -166,7 +170,9 @@ export const formatDateTime = (value) => {
  * @param separator whitespace by default
  * @returns {string} separated string
  */
-export const camelCaseToWords = (value, separator = ' ') => ((typeof value !== 'string')
-    ? '' : value.replace(/([a-z0-9])([A-Z])/g, `$1${separator}$2`)
-        .replace(/.*/, (v) => v.charAt(0) + v.slice(1).toLowerCase())
-);
+export const camelCaseToWords = (value, separator = ' ') =>
+    typeof value !== 'string'
+        ? ''
+        : value
+              .replace(/([a-z0-9])([A-Z])/g, `$1${separator}$2`)
+              .replace(/.*/, v => v.charAt(0) + v.slice(1).toLowerCase());

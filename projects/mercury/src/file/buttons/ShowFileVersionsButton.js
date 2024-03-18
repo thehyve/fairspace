@@ -6,19 +6,18 @@ const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert, isW
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
-    const openDialog = (e) => {
+    const openDialog = e => {
         if (e) e.stopPropagation();
         setOpened(true);
     };
 
-    const closeDialog = (e) => {
+    const closeDialog = e => {
         if (e) e.stopPropagation();
         setOpened(false);
     };
 
-    const revertVersion = (selectedVersion) => {
-        onRevert(selectedVersion)
-            .then(shouldClose => isMounted() && shouldClose && closeDialog());
+    const revertVersion = selectedVersion => {
+        onRevert(selectedVersion).then(shouldClose => isMounted() && shouldClose && closeDialog());
     };
 
     return (

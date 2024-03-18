@@ -21,19 +21,19 @@ const includeDetails = {...defaultOptions, details: true};
 export const ANALYSIS_EXPORT_SUBPATH = '/analysis-export';
 
 export type File = {
-    iri: string;
-    filename: string;
-    basename: string;
-    lastmod: string;
-    version?: number;
-    size: number;
-    type: string;
-    dateCreated: string;
-    dateModified?: string;
-    dateDeleted?: string;
-    access?: string;
-    metadataLinks?: string[];
-}
+    iri: string,
+    filename: string,
+    basename: string,
+    lastmod: string,
+    version?: number,
+    size: number,
+    type: string,
+    dateCreated: string,
+    dateModified?: string,
+    dateDeleted?: string,
+    access?: string,
+    metadataLinks?: string[]
+};
 
 class FileAPI {
     constructor(remoteURL = '/api/webdav') {
@@ -55,7 +55,8 @@ class FileAPI {
         if (includeMetadataLinks) {
             options.headers = {...options.headers, 'With-Metadata-Links': true};
         }
-        return this.client().stat(path, options)
+        return this.client()
+            .stat(path, options)
             .then(result => this.mapToFile(result.data));
     }
 
@@ -66,7 +67,8 @@ class FileAPI {
         };
         options.headers = {...options.headers, Version: version};
 
-        return this.client().stat(path, options)
+        return this.client()
+            .stat(path, options)
             .then(result => this.mapToFile(result.data));
     }
 
@@ -81,10 +83,9 @@ class FileAPI {
         if (showDeleted) {
             options.headers = {...options.headers, 'Show-Deleted': 'on'};
         }
-        return this.client().getDirectoryContents(path, options)
-            .then(result => result.data
-                .sort(comparing(compareBy('type'), compareBy('filename')))
-                .map(this.mapToFile));
+        return this.client()
+            .getDirectoryContents(path, options)
+            .then(result => result.data.sort(comparing(compareBy('type'), compareBy('filename'))).map(this.mapToFile));
     }
 
     /**
@@ -94,17 +95,24 @@ class FileAPI {
      * @returns {*}
      */
     createDirectory(path, options = defaultOptions) {
-        return this.client().createDirectory(path, options)
+        return this.client()
+            .createDirectory(path, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 400:
-                            throw new Error('Unable to create the given directory. \nPlease check that the name does not contain special characters.');
+                            throw new Error(
+                                'Unable to create the given directory. \nPlease check that the name does not contain special characters.'
+                            );
                         case 403:
-                            throw new Error('You do not have authorization to create a directory \nin this collection.');
+                            throw new Error(
+                                'You do not have authorization to create a directory \nin this collection.'
+                            );
                         case 405:
-                            throw new Error('A directory or file with this name already exists. \nPlease choose another name');
+                            throw new Error(
+                                'A directory or file with this name already exists. \nPlease choose another name'
+                            );
                     }
                 }
 
@@ -130,7 +138,8 @@ class FileAPI {
             options.headers = {...options.headers, 'Delete-Existing-Blob': true};
         }
 
-        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
+        return this.client()
+            .putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
@@ -209,7 +218,8 @@ class FileAPI {
         }
         if (!path) return Promise.reject(Error('No path specified for deletion'));
 
-        return this.client().deleteFile(path, options)
+        return this.client()
+            .deleteFile(path, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
@@ -231,14 +241,13 @@ class FileAPI {
     deleteAllInDirectory(path) {
         if (!path) return Promise.reject(Error('No path specified for deletion'));
 
-        return this.post(path, {action: 'delete_all_in_directory'})
-            .catch(e => {
-                if (e && e.response) {
-                    throw new Error('Could not delete content of a directory.');
-                }
+        return this.post(path, {action: 'delete_all_in_directory'}).catch(e => {
+            if (e && e.response) {
+                throw new Error('Could not delete content of a directory.');
+            }
 
-                return Promise.reject(e);
-            });
+            return Promise.reject(e);
+        });
     }
 
     /**
@@ -248,20 +257,18 @@ class FileAPI {
      */
     undelete(path) {
         if (!path) return Promise.reject(new Error('No path specified for undeleting'));
-        return this.post(path, {action: 'undelete'}, true)
-            .catch(e => {
-                console.error('Could not undelete file or directory.', e);
-                throw new Error('Could not undelete file or directory.');
-            });
+        return this.post(path, {action: 'undelete'}, true).catch(e => {
+            console.error('Could not undelete file or directory.', e);
+            throw new Error('Could not undelete file or directory.');
+        });
     }
 
     revertToVersion(path, version) {
         if (!path) return Promise.reject(Error('No path specified for version reverting'));
 
-        return this.post(path, {action: 'revert', version})
-            .catch(() => {
-                throw new Error('Could not revert a file to a previous version.');
-            });
+        return this.post(path, {action: 'revert', version}).catch(() => {
+            throw new Error('Could not revert a file to a previous version.');
+        });
     }
 
     /**
@@ -284,13 +291,16 @@ class FileAPI {
 
         // We have to specify the destination ourselves, as the client() adds the fullpath
         // to the
-        return this.client().moveFile(source, destination, defaultOptions)
+        return this.client()
+            .moveFile(source, destination, defaultOptions)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 400:
-                            throw new Error('Could not move one or more files. Possibly the filename contains special characters.');
+                            throw new Error(
+                                'Could not move one or more files. Possibly the filename contains special characters.'
+                            );
                         case 403:
                             throw new Error('Could not move one or more files. Only admins can move files.');
                         case 409:
@@ -317,15 +327,20 @@ class FileAPI {
             return Promise.reject(Error('No destination specified to copy to'));
         }
 
-        return this.client().copyFile(source, destination, defaultOptions)
+        return this.client()
+            .copyFile(source, destination, defaultOptions)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error('Could not copy one or more files. \nDo you have write permission to the destination collection?');
+                            throw new Error(
+                                'Could not copy one or more files. \nDo you have write permission to the destination collection?'
+                            );
                         case 409:
-                            throw new Error('Could not copy one or more files. \nThe destination can not be copied to.');
+                            throw new Error(
+                                'Could not copy one or more files. \nThe destination can not be copied to.'
+                            );
                         case 412:
                             throw new Error('Could not copy one or more files. \nThe destination file already exists.');
                     }
@@ -342,8 +357,9 @@ class FileAPI {
      * @returns {*}
      */
     movePaths(filePaths, destinationDir) {
-        return this.uniqueDestinationPaths(filePaths, destinationDir)
-            .then(mapping => Promise.all(mapping.map(([src, dst]) => this.move(src, dst))));
+        return this.uniqueDestinationPaths(filePaths, destinationDir).then(mapping =>
+            Promise.all(mapping.map(([src, dst]) => this.move(src, dst)))
+        );
     }
 
     /**
@@ -360,9 +376,13 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error('Could not copy one or more files. \nDo you have write permission to the destination collection?');
+                            throw new Error(
+                                'Could not copy one or more files. \nDo you have write permission to the destination collection?'
+                            );
                         case 409:
-                            throw new Error('Could not copy one or more files. \nThe destination can not be copied to.');
+                            throw new Error(
+                                'Could not copy one or more files. \nThe destination can not be copied to.'
+                            );
                         case 412:
                             throw new Error('Could not copy one or more files. \nThe destination file already exists.');
                     }
@@ -381,12 +401,14 @@ class FileAPI {
     uniqueDestinationPaths(filePaths, destinationDir) {
         return this.list(destinationDir)
             .then(files => files.map(f => f.basename))
-            .then(usedNames => filePaths.map(sourceFile => {
-                const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
-                usedNames.push(destinationFilename);
-                const destinationFile = joinPaths(destinationDir, destinationFilename);
-                return [sourceFile, destinationFile];
-            }));
+            .then(usedNames =>
+                filePaths.map(sourceFile => {
+                    const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
+                    usedNames.push(destinationFilename);
+                    const destinationFile = joinPaths(destinationDir, destinationFilename);
+                    return [sourceFile, destinationFile];
+                })
+            );
     }
 
     /**
@@ -442,9 +464,7 @@ class FileAPI {
             responseType: 'text',
             data: formData
         };
-        return this.client()
-            .customRequest(path, requestOptions)
-            .catch(handleHttpError('Error uploading metadata'));
+        return this.client().customRequest(path, requestOptions).catch(handleHttpError('Error uploading metadata'));
     }
 
     showFileHistory(file, startIndex, endIndex) {
@@ -456,14 +476,14 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile = (fileObject) => {
+    mapToFile = fileObject => {
         const properties = {...fileObject, ...(fileObject.props || {})};
         delete properties.props;
         Object.keys(properties).forEach(key => {
             // The WebDAV client does not properly decode the XML response,
             // so we need to do that here
             const value = properties[key];
-            properties[key] = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
+            properties[key] = typeof value === 'string' ? decodeHTMLEntities(value) : value;
         });
         return properties;
     };

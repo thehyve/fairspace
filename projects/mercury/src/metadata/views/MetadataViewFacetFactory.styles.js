@@ -1,7 +1,8 @@
 const styles = theme => ({
     root: {
         width: 250,
-        boxShadow: '0px 1px 1px -1px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 1px 1px 0px rgba(0,0,0,0.12)'
+        boxShadow:
+            '0px 1px 1px -1px rgba(0,0,0,0.2), 0px 0px 0px 0px rgba(0,0,0,0.14), 0px 1px 1px 0px rgba(0,0,0,0.12)'
     },
     title: {
         padding: 8,
@@ -30,17 +31,17 @@ const styles = theme => ({
         padding: 8
     },
     booleanContent: {
-        textAlign: 'center',
+        textAlign: 'center'
     },
     expand: {
         transform: 'rotate(0deg)',
         marginLeft: 'auto',
         transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
+            duration: theme.transitions.duration.shortest
+        })
     },
     expandOpen: {
-        transform: 'rotate(180deg)',
+        transform: 'rotate(180deg)'
     },
     headerIcon: {
         padding: 0

@@ -8,39 +8,36 @@ describe('jsonLdConverter', () => {
         const propertyShapes = [
             {
                 '@id': 'http://labelShape',
-                [constants.SHACL_PATH]: [{'@id': constants.LABEL_URI}],
+                [constants.SHACL_PATH]: [{'@id': constants.LABEL_URI}]
             },
             {
                 '@id': 'http://commentShape',
-                [constants.SHACL_PATH]: [{'@id': constants.COMMENT_URI}],
+                [constants.SHACL_PATH]: [{'@id': constants.COMMENT_URI}]
             },
             {
                 '@id': 'http://collectionShape',
-                [constants.SHACL_PATH]: [{'@id': constants.COLLECTION_URI}],
+                [constants.SHACL_PATH]: [{'@id': constants.COLLECTION_URI}]
             },
             {
                 '@id': 'http://listShape',
                 [constants.SHACL_PATH]: [{'@id': 'http://list'}],
-                [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}],
+                [constants.SHACL_NODE]: [{'@id': constants.DASH_LIST_SHAPE}]
             }
-
         ];
 
         it('should return values for each predicate', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['https://fairspace.nl/ontology#Collection'],
-                [constants.COMMENT_URI]: [
-                    {'@value': 'My first collection'},
-                    {'@value': 'Some more info'}
-                ]
+                [constants.COMMENT_URI]: [{'@value': 'My first collection'}, {'@value': 'Some more info'}]
             };
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-            expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual(
-                ['My first collection', 'Some more info']
-            );
+            expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual([
+                'My first collection',
+                'Some more info'
+            ]);
         });
 
         describe('sorting', () => {
@@ -48,10 +45,7 @@ describe('jsonLdConverter', () => {
                 const metadata = {
                     '@id': subject,
                     '@type': ['https://fairspace.nl/ontology#Collection'],
-                    [constants.COLLECTION_URI]: [
-                        {'@id': 'http://a'},
-                        {'@id': 'http://b'}
-                    ]
+                    [constants.COLLECTION_URI]: [{'@id': 'http://a'}, {'@id': 'http://b'}]
                 };
 
                 const allMetadata = {
@@ -67,9 +61,7 @@ describe('jsonLdConverter', () => {
 
                 const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
-                expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.id)).toEqual(
-                    ['http://b', 'http://a']
-                );
+                expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.id)).toEqual(['http://b', 'http://a']);
             });
 
             it('should return values sorted', () => {
@@ -88,28 +80,23 @@ describe('jsonLdConverter', () => {
 
                 const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-                expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual(
-                    ['AAAA', 'ZZZZ']
-                );
+                expect(valuesByPredicate[constants.COMMENT_URI].map(v => v.value)).toEqual(['AAAA', 'ZZZZ']);
             });
 
             it('should not sort rdf lists', () => {
                 const metadata = {
                     '@id': subject,
                     '@type': ['https://fairspace.nl/ontology#Collection'],
-                    'http://list': [{
-                        '@list': [
-                            {'@value': 'ZZZ'},
-                            {'@value': 'AAA'}
-                        ]
-                    }]
+                    'http://list': [
+                        {
+                            '@list': [{'@value': 'ZZZ'}, {'@value': 'AAA'}]
+                        }
+                    ]
                 };
 
                 const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-                expect(valuesByPredicate['http://list'].map(v => v.value)).toEqual(
-                    ['ZZZ', 'AAA']
-                );
+                expect(valuesByPredicate['http://list'].map(v => v.value)).toEqual(['ZZZ', 'AAA']);
             });
         });
 
@@ -117,28 +104,25 @@ describe('jsonLdConverter', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['https://fairspace.nl/ontology#Collection'],
-                'http://list': [{
-                    '@list': [
-                        {'@value': 'My first collection'},
-                        {'@value': 'Some more info'}
-                    ]
-                }]
+                'http://list': [
+                    {
+                        '@list': [{'@value': 'My first collection'}, {'@value': 'Some more info'}]
+                    }
+                ]
             };
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
 
-            expect(valuesByPredicate['http://list'].map(v => v.value)).toEqual(
-                ['My first collection', 'Some more info']
-            );
+            expect(valuesByPredicate['http://list'].map(v => v.value)).toEqual([
+                'My first collection',
+                'Some more info'
+            ]);
         });
         it('should not include properties for which no shape is given', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['https://fairspace.nl/ontology#Collection'],
-                'http://not-existing': [
-                    {'@value': 'My first collection'},
-                    {'@value': 'Some more info'}
-                ]
+                'http://not-existing': [{'@value': 'My first collection'}, {'@value': 'Some more info'}]
             };
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes);
@@ -149,10 +133,7 @@ describe('jsonLdConverter', () => {
             const metadata = {
                 '@id': subject,
                 '@type': ['https://fairspace.nl/ontology#Collection'],
-                [constants.COLLECTION_URI]: [
-                    {'@id': 'http://a'},
-                    {'@id': 'http://b'}
-                ]
+                [constants.COLLECTION_URI]: [{'@id': 'http://a'}, {'@id': 'http://b'}]
             };
 
             const allMetadata = {
@@ -168,9 +149,7 @@ describe('jsonLdConverter', () => {
 
             const valuesByPredicate = fromJsonLd(metadata, propertyShapes, allMetadata);
 
-            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.label)).toEqual(
-                ['AAA', 'BBB']
-            );
+            expect(valuesByPredicate[constants.COLLECTION_URI].map(v => v.label)).toEqual(['AAA', 'BBB']);
         });
     });
 
@@ -280,7 +259,13 @@ describe('jsonLdConverter', () => {
         it('filters out invalid values', () => {
             const subject = 'some-subject';
             const predicate = 'some-predicate';
-            const values = [{value: ''}, {value: undefined}, {value: null}, {value: 'some-value'}, {value: 'some-other-value'}];
+            const values = [
+                {value: ''},
+                {value: undefined},
+                {value: null},
+                {value: 'some-value'},
+                {value: 'some-other-value'}
+            ];
             const jsonLd = toJsonLd(subject, predicate, values, []);
 
             const expected = {
@@ -309,7 +294,10 @@ describe('jsonLdConverter', () => {
     describe('normalizeTypes', () => {
         it('replaces rdf:type with @type', () => {
             const result = normalizeTypes([
-                {'@id': 'http://example.com/1', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]},
+                {
+                    '@id': 'http://example.com/1',
+                    'http://www.w3.org/1999/02/22-rdf-syntax-ns#type': [{'@id': 'http://example.com/Type'}]
+                },
                 {'@id': 'http://example.com/2', '@type': ['http://example.com/Type']},
                 {'@id': 'http://example.com/2', 'http://example.com/property': [123]}
             ]);

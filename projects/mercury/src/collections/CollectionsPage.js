@@ -22,12 +22,12 @@ import UserContext from '../users/UserContext';
 import {handleTextSearchRedirect} from '../search/searchUtils';
 
 type CollectionsPageProperties = {
-    history: History;
-    showBreadCrumbs: boolean;
-    workspaceIri: string;
-    documentTitle: string;
-    classes: any;
-}
+    history: History,
+    showBreadCrumbs: boolean,
+    workspaceIri: string,
+    documentTitle: string,
+    classes: any
+};
 
 const CollectionsPage = (props: CollectionsPageProperties) => {
     const {showBreadCrumbs = false, history, workspaceIri, documentTitle, classes} = props;
@@ -45,18 +45,21 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
     const {isSelected, toggle, selected} = useSingleSelection();
     const [preselectedCollectionIri, setPreselectedCollectionIri] = useState(false);
 
-    const handleSearch = (value) => {
+    const handleSearch = value => {
         handleTextSearchRedirect(history, value);
     };
 
     let unmounting = false;
 
-    useEffect(() => (function cleanup() {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        unmounting = true;
-    }));
+    useEffect(
+        () =>
+            function cleanup() {
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                unmounting = true;
+            }
+    );
 
-    const toggleCollection = (collectionIri) => {
+    const toggleCollection = collectionIri => {
         if (unmounting) {
             return;
         }
@@ -75,9 +78,8 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
 
     const handleCancelSwitchCollection = () => setShowConfirmDialog(false);
 
-    const showMetadataSearchButton = (
-        currentUser && currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
-    );
+    const showMetadataSearchButton =
+        currentUser && currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW);
 
     return (
         <CollectionBreadcrumbsContextProvider>
@@ -89,32 +91,32 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
                             <SearchBar
                                 placeholder="Search in all collections"
                                 onSearchChange={handleSearch}
-                                disabled={collectionsLoading || collectionsError || !collections || collections.length === 0}
+                                disabled={
+                                    collectionsLoading || collectionsError || !collections || collections.length === 0
+                                }
                             />
                         </Grid>
                         {showMetadataSearchButton && (
                             <Grid item container xs={4} justifyContent="flex-end">
                                 <Grid item>
-                                    <Button
-                                        variant="text"
-                                        color="primary"
-                                        href={getMetadataViewsPath(RESOURCES_VIEW)}
-                                    >
+                                    <Button variant="text" color="primary" href={getMetadataViewsPath(RESOURCES_VIEW)}>
                                         Collection metadata search
                                     </Button>
                                 </Grid>
-                                <Grid item><Divider orientation="vertical" /></Grid>
+                                <Grid item>
+                                    <Divider orientation="vertical" />
+                                </Grid>
                             </Grid>
                         )}
                         <Grid item xs={2} className={classes.topBarSwitch}>
                             <FormControlLabel
-                                control={(
+                                control={
                                     <Switch
                                         color="primary"
                                         checked={showDeletedCollections}
                                         onChange={() => setShowDeletedCollections(!showDeletedCollections)}
                                     />
-                                )}
+                                }
                                 label="Show deleted"
                             />
                         </Grid>
@@ -149,8 +151,10 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
                 <ConfirmationDialog
                     open
                     title="Unsaved changes"
-                    content={'You have unsaved changes, are you sure you want to navigate away?'
-                    + ' Your pending changes will be lost.'}
+                    content={
+                        'You have unsaved changes, are you sure you want to navigate away?' +
+                        ' Your pending changes will be lost.'
+                    }
                     agreeButtonText="Navigate"
                     disagreeButtonText="back to form"
                     onAgree={handleConfirmSwitchCollection}

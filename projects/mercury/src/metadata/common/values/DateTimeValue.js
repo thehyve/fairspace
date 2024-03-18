@@ -15,7 +15,7 @@ class DateTimeValue extends React.Component {
         }
     }
 
-    handleChange = (date) => {
+    handleChange = date => {
         this.props.onChange({value: date});
     };
 
@@ -41,7 +41,7 @@ class DateTimeValue extends React.Component {
 }
 
 DateTimeValue.defaultProps = {
-    entry: {value: undefined},
+    entry: {value: undefined}
 };
 
 export default DateTimeValue;

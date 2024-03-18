@@ -40,16 +40,20 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = {}, voca
     const valuesByPredicate = {};
 
     const expectsRdfList = predicateUri => {
-        const propertyShape = propertyShapes
-            .find(shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri);
+        const propertyShape = propertyShapes.find(
+            shape => getFirstPredicateId(shape, constants.SHACL_PATH) === predicateUri
+        );
         return propertyShape && isRdfList(propertyShape);
     };
 
-    const getValuesFirstPredicateId = (predicate) => {
+    const getValuesFirstPredicateId = predicate => {
         // const relevantItems = allMetadata[iri][predicate] ?? [];
 
-        const relevantItems = Object.values(allMetadata).filter(item => Object.prototype.hasOwnProperty.call(item, predicate)
-            && item[predicate].find(v => v['@id'] === iri) !== undefined);
+        const relevantItems = Object.values(allMetadata).filter(
+            item =>
+                Object.prototype.hasOwnProperty.call(item, predicate) &&
+                item[predicate].find(v => v['@id'] === iri) !== undefined
+        );
 
         const newItems = [];
         for (let i = 0; i < relevantItems.length; i++) {
@@ -61,7 +65,10 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = {}, voca
     };
 
     const processFirstPredicateId = (predicateUri: String) => {
-        const predicate = getFirstPredicateId(vocabulary.find(e => e['@id'] === predicateUri), constants.SHACL_INVERS_PATH);
+        const predicate = getFirstPredicateId(
+            vocabulary.find(e => e['@id'] === predicateUri),
+            constants.SHACL_INVERS_PATH
+        );
         valuesByPredicate[predicateUri] = getValuesFirstPredicateId(predicate);
     };
 
@@ -82,9 +89,9 @@ export const fromJsonLd = (metadata, propertyShapes = [], allMetadata = {}, voca
             // We want to use just the arrays. If there are multiple lists
             // they are concatenated
             // Please note that entries are not sorted as rdf:lists are meant to be ordered
-            values = flattenShallow(metadata[predicateUri].map(
-                entry => (entry['@list'] ? entry['@list'] : [entry])
-            )).map(entry => generateValueEntry(entry, allMetadata));
+            values = flattenShallow(
+                metadata[predicateUri].map(entry => (entry['@list'] ? entry['@list'] : [entry]))
+            ).map(entry => generateValueEntry(entry, allMetadata));
         } else {
             // Convert json-ld values into our internal format and
             // sort the values
@@ -172,14 +179,16 @@ export const getJsonLdForSubject = (expandedMetadata, subject) => {
 
     // when expandedMetadata is a list
     if (!Array.isArray(expandedMetadata) || (!subject && expandedMetadata.length !== 1)) {
-        console.warn('Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject');
+        console.warn(
+            'Can not combine metadata for multiple subjects at a time. Provide an expanded JSON-LD structure for a single subject'
+        );
         return {};
     }
 
     return expandedMetadata.find(item => item['@id'] === subject) || {};
 };
 
-const normalizeType = (entry) => {
+const normalizeType = entry => {
     if (!entry['@type'] && entry[constants.RDF_TYPE]) {
         const {[constants.RDF_TYPE]: types, ...rest} = entry;
         return {
@@ -196,7 +205,7 @@ const normalizeType = (entry) => {
  * with the dictionary implementation normalizing metadata is reduced to 10s of milliseconds.
  * @returns
  */
-export const normalizeTypesBySubjectId = (expandedMetadata) => {
+export const normalizeTypesBySubjectId = expandedMetadata => {
     const normalizedTypes = {};
 
     expandedMetadata.forEach(e => {
@@ -211,4 +220,4 @@ export const normalizeTypesBySubjectId = (expandedMetadata) => {
  * @param expandedMetadata
  * @returns {*}
  */
-export const normalizeTypes = (expandedMetadata) => expandedMetadata.map(e => normalizeType(e));
+export const normalizeTypes = expandedMetadata => expandedMetadata.map(e => normalizeType(e));

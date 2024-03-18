@@ -73,14 +73,22 @@ describe('LinkedDataProperty elements', () => {
         };
 
         it('should allow adding new entities', () => verifyCanEdit(defaultProperty, true));
-        it('should not allow adding new entities if property is not editable', () => verifyCanEdit({
-            ...defaultProperty,
-            isEditable: false
-        }, false));
-        it('should not allow adding new entities if property is machineOnly', () => verifyCanEdit({
-            ...defaultProperty,
-            machineOnly: true
-        }, false));
+        it('should not allow adding new entities if property is not editable', () =>
+            verifyCanEdit(
+                {
+                    ...defaultProperty,
+                    isEditable: false
+                },
+                false
+            ));
+        it('should not allow adding new entities if property is machineOnly', () =>
+            verifyCanEdit(
+                {
+                    ...defaultProperty,
+                    machineOnly: true
+                },
+                false
+            ));
     });
 
     describe('inputComponents', () => {
@@ -91,7 +99,13 @@ describe('LinkedDataProperty elements', () => {
         };
 
         const renderTable = property => {
-            const wrapper = mount(<ThemeProvider theme={theme}><LinkedDataContext.Provider value={{valueComponentFactory}}><LinkedDataProperty property={property} /></LinkedDataContext.Provider></ThemeProvider>);
+            const wrapper = mount(
+                <ThemeProvider theme={theme}>
+                    <LinkedDataContext.Provider value={{valueComponentFactory}}>
+                        <LinkedDataProperty property={property} />
+                    </LinkedDataContext.Provider>
+                </ThemeProvider>
+            );
             const table = wrapper.find(LinkedDataInputFieldsTable);
             expect(table.length).toEqual(1);
             return table;

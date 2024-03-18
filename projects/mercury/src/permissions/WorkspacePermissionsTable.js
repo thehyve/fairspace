@@ -31,8 +31,13 @@ const styles = {
     }
 };
 
-export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermissionsText, handleDeleteSelectedPermission,
-    canManage, classes}) => {
+export const WorkspacePermissionsTable = ({
+    selectedPermissions = [],
+    emptyPermissionsText,
+    handleDeleteSelectedPermission,
+    canManage,
+    classes
+}) => {
     if (selectedPermissions.length === 0) {
         return (
             <Typography variant="body2" className={classes.emptyPermissions}>
@@ -44,29 +49,27 @@ export const WorkspacePermissionsTable = ({selectedPermissions = [], emptyPermis
     return (
         <Table size="small" className={classes.table}>
             <TableBody className={classes.tableBody}>
-                {
-                    selectedPermissions.map(p => (
-                        <TableRow key={p.iri} className={classes.tableRow}>
-                            <TableCell width={25} className={classes.iconCell}>
-                                <Widgets />
-                            </TableCell>
-                            <TableCell width="100%" data-testid="permission">
-                                <Tooltip title={p.name} placement="left-start" arrow>
-                                    <Typography variant="body2" noWrap style={{width: '100%'}}>
-                                        {p.name}
-                                    </Typography>
-                                </Tooltip>
-                            </TableCell>
-                            <TableCell width={40} className={classes.iconCell} align="right">
-                                {canManage && (
-                                    <IconButton onClick={() => handleDeleteSelectedPermission(p)} size="medium">
-                                        <Close />
-                                    </IconButton>
-                                )}
-                            </TableCell>
-                        </TableRow>
-                    ))
-                }
+                {selectedPermissions.map(p => (
+                    <TableRow key={p.iri} className={classes.tableRow}>
+                        <TableCell width={25} className={classes.iconCell}>
+                            <Widgets />
+                        </TableCell>
+                        <TableCell width="100%" data-testid="permission">
+                            <Tooltip title={p.name} placement="left-start" arrow>
+                                <Typography variant="body2" noWrap style={{width: '100%'}}>
+                                    {p.name}
+                                </Typography>
+                            </Tooltip>
+                        </TableCell>
+                        <TableCell width={40} className={classes.iconCell} align="right">
+                            {canManage && (
+                                <IconButton onClick={() => handleDeleteSelectedPermission(p)} size="medium">
+                                    <Close />
+                                </IconButton>
+                            )}
+                        </TableCell>
+                    </TableRow>
+                ))}
             </TableBody>
         </Table>
     );

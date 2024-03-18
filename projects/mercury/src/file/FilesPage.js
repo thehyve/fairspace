@@ -31,25 +31,25 @@ import type {Match} from '../types';
 import {handleTextSearchRedirect} from '../search/searchUtils';
 
 type ContextualFilesPageProperties = {
-    match: Match;
-    history: History;
-    location: Location;
-    classes: any;
+    match: Match,
+    history: History,
+    location: Location,
+    classes: any
 };
 
 type ParentAwareFilesPageProperties = ContextualFilesPageProperties & {
-    collection: Collection;
-    currentUser: User;
-    openedPath: string;
-    views: MetadataViewOptions[];
-    loading: boolean;
-    error: Error;
-    showDeleted: boolean;
-    setShowDeleted: (boolean) => void;
-}
+    collection: Collection,
+    currentUser: User,
+    openedPath: string,
+    views: MetadataViewOptions[],
+    loading: boolean,
+    error: Error,
+    showDeleted: boolean,
+    setShowDeleted: boolean => void
+};
 
 type FilesPageProperties = ParentAwareFilesPageProperties & {
-    isOpenedPathDeleted: boolean;
+    isOpenedPathDeleted: boolean
 };
 
 export const FilesPage = (props: FilesPageProperties) => {
@@ -60,7 +60,12 @@ export const FilesPage = (props: FilesPageProperties) => {
         setShowDeleted = () => {},
         openedPath = '',
         views = [],
-        currentUser, error, location, history, collection, classes
+        currentUser,
+        error,
+        location,
+        history,
+        collection,
+        classes
     } = props;
 
     const selection = useMultipleSelection();
@@ -71,7 +76,9 @@ export const FilesPage = (props: FilesPageProperties) => {
     //
     // Check whether a filename is specified in the url for selection
     // If so, select it on first render
-    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
+    const preselectedFile = location.search
+        ? decodeURIComponent(queryString.parse(location.search).selection)
+        : undefined;
 
     const getLocationContext = () => {
         const collectionIri: string = collection.iri || '';
@@ -79,11 +86,10 @@ export const FilesPage = (props: FilesPageProperties) => {
         return encodeURI(collectionRoot + openedPath);
     };
 
-    const getMetadataSearchRedirect = () => (
-        `${getMetadataViewsPath()}?${queryString.stringify({view: RESOURCES_VIEW, context: getLocationContext()})}`
-    );
+    const getMetadataSearchRedirect = () =>
+        `${getMetadataViewsPath()}?${queryString.stringify({view: RESOURCES_VIEW, context: getLocationContext()})}`;
 
-    const handleTextSearch = (value) => {
+    const handleTextSearch = value => {
         handleTextSearchRedirect(history, value, getLocationContext());
     };
 
@@ -98,21 +104,35 @@ export const FilesPage = (props: FilesPageProperties) => {
     const pathSegments = splitPathIntoArray(openedPath);
     const breadcrumbSegments = collection.name
         ? pathSegments.map((segment, idx) => ({
-            label: idx === 0 ? collection.name : segment,
-            href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + consts.PATH_SEPARATOR
-                + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
-        }))
-        : [{label: '...', href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + encodeURI(openedPath)}];
+              label: idx === 0 ? collection.name : segment,
+              href:
+                  consts.PATH_SEPARATOR +
+                  consts.COLLECTIONS_PATH +
+                  consts.PATH_SEPARATOR +
+                  pathSegments
+                      .slice(0, idx + 1)
+                      .map(encodeURIComponent)
+                      .join(consts.PATH_SEPARATOR)
+          }))
+        : [
+              {
+                  label: '...',
+                  href: consts.PATH_SEPARATOR + consts.COLLECTIONS_PATH + encodeURI(openedPath)
+              }
+          ];
 
     usePageTitleUpdater(`${breadcrumbSegments.map(s => s.label).join(' / ')} / Collections`);
 
     // Path for which metadata should be rendered
-    const path = (selection.selected.length === 1) ? selection.selected[0] : openedPath;
+    const path = selection.selected.length === 1 ? selection.selected[0] : openedPath;
 
-    const showMetadataSearchButton: boolean = (
-        currentUser && currentUser.canViewPublicMetadata && views && views.some(v => v.name === RESOURCES_VIEW)
-        && !isOpenedPathDeleted && collection.iri
-    );
+    const showMetadataSearchButton: boolean =
+        currentUser &&
+        currentUser.canViewPublicMetadata &&
+        views &&
+        views.some(v => v.name === RESOURCES_VIEW) &&
+        !isOpenedPathDeleted &&
+        collection.iri;
 
     return (
         <CollectionBreadcrumbsContextProvider>
@@ -139,19 +159,21 @@ export const FilesPage = (props: FilesPageProperties) => {
                                         Collection metadata search
                                     </Button>
                                 </Grid>
-                                <Grid item><Divider orientation="vertical" /></Grid>
+                                <Grid item>
+                                    <Divider orientation="vertical" />
+                                </Grid>
                             </Grid>
                         )}
                         <Grid item xs={2} className={classes.topBarSwitch}>
                             <FormControlLabel
-                                control={(
+                                control={
                                     <Switch
                                         color="primary"
                                         checked={showDeleted}
                                         onChange={() => setShowDeleted(!showDeleted)}
                                         disabled={isOpenedPathDeleted}
                                     />
-                                )}
+                                }
                                 label="Show deleted"
                             />
                         </Grid>
@@ -188,11 +210,13 @@ export const FilesPage = (props: FilesPageProperties) => {
 
 const ParentAwareFilesPage = (props: ParentAwareFilesPageProperties) => {
     const {data, error, loading, refresh} = useAsync(
-        () => (LocalFileAPI.stat(props.openedPath, true)),
+        () => LocalFileAPI.stat(props.openedPath, true),
         [props.openedPath]
     );
 
-    useEffect(() => {refresh();}, [props.collection.dateDeleted, refresh]);
+    useEffect(() => {
+        refresh();
+    }, [props.collection.dateDeleted, refresh]);
 
     const isParentFolderDeleted = data && data.props && !!data.props.dateDeleted;
     const isOpenedPathDeleted = !!props.collection.dateDeleted || isParentFolderDeleted;
