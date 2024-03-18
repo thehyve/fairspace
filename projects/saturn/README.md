@@ -13,7 +13,7 @@ Prerequisites:
 
 - Java 21
 - Gradle
-- PostgresQL instance running (optional)
+- PostgreSQL instance running (optional)
 - Keycloak instance running
 
 To run the application, execute the main method in the [App](src/main/java/io/fairspace/saturn/App.java) class or execute the following command:
