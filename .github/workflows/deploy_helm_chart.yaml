@@ -71,9 +71,8 @@ jobs:
 
       - name: CLUSTER INFO
         run: |
-          gcloud container clusters get-credentials fns-cloud-f01 --zone europe-west1-b --project fns-cloud-852306
           gcloud config set project fns-cloud-852306
-          gcloud auth login
+          gcloud container clusters get-credentials fns-cloud-f01 --zone europe-west1-b
           kubectl cluster-info
 
       - name: Setup Helm
