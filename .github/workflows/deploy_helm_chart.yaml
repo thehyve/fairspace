@@ -73,6 +73,9 @@ jobs:
 
       - name: CLUSTER INFO
         run: |
+          gcloud container clusters get-credentials 
+          gcloud config set project
+          gcloud auth login
           kubectl cluster-info
 
       - name: Setup Helm
