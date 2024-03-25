@@ -77,7 +77,7 @@ saturn:
       size: 5Gi
     extra-file-storage:
   image:
-    image: eu.gcr.io/fairspace-207108/saturn
+    image: ghcr.io/thehyve/fairspace/saturn
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   initContainer:
@@ -145,7 +145,7 @@ saturn:
 #####################################################################
 pluto:
   image:
-    image: eu.gcr.io/fairspace-207108/pluto
+    image: ghcr.io/thehyve/fairspace/pluto
     tag: RELEASEVERSION
     pullPolicy: IfNotPresent
   logLevel: INFO

@@ -1,0 +1,75 @@
+name: Deploy Helm Chart
+
+env:
+  HELM_VERSION: '3.14.3'
+  HELM_REGISTRY: ghcr.io/${{ github.repository_owner }}/helm-charts
+#
+## Environment variables available to all jobs and steps in this workflow
+#env:
+#  GKE_PROJECT: randocats
+#  GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
+#  GITHUB_SHA: ${{ github.sha }}
+#  GKE_ZONE: us-east1-b
+#  GKE_CLUSTER: randocats-cluster
+#  IMAGE: randocats
+#  REGISTRY_HOSTNAME: us.gcr.io
+#  DEPLOYMENT_NAME: randocats
+
+on:
+  push:
+    branches:
+      - devops/FAIRSPC-23_deployment
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Manual trigger for Helm chart deploy"
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        default: "fns_test"
+        options:
+          - "fns_test"
+          - "fns_prod"
+
+jobs:
+  setup-deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare model and k8s values files
+        run: |
+          echo "${{ env.FNS_VIEWS_YAML }}" > fairspace_k8s_values.yaml
+          echo "${{ env.FNS_VOCABULARY_TTL}}" > vocabulary.ttl
+          echo "${{ env.FNS_TAXONOMIES_TTL }}" > taxonomies.ttl
+
+      - name: Auth GCP
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GKE_SERVICE_ACCOUNT_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Use gcloud CLI
+        run: gcloud info
+
+      # Configure docker to use the gcloud command-line tool as a credential helper
+      - run: |
+          # Set up docker to authenticate
+          # via gcloud command-line tool.
+          gcloud auth configure-docker
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.1.0
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Login with Helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.HELM_REGISTRY }} --username ${{ github.repository_owner }} --password-stdin
+
+          
