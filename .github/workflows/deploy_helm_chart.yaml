@@ -53,7 +53,7 @@ jobs:
       - name: Define the version
         run: |
           VERSION=$(cat ./VERSION)-SNAPSHOT
-          if [[ ${{ github.event.inputs.version }} ]]; then
+          if [[ -n ${{ github.event.inputs.version }} ]]; then
             VERSION=${{ github.event.inputs.version }}
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
