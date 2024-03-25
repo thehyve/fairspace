@@ -69,12 +69,6 @@ jobs:
         run: |
           gcloud auth configure-docker
 
-      - name: CLUSTER INFO
-        run: |
-          gcloud config set project fns-cloud-852306
-          gcloud container clusters get-credentials fns-cloud-f01 --zone europe-west1-b
-          kubectl cluster-info
-
       - name: Setup Helm
         uses: azure/setup-helm@v4.1.0
         with:
@@ -86,6 +80,7 @@ jobs:
 
       - name: Deploy Helm chart
         run: |
+          gcloud container clusters get-credentials fns-cloud-f01 --zone europe-west1-b --project fns-cloud-852306
           helm upgrade --install fairspace oci://${{ env.HELM_REGISTRY }}/fairspace --version ${{ env.VERSION }}
           --namespace=fairspace-${{ github.event.inputs.environment }}
           --set-file saturn.vocabulary=vocabulary.ttl
