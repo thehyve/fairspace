@@ -26,10 +26,10 @@ on:
       environment:
         description: "Environment to deploy to"
         required: true
-        default: "fns_test"
+        default: "test"
         options:
-          - "fns_test"
-          - "fns_prod"
+          - "test"
+          - "prod"
 
 jobs:
   setup-deploy:
@@ -42,7 +42,8 @@ jobs:
 
       - name: Prepare model and k8s values files
         run: |
-          echo "${{ env.FNS_VIEWS_YAML }}" > fairspace_k8s_values.yaml
+          echo "${{ env.FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
+          echo "${{ env.FNS_VIEWS_YAML }}" > views.yaml
           echo "${{ env.FNS_VOCABULARY_TTL}}" > vocabulary.ttl
           echo "${{ env.FNS_TAXONOMIES_TTL }}" > taxonomies.ttl
 
@@ -54,13 +55,8 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Use gcloud CLI
-        run: gcloud info
-
-      # Configure docker to use the gcloud command-line tool as a credential helper
-      - run: |
-          # Set up docker to authenticate
-          # via gcloud command-line tool.
+      - name: Configure docker to authenticate
+        run: |
           gcloud auth configure-docker
 
       - name: Setup Helm
@@ -72,4 +68,18 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ env.HELM_REGISTRY }} --username ${{ github.repository_owner }} --password-stdin
 
-          
+      - name: Deploy Helm chart
+        run: |
+          helm pull ${{ env.HELM_REGISTRY }}/fairspace --version 0.7.31
+#          helm upgrade fairspace HELM_REGISTRY
+#          --namespace=fairspace-${{ github.event.inputs.environment }}
+#          --set-file saturn.vocabulary=vocabulary.ttl
+#          --set-file saturn.views=views.yaml
+#          -f fairspace_k8s_values.yaml
+
+      - name: Clean up
+        run: |
+          rm -rf fairspace_k8s_values.yaml
+          rm -rf vocabulary.ttl
+          rm -rf taxonomies.ttl
+          rm -rf views.yaml
