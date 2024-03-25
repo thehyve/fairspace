@@ -70,8 +70,8 @@ jobs:
 
       - name: Deploy Helm chart
         run: |
-          helm repo add fairspace ${{ env.HELM_REGISTRY }}
-          helm pull ${{ env.HELM_REGISTRY }}/fairspace --version 0.7.31
+#          helm repo add fairspace ${{ env.HELM_REGISTRY }}
+          helm pull oci://${{ env.HELM_REGISTRY }}/fairspace --version 0.7.31
 #          helm upgrade fairspace HELM_REGISTRY
 #          --namespace=fairspace-${{ github.event.inputs.environment }}
 #          --set-file saturn.vocabulary=vocabulary.ttl
