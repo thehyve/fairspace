@@ -71,6 +71,10 @@ jobs:
         run: |
           gcloud auth configure-docker
 
+      - name: CLUSTER INFO
+        run: |
+          kubectl cluster-info
+
       - name: Setup Helm
         uses: azure/setup-helm@v4.1.0
         with:
