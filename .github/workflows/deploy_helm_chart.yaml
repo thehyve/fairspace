@@ -12,8 +12,6 @@ env:
 #  GKE_ZONE: us-east1-b
 #  GKE_CLUSTER: randocats-cluster
 #  IMAGE: randocats
-#  REGISTRY_HOSTNAME: us.gcr.io
-#  DEPLOYMENT_NAME: randocats
 
 on:
   push:
@@ -73,8 +71,8 @@ jobs:
 
       - name: CLUSTER INFO
         run: |
-          gcloud container clusters get-credentials 
-          gcloud config set project
+          gcloud container clusters get-credentials fns-cloud-f01 --zone europe-west1-b --project fns-cloud-852306
+          gcloud config set project fns-cloud-852306
           gcloud auth login
           kubectl cluster-info
 
