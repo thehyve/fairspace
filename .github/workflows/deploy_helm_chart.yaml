@@ -60,7 +60,8 @@ jobs:
       - name: Auth GCP
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GKE_SERVICE_ACCOUNT_KEY }}
+          workload_identity_provider: projects/687196986816/locations/global/workloadIdentityPools/fns-pool/providers/fns-provider
+          service_account: fs-helm-repo-service-account@fns-cloud-852306.iam.gserviceaccount.com
 
       - uses: google-github-actions/get-gke-credentials@v0.4.0
         with:
