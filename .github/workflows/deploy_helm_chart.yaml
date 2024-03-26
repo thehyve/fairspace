@@ -62,6 +62,14 @@ jobs:
         with:
           credentials_json: ${{ secrets.GKE_SERVICE_ACCOUNT_KEY }}
 
+      - uses: google-github-actions/get-gke-credentials@v0.4.0
+        with:
+          cluster_name: fns-cloud-f01
+          location: europe-west1-b
+
+      - id: get-pods
+        run: kubectl get pods
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
@@ -80,7 +88,6 @@ jobs:
 
       - name: Deploy Helm chart
         run: |
-          gcloud container clusters get-credentials fns-cloud-f01 --zone europe-west1-b --project fns-cloud-852306
           helm upgrade --install fairspace oci://${{ env.HELM_REGISTRY }}/fairspace --version ${{ env.VERSION }}
           --namespace=fairspace-${{ github.event.inputs.environment }}
           --set-file saturn.vocabulary=vocabulary.ttl
