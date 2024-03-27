@@ -3,15 +3,6 @@ name: Deploy Helm Chart
 env:
   HELM_VERSION: '3.14.3'
   HELM_REGISTRY: ghcr.io/${{ github.repository_owner }}/helm-charts
-#
-## Environment variables available to all jobs and steps in this workflow
-#env:
-#  GKE_PROJECT: randocats
-#  GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
-#  GITHUB_SHA: ${{ github.sha }}
-#  GKE_ZONE: us-east1-b
-#  GKE_CLUSTER: randocats-cluster
-#  IMAGE: randocats
 
 on:
   push:
@@ -63,8 +54,8 @@ jobs:
       - name: Auth GCP
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: projects/687196986816/locations/global/workloadIdentityPools/fns-pool/providers/fns-provider
-          service_account: fs-helm-repo-service-account@fns-cloud-852306.iam.gserviceaccount.com
+          workload_identity_provider: projects/687196986816/locations/global/workloadIdentityPools/fs-fns-pool/providers/fs-fns-provider
+          service_account: cicd-service-account@fns-cloud-852306.iam.gserviceaccount.com
 
       - uses: google-github-actions/get-gke-credentials@v2
         with:
