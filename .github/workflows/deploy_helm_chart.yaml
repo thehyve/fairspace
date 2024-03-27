@@ -26,7 +26,8 @@ on:
 jobs:
   setup-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
+#    environment: ${{ github.event.inputs.environment }}
+    environment: test
     permissions:
       contents: 'read'
       id-token: 'write'
