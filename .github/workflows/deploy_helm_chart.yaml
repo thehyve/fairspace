@@ -50,6 +50,8 @@ jobs:
           cat fairspace_k8s_values.yaml
           echo "CONTENT FROM ENV VAR"
           echo "${{ env.FAIRSPACE_VALUES_YAML }}"
+          echo "CONTENT FROM ENV SECRETS"
+          echo "${{ secrets.FAIRSPACE_VALUES_YAML }}"
           echo "CONTENT ABOVE"
           echo "${{ env.FNS_VIEWS_YAML }}" > views.yaml
           echo "${{ env.FNS_VOCABULARY_TTL}}" > vocabulary.ttl
