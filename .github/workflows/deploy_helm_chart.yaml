@@ -37,12 +37,13 @@ jobs:
 
       - name: Prepare model and k8s values files
         run: |
-          ENVIRONMENT = ${{ github.event.inputs.environment }}
-          if [ -n $ENVIRONMENT ]; then
-            ENVIRONMENT = test
+          if [ -n "${{ github.event.inputs.environment }}" ]; then
+            ENVIRONMENT="${{ github.event.inputs.environment }}"
+          else
+            ENVIRONMENT="test"
           fi
           echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
-          Starting deployment to the $ENV environment
+          Starting deployment to the $ENVIRONMENT environment
           echo "${{ env.FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
           
           cat fairspace_k8s_values.yaml
