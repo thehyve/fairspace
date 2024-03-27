@@ -45,7 +45,7 @@ jobs:
           fi
           echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
           echo "Starting deployment to the $ENVIRONMENT environment"
-          echo "${{ .FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
+          echo "${{ env.FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
           echo "LEGO"
           head -n 1 fairspace_k8s_values.yaml
           echo "${{ env.FNS_VIEWS_YAML }}" > views.yaml
