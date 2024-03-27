@@ -45,10 +45,18 @@ jobs:
           fi
           echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
           echo "Starting deployment to the $ENVIRONMENT environment"
-          echo "${{ secrets.FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
+          echo "${{ .FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
+          echo "LEGO"
+          head -n 1 fairspace_k8s_values.yaml
           echo "${{ env.FNS_VIEWS_YAML }}" > views.yaml
+          echo "LEGO2"
+          head -n 1 views.yaml
           echo "${{ env.FNS_VOCABULARY_TTL}}" > vocabulary.ttl
+          echo "LEGO3"
+          head -n 1 vocabulary.yaml
           echo "${{ env.FNS_TAXONOMIES_TTL }}" > taxonomies.ttl
+          echo "LEGO4"
+          head -n 1 taxonomies.yaml
 
       - name: Define the version
         run: |
