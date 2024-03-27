@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
-import {Box, FormHelperText, FormLabel} from '@mui/material';
+import {Box, FormHelperText, FormLabel, FormControl} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import MessageDisplay from '../common/components/MessageDisplay';
 import LoadingInlay from '../common/components/LoadingInlay';
@@ -14,6 +14,12 @@ const useStyles = makeStyles({
     root: {
         marginLeft: 20,
         marginBottom: 5
+    },
+    property: {
+        marginTop: 10
+    },
+    helperText: {
+        marginLeft: 0
     }
 });
 
@@ -55,17 +61,17 @@ export const PermissionViewer = ({
     );
 
     return (
-        <div>
+        <FormControl className={classes.property}>
             <FormLabel>Share with users</FormLabel>
             <Box className={classes.root}>
                 {renderUserPermissionComponent()}
-                <FormHelperText>
+                <FormHelperText className={classes.helperText}>
                     Members of the owner workspace can have modify rights, all others have read-only rights.
                 </FormHelperText>
             </Box>
             <FormLabel>Share with workspaces</FormLabel>
             <Box className={classes.root}>{renderWorkspacePermissionComponent()}</Box>
-        </div>
+        </FormControl>
     );
 };
 

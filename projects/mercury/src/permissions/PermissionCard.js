@@ -66,10 +66,14 @@ const styles = theme => ({
         margin: '0 4px'
     },
     property: {
-        marginTop: 10
+        marginTop: 0
     },
     group: {
         marginLeft: 20,
+        marginBottom: 0
+    },
+    helperText: {
+        marginLeft: 0,
         marginBottom: 0
     },
     accessIcon: {
@@ -224,11 +228,12 @@ export const PermissionCard = (props: PermissionCardProperties) => {
     };
 
     const showSingleAccessMode = () => (
-        <ListItemText
-            primary={camelCaseToWords(collection.accessMode)}
-            secondary={descriptionForAccessMode(collection.accessMode)}
-            style={{whiteSpace: 'normal'}}
-        />
+        <FormControl>
+            <ListItemText primary={camelCaseToWords(collection.accessMode)} style={{whiteSpace: 'normal'}} />
+            <FormHelperText className={classes.helperText}>
+                {descriptionForAccessMode(collection.accessMode)}
+            </FormHelperText>
+        </FormControl>
     );
     const showMultipleAccessModes = () => (
         <FormControl>
@@ -236,7 +241,10 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 value={collection.accessMode}
                 onChange={mode => handleSetAccessMode(mode)}
                 inputProps={{'aria-label': 'View mode'}}
+                helperText={descriptionForAccessMode(collection.accessMode)}
+                FormHelperTextProps={{className: classes.helperText}}
                 select
+                SelectProps={{renderValue: selected => camelCaseToWords(selected)}}
             >
                 {/* show available access modes which user can select */}
                 {collection.availableAccessModes.map(mode => (
@@ -281,11 +289,9 @@ export const PermissionCard = (props: PermissionCardProperties) => {
         <FormControl className={classes.property}>
             <FormLabel>Public access</FormLabel>
             <Box className={classes.group}>
-                <FormGroup>
-                    {collection.canManage && collection.availableAccessModes.length > 1
-                        ? showMultipleAccessModes()
-                        : showSingleAccessMode()}
-                </FormGroup>
+                {collection.canManage && collection.availableAccessModes.length > 1
+                    ? showMultipleAccessModes()
+                    : showSingleAccessMode()}
             </Box>
         </FormControl>
     );
@@ -326,7 +332,9 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                         <Typography>{camelCaseToWords(ownerWorkspaceAccess)}</Typography>
                     )}
                 </FormGroup>
-                <FormHelperText>Default access for members of the owner workspace.</FormHelperText>
+                <FormHelperText className={classes.helperText}>
+                    Default access for members of the owner workspace.
+                </FormHelperText>
             </Box>
         </FormControl>
     );
