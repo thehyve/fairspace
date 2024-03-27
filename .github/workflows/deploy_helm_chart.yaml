@@ -62,11 +62,8 @@ jobs:
           cluster_name: fns-cloud-f01
           location: europe-west1
 
-      - id: get-pods
-        run: kubectl get pods
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+#      - name: Set up Google Cloud SDK
+#        uses: google-github-actions/setup-gcloud@v2
 
       - name: Configure docker to authenticate
         run: |
