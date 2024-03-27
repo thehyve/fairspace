@@ -43,7 +43,7 @@ jobs:
             ENVIRONMENT="test"
           fi
           echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
-          Starting deployment to the $ENVIRONMENT environment
+          echo "Starting deployment to the $ENVIRONMENT environment"
           echo "${{ env.FAIRSPACE_VALUES_YAML }}" > fairspace_k8s_values.yaml
           
           cat fairspace_k8s_values.yaml
