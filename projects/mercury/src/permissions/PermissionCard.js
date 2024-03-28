@@ -69,7 +69,7 @@ const styles = theme => ({
         marginTop: 0
     },
     group: {
-        marginLeft: 20,
+        marginLeft: 0,
         marginBottom: 0
     },
     helperText: {
@@ -367,7 +367,7 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                 subheader={accessLevelDescription(accessLevel)}
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent style={{paddingTop: 0}}>
+                <CardContent style={{paddingTop: 8, paddingBottom: 16}}>
                     <div style={{overflowX: 'auto'}}>
                         <List>
                             <ListItem disableGutters>{renderAccessMode()}</ListItem>

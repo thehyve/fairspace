@@ -383,7 +383,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         avatar={ICONS[iconName]}
                         style={{wordBreak: 'break-word'}}
                     />
-                    <CardContent style={{paddingTop: 0}}>
+                    <CardContent style={{paddingTop: 8, paddingBottom: 16}}>
                         <Typography component="p" style={{whiteSpace: 'pre-line'}}>
                             {collection.description}
                         </Typography>
