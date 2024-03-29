@@ -251,7 +251,7 @@ const MetadataCard = props => {
                 }
             />
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-                <CardContent>{children}</CardContent>
+                <CardContent style={{paddingTop: 8, paddingBottom: 16}}>{children}</CardContent>
             </Collapse>
         </Card>
     );

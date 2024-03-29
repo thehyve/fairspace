@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
-import {Box, FormHelperText, FormLabel} from '@mui/material';
+import {Box, FormHelperText, FormLabel, FormControl, FormGroup} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import MessageDisplay from '../common/components/MessageDisplay';
 import LoadingInlay from '../common/components/LoadingInlay';
@@ -12,8 +12,15 @@ import {sortPermissions} from '../collections/collectionUtils';
 
 const useStyles = makeStyles({
     root: {
-        marginLeft: 20,
-        marginBottom: 5
+        marginLeft: 0,
+        marginBottom: 8
+    },
+    property: {
+        marginTop: 8
+    },
+    helperText: {
+        marginLeft: 0,
+        marginBottom: 0
     }
 });
 
@@ -55,17 +62,21 @@ export const PermissionViewer = ({
     );
 
     return (
-        <div>
-            <FormLabel>Share with users</FormLabel>
-            <Box className={classes.root}>
-                {renderUserPermissionComponent()}
-                <FormHelperText>
-                    Members of the owner workspace can have modify rights, all others have read-only rights.
-                </FormHelperText>
-            </Box>
-            <FormLabel>Share with workspaces</FormLabel>
-            <Box className={classes.root}>{renderWorkspacePermissionComponent()}</Box>
-        </div>
+        <FormGroup>
+            <FormControl className={classes.property}>
+                <FormLabel>Share with users</FormLabel>
+                <Box className={classes.root}>
+                    {renderUserPermissionComponent()}
+                    <FormHelperText className={classes.helperText}>
+                        Members of the owner workspace can have modify rights, all others have read-only rights.
+                    </FormHelperText>
+                </Box>
+            </FormControl>
+            <FormControl className={classes.property}>
+                <FormLabel>Share with workspaces</FormLabel>
+                <Box className={classes.root}>{renderWorkspacePermissionComponent()}</Box>
+            </FormControl>
+        </FormGroup>
     );
 };
 
