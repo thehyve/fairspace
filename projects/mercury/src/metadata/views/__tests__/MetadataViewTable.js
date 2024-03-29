@@ -50,6 +50,10 @@ describe('MetadataViewTable', () => {
         expect(queryAllByText('DNA').length).toBe(2);
         expect(queryByText('Lip')).toBeInTheDocument();
         expect(queryByText('Tongue')).toBeInTheDocument();
+        expect(queryByText('Is reused')).toBeInTheDocument();
+        // check if the icons for boolean values are rendered
+        expect(screen.getByTestId('icon-true')).toBeInTheDocument();
+        expect(screen.getByTestId('icon-false')).toBeInTheDocument();
     });
 
     it('renders visible columns only', () => {
@@ -88,6 +92,10 @@ describe('MetadataViewTable', () => {
         expect(queryByText('Files')).not.toBeInTheDocument();
         expect(queryByText('DNA')).not.toBeInTheDocument();
         expect(queryByText('Tongue')).not.toBeInTheDocument();
+        expect(queryByText('Is reused')).not.toBeInTheDocument();
+        // check if the icons for boolean values are not rendered
+        expect(screen.queryByTestId('icon-true')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('icon-false')).not.toBeInTheDocument();
     });
 
     it('should redirect when opening collection entry', async () => {

@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import Switch from '@mui/material/Switch';
 import {formatDateTime} from '../../../common/utils/genericUtils';
 
 import LinkedDataLink from '../LinkedDataLink';
@@ -18,8 +17,10 @@ export const ReferringValue = ({property, entry}) => {
         switch (property.datatype) {
             case DATETIME_URI:
                 return formatDateTime(value.value);
-            case BOOLEAN_URI:
-                return <Switch checked={!!value.value} readOnly />;
+            case BOOLEAN_URI: {
+                const booleanValueString = value.value === 'true' || value.value === 't' ? 'True' : 'False';
+                return renderValue(property, booleanValueString);
+            }
             case MARKDOWN_URI:
                 return <ReactMarkdown>{value.value}</ReactMarkdown>;
             default:

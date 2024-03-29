@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ReferringValue} from '../ReferringValue';
 import LinkedDataLink from '../../LinkedDataLink';
+import {BOOLEAN_URI} from '../../../../constants';
 
 describe('ReferringValue', () => {
     it('should render an external link directly', () => {
@@ -64,5 +65,35 @@ describe('ReferringValue', () => {
                 entry
             })
         ).toEqual('My resource');
+    });
+
+    it('should render a "true" value', () => {
+        const property = {datatype: BOOLEAN_URI};
+        const entry = {
+            label: '',
+            value: 'true'
+        };
+
+        expect(
+            ReferringValue({
+                property,
+                entry
+            })
+        ).toEqual('True');
+    });
+
+    it('should render a "false" value', () => {
+        const property = {datatype: BOOLEAN_URI};
+        const entry = {
+            label: '',
+            value: 'false'
+        };
+
+        expect(
+            ReferringValue({
+                property,
+                entry
+            })
+        ).toEqual('False');
     });
 });

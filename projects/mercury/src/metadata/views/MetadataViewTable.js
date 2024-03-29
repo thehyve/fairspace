@@ -8,7 +8,7 @@ import type {MetadataViewColumn, MetadataViewData} from './MetadataViewAPI';
 import {TextualValueTypes} from './MetadataViewAPI';
 import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
 import {RESOURCES_VIEW} from './metadataViewUtils';
-import {formatDate} from '../../common/utils/genericUtils';
+import {renderBooleanIcon, formatDate} from '../../common/utils/genericUtils';
 import type {Collection} from '../../collections/CollectionAPI';
 import {collectionAccessIcon} from '../../collections/collectionUtils';
 import {getPathFromIri, redirectLink} from '../../file/fileUtils';
@@ -171,6 +171,10 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
         const displayValue = (value || [])
             .map(v => (column.type === 'Date' ? formatDate(v.value) : v.label))
             .join(', ');
+
+        if (column.type === 'Boolean') {
+            return <TableCell key={column.name}>{renderBooleanIcon(displayValue)}</TableCell>;
+        }
 
         return (
             <TableCell key={column.name} onClick={onClickHandler}>
