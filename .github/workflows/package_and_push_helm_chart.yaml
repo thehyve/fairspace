@@ -44,6 +44,7 @@ jobs:
 
       - name: Push Helm chart to repository
         run: |
+          helm dependency update charts/fairspace
           helm package "charts/fairspace" --version ${{ env.VERSION }}
           helm push "fairspace-${{ env.VERSION }}.tgz" "oci://${{ vars.HELM_REGISTRY }}"
           echo "Pushed package to repository"
