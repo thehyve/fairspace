@@ -19,7 +19,6 @@ on:
 jobs:
   setup-deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.environment }}
     permissions:
       contents: 'read'
       id-token: 'write'
