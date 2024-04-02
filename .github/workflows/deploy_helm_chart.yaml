@@ -75,9 +75,18 @@ jobs:
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ vars.HELM_REGISTRY }} --username ${{ github.repository_owner }} --password-stdin
 
+      - name: Check if namespace exists (create if not)
+        id: check_namespace
+        run: |
+          if kubectl get namespace fairspace-${{ env.ENVIRONMENT }} &> /dev/null; then
+            echo "Namespace fairspace-${{ env.ENVIRONMENT }} exists."
+          else
+            echo "Namespace fairspace-${{ env.ENVIRONMENT }} does not exist. Creating namespace."
+            kubectl create namespace fairspace-${{ env.ENVIRONMENT }}
+          fi
+
       - name: Delete StatefulSet (if exists) to force re-deploy
         run: |
-          # Check if the StatefulSet exists
           if kubectl get statefulset fairspace --namespace fairspace-${{ env.ENVIRONMENT }} &> /dev/null; then
             kubectl delete statefulset fairspace --namespace fairspace-${{ env.ENVIRONMENT }} --cascade=orphan
             echo "StatefulSet fairspace deleted."
