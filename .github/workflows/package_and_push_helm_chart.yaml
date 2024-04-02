@@ -37,7 +37,7 @@ jobs:
       - name: Prepare version
         run: |
           VERSION=$(cat ./VERSION)
-          if [[ ${{ github.event.inputs.environment }} = "SNAPSHOT" ]] || [[ $BRANCH = "dev" ]]; then
+          if [[ ${{ github.event.inputs.release_type }} = "SNAPSHOT" ]] || [[ $BRANCH = "dev" ]]; then
             VERSION=$VERSION-SNAPSHOT
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
