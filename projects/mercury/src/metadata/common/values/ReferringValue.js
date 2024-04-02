@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import {formatDateTime} from '../../../common/utils/genericUtils';
+import {formatDateTime, stringToBooleanValueOrNull} from '../../../common/utils/genericUtils';
 
 import LinkedDataLink from '../LinkedDataLink';
 import {BOOLEAN_URI, DATETIME_URI, MARKDOWN_URI} from '../../../constants';
@@ -18,7 +18,7 @@ export const ReferringValue = ({property, entry}) => {
             case DATETIME_URI:
                 return formatDateTime(value.value);
             case BOOLEAN_URI: {
-                const booleanValueString = value.value === 'true' || value.value === 't' ? 'True' : 'False';
+                const booleanValueString = stringToBooleanValueOrNull(value.value) ? 'True' : 'False';
                 return renderValue(property, booleanValueString);
             }
             case MARKDOWN_URI:

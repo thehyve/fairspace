@@ -1,16 +1,17 @@
 import {
+    camelCaseToWords,
     compareBy,
     comparePrimitives,
     comparing,
     first,
     flattenShallow,
     formatDateTime,
+    groupBy,
+    isEmptyObject,
     isNonEmptyValue,
     joinWithSeparator,
     stableSort,
-    camelCaseToWords,
-    groupBy,
-    isEmptyObject
+    stringToBooleanValueOrNull
 } from '../genericUtils';
 
 describe('array Utils', () => {
@@ -208,5 +209,35 @@ describe('camelCaseToWords', () => {
     });
     it('should return empty string for non-string value', () => {
         expect(camelCaseToWords(['test'])).toEqual('');
+    });
+});
+
+describe('renderBooleanIcon', () => {
+    it('should return true for true', () => {
+        expect(stringToBooleanValueOrNull(true)).toEqual(true);
+    });
+    it('should return true for "t"', () => {
+        expect(stringToBooleanValueOrNull('t')).toEqual(true);
+    });
+    it('should return true for "True"', () => {
+        expect(stringToBooleanValueOrNull('True')).toEqual(true);
+    });
+    it('should return false for false', () => {
+        expect(stringToBooleanValueOrNull(false)).toEqual(false);
+    });
+    it('should return false for "f"', () => {
+        expect(stringToBooleanValueOrNull('f')).toEqual(false);
+    });
+    it('should return a false icon for "False"', () => {
+        expect(stringToBooleanValueOrNull('False')).toEqual(false);
+    });
+    it('should return null for null', () => {
+        expect(stringToBooleanValueOrNull(null)).toEqual(null);
+    });
+    it('should return null for undefined', () => {
+        expect(stringToBooleanValueOrNull(undefined)).toEqual(null);
+    });
+    it('should return null for non-boolean values', () => {
+        expect(stringToBooleanValueOrNull('test')).toEqual(null);
     });
 });

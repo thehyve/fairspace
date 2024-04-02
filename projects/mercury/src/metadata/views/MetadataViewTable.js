@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect} from 'react';
 import {Checkbox, Link, Table, TableBody, TableCell, TableHead, TableRow} from '@mui/material';
+import {Check, Close} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
 import {Link as RouterLink} from 'react-router-dom';
 import qs from 'qs';
@@ -8,7 +9,7 @@ import type {MetadataViewColumn, MetadataViewData} from './MetadataViewAPI';
 import {TextualValueTypes} from './MetadataViewAPI';
 import type {MetadataViewEntity, MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
 import {RESOURCES_VIEW} from './metadataViewUtils';
-import {renderBooleanIcon, formatDate} from '../../common/utils/genericUtils';
+import {stringToBooleanValueOrNull, formatDate} from '../../common/utils/genericUtils';
 import type {Collection} from '../../collections/CollectionAPI';
 import {collectionAccessIcon} from '../../collections/collectionUtils';
 import {getPathFromIri, redirectLink} from '../../file/fileUtils';
@@ -160,6 +161,17 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
                 useApplyButton
             />
         );
+    };
+
+    const renderBooleanIcon = (displayValue: string) => {
+        const value = stringToBooleanValueOrNull(displayValue);
+        if (value === true) {
+            return <Check size="small" data-testid="icon-true" />;
+        }
+        if (value === false) {
+            return <Close size="small" data-testid="icon-false" />;
+        }
+        return '';
     };
 
     const renderTableCell = (row: Map<string, any>, column: MetadataViewColumn, onClickHandler) => {

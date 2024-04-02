@@ -1,7 +1,5 @@
 import {isValid} from 'date-fns';
 import {enGB} from 'date-fns/locale';
-import {Check, Close} from '@mui/icons-material';
-import React from 'react';
 
 //* *********************************
 //* ARRAYS
@@ -165,14 +163,14 @@ export const formatDateTime = value => {
     return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
 
-export const renderBooleanIcon = value => {
-    if (value === true || value === 't') {
-        return <Check size="small" data-testid="icon-true" />;
+export const stringToBooleanValueOrNull = (value: string) => {
+    if (['true', 't'].indexOf(value?.toString().toLowerCase()) >= 0) {
+        return true;
     }
-    if (value === false || value === 'f') {
-        return <Close size="small" data-testid="icon-false" />;
+    if (['false', 'f'].indexOf(value?.toString().toLowerCase()) >= 0) {
+        return false;
     }
-    return value;
+    return null;
 };
 
 /**
