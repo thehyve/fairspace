@@ -2576,7 +2576,7 @@ kubectl get ns
 [source, shell]
 ----
 # Add the stable repo (prepare and use personal access token, also known as PAT, within your GitHub account as a password)
-~/bin/helm/helm helm registry login ghcr.io/fairspace/helm-charts --username <your github account> --password-stdin
+~/bin/helm/helm registry login ghcr.io/fairspace/helm-charts --username <your github account> --password-stdin
 # (Optional) Add the fairspace repo via the GCS plugin for writing
 ~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.4.2
 gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
