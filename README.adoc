@@ -2513,7 +2513,7 @@ Now everything should be ready to start using Fairspace:
 Requires:
 
 * Helm >= 3.14.x
-* kubectl >= 1.26.x
+* kubectl >= 1.27.x
 
 You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Helm].
 Helm charts for Fairspace are published to the public helm repository at
@@ -2538,7 +2538,7 @@ We provide a number of charts for various components that can be used in combina
 ~/bin/helm/helm version
 ----
 
-* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.14.x install version > 1.26.x).
+* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.14.x install version > 1.27.x).
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
