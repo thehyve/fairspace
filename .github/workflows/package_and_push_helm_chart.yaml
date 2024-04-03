@@ -7,8 +7,6 @@ on:
       - release
   workflow_dispatch:
     inputs:
-      name:
-        description: "Manual trigger for Helm chart packaging and pushing"
       version:
         description: "Version of the Helm chart to push"
         required: false

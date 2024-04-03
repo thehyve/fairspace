@@ -3,12 +3,11 @@ name: Deploy Helm Chart to FNS GKE
 on:
   workflow_dispatch:
     inputs:
-      name:
-        description: "Manual trigger for Helm chart deploy"
       version:
-        description: "Version of the Helm chart to deploy (optional, defaults to latest  snapshot)"
+        description: "Version of the Helm chart to deploy (optional, defaults to latest snapshot)"
         required: false
-      environment:
+      env:
+        type: choice
         description: "Environment to deploy to"
         required: true
         default: "test"
@@ -46,7 +45,7 @@ jobs:
 
       - name: Define Helm Chart version (taken from input or latest snapshot)
         run: |
-          VERSION=$(cat ./VERSION)
+          VERSION=$(cat ./VERSION)-SNAPSHOT
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION=${{ github.event.inputs.version }}
           fi
