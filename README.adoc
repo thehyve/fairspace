@@ -2512,12 +2512,12 @@ Now everything should be ready to start using Fairspace:
 
 Requires:
 
-* Helm >= 3.13.x
+* Helm >= 3.14.x
 * kubectl >= 1.27.x
 
 You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Helm].
 Helm charts for Fairspace are published to the public helm repository at
-https://storage.googleapis.com/fairspace-helm.
+ghcr.io/thehyve/helm-charts/fairspace (GitHub Packages of the Fairspace repository)
 
 We provide a number of charts for various components that can be used in combination, or separately:
 
@@ -2530,7 +2530,7 @@ We provide a number of charts for various components that can be used in combina
 
 ===== Download and install helm and gcloud
 
-* Download ``helm 3.13.1`` from https://github.com/helm/helm/releases/tag/v3.13.1
+* Download ``helm 3.14.3`` from https://github.com/helm/helm/releases/tag/v3.14.3
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
 [source, shell]
@@ -2538,7 +2538,7 @@ We provide a number of charts for various components that can be used in combina
 ~/bin/helm/helm version
 ----
 
-* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.13.x install version > 1.27.x).
+* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.14.x install version > 1.27.x).
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
@@ -2572,13 +2572,11 @@ kubectl get ns
 ~/bin/helm/helm list -A
 ----
 
-===== Initialise helm and add fairspace repository
+===== Initialise helm and login to Fairspace GitHub Packages
 [source, shell]
 ----
-# Add the stable repo
-~/bin/helm/helm repo add stable https://charts.helm.sh/stable
-# Add the fairspace repo for reading
-~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
+# Add the stable repo (prepare and use personal access token, also known as PAT, within your GitHub account as a password)
+~/bin/helm/helm registry login ghcr.io/fairspace/helm-charts --username <your github account> --password-stdin
 # (Optional) Add the fairspace repo via the GCS plugin for writing
 ~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.4.2
 gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
@@ -2623,7 +2621,7 @@ install the Fairspace Keycloak chart:
 ~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.7.0 --namespace keycloak-new \
 -f /path/to/fairspace-keycloak-values.yaml
 ----
-You can pass values files with ``-f``.
+You can pass values files with ``-f`` or ``--values``.
 
 Example ``fairspace-keycloak-values.yaml`` file:
 [source, yaml]
