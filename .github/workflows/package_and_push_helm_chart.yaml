@@ -34,14 +34,15 @@ jobs:
         run: |
           VERSION=$(cat ./VERSION)
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          if [ $BRANCH != "release" ]
-          then
+          echo "Building images from the branch: $BRANCH"
+          if [ $BRANCH != "release" ]; then
             VERSION=$VERSION-SNAPSHOT
           fi
           # override version of custom input is provided
-          if [ "${{ github.event.inputs.version  != '' }}" ]; then
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
             VERSION=${{ github.event.inputs.version }}
           fi
+          echo "Helm charts version to be deployed: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Push Helm chart to repository
