@@ -9,13 +9,9 @@ on:
     inputs:
       name:
         description: "Manual trigger for Helm chart packaging and pushing"
-      release_type:
-        description: "Release or snapshot version?"
-        required: true
-        default: "SNAPSHOT"
-        options:
-          - "SNAPSHOT"
-          - "RELEASE"
+      version:
+        description: "Version of the Helm chart to push"
+        required: false
 
 jobs:
   deploy:
@@ -32,13 +28,19 @@ jobs:
 
       - name: Login with Helm
         run: |
-          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ vars.HELM_REGISTRY }} --username ${{ github.repository_owner }} --password-stdin
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ vars.HELM_REGISTRY }} --username ${{ github.actor }} --password-stdin
 
       - name: Prepare version
         run: |
           VERSION=$(cat ./VERSION)
-          if [[ ${{ github.event.inputs.release_type }} = "SNAPSHOT" ]] || [[ $BRANCH = "dev" ]]; then
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          if [ $BRANCH != "release" ]
+          then
             VERSION=$VERSION-SNAPSHOT
+          fi
+          # override version of custom input is provided
+          if [ "${{ github.event.inputs.version  != '' }}" ]; then
+            VERSION=${{ github.event.inputs.version }}
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
@@ -48,7 +50,3 @@ jobs:
           helm package "charts/fairspace" --version ${{ env.VERSION }}
           helm push "fairspace-${{ env.VERSION }}.tgz" "oci://${{ vars.HELM_REGISTRY }}"
           echo "Pushed package to repository"
-
-      - name: Clean up
-        run: |
-          rm -rf "fairspace*.tgz"

@@ -46,7 +46,7 @@ jobs:
 
       - name: Define Helm Chart version (taken from input or latest snapshot)
         run: |
-          VERSION=$(cat ./VERSION)-SNAPSHOT
+          VERSION=$(cat ./VERSION)
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION=${{ github.event.inputs.version }}
           fi
