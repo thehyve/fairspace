@@ -2691,7 +2691,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.31 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.29 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
