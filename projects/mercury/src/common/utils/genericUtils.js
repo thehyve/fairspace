@@ -163,6 +163,16 @@ export const formatDateTime = value => {
     return isToday ? timeFormatter.format(date) : dateFormatter.format(date);
 };
 
+export const stringToBooleanValueOrNull = (value: string) => {
+    if (['true', 't'].indexOf(value?.toString().toLowerCase()) >= 0) {
+        return true;
+    }
+    if (['false', 'f'].indexOf(value?.toString().toLowerCase()) >= 0) {
+        return false;
+    }
+    return null;
+};
+
 /**
  * Splits camel case string into separated strings
  *

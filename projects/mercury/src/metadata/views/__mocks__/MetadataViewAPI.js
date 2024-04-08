@@ -1,4 +1,4 @@
-import type {MetadataViewData, MetadataViewFacet, MetadataViewOptions} from '../MetadataViewAPI';
+import type {MetadataViewFacet, MetadataViewOptions} from '../MetadataViewAPI';
 
 export const mockViews: MetadataViewOptions[] = () => [
     {
@@ -65,6 +65,11 @@ export const mockViews: MetadataViewOptions[] = () => [
                 name: 'Sample_origin',
                 title: 'Origin',
                 type: 'Term'
+            },
+            {
+                name: 'Sample_reuse',
+                title: 'Is reused',
+                type: 'Boolean'
             },
             {
                 name: 'Collection',
@@ -299,6 +304,7 @@ export const mockRows = viewName => {
                     Sample_tumorCellularity: [{value: 2, label: '2'}],
                     Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
                     Sample_origin: [{value: 'http://example.com/sampleType#normal', label: 'Normal'}],
+                    Sample_reuse: [{value: 't', label: 't'}],
                     Collection: [
                         {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'},
                         {value: 'http://localhost:8080/api/webdav/f02', label: 'f02'}
@@ -310,7 +316,8 @@ export const mockRows = viewName => {
                     Sample_topography: [{value: 'http://example.com/sampleType#tongue', label: 'Tongue'}],
                     Sample_tumorCellularity: [{value: 4, label: '4'}],
                     Sample_nature: [{value: 'http://example.com/sampleType#dna', label: 'DNA'}],
-                    Sample_origin: [{value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}]
+                    Sample_origin: [{value: 'http://example.com/sampleType#tumoral', label: 'Tumoral'}],
+                    Sample_reuse: [{value: 'f', label: 'f'}]
                 }
             ];
         case 'Subject':
@@ -320,6 +327,7 @@ export const mockRows = viewName => {
                     Subject_gender: [{value: 'http://example.com/sampleType#male', label: 'Male'}],
                     Subject_species: [{value: 'http://example.com/sampleType#hs', label: 'Homo Sapiens'}],
                     Subject_birthDate: [{value: new Date(2010, 11, 25).toLocaleString(), label: '2010-11-25'}],
+                    Subject_consent: [{value: 'f', label: 'f'}],
                     Collection: [
                         {value: 'http://localhost:8080/api/webdav/f01', label: 'f01'},
                         {value: 'http://localhost:8080/api/webdav/f02', label: 'f02'}
@@ -362,15 +370,4 @@ export const mockRows = viewName => {
         default:
             return [];
     }
-};
-
-export const mockGetViewData: Promise<MetadataViewData> = viewName => {
-    const rows = mockRows(viewName);
-    return new Promise(resolve =>
-        resolve({
-            page: 0,
-            rows,
-            totalCount: rows.length
-        })
-    );
 };
