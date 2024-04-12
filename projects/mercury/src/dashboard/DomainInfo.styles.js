@@ -15,7 +15,9 @@ const styles = theme => ({
         marginTop: 10
     },
     imageIconRoot: {
-        textAlign: 'center'
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: 'xx-large'
     },
     imageIcon: {
         display: 'flex',
@@ -24,6 +26,9 @@ const styles = theme => ({
     },
     domainText: {
         color: theme.palette.grey[700]
+    },
+    link: {
+        textDecoration: 'none'
     }
 });
 

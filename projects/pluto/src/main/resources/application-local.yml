@@ -11,7 +11,7 @@ pluto:
   icons:
     jupyter: /icons/jupyter.svg
     omics: /icons/omics.svg
-    metadata: /icons/search_1.svg
+    metadata: /icons/metadata.svg
   storages:
     test:
        name: test

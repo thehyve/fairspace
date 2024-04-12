@@ -8,7 +8,7 @@ const DomainInfo = props => {
     const {domainName, domainLink, domainIcon, classes} = props;
     return (
         <div className={classes.outerMargin}>
-            <Link href={domainLink}>
+            <Link href={domainLink} className={classes.link}>
                 <Paper className={classes.paper}>
                     <Typography variant="h6" className={classes.domainText}>
                         {domainName}

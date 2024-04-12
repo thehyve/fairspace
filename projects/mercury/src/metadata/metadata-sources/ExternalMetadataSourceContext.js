@@ -4,7 +4,7 @@ import MetadataSourceContext from './MetadataSourceContext';
 const ExternalMetadataSourceContext = React.createContext({});
 
 export const ExternalMetadataSourceProvider = ({children}) => {
-    const {metadataSources, error, loading, refresh} = useContext(MetadataSourceContext);
+    const {metadataSources = [], error, loading, refresh} = useContext(MetadataSourceContext);
 
     const externalMetadataSources = metadataSources.filter(source => source.path !== null);
 

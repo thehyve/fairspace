@@ -6,7 +6,7 @@ import {MetadataSource} from '../external-views/externalMetadataSourceUtils';
 const InternalMetadataSourceContext = React.createContext({});
 
 export const InternalMetadataSourceProvider = ({children}) => {
-    const {metadataSources, error, loading, refresh} = useContext(MetadataSourceContext);
+    const {metadataSources = [], error, loading, refresh} = useContext(MetadataSourceContext);
 
     const internalMetadataSource: MetadataSource = metadataSources.find(source => source.path === null);
     const internalMetadataLabel: string =
