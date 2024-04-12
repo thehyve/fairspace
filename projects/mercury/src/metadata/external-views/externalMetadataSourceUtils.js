@@ -1,9 +1,14 @@
 import * as consts from '../../constants';
 
-export type ExternalMetadataSource = {
+export type MetadataSource = {
+    label: string,
+    iconPath: string,
+    icon: string // URL to the crated svg `Blob` object
+};
+
+export type ExternalMetadataSource = MetadataSource & {
     path: string,
-    name: string,
-    label: string
+    name: string
 };
 
 export const getExternalMetadataSourcePathPrefix = (sourceName: string) =>

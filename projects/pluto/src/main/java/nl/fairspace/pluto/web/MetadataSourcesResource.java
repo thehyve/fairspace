@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import nl.fairspace.pluto.config.dto.PlutoConfig;
 import nl.fairspace.pluto.web.dto.MetadataSourceInfo;
 
+import static nl.fairspace.pluto.config.Urls.ICONS_PATH;
 import static nl.fairspace.pluto.config.Urls.METADATA_SOURCES_PATH;
 
 @RestController
@@ -20,11 +21,12 @@ import static nl.fairspace.pluto.config.Urls.METADATA_SOURCES_PATH;
 public class MetadataSourcesResource {
 
     private final PlutoConfig plutoConfig;
+    private final IconsResource iconsResource;
 
     /**
-     * GET  /api/metadata-sources/ : returns configured external metadata sources.
+     * GET  /api/metadata-sources/ : returns configured metadata sources.
      *
-     * @return the external metadata sources.
+     * @return the metadata sources.
      */
     @GetMapping(METADATA_SOURCES_PATH)
     public ResponseEntity<List<MetadataSourceInfo>> metadataSources() {
@@ -33,7 +35,8 @@ public class MetadataSourcesResource {
                 .map(source -> new MetadataSourceInfo(
                         source.getName(),
                         source.getLabel(),
-                        String.format("/api/metadata-sources/%s", source.getName())))
+                        source.getName() != null ? String.format("/api/metadata-sources/%s", source.getName()) : null,
+                        iconsResource.getIconUrl(source.getIconName())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(metadataSources);
     }

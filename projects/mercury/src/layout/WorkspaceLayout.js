@@ -15,7 +15,9 @@ import {MetadataViewFacetsProvider} from '../metadata/views/MetadataViewFacetsCo
 import {ExternalStoragesProvider} from '../external-storage/ExternalStoragesContext';
 import {StatusProvider} from '../status/StatusContext';
 import type {Workspace} from '../workspaces/WorkspacesAPI';
-import {ExternalMetadataSourceProvider} from '../metadata/external-sources/ExternalMetadataSourceContext';
+import {ExternalMetadataSourceProvider} from '../metadata/metadata-sources/ExternalMetadataSourceContext';
+import {InternalMetadataSourceProvider} from '../metadata/metadata-sources/InternalMetadataSourceContext';
+import {MetadataSourceProvider} from '../metadata/metadata-sources/MetadataSourceContext';
 
 const WorkspaceLayoutInner = () => {
     const {workspaces} = useContext(WorkspaceContext);
@@ -31,17 +33,21 @@ const WorkspaceLayoutInner = () => {
                         <ServicesProvider>
                             <FeaturesProvider>
                                 <ExternalStoragesProvider>
-                                    <ExternalMetadataSourceProvider>
-                                        <MetadataViewFacetsProvider>
-                                            <MetadataViewProvider>
-                                                <Layout
-                                                    renderMenu={() => <MainMenu />}
-                                                    renderMain={() => <WorkspaceRoutes />}
-                                                    renderTopbar={() => <TopBar title={title} />}
-                                                />
-                                            </MetadataViewProvider>
-                                        </MetadataViewFacetsProvider>
-                                    </ExternalMetadataSourceProvider>
+                                    <MetadataSourceProvider>
+                                        <ExternalMetadataSourceProvider>
+                                            <InternalMetadataSourceProvider>
+                                                <MetadataViewFacetsProvider>
+                                                    <MetadataViewProvider>
+                                                        <Layout
+                                                            renderMenu={() => <MainMenu />}
+                                                            renderMain={() => <WorkspaceRoutes />}
+                                                            renderTopbar={() => <TopBar title={title} />}
+                                                        />
+                                                    </MetadataViewProvider>
+                                                </MetadataViewFacetsProvider>
+                                            </InternalMetadataSourceProvider>
+                                        </ExternalMetadataSourceProvider>
+                                    </MetadataSourceProvider>
                                 </ExternalStoragesProvider>
                             </FeaturesProvider>
                         </ServicesProvider>

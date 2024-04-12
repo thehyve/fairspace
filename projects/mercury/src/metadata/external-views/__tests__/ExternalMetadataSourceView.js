@@ -2,7 +2,7 @@ import React from 'react';
 
 import {render, screen, waitFor} from '@testing-library/react';
 import ExternalMetadataSourceView from '../ExternalMetadataSourceView';
-import {ExternalMetadataSourceProvider} from '../ExternalMetadataSourceContext';
+import {ExternalMetadataSourceProvider} from '../../metadata-sources/ExternalMetadataSourceContext';
 import useAsync from '../../../common/hooks/UseAsync';
 
 jest.mock('axios');

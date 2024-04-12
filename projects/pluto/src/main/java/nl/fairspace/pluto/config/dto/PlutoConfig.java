@@ -26,6 +26,8 @@ public class PlutoConfig {
 
         @NotBlank
         private String url;
+
+        private String iconName;
     }
 
     @Data
@@ -44,11 +46,25 @@ public class PlutoConfig {
         private String rootDirectoryIri;
     }
 
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class Service {
+        @NotBlank
+        private String name;
+
+        @NotBlank
+        private String url;
+
+        private String iconName;
+    }
+
     private String sessionCookieName = "JSESSIONID";
     private boolean forceHttps = true;
     private List<String> domains = Collections.emptyList();
     private Map<String, Storage> storages = new LinkedHashMap<>();
     private Map<String, MetadataSource> metadataSources = new LinkedHashMap<>();
+    private Map<String, Service> services = new LinkedHashMap<>();
     private String downstreamServiceHealthUrl;
     private String staticHtmlLocation;
+    private Map<String, String> icons;
 }

@@ -17,8 +17,8 @@ import UserRolesPage from '../users/UserRolesPage';
 import MetadataView from '../metadata/views/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
 import ExternalStoragePage from '../external-storage/ExternalStoragePage';
-import ExternalMetadataSourcesView from '../metadata/external-sources/ExternalMetadataSourceView';
-import {METADATA_VIEW_MENU_LABEL} from '../constants';
+import ExternalMetadataSourcesView from '../metadata/external-views/ExternalMetadataSourceView';
+import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
 
 const getSubject = () => (document.location.search ? queryString.parse(document.location.search).iri : null);
 
@@ -27,6 +27,7 @@ const MetadataViewMemo = React.memo(MetadataView);
 
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
+    const {internalMetadataLabel} = useContext(InternalMetadataSourceContext);
 
     return (
         <Switch>
@@ -107,7 +108,7 @@ const WorkspaceRoutes = () => {
                     if (subject) {
                         return (
                             <MetadataWrapper>
-                                <LinkedDataEntityPage title={METADATA_VIEW_MENU_LABEL} subject={subject} />
+                                <LinkedDataEntityPage title={internalMetadataLabel} subject={subject} />
                             </MetadataWrapper>
                         );
                     }

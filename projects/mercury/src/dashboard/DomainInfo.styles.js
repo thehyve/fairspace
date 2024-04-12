@@ -14,6 +14,14 @@ const styles = theme => ({
         marginLeft: 10,
         marginTop: 10
     },
+    imageIconRoot: {
+        textAlign: 'center'
+    },
+    imageIcon: {
+        display: 'flex',
+        height: 'inherit',
+        width: 'inherit'
+    },
     domainText: {
         color: theme.palette.grey[700]
     }

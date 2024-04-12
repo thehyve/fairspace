@@ -33,6 +33,7 @@ import {getParentPath, getPathFromIri} from '../../file/fileUtils';
 import usePageTitleUpdater from '../../common/hooks/UsePageTitleUpdater';
 import MetadataViewFacetsContext from './MetadataViewFacetsContext';
 import {accessLevelForCollection} from '../../collections/collectionUtils';
+import InternalMetadataSourceContext from '../metadata-sources/InternalMetadataSourceContext';
 
 type ContextualMetadataViewProperties = {
     classes: any
@@ -44,15 +45,25 @@ type MetadataViewProperties = ContextualMetadataViewProperties & {
     filters: MetadataViewFilter[],
     locationContext: string,
     currentViewName: string,
+    metadataLabel: string,
     pathPrefix: string,
     handleViewChangeRedirect: () => {}
 };
 
 export const MetadataView = (props: MetadataViewProperties) => {
-    const {views, facets, filters, currentViewName, locationContext, classes, handleViewChangeRedirect, pathPrefix} =
-        props;
+    const {
+        views,
+        facets,
+        filters,
+        currentViewName,
+        metadataLabel,
+        locationContext,
+        classes,
+        handleViewChangeRedirect,
+        pathPrefix
+    } = props;
 
-    usePageTitleUpdater('Metadata');
+    usePageTitleUpdater(metadataLabel);
 
     const {collections} = useContext(CollectionsContext);
     const {toggle, selected} = useSingleSelection();
@@ -211,7 +222,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
             value={{
                 segments: [
                     {
-                        label: 'Metadata',
+                        label: metadataLabel,
                         href: getMetadataViewsPath(currentView.name, pathPrefix),
                         icon: <Assignment />
                     }
@@ -297,7 +308,9 @@ export const MetadataView = (props: MetadataViewProperties) => {
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
     const {views = [], filters, loading, error} = useContext(MetadataViewContext);
     const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
+    const {internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
+    const metadataLabel = props.metadataLabel || internalMetadataLabel;
     const locationContext = getLocationContextFromString(window.location.search);
     const history = useHistory();
 
@@ -328,6 +341,7 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
     return (
         <MetadataView
             {...props}
+            metadataLabel={metadataLabel}
             facets={facets}
             views={views}
             filters={filters}

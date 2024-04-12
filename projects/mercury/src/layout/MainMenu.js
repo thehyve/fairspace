@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import withStyles from '@mui/styles/withStyles';
 import {NavLink} from 'react-router-dom';
-import {Divider, List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
+import {Divider, Icon, List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
 import {Search, SavedSearch, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from '../common/contexts/ServicesContext';
@@ -9,15 +9,26 @@ import UserContext from '../users/UserContext';
 import {isAdmin} from '../users/userUtils';
 import MetadataViewContext from '../metadata/views/MetadataViewContext';
 import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
-import ExternalMetadataSourceContext from '../metadata/external-sources/ExternalMetadataSourceContext';
+import ExternalMetadataSourceContext from '../metadata/metadata-sources/ExternalMetadataSourceContext';
 import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
-import {getExternalMetadataSourcePathPrefix} from '../metadata/external-sources/externalMetadataSourceUtils';
-import {METADATA_VIEW_MENU_LABEL} from '../constants';
+import {getExternalMetadataSourcePathPrefix} from '../metadata/external-views/externalMetadataSourceUtils';
+import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
 
 const styles = {
     mainMenuButton: {
         paddingTop: 15,
         paddingBottom: 15
+    },
+    imageIcon: {
+        display: 'flex',
+        height: 'inherit',
+        width: 'inherit'
+    },
+    coreMenuImageIcon: {
+        opacity: 0.6
+    },
+    iconRoot: {
+        textAlign: 'center'
     }
 };
 const MainMenu = ({classes}) => {
@@ -26,6 +37,7 @@ const MainMenu = ({classes}) => {
     const {currentUser} = useContext(UserContext);
     const {externalStorages} = useContext(ExternalStoragesContext);
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
+    const {internalMetadataIcon, internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const {views} = useContext(MetadataViewContext);
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
@@ -90,9 +102,19 @@ const MainMenu = ({classes}) => {
                         selected={pathname.startsWith('/metadata-views')}
                     >
                         <ListItemIcon>
-                            <Search />
+                            {internalMetadataIcon ? (
+                                <Icon classes={{root: classes.iconRoot}}>
+                                    <img
+                                        alt="Metadata"
+                                        src={internalMetadataIcon}
+                                        className={`${classes.imageIcon} ${classes.coreMenuImageIcon}`}
+                                    />
+                                </Icon>
+                            ) : (
+                                <Search />
+                            )}
                         </ListItemIcon>
-                        <ListItemText primary={METADATA_VIEW_MENU_LABEL} />
+                        <ListItemText primary={internalMetadataLabel} />
                     </ListItemButton>
                 )}
                 {currentUser.canViewPublicMetadata &&
@@ -106,7 +128,17 @@ const MainMenu = ({classes}) => {
                             selected={pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name))}
                         >
                             <ListItemIcon>
-                                <SavedSearch />
+                                {source.icon ? (
+                                    <Icon classes={{root: classes.iconRoot}}>
+                                        <img
+                                            alt={source.name}
+                                            src={source.icon}
+                                            className={`${classes.imageIcon} ${classes.coreMenuImageIcon}`}
+                                        />
+                                    </Icon>
+                                ) : (
+                                    <SavedSearch />
+                                )}
                             </ListItemIcon>
                             <ListItemText primary={source.label} />
                         </ListItemButton>
@@ -130,18 +162,24 @@ const MainMenu = ({classes}) => {
             <div>
                 <Divider />
                 <List>
-                    {Object.keys(services).map(key => (
+                    {services.map(service => (
                         <ListItemButton
                             className={classes.mainMenuButton}
                             component="a"
                             target="_blank"
-                            href={interpolate(services[key])}
-                            key={'service-' + key}
+                            href={interpolate(service.url)}
+                            key={'service-' + service.name}
                         >
                             <ListItemIcon>
-                                <OpenInNew />
+                                {service.icon ? (
+                                    <Icon classes={{root: classes.iconRoot}}>
+                                        <img alt={service.name} src={service.icon} className={classes.imageIcon} />
+                                    </Icon>
+                                ) : (
+                                    <OpenInNew />
+                                )}
                             </ListItemIcon>
-                            <ListItemText primary={key} />
+                            <ListItemText primary={service.name} />
                         </ListItemButton>
                     ))}
                 </List>

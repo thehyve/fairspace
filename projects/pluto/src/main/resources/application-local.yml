@@ -8,6 +8,10 @@ pluto:
   oauth2:
     base-url: http://localhost:5100
     realm: fairspace
+  icons:
+    jupyter: /icons/jupyter.svg
+    omics: /icons/omics.svg
+    metadata: /icons/search_1.svg
   storages:
     test:
        name: test
@@ -16,10 +20,25 @@ pluto:
        search-url: http://localhost:8090/api/search/files
        root-directory-iri: http://localhost:8080/api/webdav
   metadata-sources:
+    internal:
+      label: "Metadata"
+      icon-name: metadata
     test:
       name: test
-      label: "TEST Metadata"
+      label: "External Metadata"
       url: http://localhost:8090/api/
+      icon-name: omics
+  services:
+    jupyterhub:
+      name: "JupyterHub"
+      url: https://jupyter.org/hub#
+      icon-name: jupyter
+    cbioportal:
+      name: "cBioPortal"
+      url: https://www.cbioportal.org
+    "test username":
+      name: "test username"
+      url: http://google.com?q=${username}
 
 spring:
   cloud:

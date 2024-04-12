@@ -3,13 +3,14 @@ package nl.fairspace.pluto.web.dto;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
-public class MetadataSourceInfo {
+@NoArgsConstructor
+public class Service {
     private String name;
-    private String label;
-    private String path;
+    private String url;
     private String iconPath;
 }
