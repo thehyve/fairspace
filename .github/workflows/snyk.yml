@@ -1,9 +1,11 @@
 name: Workflow for Gradle using Snyk
 on:
   push:
-    branches: [ dev, release ]
+    branches:
+    - dev
+    - release
   pull_request:
-    # The branches below must be a subset of the branches above
+    #  The branches below must be a subset of the branches above
     branches: [ dev, release ]
   schedule:
     - cron: '0 2 * * 1'
@@ -12,10 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+
+    - name: Install Snyk
+      run: |
+        echo "JAVA VERSION "
+        java --version
+        npm install -g snyk
+        snyk --version 
+
     - name: Run Snyk to check for vulnerabilities
-      uses: snyk/actions/gradle-jdk16@master
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        command: test
-        args: --all-projects --severity-threshold=critical --fail-on=all
+      run: |
+        snyk test --all-projects --severity-threshold=critical --fail-on=all -d
