@@ -1643,6 +1643,25 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 ----
 ====
 
+===== Icons (SVG)
+
+|===
+| ``GET /api/iconsvg/{icon_name}``
+
+| Retrieve an SVG icon by name.
+|===
+
+Response contains an SVG icon (if configured).
+
+.Example retrieving icon (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -H 'Accept: image/svg+xml' 'http://localhost:8080/api/iconsvg/{icon_name}'
+----
+====
+
 ===== Services
 
 |===
@@ -1652,7 +1671,8 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 |===
 
 Response contains list of external services linked to Fairspace,
-e.g. JupyterHub, cBioPortal, etc.
+e.g. JupyterHub, cBioPortal, etc with their configuration details: name, url and icon name that can be used to retrieve
+the icon (using ``GET /api/iconsvg/{icon_name}``).
 
 .Example listing services (curl)
 [%collapsible]
@@ -1879,7 +1899,10 @@ Multiple external Fairspace metadata pages can be configured simultaneously. A l
 | ``label``
 | String to be used as a display name of the metadata source.
 | ``url``
-| Fairspace instance to connect to.
+| Fairspace instance to connect to. If the url is not specified, the metadata source will be treated as the internal one.
+| *Important!* There should only be a single configuration of internal metadata (only the first one will not be ignored).
+| ``icon-name``
+| Name of an icon configured in the "icons" section of values.yaml file. If the name is not specified, there will be a default icon used.
 |===
 
 Sample configuration of *external* metadata sources in YAML format:
@@ -1888,10 +1911,15 @@ Sample configuration of *external* metadata sources in YAML format:
 fairspace:
     ...
     metadata-sources:
+      internal:
+        name: internal
+        label: "Internal metadata"
+        icon-name: "icon-internal-metadata"
       additionalMetaSource1:
         name: metadataSource1
         label: "Test metadata 1"
         url: https://fairspace-test1/api/
+        icon-name: "icon-1"
       metaSource2:
         name: metadataSource2
         label: "Test metadata 2"
@@ -2715,8 +2743,13 @@ fairspace:
   ingress:
     domain: fairspace.example.com
   features: []
+  icons:
+    jupyter: "/icons/jupyter.svg
   services:
-    JupyterHub: https://jupyterhub.example.com/user/${username}/lab
+    jupyterhub:
+        name: "JupyterHub"
+        url: https://jupyterhub.example.com/user/${username}/lab
+        icon-name: "jupyter"
   storages:
     external:
       name: external
