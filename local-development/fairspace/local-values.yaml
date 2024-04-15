@@ -16,8 +16,25 @@ fairspace:
       enabled: false
   features:
     - ExtraStorage
+  icons:
+    test-icon: test.svg
+    jupyter: /icons/jupyter.svg
+    omics: /icons/omics.svg
+    metadata: /icons/metadata.svg
   services:
-    JupyterHub: http://jupyterhub.local/user/${username}/lab
+    JupyterHub:
+      name: "JupyterHub"
+      url: http://jupyterhub.local/user/${username}/lab
+      icons-name: jupyter
+  metadata-sources:
+    internal:
+      label: "Metadata"
+      icon-name: metadata
+    test:
+      name: test
+      label: "External Metadata"
+      url: http://pluto.local/api/
+      icon-name: "test-icon"
 
 # Specific settings for Saturn subchart
 saturn:

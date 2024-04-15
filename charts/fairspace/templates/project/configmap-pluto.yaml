@@ -21,61 +21,73 @@ data:
 {{ toYaml .Values.fairspace.storages | indent 8 }}
       metadata-sources:
 {{ toYaml (index .Values.fairspace "metadata-sources") | indent 8 }}
-    management:
-      endpoint:
-        health:
-          probes:
-            enabled: true
+      services:
+{{ toYaml (index .Values.fairspace.services ) | indent 8 }}
+      icons:
+{{ toYaml (index .Values.fairspace.icons ) | indent 8 }}
+      management:
+        endpoint:
+          health:
+            probes:
+              enabled: true
 
-    logging:
-      level:
-        root: {{ .Values.pluto.logLevel }}
+      logging:
+        level:
+          root: {{ .Values.pluto.logLevel }}
 
-    server:
-      error:
-        whitelabel:
-          enabled: false
-      max-http-header-size: 65535
+      server:
+        error:
+          whitelabel:
+            enabled: false
+        max-http-header-size: 65535
 
-    security:
-      oidc:
-        redirect-after-logout-url: {{ template "fairspace.scheme" . }}://{{ .Values.fairspace.ingress.domain }}/login
-        clientId: {{ .Values.external.keycloak.clientId }}
-        clientSecret: '{{ .Values.external.keycloak.clientSecret }}'
+      security:
+        oidc:
+          redirect-after-logout-url: {{ template "fairspace.scheme" . }}://{{ .Values.fairspace.ingress.domain }}/login
+          clientId: {{ .Values.external.keycloak.clientId }}
+          clientSecret: '{{ .Values.external.keycloak.clientSecret }}'
 
-    spring:
-      web:
-        resources:
-          static-locations: classpath:static,file:/opt/mercury
-      cloud:
-        gateway:
-          routes:
-{{ if .Values.pluto.backends.storageRoutes }}
-{{ toYaml .Values.pluto.backends.storageRoutes | indent 10 }}
-{{ end }}
-          - id: saturn-post-request-size
-            uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090/api/" }}
-            predicates:
-            - Method=POST
-            - Path=/api/**
-            filters:
-            - name: RequestSize
-              args:
-                maxSize: {{ .Values.pluto.maxFileSize }}
-          - id: saturn
-            uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
-            predicates:
-            - Path=/api/**
-          default-filters:
-            - RemoveRequestHeader=Pragma X-Frame-Options X-Content-Type-Options X-XSS-Protection X-Permitted-Cross-Domain-Policies Origin
-            # Including the ORIGIN header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
-            - name: Retry
-              args:
-                methods: GET,PUT,POST,DELETE
-                exceptions:
-                  - reactor.netty.http.client.PrematureCloseException
-          httpclient:
-            connect-timeout: {{ .Values.pluto.connectTimeoutMillis }}
-            response-timeout: {{ .Values.pluto.responseTimeoutMillis }}
-            pool:
-              max-idle-time: 20s
+      spring:
+        web:
+          resources:
+            static-locations: classpath:static,file:/opt/mercury
+        cloud:
+          gateway:
+            routes:
+  {{ if .Values.pluto.backends.storageRoutes }}
+  {{ toYaml .Values.pluto.backends.storageRoutes | indent 10 }}
+  {{ end }}
+            - id: saturn-post-request-size
+              uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090/api/" }}
+              predicates:
+              - Method=POST
+              - Path=/api/**
+              filters:
+              - name: RequestSize
+                args:
+                  maxSize: {{ .Values.pluto.maxFileSize }}
+            - id: saturn
+              uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090"}}
+              predicates:
+              - Path=/api/**
+            default-filters:
+              - RemoveRequestHeader=Pragma X-Frame-Options X-Content-Type-Options X-XSS-Protection X-Permitted-Cross-Domain-Policies Origin
+              # Including the ORIGIN header would trigger CORS filtering downstream, but Pluto is already doing the filtering.
+              - name: Retry
+                args:
+                  methods: GET,PUT,POST,DELETE
+                  exceptions:
+                    - reactor.netty.http.client.PrematureCloseException
+            httpclient:
+              connect-timeout: {{ .Values.pluto.connectTimeoutMillis }}
+              response-timeout: {{ .Values.pluto.responseTimeoutMillis }}
+              pool:
+                max-idle-time: 20s
+
+
+{{- if .Values.iconFolder }}
+{{- range $key, $value := .Files.Get .Values.iconFolder }}
+{{ $key }}: |
+  {{ .Files.Get $value }}
+{{- end }}
+{{- end }}
