@@ -2675,6 +2675,8 @@ ingress:
       force: true
 ----
 
+You can pass values files with ``-f`` or ``--values``.
+
 ===== Configure a Keycloak realm for Fairspace
 
 * Navigate to ``https://keycloak.example.com`` and select _Administration Console_:
@@ -2745,6 +2747,7 @@ fairspace:
   features: []
   icons:
     jupyter: "/icons/jupyter.svg" # path to the icon svg file
+    extra-icon: "extra-icon.svg" # path to the custom svg file
   services:
     jupyterhub:
         name: "JupyterHub"
@@ -2810,6 +2813,16 @@ postgres:
       size: 60Gi
       storageClass: expandable
 ----
+
+Additionally, to include custom icons for `fairspace.icons` option, you need to pass paths to the icon svg files as `svgicons.<iconname>=<path/to/the/icon.svg` using `--set-file` option:
+
+[source, shell]
+----
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.29 --namespace fairspace-new \
+-f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml --set-file svgicons.extra-icon=/path/to/extra-icon.svg
+----
+
+It is possible to pass multiple icon files with the `--set-file` option. Each of the icons has to be included as child of the `svgicons` key.
 
 ===== Deploy Jupyter Hub
 Create a new Kubernetes namespace:

@@ -54,9 +54,9 @@ data:
         cloud:
           gateway:
             routes:
-  {{ if .Values.pluto.backends.storageRoutes }}
-  {{ toYaml .Values.pluto.backends.storageRoutes | indent 10 }}
-  {{ end }}
+{{ if .Values.pluto.backends.storageRoutes }}
+{{ toYaml .Values.pluto.backends.storageRoutes | indent 12 }}
+{{ end }}
             - id: saturn-post-request-size
               uri: {{ .Values.pluto.backends.saturn | default "http://localhost:8090/api/" }}
               predicates:
@@ -84,10 +84,8 @@ data:
               pool:
                 max-idle-time: 20s
 
-
-{{- if .Values.iconFolder }}
-{{- range $key, $value := .Files.Get .Values.iconFolder }}
-{{ $key }}: |
-  {{ .Files.Get $value }}
-{{- end }}
+# Add external svg icons to the configmap data
+{{- range $key, $value := .Values.svgicons }}
+  {{ (print $key ".svg") }}: |-
+    {{ $value | nindent 4 }}
 {{- end }}
