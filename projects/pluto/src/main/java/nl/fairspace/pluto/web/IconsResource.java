@@ -1,16 +1,17 @@
 package nl.fairspace.pluto.web;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.config.dto.PlutoConfig;
+import org.apache.commons.io.IOUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import org.apache.commons.io.IOUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
 
 import static nl.fairspace.pluto.config.Urls.ICONS_PATH;
 
@@ -43,7 +44,6 @@ public class IconsResource {
         }
         return null;
     }
-
 
     private InputStream getSvgIconInputStream(String iconName) {
         String iconPath = plutoConfig.getIcons().get(iconName);

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import nl.fairspace.pluto.config.dto.PlutoConfig;
 import nl.fairspace.pluto.web.dto.MetadataSourceInfo;
 
-import static nl.fairspace.pluto.config.Urls.ICONS_PATH;
 import static nl.fairspace.pluto.config.Urls.METADATA_SOURCES_PATH;
 
 @RestController
