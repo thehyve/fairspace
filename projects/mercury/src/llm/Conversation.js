@@ -316,75 +316,79 @@ const Conversation = props => {
     }, [conversationId]);
 
     return (
-        <Paper className={classes.searchContainer}>
-            <Grid container justifyContent="center" spacing="5">
-                <Grid item md={12}>
-                    <Grid container justifyContent="center" spacing="5">
-                        <Grid item md={3} className={classes.newConversation}>
-                            <Button
-                                variant="contained"
-                                size="small"
-                                onClick={startNewConversation}
-                                startIcon={<AddIcon />}
-                            >
-                                New Question
-                            </Button>
-                        </Grid>
-                        <Grid item md={9}>
-                            <Paper className={classes.searchSection} elevation={1}>
-                                <TextField
-                                    id="outlined-search"
-                                    label="Fairspace search"
-                                    type="search"
-                                    className={classes.searchInput}
-                                    onChange={event => {
-                                        processSearchQueryChange(event.target.value);
-                                    }}
-                                    onKeyDown={event => {
-                                        if (event.key === 'Enter') {
-                                            processSearchQueryChange(event.target.value);
-                                            prepareFetchSearch();
-                                        }
-                                    }}
-                                    value={query}
-                                />
-                                <IconButton
-                                    className={classes.searchIcon}
-                                    color="primary"
-                                    onClick={() => prepareFetchSearch()}
+        <div className={classes.outerDiv}>
+            <Paper className={classes.searchContainer}>
+                <Grid container justifyContent="center" spacing="5" className={classes.mainGrid}>
+                    <Grid item md={12}>
+                        <Grid container justifyContent="center" spacing="5">
+                            <Grid item md={3} className={classes.newConversation}>
+                                <Button
+                                    variant="contained"
+                                    size="small"
+                                    onClick={startNewConversation}
+                                    startIcon={<AddIcon />}
                                 >
-                                    <SearchIcon />
-                                </IconButton>
-                            </Paper>
+                                    New Question
+                                </Button>
+                            </Grid>
+                            <Grid item md={9}>
+                                <Paper className={classes.searchSection} elevation={1}>
+                                    <TextField
+                                        id="outlined-search"
+                                        label="What articles are you looking for?"
+                                        type="search"
+                                        className={classes.searchInput}
+                                        onChange={event => {
+                                            processSearchQueryChange(event.target.value);
+                                        }}
+                                        onKeyDown={event => {
+                                            if (event.key === 'Enter') {
+                                                processSearchQueryChange(event.target.value);
+                                                prepareFetchSearch();
+                                            }
+                                        }}
+                                        value={query}
+                                    />
+                                    <IconButton
+                                        className={classes.searchIcon}
+                                        color="primary"
+                                        onClick={() => prepareFetchSearch()}
+                                    >
+                                        <SearchIcon />
+                                    </IconButton>
+                                </Paper>
+                            </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
-                <Grid
-                    item
-                    md={3}
-                    sx={{
-                        paddingRight: '5px'
-                    }}
-                >
-                    {renderHistoryList()}
-                </Grid>
-                <Grid item md={9}>
-                    <Fade in={loading}>
-                        <CircularProgress />
-                    </Fade>
-                    <Grid item md={12} className={classes.responseMessage}>
-                        <Typography variant="body1">{responseMessage}</Typography>
+                    <Grid
+                        item
+                        md={3}
+                        sx={{
+                            paddingRight: '5px'
+                        }}
+                    >
+                        {renderHistoryList()}
                     </Grid>
-                    <Grid item md={12}>
-                        {renderMessages()}
-                    </Grid>
-                    <Grid item md={12}>
-                        {responseArticles && responseArticles.length > 0 && renderArticleReferences()}
+                    <Grid item md={9}>
+                        <div className={classes.allResults}>
+                            <Fade in={loading}>
+                                <CircularProgress />
+                            </Fade>
+                            <Grid item md={12} className={classes.responseMessage}>
+                                <Typography variant="body1">{responseMessage}</Typography>
+                            </Grid>
+                            <Grid item md={12}>
+                                {renderMessages()}
+                            </Grid>
+                            <Grid item md={12}>
+                                {responseArticles && responseArticles.length > 0 && renderArticleReferences()}
+                            </Grid>
+                        </div>
                     </Grid>
                 </Grid>
-            </Grid>
-            <div>{renderModal()}</div>
-        </Paper>
+                <div>{renderModal()}</div>
+            </Paper>
+        </div>
     );
 };
 

@@ -47,7 +47,7 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
-                path="/question"
+                path="/ask"
                 exact
                 render={() => (
                     <LinkedDataMetadataProvider>

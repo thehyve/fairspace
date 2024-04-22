@@ -15,6 +15,19 @@ const styles = theme => ({
         borderBottom: '2px solid ' + theme.palette.primary.main,
         marginBottom: 50
     },
+    outerDiv: {
+        display: 'flex',
+        justifyContent: 'center',
+        width: '100%'
+    },
+    mainGrid: {
+        width: '100%'
+    },
+    searchContainer: {
+        padding: 20,
+        maxWidth: 1200,
+        width: '100%'
+    },
     gridRow: {
         minHeight: '200px'
     },
@@ -23,15 +36,18 @@ const styles = theme => ({
         marginBottom: 20
     },
     historyList: {
-        width: '100%',
-        maxWidth: 360,
+        width: 260,
+        maxWidth: '100%',
         maxHeight: '1200px',
         display: 'block',
         position: 'relative',
-        overflow: 'scroll'
+        overflow: 'auto'
     },
     historyListItem: {
-        backgroundColor: '#F1F1F1',
+        borderColor: theme.palette.primary.dark,
+        borderRadius: 5,
+        borderStyle: 'solid',
+        borderWidth: 1,
         marginBottom: 6,
         paddingBottom: 6
     },
@@ -39,15 +55,16 @@ const styles = theme => ({
         display: 'flex',
         alignItems: 'center'
     },
-    searchContainer: {
-        padding: 20,
-        width: '100%'
-    },
     searchSection: {
         padding: 10,
         marginBottom: 20,
         borderRadius: 15,
         maxWidth: 500
+    },
+    allResults: {
+        marginTop: 20,
+        marginBottom: 20,
+        width: '100%'
     },
     articleContainer: {
         overflow: 'auto'
