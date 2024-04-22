@@ -7,6 +7,7 @@ import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.maintenance.MaintenanceApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
+import io.fairspace.saturn.services.search.AiSearchApp;
 import io.fairspace.saturn.services.search.SearchApp;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.views.ViewApp;
@@ -19,6 +20,7 @@ public class SparkFilterFactory {
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
                 new ViewApp(apiPathPrefix + "/views", svc.getViewService(), svc.getQueryService()),
                 new SearchApp(apiPathPrefix + "/search", svc.getSearchService(), svc.getQueryService()),
+                new AiSearchApp(apiPathPrefix + "/aisearch"),
                 new VocabularyApp(apiPathPrefix + "/vocabulary"),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new FeaturesApp(apiPathPrefix + "/features", config.features),
