@@ -45,7 +45,7 @@ jobs:
 
       - name: Define Helm Chart version (taken from input or latest snapshot)
         run: |
-          VERSION=$(cat ./VERSION)-SNAPSHOT
+          VERSION=$(cat ./VERSION)-snapshot
           if [ -n "${{ github.event.inputs.version }}" ]; then
             VERSION=${{ github.event.inputs.version }}
           fi
@@ -90,7 +90,7 @@ jobs:
             echo "StatefulSet fairspace deleted."
           else
             echo "StatefulSet fairspace does not exist."
-          fi 
+          fi
 
       - name: Deploy Helm chart
         run: |

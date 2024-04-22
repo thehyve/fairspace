@@ -52,7 +52,7 @@ dependencies {
     implementation "com.sparkjava:spark-core:2.9.4"
     implementation 'com.pivovarit:throwing-function:1.5.1'
     implementation 'com.google.guava:guava:33.0.0-jre'
-//    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0' // To be updated when Jena 5 is released.
+    //    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0' // To be updated when Jena 5 is released.
     implementation('com.io-informatics.oss:jackson-jsonld:0.1.1') {
         exclude group: 'com.github.jsonld-java'
     }
@@ -68,6 +68,9 @@ dependencies {
 
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "com.zaxxer:HikariCP:5.1.0"
+
+    // LLM is customer specific. By default 'lib.jar' will be a demo implementation, overwrite it with customer specific implementation
+    implementation files("libs/lib.jar")
 
     runtimeOnly 'org.apache.logging.log4j:log4j-api:2.23.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.23.0'

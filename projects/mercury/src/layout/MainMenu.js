@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import {NavLink} from 'react-router-dom';
 import {Button, Icon, Stack} from '@mui/material';
 import {Search, SavedSearch, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from '@mui/icons-material';
+import ChatIcon from '@mui/icons-material/Chat';
 import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from '../common/contexts/ServicesContext';
 import UserContext from '../users/UserContext';
@@ -52,6 +53,10 @@ const styles = theme => ({
     },
     iconRoot: {
         textAlign: 'center'
+    },
+    divider: {
+        marginTop: 7,
+        marginBottom: 7
     }
 });
 const MainMenu = ({open, classes}) => {

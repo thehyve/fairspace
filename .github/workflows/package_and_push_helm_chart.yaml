@@ -34,7 +34,7 @@ jobs:
           BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           echo "Building images from the branch: $BRANCH"
           if [ $BRANCH != "release" ]; then
-            VERSION=$VERSION-SNAPSHOT
+            VERSION=$VERSION-snapshot
           fi
           # override version of custom input is provided
           if [[ -n "${{ github.event.inputs.version }}" ]]; then
