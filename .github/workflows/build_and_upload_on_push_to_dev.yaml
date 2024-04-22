@@ -40,7 +40,7 @@ jobs:
           VER=$(cat ./VERSION)
           if [ $BRANCH != "release" ]
           then
-            VER=$VER-SNAPSHOT
+            VER=$VER-snapshot
           fi
 
           echo "fairspace_version=$VER" >> "$GITHUB_OUTPUT"

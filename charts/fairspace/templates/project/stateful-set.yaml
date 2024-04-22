@@ -79,6 +79,11 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-oauth-client"
                   key: clientSecret
+            - name: LLM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Name }}-oauth-client"
+                  key: llmKey
             - name: AUDIT_LOG_ROOT
               value: /data/saturn/audit
 {{- if .Values.saturn.loglevel }}
