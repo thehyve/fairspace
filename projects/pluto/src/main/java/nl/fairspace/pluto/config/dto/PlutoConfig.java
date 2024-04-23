@@ -48,7 +48,7 @@ public class PlutoConfig {
 
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public static class Service {
+    public static class ExternalService {
         @NotBlank
         private String name;
 
@@ -63,7 +63,7 @@ public class PlutoConfig {
     private List<String> domains = Collections.emptyList();
     private Map<String, Storage> storages = new LinkedHashMap<>();
     private Map<String, MetadataSource> metadataSources = new LinkedHashMap<>();
-    private Map<String, Service> services = new LinkedHashMap<>();
+    private Map<String, ExternalService> services = new LinkedHashMap<>();
     private String downstreamServiceHealthUrl;
     private String staticHtmlLocation;
     private Map<String, String> icons;

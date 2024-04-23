@@ -3,7 +3,7 @@ package nl.fairspace.pluto.web;
 import java.io.IOException;
 import java.io.InputStream;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.ResponseEntity;
@@ -17,17 +17,18 @@ import static nl.fairspace.pluto.config.Urls.ICONS_PATH;
 
 @RestController
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class IconsResource {
 
     private final PlutoConfig plutoConfig;
     /**
-     * GET  /api/iconsvg/{icon_name} : returns an icon of specified name if exists.
+     * GET  /api/iconsvg/{icon_name} : returns a svg icon of specified name if exists.
+     *
+     * @return svg icon.
      */
     @GetMapping(value = ICONS_PATH + "{icon_name}", produces = "image/svg+xml")
     public ResponseEntity<byte[]> iconsvg(@PathVariable String icon_name) {
-        try {
-            InputStream in = getSvgIconInputStream(icon_name);
+        try (InputStream in = getSvgIconInputStream(icon_name)) {
             if (in == null || in.available() == 0) {
                 return ResponseEntity.notFound().build();
             }

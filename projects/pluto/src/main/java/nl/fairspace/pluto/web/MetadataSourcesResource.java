@@ -34,7 +34,9 @@ public class MetadataSourcesResource {
                 .map(source -> new MetadataSourceInfo(
                         source.getName(),
                         source.getLabel(),
-                        source.getName() != null ? String.format("/api/metadata-sources/%s", source.getName()) : null,
+                        source.getName() != null
+                                ? String.format("%s%s", METADATA_SOURCES_PATH, source.getName())
+                                : null,
                         iconsResource.getIconUrl(source.getIconName())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(metadataSources);
