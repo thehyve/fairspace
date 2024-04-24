@@ -2,14 +2,7 @@ import {createClient} from 'webdav';
 import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
 // eslint-disable-next-line import/no-cycle
-import {
-    decodeHTMLEntities,
-    encodePath,
-    generateUniqueFileName,
-    getFileName,
-    joinPaths,
-    joinPathsAvoidEmpty
-} from './fileUtils';
+import {encodePath, generateUniqueFileName, getFileName, joinPaths, joinPathsAvoidEmpty} from './fileUtils';
 import {handleHttpError} from '../common/utils/httpUtils';
 
 // Ensure that the client passes along the credentials
@@ -479,12 +472,6 @@ class FileAPI {
     mapToFile = fileObject => {
         const properties = {...fileObject, ...(fileObject.props || {})};
         delete properties.props;
-        Object.keys(properties).forEach(key => {
-            // The WebDAV client does not properly decode the XML response,
-            // so we need to do that here
-            const value = properties[key];
-            properties[key] = typeof value === 'string' ? decodeHTMLEntities(value) : value;
-        });
         return properties;
     };
 }
