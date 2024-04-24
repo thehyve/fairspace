@@ -20,14 +20,14 @@ import static nl.fairspace.pluto.config.Urls.SERVICES_PATH;
 public class ServicesResource {
 
     private final PlutoConfig plutoConfig;
-    private final IconsResource iconsResource;
+    private final IconsResourceService iconsResourceService;
 
     @GetMapping(SERVICES_PATH)
     public ResponseEntity<List<Service>> services() {
         log.trace("REST request to list configured services");
         var services = plutoConfig.getServices().values().stream()
                 .map(service -> new Service(
-                        service.getName(), service.getUrl(), iconsResource.getIconUrl(service.getIconName())))
+                        service.getName(), service.getUrl(), iconsResourceService.getIconUrl(service.getIconName())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(services);
     }

@@ -20,7 +20,7 @@ import static nl.fairspace.pluto.config.Urls.METADATA_SOURCES_PATH;
 public class MetadataSourcesResource {
 
     private final PlutoConfig plutoConfig;
-    private final IconsResource iconsResource;
+    private final IconsResourceService iconsResourceService;
 
     /**
      * GET  /api/metadata-sources/ : returns configured metadata sources.
@@ -37,7 +37,7 @@ public class MetadataSourcesResource {
                         source.getName() != null
                                 ? String.format("%s%s", METADATA_SOURCES_PATH, source.getName())
                                 : null,
-                        iconsResource.getIconUrl(source.getIconName())))
+                        iconsResourceService.getIconUrl(source.getIconName())))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(metadataSources);
     }

@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import nl.fairspace.pluto.config.dto.PlutoConfig;
-
 import static nl.fairspace.pluto.config.Urls.ICONS_PATH;
 
 @RestController
@@ -22,7 +20,7 @@ import static nl.fairspace.pluto.config.Urls.ICONS_PATH;
 @RequiredArgsConstructor
 public class IconsResource {
 
-    private final PlutoConfig plutoConfig;
+    private final IconsResourceService iconsResourceService;
     /**
      * GET  /api/iconsvg/{icon_name} : returns a svg icon of specified name if exists.
      * If icon does not exist, returns 404.
@@ -32,7 +30,7 @@ public class IconsResource {
      */
     @GetMapping(value = ICONS_PATH + "{icon_name}", produces = "image/svg+xml")
     public ResponseEntity<byte[]> iconsvg(@PathVariable String icon_name) {
-        try (InputStream in = getSvgIconInputStream(icon_name)) {
+        try (InputStream in = iconsResourceService.getSvgIconInputStream(icon_name)) {
             if (in == null || in.available() == 0) {
                 return ResponseEntity.notFound().build();
             }
@@ -43,20 +41,5 @@ public class IconsResource {
             log.error("Error reading image", e);
             return ResponseEntity.notFound().build();
         }
-    }
-
-    public String getIconUrl(String name) {
-        if (plutoConfig.getIcons().containsKey(name)) {
-            return String.format("%s%s", ICONS_PATH, name);
-        }
-        return null;
-    }
-
-    private InputStream getSvgIconInputStream(String iconName) {
-        String iconPath = plutoConfig.getIcons().get(iconName);
-        if (iconPath == null) {
-            return null;
-        }
-        return getClass().getResourceAsStream(iconPath);
     }
 }
