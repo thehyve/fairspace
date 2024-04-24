@@ -137,12 +137,6 @@ export function generateUniqueFileName(fileName, usedNames = []) {
     return newName;
 }
 
-export const decodeHTMLEntities = (htmlSource: string) => {
-    const element = document.createElement('textarea');
-    element.innerHTML = htmlSource;
-    return element.textContent;
-};
-
 export const isUnsafeFileName = fileName => NON_SAFE_FILE_NAMES.includes(fileName);
 
 export const fileNameContainsInvalidCharacter = fileName =>
