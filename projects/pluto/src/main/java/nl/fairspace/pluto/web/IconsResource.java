@@ -2,10 +2,12 @@ package nl.fairspace.pluto.web;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +25,8 @@ public class IconsResource {
     private final PlutoConfig plutoConfig;
     /**
      * GET  /api/iconsvg/{icon_name} : returns a svg icon of specified name if exists.
+     * If icon does not exist, returns 404.
+     * Cache-control header with max-age allows to cache the icon.
      *
      * @return svg icon.
      */
@@ -32,7 +36,9 @@ public class IconsResource {
             if (in == null || in.available() == 0) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(IOUtils.toByteArray(in));
+            return ResponseEntity.ok()
+                    .cacheControl(CacheControl.maxAge(30, TimeUnit.DAYS).cachePrivate())
+                    .body(IOUtils.toByteArray(in));
         } catch (IOException e) {
             log.error("Error reading image", e);
             return ResponseEntity.notFound().build();

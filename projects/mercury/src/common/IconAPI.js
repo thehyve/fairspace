@@ -12,7 +12,7 @@ export const getSvgIcon = (object: ObjectWithIconPath): Promise<ObjectWithIconOb
     if (object.iconPath === null) {
         return Promise.resolve(object);
     }
-    return axios.get(object.iconPath, {responseType: 'blob'}).then(response => {
+    return axios.get(object.iconPath, {headers: {'Cache-Control': 'Private'}, responseType: 'blob'}).then(response => {
         const iconUrl = URL.createObjectURL(response.data);
         return {
             ...object,
