@@ -7,7 +7,7 @@ import withStyles from '@mui/styles/withStyles';
 const styles = theme => ({
     root: {
         zIndex: theme.zIndex.drawer + 1,
-        borderBottom: '5px solid ' + theme.palette.primary.dark
+        borderBottom: '3px solid ' + theme.palette.primary.dark
     },
     title: {
         flexGrow: 1,
