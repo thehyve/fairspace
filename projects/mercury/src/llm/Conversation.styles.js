@@ -36,20 +36,27 @@ const styles = theme => ({
         marginBottom: 20
     },
     historyList: {
-        width: 260,
+        width: 295,
         maxWidth: '100%',
         maxHeight: '1200px',
         display: 'block',
         position: 'relative',
-        overflow: 'auto'
+        overflow: 'auto',
+        marginRight: '25px'
+    },
+    historyListContainer: {
+        borderTop: '1.5px solid ' + theme.palette.primary.light,
+        backgroundColor: '#F1F1F1'
     },
     historyListItem: {
         borderColor: theme.palette.primary.dark,
+        backgroundColor: 'white',
         borderRadius: 5,
         borderStyle: 'solid',
         borderWidth: 1,
         marginBottom: 6,
-        paddingBottom: 6
+        paddingBottom: 6,
+        marginRight: 8
     },
     newConversation: {
         display: 'flex',
