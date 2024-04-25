@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-// import ShortcutIcon from '@mui/icons-material/Shortcut';
 import {
     Box,
     Button,
@@ -291,28 +290,27 @@ const Conversation = props => {
             return;
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         performSearch()
-            // eslint-disable-next-line react-hooks/exhaustive-deps
             .then(processResponseMessages)
             .then(() => setLoading(false))
             .catch(() => {
                 handleHttpError('Connection error.');
                 handleSearchError('Fairspace article search is not available at the moment');
             });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [finalQuery]);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         getAllConversationHistory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationHistory]);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         if (restoreChatStatus) {
             restoreChat(conversationId);
         }
         setRestoreChatStatus(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [conversationId]);
 
     return (
@@ -359,13 +357,7 @@ const Conversation = props => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <Grid
-                    item
-                    md={3}
-                    sx={{
-                        paddingRight: '5px'
-                    }}
-                >
+                <Grid item md={3} className={classes.historyListContainer}>
                     {renderHistoryList()}
                 </Grid>
                 <Grid item md={9}>
