@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import LoadingInlay from '../../common/components/LoadingInlay';
 import MessageDisplay from '../../common/components/MessageDisplay';
 import MetadataView from '../views/MetadataView';
-import ExternalMetadataSourceContext from './ExternalMetadataSourceContext';
+import ExternalMetadataSourceContext from '../metadata-sources/ExternalMetadataSourceContext';
 import type {ExternalMetadataSource} from './externalMetadataSourceUtils';
 import {getExternalMetadataSourcePathPrefix} from './externalMetadataSourceUtils';
 import MetadataAPIPathContext from '../common/MetadataAPIPathContext';
@@ -35,7 +35,11 @@ const ExternalMetadataSourceView = (props: ExternalMetadataSourceViewProperties)
                 <MetadataViewFacetsProvider>
                     <VocabularyProvider>
                         <LinkedDataMetadataProvider>
-                            <MetadataView {...props} pathPrefix={getExternalMetadataSourcePathPrefix(source.name)} />
+                            <MetadataView
+                                {...props}
+                                pathPrefix={getExternalMetadataSourcePathPrefix(source.name)}
+                                metadataLabel={source.label}
+                            />
                         </LinkedDataMetadataProvider>
                     </VocabularyProvider>
                 </MetadataViewFacetsProvider>

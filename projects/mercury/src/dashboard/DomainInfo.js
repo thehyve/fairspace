@@ -1,20 +1,25 @@
 import React from 'react';
-// import ShortcutIcon from '@mui/icons-material/Shortcut';
 import HubIcon from '@mui/icons-material/Hub';
-import {Link, Paper, Typography} from '@mui/material';
+import {Icon, Link, Paper, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import styles from './DomainInfo.styles';
 
 const DomainInfo = props => {
-    const {domainName, domainLink, classes} = props;
+    const {domainName, domainLink, domainIcon, classes} = props;
     return (
         <div className={classes.outerMargin}>
-            <Link href={domainLink}>
+            <Link href={domainLink} className={classes.link}>
                 <Paper className={classes.paper}>
                     <Typography variant="h6" className={classes.domainText}>
                         {domainName}
                     </Typography>
-                    <HubIcon className={classes.icon} />
+                    {domainIcon ? (
+                        <Icon classes={{root: classes.imageIconRoot}}>
+                            <img alt={domainName} src={domainIcon} className={classes.imageIcon} />
+                        </Icon>
+                    ) : (
+                        <HubIcon className={classes.icon} />
+                    )}
                 </Paper>
             </Link>
         </div>

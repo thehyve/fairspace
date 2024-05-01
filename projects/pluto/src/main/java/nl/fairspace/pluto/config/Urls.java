@@ -6,4 +6,6 @@ public final class Urls {
     public static final String STORAGES_PATH = PLUTO_API_PREFIX + "/storages/";
     public static final String METADATA_SOURCES_PATH = PLUTO_API_PREFIX + "/metadata-sources/";
     public static final String CONFIG_PATH = PLUTO_API_PREFIX + "/config";
+    public static final String ICONS_PATH = PLUTO_API_PREFIX + "/icons/";
+    public static final String SERVICES_PATH = PLUTO_API_PREFIX + "/services/";
 }

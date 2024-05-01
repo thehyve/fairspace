@@ -47,10 +47,6 @@ auth:
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
-services:
-  jupyterhub: https://jupyter.org/hub#
-  cbioportal: https://www.cbioportal.org
-  "test username": http://google.com?q=${username}
 features:
   - ExtraStorage
 viewDatabase:

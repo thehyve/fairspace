@@ -3,8 +3,8 @@ package nl.fairspace.pluto.web;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +17,10 @@ import static nl.fairspace.pluto.config.Urls.STORAGES_PATH;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class StoragesResource {
 
-    @Autowired
-    PlutoConfig plutoConfig;
+    private final PlutoConfig plutoConfig;
 
     /**
      * GET  /api/storages/ : returns configured external storages.

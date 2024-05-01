@@ -1,19 +1,12 @@
-import React from 'react';
-import axios from 'axios';
-import {extractJsonData, handleHttpError} from '../../common/utils/httpUtils';
-import useAsync from '../../common/hooks/UseAsync';
+import React, {useContext} from 'react';
+import MetadataSourceContext from './MetadataSourceContext';
 
 const ExternalMetadataSourceContext = React.createContext({});
 
 export const ExternalMetadataSourceProvider = ({children}) => {
-    const {
-        data: externalMetadataSources = [],
-        error,
-        loading,
-        refresh
-    } = useAsync(() =>
-        axios.get('/api/metadata-sources/').then(extractJsonData).catch(handleHttpError('Connection error.'))
-    );
+    const {metadataSources = [], error, loading, refresh} = useContext(MetadataSourceContext);
+
+    const externalMetadataSources = metadataSources.filter(source => source.path !== null);
 
     return (
         <ExternalMetadataSourceContext.Provider

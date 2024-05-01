@@ -2,7 +2,8 @@ import React from 'react';
 
 import {render, screen, waitFor} from '@testing-library/react';
 import ExternalMetadataSourceView from '../ExternalMetadataSourceView';
-import {ExternalMetadataSourceProvider} from '../ExternalMetadataSourceContext';
+import {ExternalMetadataSourceProvider} from '../../metadata-sources/ExternalMetadataSourceContext';
+import {MetadataSourceProvider} from '../../metadata-sources/MetadataSourceContext';
 import useAsync from '../../../common/hooks/UseAsync';
 
 jest.mock('axios');
@@ -24,9 +25,11 @@ describe('ExternalMetadataSourceView', () => {
         });
 
         render(
-            <ExternalMetadataSourceProvider>
-                <ExternalMetadataSourceView match={{params: {source: 'example'}}} classes={{}} />
-            </ExternalMetadataSourceProvider>
+            <MetadataSourceProvider>
+                <ExternalMetadataSourceProvider>
+                    <ExternalMetadataSourceView match={{params: {source: 'example'}}} classes={{}} />
+                </ExternalMetadataSourceProvider>
+            </MetadataSourceProvider>
         );
 
         await waitFor(() => {

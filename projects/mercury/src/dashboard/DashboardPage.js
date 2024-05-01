@@ -5,15 +5,17 @@ import {Grid, Link, Paper, Typography} from '@mui/material';
 import BreadCrumbs from '../common/components/BreadCrumbs';
 import styles from './DashboardPage.styles';
 import MetadataViewContext from '../metadata/views/MetadataViewContext';
-import ExternalMetadataSourceContext from '../metadata/external-sources/ExternalMetadataSourceContext';
+import ExternalMetadataSourceContext from '../metadata/metadata-sources/ExternalMetadataSourceContext';
 import UserContext from '../users/UserContext';
 import DomainInfo from './DomainInfo';
-import {APPLICATION_NAME, METADATA_VIEW_MENU_LABEL} from '../constants';
+import {APPLICATION_NAME} from '../constants';
+import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
 
 const DashboardPage = props => {
     const {currentUser, classes} = props;
     const {views} = useContext(MetadataViewContext);
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
+    const {internalMetadataIcon, internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
 
     return (
@@ -49,8 +51,9 @@ const DashboardPage = props => {
                     <Grid container justifyContent="center" spacing="5">
                         {canViewMetadata && (
                             <DomainInfo
-                                domainName={METADATA_VIEW_MENU_LABEL}
+                                domainName={internalMetadataLabel}
                                 domainLink="/metadata-views"
+                                domainIcon={internalMetadataIcon}
                                 key="metadata-views"
                             />
                         )}
@@ -59,6 +62,7 @@ const DashboardPage = props => {
                                 <DomainInfo
                                     domainName={source.label}
                                     domainLink={'/metadata-sources/' + source.name}
+                                    domainIcon={source.icon}
                                     key={source.name}
                                 />
                             ))}

@@ -40,6 +40,7 @@ fairspace:
   services: {}
   storages: {}
   metadata-sources: {}
+  icons: {}
 
 # Generic settings for tracing
 tracing:
@@ -182,3 +183,5 @@ postgres:
 
 # Pod annotations should remain empty. They are filled within the build process
 podAnnotations: { }
+
+svgicons: { }

@@ -14,8 +14,21 @@ const styles = theme => ({
         marginLeft: 10,
         marginTop: 10
     },
+    imageIconRoot: {
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: 'xx-large'
+    },
+    imageIcon: {
+        display: 'flex',
+        height: 'inherit',
+        width: 'inherit'
+    },
     domainText: {
         color: theme.palette.grey[700]
+    },
+    link: {
+        textDecoration: 'none'
     }
 });
 
