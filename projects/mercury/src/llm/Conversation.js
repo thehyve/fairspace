@@ -129,6 +129,7 @@ const Conversation = props => {
         setMessages([]);
         setResponseArticles([]);
         setConversationId('');
+        getAllConversationHistory();
     };
 
     const processSearchQueryChange = newQuery => {
@@ -150,7 +151,6 @@ const Conversation = props => {
     const performSearch = () => {
         if (conversationId === '') {
             const searchResult = new FulltextAPI().search(query);
-            getAllConversationHistory();
             return searchResult;
         }
 
