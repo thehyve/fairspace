@@ -17,7 +17,7 @@ class FulltextAPI {
             .catch(handleHttpError('Error while performing search'));
     }
 
-    // Chat, a sequence of queries with context and follow-up. Only poassible if the chat is initialized.
+    // Chat, a sequence of queries with context and follow-up. Only possible if the chat is initialized.
     chat(query, conversationId): Promise<Response> {
         return axios
             .post(this.remoteURL + 'chat', {querytext: query, conversationId}, {headers: HEADERS})
@@ -47,6 +47,14 @@ class FulltextAPI {
             .get(this.remoteURL + 'history/' + conversationId, {headers: HEADERS})
             .then(extractJsonData)
             .catch(handleHttpError('Error while retrieving chat history'));
+    }
+
+    // Get all conversation data of single stored conversation.
+    getConversation(conversationId): Promise<Response> {
+        return axios
+            .get(this.remoteURL + 'conversation/' + conversationId, {headers: HEADERS})
+            .then(extractJsonData)
+            .catch(handleHttpError('Error while retrieving stored conversation with id ' + conversationId));
     }
 }
 
