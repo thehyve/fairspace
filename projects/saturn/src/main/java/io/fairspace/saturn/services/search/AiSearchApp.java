@@ -2,16 +2,21 @@ package io.fairspace.saturn.services.search;
 
 import lombok.extern.log4j.*;
 import nl.hyve.llm.LlmConversation;
+
 import org.json.JSONObject;
+
 import spark.Request;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import io.fairspace.saturn.services.BaseApp;
 
 import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
-
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
 import static spark.Spark.post;
+
+import java.io.FileWriter;
 
 @Log4j2
 public class AiSearchApp extends BaseApp {
@@ -48,10 +53,30 @@ public class AiSearchApp extends BaseApp {
                     return "Please provide a valid conversationid.";
                 }
 
-                var conversationId = req.params().get(":id");
+                var conversationId = req.params(":id");
 
                 res.type(APPLICATION_JSON.asString());
                 return new LlmConversation().getConversationHistory(conversationId);
+            } catch (Exception e) {
+                return handleError(req, e);
+            }
+        });
+
+        get("/conversation/:id", "application/json", (req, res) -> {
+            try {
+                boolean keyExists = req.params() != null && req.params().containsKey(":id");
+
+                if (!keyExists) {
+                    return "Please provide a valid conversationid.";
+                }
+
+                var conversationId = req.params(":id");
+                var filename = "./data/conversations/" + getUserKey() + "/" + conversationId + ".json";
+                
+                var content = new String(Files.readAllBytes(Paths.get(filename)));
+
+                res.type(APPLICATION_JSON.asString());
+                return content;
             } catch (Exception e) {
                 return handleError(req, e);
             }
@@ -71,6 +96,16 @@ public class AiSearchApp extends BaseApp {
                 var conversationId = body.getString("conversationId");
 
                 var result = new LlmConversation().continueChat(conversationId, query);
+                var filepath = "./data/conversations/" + getUserKey();
+                var file = new java.io.File(filepath + "/" + conversationId + ".json");
+
+                Files.createDirectories(Paths.get(filepath));
+                
+                try (FileWriter writer = new FileWriter(file)) {
+                    writer.write(result.toString());
+                } catch (Exception e) {
+                    System.out.println("Error writing conversation history file: " + e.getMessage());
+                }
 
                 res.type(APPLICATION_JSON.asString());
                 return result;
