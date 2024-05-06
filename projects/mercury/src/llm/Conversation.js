@@ -87,10 +87,21 @@ const Conversation = props => {
         }
     };
 
+    const processHistoryResponseMessages = data => {
+        const id = data.conversation ? data.conversation.conversationId : data.conversationId;
+        const oldMessages = data.conversation ? data.conversation.messages : data.messages;
+        const oldResponseMessage = data.reply ? data.reply.summary.summaryText : '';
+
+        setResponseMessage(oldResponseMessage);
+        setConversationId(id);
+        setMessages(oldMessages);
+        new FulltextAPI().getConversation(id).then(conversation => processResponseArticles(conversation));
+    };
+
     const restoreChat = id => {
         new FulltextAPI()
             .getHistory(id)
-            .then(processResponseMessages)
+            .then(processHistoryResponseMessages)
             .then(() => setLoading(false))
             .catch(() => handleHttpError('Error retrieving chat history.'));
     };
