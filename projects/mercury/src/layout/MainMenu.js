@@ -9,6 +9,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from '../common/contexts/ServicesContext';
 import UserContext from '../users/UserContext';
 import {isAdmin} from '../users/userUtils';
+import FeaturesContext from '../common/contexts/FeaturesContext';
 import MetadataViewContext from '../metadata/views/MetadataViewContext';
 import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
 import ExternalMetadataSourceContext from '../metadata/metadata-sources/ExternalMetadataSourceContext';
@@ -69,6 +70,10 @@ const MainMenu = ({open, classes}) => {
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
     const {internalMetadataIcon, internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const {views} = useContext(MetadataViewContext);
+
+    const {isFeatureEnabled} = useContext(FeaturesContext);
+    const useLlmSearch = isFeatureEnabled('LlmSearch');
+
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
