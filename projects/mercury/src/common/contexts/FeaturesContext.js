@@ -3,7 +3,7 @@ import React from 'react';
 import {extractJsonData, handleHttpError} from '../utils/httpUtils';
 import useAsync from '../hooks/UseAsync';
 
-export type Feature = 'ExtraStorage' | any; // more to come
+export type Feature = 'ExtraStorage' | 'LlmSearch' | any; // more to come
 
 const FeaturesContext = React.createContext({});
 
