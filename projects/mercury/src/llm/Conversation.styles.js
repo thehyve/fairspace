@@ -58,9 +58,15 @@ const styles = theme => ({
         paddingBottom: 6,
         marginRight: 8
     },
+    deleteHistoryButton: {
+        position: 'absolute',
+        marginLeft: '75%'
+    },
     newConversation: {
         display: 'flex',
-        alignItems: 'center'
+        height: 40,
+        padding: 0,
+        top: 0
     },
     searchSection: {
         padding: 10,
