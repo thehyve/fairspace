@@ -364,7 +364,9 @@ public class SparqlQueryService implements QueryService {
             case Identifier, Term, TermSet -> makeNode(createURI(o.toString()));
             case Text, Set -> makeString(o.toString());
             case Number -> makeDecimal(o.toString());
-            case Date -> makeDateTime(convertDateValue(o.toString()));
+                // Extract date only as it comes in format "yyyy-MM-ddTHH:mm:ss.SSSX"
+                // Leave it as is in case of adding new DateTime filter format
+            case Date -> makeDate(o.toString().split("T")[0]);
             case Boolean -> makeBoolean(convertBooleanValue(o.toString()));
         };
     }

@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        jena_version = '4.10.0'
+        jena_version = '4.10.0' // todo: upgrade to 5+ (FAIRSPC-69)
         milton_version = '3.1.1.488' // Milton >= 4 is migrated to Jakarta EE 9, which is not compatible with Jena < 5 (no stable release of Jena 5 yet). To be updated when Jena 5 is released.
         mockitoVersion = '5.11.0'
         jacksonVersion = '2.15.3' // check what version is used by Jena
