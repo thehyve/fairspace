@@ -15,6 +15,7 @@ import {
     Typography
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import withStyles from '@mui/styles/withStyles';
@@ -65,10 +66,17 @@ const Conversation = props => {
         const newMessages = data.conversation ? data.conversation.messages : data.messages;
         const id = data.conversation ? data.conversation.conversationId : data.conversationId;
 
-        // todo: extract all study id's, and replace study id in text with link to study, in a new tab
         if (!newMessages || newMessages.length === 0) {
             setResponseMessage('No chat messages found.');
             setResponseArticles([]);
+        } else if (
+            data.reply &&
+            data.reply.summary &&
+            data.reply.summary.summaryText.includes('not enough information')
+        ) {
+            setResponseMessage('Apologies, there is not enough information available to answer this query.');
+            setConversationId(id);
+            setMessages(newMessages);
         } else if (
             data.reply &&
             data.reply.summary &&
@@ -106,15 +114,6 @@ const Conversation = props => {
             .catch(() => handleHttpError('Error retrieving chat history.'));
     };
 
-    const prepareRestoreChat = id => {
-        setLoading(true);
-        setQuery('');
-        setResponseArticles([]);
-        setMessages([]);
-        setConversationId(id);
-        setRestoreChatStatus(true);
-    };
-
     const processConversationHistory = data => {
         if (data && data.length > 0) {
             data.sort((a, b) => new Date(b.start) - new Date(a.start));
@@ -135,12 +134,32 @@ const Conversation = props => {
             });
     };
 
+    const prepareRestoreChat = id => {
+        setLoading(true);
+        setQuery('');
+        setResponseArticles([]);
+        setMessages([]);
+        setConversationId(id);
+        setRestoreChatStatus(true);
+        getAllConversationHistory();
+    };
+
     const startNewConversation = () => {
+        setQuery('');
         setResponseMessage('');
         setMessages([]);
         setResponseArticles([]);
         setConversationId('');
         getAllConversationHistory();
+    };
+
+    const deleteChat = id => {
+        new FulltextAPI()
+            .deleteChat(id)
+            .then(getAllConversationHistory)
+            .then(startNewConversation)
+            .then(() => setLoading(false))
+            .catch(() => handleHttpError('Error deleting chat history with id ' + id));
     };
 
     const processSearchQueryChange = newQuery => {
@@ -288,6 +307,13 @@ const Conversation = props => {
                                   </Typography>
                                   <div>{item.topic}</div>
                               </div>
+                              <IconButton
+                                  className={classes.deleteHistoryButton}
+                                  color="primary"
+                                  onClick={() => deleteChat(item.id)}
+                              >
+                                  <DeleteForeverIcon />
+                              </IconButton>
                           </ListItemButton>
                       ))
                     : null}
@@ -343,7 +369,7 @@ const Conversation = props => {
                             <Paper className={classes.searchSection} elevation={1}>
                                 <TextField
                                     id="outlined-search"
-                                    label="What do you want to know more about?"
+                                    label="What would you like to know more about?"
                                     type="search"
                                     className={classes.searchInput}
                                     onChange={event => {
