@@ -126,7 +126,7 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const renderInput = (inputValue, onInputChange, placeholder) => (
-        <ValueLabelComponent value={nonEmptyNumber(inputValue, '')}>
+        <ValueLabelComponent value={nonEmptyNumber(inputValue, placeholder)}>
             <Input
                 value={nonEmptyNumber(inputValue, '')}
                 margin="dense"
