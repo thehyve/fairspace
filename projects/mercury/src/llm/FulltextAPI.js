@@ -33,6 +33,13 @@ class FulltextAPI {
             .catch(handleHttpError('Error while starting chat'));
     }
 
+    deleteChat(conversationId): Promise<Response> {
+        return axios
+            .post(this.remoteURL + 'deletechat/' + conversationId, {headers: HEADERS})
+            .then(extractJsonData)
+            .catch(handleHttpError('Error while deleting chat'));
+    }
+
     // Get all conversations for the current user.
     getAllConversations(): Promise<Response> {
         return axios

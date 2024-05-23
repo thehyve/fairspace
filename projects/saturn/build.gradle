@@ -69,8 +69,8 @@ dependencies {
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "com.zaxxer:HikariCP:5.1.0"
 
-    // LLM is customer specific. By default 'lib.jar' will be a demo implementation, overwrite it with customer specific implementation
-    implementation files("libs/lib.jar")
+    // LLM is customer specific. By default the jar will be a demo implementation, overwrite it with customer specific implementation
+    implementation files("libs/nl-hyve-fairspace-demo-v2.4.jar")
 
     runtimeOnly 'org.apache.logging.log4j:log4j-api:2.23.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.23.0'
