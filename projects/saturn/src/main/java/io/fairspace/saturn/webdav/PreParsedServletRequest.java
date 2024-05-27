@@ -2,7 +2,6 @@ package io.fairspace.saturn.webdav;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
 import io.milton.http.FileItem;
 import io.milton.http.RequestParseException;
@@ -10,6 +9,7 @@ import io.milton.servlet.ServletRequest;
 
 import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static io.milton.http.ResourceHandlerHelper.ATT_NAME_FILES;
 import static io.milton.http.ResourceHandlerHelper.ATT_NAME_PARAMS;

@@ -3,9 +3,9 @@ package io.fairspace.saturn.webdav;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;

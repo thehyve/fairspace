@@ -6,12 +6,12 @@ import lombok.extern.log4j.*;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.fuseki.server.*;
 import org.apache.jena.riot.*;
-import org.eclipse.jetty.server.session.SessionHandler;
 
 import io.fairspace.saturn.auth.*;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.views.*;
+import org.eclipse.jetty.session.SessionHandler;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;

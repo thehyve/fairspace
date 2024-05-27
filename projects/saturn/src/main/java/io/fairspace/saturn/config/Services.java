@@ -1,9 +1,9 @@
 package io.fairspace.saturn.config;
 
 import java.io.File;
-import javax.servlet.http.HttpServlet;
 
 import io.milton.resource.Resource;
+import jakarta.servlet.http.HttpServlet;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.*;

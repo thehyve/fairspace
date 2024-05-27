@@ -1,9 +1,9 @@
 buildscript {
     ext {
-        jena_version = '4.10.0' // todo: upgrade to 5+ (FAIRSPC-69)
-        milton_version = '3.1.1.488' // Milton >= 4 is migrated to Jakarta EE 9, which is not compatible with Jena < 5 (no stable release of Jena 5 yet). To be updated when Jena 5 is released.
+        jena_version = '5.0.0'
+        milton_version = '4.0.2.2101'
         mockitoVersion = '5.11.0'
-        jacksonVersion = '2.15.3' // check what version is used by Jena
+        jacksonVersion = '2.17.1' // check what version is used by Jena
         postgresqlVersion = '42.7.2'
     }
 }
@@ -52,7 +52,7 @@ dependencies {
     implementation "com.sparkjava:spark-core:2.9.4"
     implementation 'com.pivovarit:throwing-function:1.5.1'
     implementation 'com.google.guava:guava:33.0.0-jre'
-//    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0' // To be updated when Jena 5 is released.
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     implementation('com.io-informatics.oss:jackson-jsonld:0.1.1') {
         exclude group: 'com.github.jsonld-java'
     }
@@ -60,10 +60,10 @@ dependencies {
 
     implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.23.0'
 
-    implementation 'org.eclipse.jetty:jetty-proxy:9.4.54.v20240208'
+    implementation 'org.eclipse.jetty:jetty-proxy:12.0.7' // TODO figure out which version to use
 
-    implementation 'org.keycloak:keycloak-jetty94-adapter:23.0.7'
-    implementation 'org.keycloak:keycloak-admin-client:23.0.7'
+    implementation 'org.keycloak:keycloak-jetty94-adapter:23.0.7' // TODO figure out which version to use
+    implementation 'org.keycloak:keycloak-admin-client:23.0.7' // TODO figure out which version to use
     implementation 'org.keycloak:keycloak-policy-enforcer:23.0.7'
 
     implementation "org.postgresql:postgresql:${postgresqlVersion}"

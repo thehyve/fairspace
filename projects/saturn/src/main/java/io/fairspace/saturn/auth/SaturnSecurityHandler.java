@@ -1,19 +1,17 @@
 package io.fairspace.saturn.auth;
 
-import java.util.Map;
-
-import lombok.extern.log4j.*;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.util.security.Constraint;
+import io.fairspace.saturn.config.Config;
+import lombok.extern.log4j.Log4j2;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintMapping;
+import org.eclipse.jetty.ee10.servlet.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.keycloak.common.enums.SslRequired;
 import org.keycloak.enums.TokenStore;
 import org.keycloak.representations.adapters.config.AdapterConfig;
 
-import io.fairspace.saturn.config.Config;
+import java.util.Map;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-
 import static java.lang.System.getenv;
 
 @Log4j2
@@ -48,11 +46,14 @@ public class SaturnSecurityHandler extends ConstraintSecurityHandler {
     }
 
     private static ConstraintMapping constraintMapping(String pathSpec, boolean authenticate) {
-        var constraint = new Constraint();
-        constraint.setRoles(new String[] {Constraint.ANY_AUTH});
-        constraint.setAuthenticate(authenticate);
+        var constraint = new Constraint.Builder();
+        if (authenticate) {
+            constraint.roles(Constraint.ANY_USER.getName());
+        } else {
+            constraint.roles(Constraint.ALLOWED.getName());
+        }
         var mapping = new ConstraintMapping();
-        mapping.setConstraint(constraint);
+        mapping.setConstraint(constraint.build());
         mapping.setPathSpec(pathSpec);
         return mapping;
     }

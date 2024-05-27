@@ -4,7 +4,10 @@ import java.security.Principal;
 import java.util.Optional;
 
 import org.apache.jena.graph.Node;
+import org.eclipse.jetty.security.AuthenticationState;
+import org.eclipse.jetty.security.UserIdentity;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.internal.HttpConnection;
 import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.representations.AccessToken;
@@ -42,9 +45,9 @@ public class RequestContext {
 
     private static Optional<UserIdentity> getUserIdentity() {
         return Optional.ofNullable(getCurrentRequest())
-                .map(Request::getAuthentication)
-                .map(x -> (Authentication.User) x)
-                .map(Authentication.User::getUserIdentity);
+                .map(Request::getAuthenticationState)
+                .map(x -> (AuthenticationState.Succeeded) x)
+                .map(AuthenticationState.Succeeded::getUserIdentity);
     }
 
     private static Optional<Principal> getPrincipal() {

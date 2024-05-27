@@ -145,7 +145,7 @@ class SaturnKeycloakJettyAuthenticator extends KeycloakJettyAuthenticator {
             @Override
             public AuthChallenge getChallenge() {
                 // No redirects for API requests
-                if (request.getOriginalURI().startsWith("/api/")) {
+                if (request.getHttpURI().asString().startsWith("/api/")) {
                     return new AuthChallenge() {
                         @Override
                         public boolean challenge(HttpFacade exchange) {
