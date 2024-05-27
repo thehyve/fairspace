@@ -2,12 +2,38 @@ import React, {useState} from 'react';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import Grid from '@mui/material/Grid';
 import Input from '@mui/material/Input';
-import Slider from '@mui/material/Slider';
-import {Typography} from '@mui/material';
+import Slider, {SliderValueLabelProps} from '@mui/material/Slider';
+import {Tooltip, Typography} from '@mui/material';
 import type {MetadataViewFacetProperties} from '../MetadataViewFacetFactory';
 import {isNonEmptyValue} from '../../../common/utils/genericUtils';
 
 const nonEmptyNumber = (value, alternative) => (isNonEmptyValue(value) ? Number(value) : alternative);
+
+const ValueLabelComponent = (props: SliderValueLabelProps) => {
+    const {children, value} = props;
+
+    return (
+        <Tooltip
+            enterTouchDelay={0}
+            placement="top"
+            arrow
+            title={value}
+            PopperProps={{
+                popperOptions: {
+                    modifiers: {
+                        preventOverflow: {
+                            enabled: true,
+                            escapeWithReference: true,
+                            boundariesElement: 'viewport'
+                        }
+                    }
+                }
+            }}
+        >
+            {children}
+        </Tooltip>
+    );
+};
 
 const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {options = [], onChange = () => {}, activeFilterValues, classes} = props;
@@ -100,21 +126,23 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
     };
 
     const renderInput = (inputValue, onInputChange, placeholder) => (
-        <Input
-            value={nonEmptyNumber(inputValue, '')}
-            margin="dense"
-            onChange={onInputChange}
-            onBlur={handleBlur}
-            error={!!validationError}
-            inputProps={{
-                step: 1,
-                min: minValue,
-                max: maxValue,
-                type: 'number',
-                'aria-labelledby': 'input-slider',
-                placeholder
-            }}
-        />
+        <ValueLabelComponent value={nonEmptyNumber(inputValue, placeholder)}>
+            <Input
+                value={nonEmptyNumber(inputValue, '')}
+                margin="dense"
+                onChange={onInputChange}
+                onBlur={handleBlur}
+                error={!!validationError}
+                inputProps={{
+                    step: 1,
+                    min: minValue,
+                    max: maxValue,
+                    type: 'number',
+                    'aria-labelledby': 'input-slider',
+                    placeholder
+                }}
+            />
+        </ValueLabelComponent>
     );
 
     const getSliderValue = () => {
@@ -136,6 +164,9 @@ const NumericalRangeSelectionFacet = (props: MetadataViewFacetProperties) => {
             onChange={handleSliderChange}
             onChangeCommitted={() => commitChange(dynamicSliderValue)}
             valueLabelDisplay="auto"
+            slots={{
+                valueLabel: ValueLabelComponent
+            }}
             aria-labelledby="range-slider"
             getAriaValueText={() => dynamicSliderValue}
             min={minValue}
