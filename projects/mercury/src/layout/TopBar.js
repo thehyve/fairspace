@@ -21,7 +21,7 @@ const TopBar = ({classes, children}) => (
     <AppBar className={classes.root} position="sticky">
         <Toolbar>
             <div className={classes.title}>
-                <img src="/public/images/logo_white.png" alt="Fairspace" height="60" />
+                <img src="/images/icon_white.png" alt="Fairspace" height="60" />
             </div>
             {children}
             <UserMenu />
