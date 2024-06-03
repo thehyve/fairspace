@@ -6,10 +6,10 @@ import {Button, Icon, Stack} from '@mui/material';
 import {Search, SavedSearch, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from '@mui/icons-material';
 import ChatIcon from '@mui/icons-material/Chat';
 import HomeIcon from '@mui/icons-material/Home';
+import FeaturesContext from '../common/contexts/FeaturesContext';
 import ServicesContext from '../common/contexts/ServicesContext';
 import UserContext from '../users/UserContext';
 import {isAdmin} from '../users/userUtils';
-import FeaturesContext from '../common/contexts/FeaturesContext';
 import MetadataViewContext from '../metadata/views/MetadataViewContext';
 import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
 import ExternalMetadataSourceContext from '../metadata/metadata-sources/ExternalMetadataSourceContext';
@@ -55,11 +55,6 @@ const styles = theme => ({
     },
     iconRoot: {
         textAlign: 'center'
-    },
-    divider: {
-        marginTop: 7,
-        marginBottom: 7,
-        borderBottom: '1.5px solid ' + theme.palette.primary.dark
     }
 });
 const MainMenu = ({open, classes}) => {
@@ -70,7 +65,6 @@ const MainMenu = ({open, classes}) => {
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
     const {internalMetadataIcon, internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const {views} = useContext(MetadataViewContext);
-
     const {isFeatureEnabled} = useContext(FeaturesContext);
     const useLlmSearch = isFeatureEnabled('LlmSearch');
 
