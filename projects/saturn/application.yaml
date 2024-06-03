@@ -47,8 +47,10 @@ auth:
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
+# Enable feature flags, like 'ExtraStorage' and 'LlmSearch'
 features:
   - ExtraStorage
+  - LlmSearch
 viewDatabase:
   enabled: true
   url: jdbc:postgresql://localhost:9432/fairspace
