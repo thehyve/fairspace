@@ -39,7 +39,7 @@ const WorkspaceLayoutInner = () => {
                                                 <MetadataViewFacetsProvider>
                                                     <MetadataViewProvider>
                                                         <Layout
-                                                            renderMenu={() => <MainMenu />}
+                                                            renderMenu={open => <MainMenu open={open} />}
                                                             renderMain={() => <WorkspaceRoutes />}
                                                             renderTopbar={() => <TopBar title={title} />}
                                                         />

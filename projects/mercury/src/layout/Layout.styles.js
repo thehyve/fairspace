@@ -5,7 +5,7 @@ const styles = theme => ({
         minWidth: 0, // So the Typography noWrap works
         overflowY: 'scroll',
         overflowX: 'hidden',
-        height: 'calc(100vh - 115px)'
+        height: '100vh'
     }
 });
 
