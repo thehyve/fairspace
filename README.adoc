@@ -200,6 +200,15 @@ test.txt,Subject 1,https://institut-curie.org/analysis#O6-12,,
 |===
 ====
 
+=== Ask AI
+
+Ask AI is a feature that allows users to interact with an artificial intelligence model to get answers to their questions related to the metadata that is uploaded to Fairspace.
+To use Ask AI, simply type your query into the input field and press enter or click the looking glass. The AI will process the query and provide a response in the chat interface. The user can ask follow-up questions based on the responses, and the AI will maintain the context of the conversation.
+Ask AI also provides functionality to view and continue history conversations, and to delete them.
+Please note that while Ask AI is a powerful tool, it is not infallible. It is designed to assist with information retrieval and decision-making, but it should not be used as the sole source of information for critical decisions. For such purposes, please refer to the Metadata section described below.
+
+Ask AI implementations for Fairspace are not generic functionality. Both the cloud provider as well as the training data are customer specific. Here, a demo package is used as proof of concept. For custom implementations, please reach out to the The Hyve.
+
 ==== Metadata
 
 Explore metadata and find associated collections and files.
