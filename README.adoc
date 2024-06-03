@@ -207,7 +207,7 @@ To use Ask AI, simply type your query into the input field and press enter or cl
 Ask AI also provides functionality to view and continue history conversations, and to delete them.
 Please note that while Ask AI is a powerful tool, it is not infallible. It is designed to assist with information retrieval and decision-making, but it should not be used as the sole source of information for critical decisions. For such purposes, please refer to the Metadata section described below.
 
-Ask AI implementations for Fairspace are not generic functionality. Both the cloud provider as well as the training data are customer specific. Here, a demo package is used as proof of concept. For custom implementations, please reach out to the The Hyve.
+Ask AI implementations for Fairspace are not generic functionality. Both the cloud provider as well as the training data are customer specific. Here, a demo package is used as proof of concept. For custom implementations, please reach out to link:https://www.thehyve.nl/services/fairspace[The Hyve].
 
 ==== Metadata
 
