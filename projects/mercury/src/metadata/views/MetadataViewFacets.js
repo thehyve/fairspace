@@ -25,7 +25,8 @@ const styles = theme => ({
         width: 265
     },
     confirmFiltersButton: {
-        width: '100%'
+        width: '100%',
+        background: theme.palette.primary.main
     },
     facetsContainer: {
         maxHeight: 'calc(100vh - 212px)',
@@ -47,7 +48,7 @@ const styles = theme => ({
     facet: {
         borderColor: theme.palette.primary.light,
         borderWidth: 1.8,
-        borderRadius: 6,
+        borderRadius: 15,
         marginLeft: 8,
         marginTop: 6
     }

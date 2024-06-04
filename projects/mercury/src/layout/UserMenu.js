@@ -7,6 +7,7 @@ import {
     CardContent,
     ClickAwayListener,
     Grow,
+    IconButton,
     MenuItem,
     MenuList,
     Paper,
@@ -16,16 +17,22 @@ import {
 import withStyles from '@mui/styles/withStyles';
 
 import {ErrorOutline} from '@mui/icons-material';
+import ExitToApp from '@mui/icons-material/ExitToApp';
 import UserContext from '../users/UserContext';
 import LogoutContext from '../users/LogoutContext';
 import {getDisplayName} from '../users/userUtils';
 import versionInfo from '../common/VersionInfo';
 import {APPLICATION_NAME} from '../constants';
+import {COLORS} from '../App.theme';
 
-const styles = {
+const styles = theme => ({
     row: {
         display: 'flex',
-        justifyContent: 'center',
+        justifyContent: 'flex-start'
+    },
+    button: {
+        display: 'flex',
+        justifyContent: 'flex-start',
         paddingTop: 0,
         paddingBottom: 0
     },
@@ -34,22 +41,29 @@ const styles = {
         width: 28,
         height: 28
     },
+    username: {
+        color: theme.palette.primary.contrastText,
+        fontSize: 12
+    },
     logout: {
         width: 50
+    },
+    logoutIcon: {
+        color: theme.palette.primary.contrastText
     },
     menu: {
         paddingTop: 0
     },
     userMenu: {
-        backgroundColor: 'lightgrey',
+        backgroundColor: COLORS.fsBlueLightTransp25,
         cursor: 'default'
     },
     customFont: {
         fontFamily: 'sans-serif'
     }
-};
+});
 
-const UserMenu = ({classes}) => {
+const UserMenu = ({menuOpen, classes}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const {currentUser, currentUserLoading, currentUserError} = useContext(UserContext);
     const logout = useContext(LogoutContext);
@@ -72,20 +86,30 @@ const UserMenu = ({classes}) => {
     }
 
     if (currentUserError || !currentUser) {
-        return <ErrorOutline style={{fontSize: '2em'}} color="inherit" />;
+        return <ErrorOutline style={{fontSize: '2em'}} color="primary.contrastText" />;
+    }
+
+    if (!menuOpen) {
+        return (
+            <IconButton onClick={handleLogout} size="medium" title="Logout" className={classes.logoutIcon}>
+                <ExitToApp />
+            </IconButton>
+        );
     }
 
     return (
-        <>
+        <div className={classes.row}>
             <Button
                 aria-owns={anchorEl ? 'user-menu' : null}
                 aria-haspopup="true"
                 color="inherit"
                 onClick={handleClick}
-                className={classes.row}
+                className={classes.button}
             >
-                <Avatar alt={currentUser.name} src="/public/images/avatar.png" className={classes.avatar} />
-                <span>{getDisplayName(currentUser)}</span>
+                <Avatar className={classes.avatar}>
+                    {getDisplayName(currentUser) && getDisplayName(currentUser).charAt(0)}
+                </Avatar>
+                <span className={classes.username}>{getDisplayName(currentUser)}</span>
             </Button>
             <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} transition disablePortal>
                 {({TransitionProps, placement}) => (
@@ -130,7 +154,7 @@ const UserMenu = ({classes}) => {
                     </Grow>
                 )}
             </Popper>
-        </>
+        </div>
     );
 };
 

@@ -27,13 +27,24 @@ const styles = theme => ({
     },
     toolbar: {
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'flex-end',
+        alignItems: 'center',
         padding: '0 8px',
+        marginTop: 20,
+        ...theme.mixins.toolbar
+    },
+    toolbarCollapsed: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: 80,
+        alignItems: 'center',
+        padding: '0 8px',
+        marginTop: 20,
         ...theme.mixins.toolbar
     },
     toolbarIcon: {
-        color: 'white'
+        color: 'white',
+        marginLeft: 'auto'
     },
     mainLogo: {
         flexGrow: 1,

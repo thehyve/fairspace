@@ -4,6 +4,7 @@ const styles = theme => ({
         height: '100px',
         borderStyle: 'solid',
         borderColor: theme.palette.primary.light,
+        background: theme.palette.primary.dark,
         borderWidth: 2,
         textAlign: 'center'
     },
@@ -25,7 +26,7 @@ const styles = theme => ({
         width: 'inherit'
     },
     domainText: {
-        color: theme.palette.grey[700]
+        color: theme.palette.primary.contrastText
     },
     link: {
         textDecoration: 'none'

@@ -14,8 +14,9 @@ import ExternalMetadataSourceContext from '../metadata/metadata-sources/External
 import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
 import {getExternalMetadataSourcePathPrefix} from '../metadata/external-views/externalMetadataSourceUtils';
 import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
+import {COLORS} from '../App.theme';
 
-const styles = {
+const styles = theme => ({
     buttonStack: {
         paddingLeft: 20,
         paddingRight: 20
@@ -28,7 +29,7 @@ const styles = {
         paddingTop: 15,
         paddingBottom: 15,
         textAlign: 'center',
-        color: 'white',
+        color: theme.palette.primary.contrastText,
         height: 40
     },
     mainMenuButtonSmall: {
@@ -40,6 +41,9 @@ const styles = {
             marginLeft: 0
         }
     },
+    mainMenuButtonSelected: {
+        backgroundColor: COLORS.fsBlueLightTransp25
+    },
     imageIcon: {
         display: 'flex',
         height: 'inherit',
@@ -48,7 +52,7 @@ const styles = {
     iconRoot: {
         textAlign: 'center'
     }
-};
+});
 const MainMenu = ({open, classes}) => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
@@ -65,10 +69,13 @@ const MainMenu = ({open, classes}) => {
                 <Button
                     variant="outlined"
                     size="small"
-                    className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                    className={classNames(
+                        classes.mainMenuButton,
+                        !open && classes.mainMenuButtonSmall,
+                        pathname.startsWith('/dashboard') && classes.mainMenuButtonSelected
+                    )}
                     component={NavLink}
                     to="/dashboard"
-                    selected={pathname.startsWith('/dashboard')}
                     startIcon={<HomeIcon />}
                 >
                     {open && 'Home'}
@@ -76,10 +83,13 @@ const MainMenu = ({open, classes}) => {
                 <Button
                     variant="outlined"
                     size="small"
-                    className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                    className={classNames(
+                        classes.mainMenuButton,
+                        !open && classes.mainMenuButtonSmall,
+                        pathname.startsWith('/workspace') && classes.mainMenuButtonSelected
+                    )}
                     component={NavLink}
                     to="/workspaces"
-                    selected={pathname.startsWith('/workspace')}
                     startIcon={<Widgets />}
                 >
                     {open ? 'Workspaces' : null}
@@ -87,11 +97,14 @@ const MainMenu = ({open, classes}) => {
                 <Button
                     variant="outlined"
                     size="small"
-                    className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                    className={classNames(
+                        classes.mainMenuButton,
+                        !open && classes.mainMenuButtonSmall,
+                        pathname.startsWith('/collections') && classes.mainMenuButtonSelected
+                    )}
                     key="collections"
                     component={NavLink}
                     to="/collections"
-                    selected={pathname.startsWith('/collections')}
                     startIcon={<Folder />}
                 >
                     {open && 'Collections'}
@@ -101,11 +114,15 @@ const MainMenu = ({open, classes}) => {
                         <Button
                             variant="outlined"
                             size="small"
-                            className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                            className={classNames(
+                                classes.mainMenuButton,
+                                !open && classes.mainMenuButtonSmall,
+                                pathname.startsWith(getExternalStoragePathPrefix(storage.name)) &&
+                                    classes.mainMenuButtonSelected
+                            )}
                             key={getExternalStoragePathPrefix(storage.name)}
                             component={NavLink}
                             to={getExternalStoragePathPrefix(storage.name)}
-                            selected={pathname.startsWith(getExternalStoragePathPrefix(storage.name))}
                             startIcon={<FolderSpecial />}
                         >
                             {open && storage.label}
@@ -115,11 +132,14 @@ const MainMenu = ({open, classes}) => {
                     <Button
                         variant="outlined"
                         size="small"
-                        className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                        className={classNames(
+                            classes.mainMenuButton,
+                            !open && classes.mainMenuButtonSmall,
+                            pathname.startsWith('/metadata-views') && classes.mainMenuButtonSelected
+                        )}
                         key="metadata-views"
                         component={NavLink}
                         to="/metadata-views"
-                        selected={pathname.startsWith('/metadata-views')}
                         startIcon={
                             internalMetadataIcon ? (
                                 <Icon classes={{root: classes.iconRoot}}>
@@ -139,11 +159,15 @@ const MainMenu = ({open, classes}) => {
                         <Button
                             variant="outlined"
                             size="small"
-                            className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                            className={classNames(
+                                classes.mainMenuButton,
+                                !open && classes.mainMenuButtonSmall,
+                                pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name)) &&
+                                    classes.mainMenuButtonSelected
+                            )}
                             key={getExternalMetadataSourcePathPrefix(source.name)}
                             component={NavLink}
                             to={getExternalMetadataSourcePathPrefix(source.name)}
-                            selected={pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name))}
                             startIcon={
                                 source.icon ? (
                                     <Icon classes={{root: classes.iconRoot}}>
@@ -165,11 +189,14 @@ const MainMenu = ({open, classes}) => {
                     <Button
                         variant="outlined"
                         size="small"
-                        className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                        className={classNames(
+                            classes.mainMenuButton,
+                            !open && classes.mainMenuButtonSmall,
+                            pathname.startsWith('/users') && classes.mainMenuButtonSelected
+                        )}
                         key="users"
                         component={NavLink}
                         to="/users"
-                        selected={pathname.startsWith('/users')}
                         startIcon={<VerifiedUser />}
                     >
                         {open && 'Users'}

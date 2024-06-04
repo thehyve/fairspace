@@ -4,8 +4,6 @@ import {AppBar, Toolbar} from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
 
-import UserMenu from './UserMenu';
-
 const styles = theme => ({
     root: {
         zIndex: theme.zIndex.drawer + 1
@@ -24,7 +22,6 @@ const TopBar = ({classes, children}) => (
                 <img src="/images/icon_white.png" alt="Fairspace" height="60" />
             </div>
             {children}
-            <UserMenu />
         </Toolbar>
     </AppBar>
 );
