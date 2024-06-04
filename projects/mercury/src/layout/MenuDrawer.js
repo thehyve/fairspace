@@ -7,6 +7,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import styles from './MenuDrawer.styles';
+import UserMenu from './UserMenu';
 
 const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMouseLeave, classes}) => (
     <Drawer
@@ -25,7 +26,8 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
         <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             {renderMenu(open)}
         </div>
-        <div className={classes.toolbar}>
+        <div className={open ? classes.toolbar : classes.toolbarCollapsed}>
+            <UserMenu menuOpen={open} />
             <IconButton onClick={toggleMenuExpansion} size="medium" className={classes.toolbarIcon}>
                 {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>

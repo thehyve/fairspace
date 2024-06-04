@@ -13,11 +13,18 @@ const globalTheme = createTheme({
         primary: {
             main: COLORS.fsBlueMedium,
             light: COLORS.fsBlueLight,
-            dark: COLORS.fsBlueDark
+            dark: COLORS.fsBlueDark,
+            contrastText: 'white'
         },
-        secondary: pink,
+        secondary: {
+            main: '#758bfd'
+        },
+        error: pink,
+        success: {
+            main: '#08a045'
+        },
         background: {
-            default: '#d9d9d9'
+            default: '#eef0eb'
         }
     }
 });
@@ -25,6 +32,7 @@ const globalTheme = createTheme({
 export default createTheme({
     ...globalTheme,
     typography: {
+        fontFamily: ['Sora', 'Palanquin'].join(','),
         button: {
             textTransform: 'none'
         }
@@ -115,20 +123,43 @@ export default createTheme({
             styleOverrides: {
                 root: {
                     background: globalTheme.palette.primary.dark,
+                    '&:hover': {
+                        background: globalTheme.palette.primary.light
+                    },
                     borderRadius: 15,
                     borderColor: globalTheme.palette.primary.light,
                     paddingBottom: 0,
                     paddingTop: 0,
                     minHeight: 35
+                },
+                text: {
+                    color: globalTheme.palette.primary.contrastText
                 }
             }
         },
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'whitesmoke',
+                    backgroundColor: globalTheme.palette.primary.dark,
                     marginBottom: 0,
-                    padding: 5
+                    padding: 5,
+                    borderRadius: 15
+                },
+                title: {
+                    color: globalTheme.palette.primary.contrastText
+                },
+                avatar: {
+                    color: globalTheme.palette.primary.contrastText
+                },
+                subheader: {
+                    color: globalTheme.palette.primary.contrastText
+                }
+            }
+        },
+        MuiCardContent: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 15
                 }
             }
         },
@@ -157,15 +188,10 @@ export default createTheme({
             styleOverrides: {
                 root: {
                     backgroundColor: globalTheme.palette.background.default,
-                    // borderRadius: 15,
                     border: '1px solid',
                     borderColor: globalTheme.palette.primary.dark
-                }
-            }
-        },
-        MuiBox: {
-            styleOverrides: {
-                root: {
+                },
+                rounded: {
                     borderRadius: 15
                 }
             }

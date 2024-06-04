@@ -27,7 +27,8 @@ const styles = theme => ({
         textAlign: 'end'
     },
     clearAllButton: {
-        color: theme.palette.error.main
+        color: theme.palette.primary.contrastText,
+        background: theme.palette.primary.main
     },
     activeFilters: {
         marginBottom: 10
