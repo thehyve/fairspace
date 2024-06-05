@@ -50,7 +50,10 @@ const styles = theme => ({
         transform: 'rotate(180deg)'
     },
     permissionsCard: {
-        marginTop: 10
+        marginTop: 10,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
     },
     avatar: {
         width: 20,

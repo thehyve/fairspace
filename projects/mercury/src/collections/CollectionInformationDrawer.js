@@ -50,7 +50,10 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         outline: 'none',
         transitionBorder: '.24s',
-        easeInOut: true
+        easeInOut: true,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
     },
     activeStyle: {
         borderColor: theme.palette.info.main,

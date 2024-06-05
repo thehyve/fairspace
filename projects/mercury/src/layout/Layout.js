@@ -76,9 +76,8 @@ const Layout = ({classes, renderMenu, renderMain = () => {}}) => {
         return <></>;
     };
 
-    // The topbar is shown even if the user has no proper authorization
     return (
-        // The app itself consists of a topbar, a drawer and the actual page
+        // The app itself consists of a drawer and the actual page
         <>
             {renderAlert()}
             {renderMenu && (

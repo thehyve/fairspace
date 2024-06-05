@@ -10,7 +10,7 @@ import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityForm
 import type {MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
 import CopyButton from '../../common/components/CopyButton';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
     expandOpen: {
         transform: 'rotate(180deg)'
     },
@@ -21,7 +21,10 @@ const useStyles = makeStyles(() => ({
         flexDirection: 'column',
         outline: 'none',
         transitionBorder: '.24s',
-        easeInOut: true
+        easeInOut: true,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
     },
     emptyLinkedFiles: {
         fontStyle: 'italic'

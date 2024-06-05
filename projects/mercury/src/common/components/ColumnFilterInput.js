@@ -11,10 +11,6 @@ const useStyles = makeStyles(theme => ({
         position: 'relative',
         flex: 0.8,
         borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.common.white, 0.15),
-        '&:hover': {
-            backgroundColor: alpha(theme.palette.common.white, 0.25)
-        },
         marginLeft: 0,
         width: '100%',
         [theme.breakpoints.up('sm')]: {
@@ -22,7 +18,14 @@ const useStyles = makeStyles(theme => ({
         }
     },
     inputRoot: {
-        color: 'inherit',
+        borderRadius: theme.shape.borderRadius,
+        borderColor: theme.palette.primary.main,
+        backgroundColor: alpha(theme.palette.primary.main, 0.15),
+        color: theme.palette.primary.contrastText,
+        '&:hover': {
+            backgroundColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: theme.palette.primary.main
+        },
         width: '100%',
         fontSize: '0.9rem',
         minWidth: 180,

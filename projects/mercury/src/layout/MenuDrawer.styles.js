@@ -4,6 +4,7 @@ const styles = theme => ({
         whiteSpace: 'nowrap',
         width: 280,
         marginTop: '0',
+        border: 'none',
         overflow: 'hidden',
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
@@ -30,7 +31,8 @@ const styles = theme => ({
         justifyContent: 'flex-end',
         alignItems: 'center',
         padding: '0 8px',
-        marginTop: 20,
+        marginTop: 'auto',
+        marginBottom: 0,
         ...theme.mixins.toolbar
     },
     toolbarCollapsed: {
@@ -39,7 +41,8 @@ const styles = theme => ({
         height: 80,
         alignItems: 'center',
         padding: '0 8px',
-        marginTop: 20,
+        marginTop: 'auto',
+        marginBottom: 0,
         ...theme.mixins.toolbar
     },
     toolbarIcon: {
