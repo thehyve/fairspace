@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import {CloudDownload, Folder, MoreVert} from '@mui/icons-material';
 import {useHistory, withRouter} from 'react-router-dom';
+import withStyles from '@mui/styles/withStyles';
 
 import CollectionEditor from './CollectionEditor';
 import type {Collection, Resource, Status} from './CollectionAPI';
@@ -74,6 +75,14 @@ type CollectionDetailsState = {
     unpublishing: boolean,
     anchorEl: any
 };
+
+const styles = theme => ({
+    card: {
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
+    }
+});
 
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
@@ -351,7 +360,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
         return (
             <>
-                <Card>
+                <Card className={this.props.classes.card}>
                     <CardHeader
                         action={
                             menuItems &&
@@ -363,6 +372,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             aria-owns={anchorEl ? 'long-menu' : undefined}
                                             aria-haspopup="true"
                                             onClick={this.handleMenuClick}
+                                            styles={{color: 'white'}}
                                         >
                                             <MoreVert />
                                         </IconButton>
@@ -540,4 +550,4 @@ const ContextualCollectionDetails = props => {
     );
 };
 
-export default withRouter(ContextualCollectionDetails);
+export default withRouter(withStyles(styles)(ContextualCollectionDetails));

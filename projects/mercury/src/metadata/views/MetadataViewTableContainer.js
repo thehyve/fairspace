@@ -53,7 +53,7 @@ type MetadataViewTableContainerProperties = {
     classes: any
 };
 
-const styles = () => ({
+const styles = theme => ({
     footerButtonDiv: {
         display: 'flex',
         padding: 0,
@@ -74,7 +74,7 @@ const styles = () => ({
         overflowY: 'auto',
         overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {
-            backgroundColor: 'white'
+            backgroundColor: theme.palette.background.default
         }
     },
     tableFooter: {

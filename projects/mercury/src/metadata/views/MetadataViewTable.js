@@ -31,6 +31,11 @@ type MetadataViewTableProperties = {
 };
 
 const useStyles = makeStyles(() => ({
+    headerRow: {
+        '& .MuiTableCell-root': {
+            borderRadius: 20
+        }
+    },
     headerCellContents: {
         verticalAlign: 'top',
         whiteSpace: 'nowrap'
@@ -206,8 +211,8 @@ export const MetadataViewTable = (props: MetadataViewTableProperties) => {
 
     return (
         <Table data-testid="results-table" size="small" stickyHeader={!loading}>
-            <TableHead>
-                <TableRow>
+            <TableHead className={classes.headerRow}>
+                <TableRow sx={{'&:last-child td, &:last-child th': {border: 0}}}>
                     <TableCell style={{padding: 0}}>
                         <Checkbox
                             id="checkAll"

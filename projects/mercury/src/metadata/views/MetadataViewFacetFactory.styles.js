@@ -10,6 +10,9 @@ const styles = theme => ({
         '& .MuiCardHeader-action': {
             alignSelf: 'auto',
             margin: 0
+        },
+        '& .MuiIconButton-root': {
+            color: theme.palette.primary.contrastText
         }
     },
     content: {

@@ -26,13 +26,33 @@ const globalTheme = createTheme({
         background: {
             default: '#eef0eb'
         }
+    },
+    shape: {
+        borderRadius: 15
     }
 });
+
+const scrollbarStyles = {
+    '&::-webkit-scrollbar': {
+        width: '0.3em',
+        height: '0.3em'
+    },
+    '&::-webkit-scrollbar-track': {
+        boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+        webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)'
+    },
+    '&::-webkit-scrollbar-thumb': {
+        backgroundColor: globalTheme.palette.primary.light,
+        outline: `1px solid ${globalTheme.palette.primary.light}`,
+        borderRadius: 5
+    }
+};
 
 export default createTheme({
     ...globalTheme,
     typography: {
         fontFamily: ['Sora', 'Palanquin'].join(','),
+        fontSize: 13,
         button: {
             textTransform: 'none'
         }
@@ -126,7 +146,7 @@ export default createTheme({
                     '&:hover': {
                         background: globalTheme.palette.primary.light
                     },
-                    borderRadius: 15,
+                    borderRadius: globalTheme.shape.borderRadius,
                     borderColor: globalTheme.palette.primary.light,
                     paddingBottom: 0,
                     paddingTop: 0,
@@ -142,8 +162,7 @@ export default createTheme({
                 root: {
                     backgroundColor: globalTheme.palette.primary.dark,
                     marginBottom: 0,
-                    padding: 5,
-                    borderRadius: 15
+                    padding: 5
                 },
                 title: {
                     color: globalTheme.palette.primary.contrastText
@@ -159,7 +178,7 @@ export default createTheme({
         MuiCardContent: {
             styleOverrides: {
                 root: {
-                    borderRadius: 15
+                    borderRadius: globalTheme.shape.borderRadius
                 }
             }
         },
@@ -189,10 +208,22 @@ export default createTheme({
                 root: {
                     backgroundColor: globalTheme.palette.background.default,
                     border: '1px solid',
-                    borderColor: globalTheme.palette.primary.dark
-                },
-                rounded: {
-                    borderRadius: 15
+                    borderColor: globalTheme.palette.primary.dark,
+                    ...scrollbarStyles
+                }
+            }
+        },
+        MuiGrid: {
+            styleOverrides: {
+                root: {
+                    ...scrollbarStyles
+                }
+            }
+        },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    ...scrollbarStyles
                 }
             }
         }

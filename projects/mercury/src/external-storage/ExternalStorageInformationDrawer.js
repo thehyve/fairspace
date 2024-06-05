@@ -27,7 +27,7 @@ import LinkedDataLink from '../metadata/common/LinkedDataLink';
 import type {DisplayProperty} from './UseExternalStorageMetadata';
 import useExternalStorageMetadata from './UseExternalStorageMetadata';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
     expandOpen: {
         transform: 'rotate(180deg)'
     },
@@ -38,7 +38,10 @@ const useStyles = makeStyles(() => ({
         flexDirection: 'column',
         outline: 'none',
         transitionBorder: '.24s',
-        easeInOut: true
+        easeInOut: true,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
     }
 }));
 
