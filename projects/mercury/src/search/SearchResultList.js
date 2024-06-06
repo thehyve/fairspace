@@ -9,30 +9,32 @@ import {
     TableHead,
     TableRow,
     Tooltip,
-    Typography,
+    Typography
 } from '@mui/material';
 
 import withStyles from '@mui/styles/withStyles';
 
 import {Link as RouterLink} from 'react-router-dom';
 import {Folder, FolderOpenOutlined, InsertDriveFileOutlined} from '@mui/icons-material';
-import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from "../constants";
-import useAsync from "../common/hooks/UseAsync";
+import {COLLECTION_URI, DIRECTORY_URI, FILE_URI} from '../constants';
+import useAsync from '../common/hooks/UseAsync';
 import {
-    getLocationContextFromString, getSearchPathSegments,
+    getLocationContextFromString,
+    getSearchPathSegments,
     getSearchQueryFromString,
     getStorageFromString,
-    handleSearchError, handleTextSearchRedirect
-} from "./searchUtils";
-import SearchBar from "./SearchBar";
-import LoadingInlay from "../common/components/LoadingInlay";
-import MessageDisplay from "../common/components/MessageDisplay";
+    handleSearchError,
+    handleTextSearchRedirect
+} from './searchUtils';
+import SearchBar from './SearchBar';
+import LoadingInlay from '../common/components/LoadingInlay';
+import MessageDisplay from '../common/components/MessageDisplay';
 import BreadCrumbs from '../common/components/BreadCrumbs';
-import SearchAPI, {LocalSearchAPI} from "./SearchAPI";
-import ExternalStoragesContext from "../external-storage/ExternalStoragesContext";
-import CollectionBreadcrumbsContextProvider from "../collections/CollectionBreadcrumbsContextProvider";
-import ExternalStorageBreadcrumbsContextProvider from "../external-storage/ExternalStorageBreadcrumbsContextProvider";
-import {getPathFromIri, redirectLink} from "../file/fileUtils";
+import SearchAPI, {LocalSearchAPI} from './SearchAPI';
+import ExternalStoragesContext from '../external-storage/ExternalStoragesContext';
+import CollectionBreadcrumbsContextProvider from '../collections/CollectionBreadcrumbsContextProvider';
+import ExternalStorageBreadcrumbsContextProvider from '../external-storage/ExternalStorageBreadcrumbsContextProvider';
+import {getPathFromIri, redirectLink} from '../file/fileUtils';
 import ShortText from './ShortText';
 
 const styles = {
@@ -43,7 +45,7 @@ const styles = {
         marginTop: 16
     },
     table: {
-        minWidth: 700,
+        minWidth: 700
     },
     search: {
         width: '80%',
@@ -56,21 +58,21 @@ const styles = {
 };
 
 const SearchResultList = ({classes, items, total, storage = {}, loading, error, history}) => {
-    const renderType = (item) => {
+    const renderType = item => {
         let avatar;
         let typeLabel;
         switch (item.type) {
             case COLLECTION_URI:
                 avatar = <Folder />;
-                typeLabel = "Collection";
+                typeLabel = 'Collection';
                 break;
             case DIRECTORY_URI:
                 avatar = <FolderOpenOutlined />;
-                typeLabel = "Directory";
+                typeLabel = 'Directory';
                 break;
             case FILE_URI:
                 avatar = <InsertDriveFileOutlined />;
-                typeLabel = "File";
+                typeLabel = 'File';
                 break;
             default:
                 avatar = null;
@@ -88,13 +90,13 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
         return <Typography>{typeLabel}</Typography>;
     };
 
-    const link = (item) => redirectLink(item.id, item.type, storage);
+    const link = item => redirectLink(item.id, item.type, storage);
 
     /**
      * Handles a click on a search result.
      * @param item The clicked search result.
      */
-    const handleResultDoubleClick = (item) => {
+    const handleResultDoubleClick = item => {
         history.push(link(item));
     };
 
@@ -121,32 +123,22 @@ const SearchResultList = ({classes, items, total, storage = {}, loading, error, 
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {items
-                        .map((item) => (
-                            <TableRow
-                                hover
-                                key={item.id}
-                                onDoubleClick={() => handleResultDoubleClick(item)}
-                            >
-                                <TableCell width={5}>{renderType(item)}</TableCell>
-                                <TableCell style={{maxWidth: 500}}>
-                                    <ListItemText
-                                        primary={item.label}
-                                        secondary={<ShortText text={item.comment} maxLength={200} maxLines={3} />}
-                                    />
-                                </TableCell>
-                                <TableCell>
-                                    <Link
-                                        to={link(item)}
-                                        component={RouterLink}
-                                        color="inherit"
-                                        underline="hover"
-                                    >
-                                        {getPathFromIri(item.id, storage.rootDirectoryIri)}
-                                    </Link>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                    {items.map(item => (
+                        <TableRow hover key={item.id} onDoubleClick={() => handleResultDoubleClick(item)}>
+                            <TableCell width={5}>{renderType(item)}</TableCell>
+                            <TableCell style={{maxWidth: 500}}>
+                                <ListItemText
+                                    primary={item.label}
+                                    secondary={<ShortText text={item.comment} maxLength={200} maxLines={3} />}
+                                />
+                            </TableCell>
+                            <TableCell>
+                                <Link to={link(item)} component={RouterLink} color="inherit" underline="hover">
+                                    {getPathFromIri(item.id, storage.rootDirectoryIri)}
+                                </Link>
+                            </TableCell>
+                        </TableRow>
+                    ))}
                 </TableBody>
             </Table>
         </Paper>
@@ -159,7 +151,8 @@ export const SearchResultListContainer = ({
     query = getSearchQueryFromString(search),
     context = getLocationContextFromString(search),
     storage = getStorageFromString(search),
-    classes, history
+    classes,
+    history
 }) => {
     const {externalStorages = []} = useContext(ExternalStoragesContext);
     const currentStorage = externalStorages.find(s => s.name === storage);
@@ -172,19 +165,14 @@ export const SearchResultListContainer = ({
     const items = data || [];
     const total = items.length;
 
-    const handleSearch = (value) => {
+    const handleSearch = value => {
         handleTextSearchRedirect(history, value, context, currentStorage);
     };
 
     const renderTextSearchResultList = () => (
         <div>
             <BreadCrumbs additionalSegments={getSearchPathSegments(context, storage)} />
-            <SearchBar
-                placeholder="Search"
-                onSearchChange={handleSearch}
-                query={query}
-                width="40%"
-            />
+            <SearchBar placeholder="Search" onSearchChange={handleSearch} query={query} width="40%" />
             <SearchResultList
                 items={items}
                 total={total}
@@ -202,10 +190,7 @@ export const SearchResultListContainer = ({
             {renderTextSearchResultList()}
         </ExternalStorageBreadcrumbsContextProvider>
     ) : (
-        <CollectionBreadcrumbsContextProvider>
-            {renderTextSearchResultList()}
-        </CollectionBreadcrumbsContextProvider>
-
+        <CollectionBreadcrumbsContextProvider>{renderTextSearchResultList()}</CollectionBreadcrumbsContextProvider>
     );
 };
 

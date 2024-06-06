@@ -1,11 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {render} from '@testing-library/react';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {TableRow} from "@mui/material";
-import CollectionList from "../CollectionList";
+import {configure, mount} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {TableRow} from '@mui/material';
 import {ThemeProvider} from '@mui/material/styles';
+import CollectionList from '../CollectionList';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -14,22 +14,30 @@ configure({adapter: new Adapter()});
 
 describe('CollectionList', () => {
     it('shows warning message when no collections available', () => {
-        const {getByText} = render(<ThemeProvider theme={theme}><CollectionList /></ThemeProvider>);
+        const {getByText} = render(
+            <ThemeProvider theme={theme}>
+                <CollectionList />
+            </ThemeProvider>
+        );
         expect(getByText(/No collections available/i)).toBeInTheDocument();
     });
 
     it('renders correct header and values columns', () => {
-        const collections = [{
-            name: 'My Collection',
-            creatorDisplayName: 'Mariah Carey',
-            dateCreated: new Date().toUTCString(),
-            iri: 'http://example.com/0',
-            ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceCode: 'ws1'
-        }];
+        const collections = [
+            {
+                name: 'My Collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/0',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceCode: 'ws1'
+            }
+        ];
 
         const {queryByText} = render(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted={false} /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} showDeleted={false} />
+            </ThemeProvider>
         );
 
         expect(queryByText('Name')).toBeInTheDocument();
@@ -43,18 +51,22 @@ describe('CollectionList', () => {
     });
 
     it('renders correct header and values columns in "show deleted" mode', () => {
-        const collections = [{
-            name: 'My Collection',
-            creatorDisplayName: 'Mariah Carey',
-            dateCreated: new Date().toUTCString(),
-            iri: 'http://example.com/0',
-            ownerWorkspace: 'http://example.com/ws1',
-            ownerWorkspaceCode: 'ws1',
-            dateDeleted: new Date().toUTCString()
-        }];
+        const collections = [
+            {
+                name: 'My Collection',
+                creatorDisplayName: 'Mariah Carey',
+                dateCreated: new Date().toUTCString(),
+                iri: 'http://example.com/0',
+                ownerWorkspace: 'http://example.com/ws1',
+                ownerWorkspaceCode: 'ws1',
+                dateDeleted: new Date().toUTCString()
+            }
+        ];
 
         const {getByText} = render(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} showDeleted /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} showDeleted />
+            </ThemeProvider>
         );
 
         expect(getByText('Name')).toBeInTheDocument();
@@ -86,10 +98,13 @@ describe('CollectionList', () => {
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
-            }];
+            }
+        ];
 
         const wrapper = mount(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} />
+            </ThemeProvider>
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 
@@ -110,7 +125,7 @@ describe('CollectionList', () => {
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString(),
-                description: "This one is not a secret"
+                description: 'This one is not a secret'
             },
             {
                 name: 'Secret collection',
@@ -120,10 +135,13 @@ describe('CollectionList', () => {
                 ownerWorkspace: 'http://example.com/ws1',
                 ownerWorkspaceCode: 'ws1',
                 dateDeleted: new Date().toUTCString()
-            }];
+            }
+        ];
 
         const wrapper = mount(
-            <ThemeProvider theme={theme}><CollectionList collections={collections} /></ThemeProvider>
+            <ThemeProvider theme={theme}>
+                <CollectionList collections={collections} />
+            </ThemeProvider>
         );
         expect(wrapper.find(TableRow).length).toBe(3);
 

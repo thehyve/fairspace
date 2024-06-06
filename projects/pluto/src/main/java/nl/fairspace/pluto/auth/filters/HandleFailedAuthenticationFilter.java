@@ -1,12 +1,13 @@
 package nl.fairspace.pluto.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.AuthConstants;
-import nl.fairspace.pluto.auth.AuthorizationFailedHandler;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import nl.fairspace.pluto.auth.AuthConstants;
+import nl.fairspace.pluto.auth.AuthorizationFailedHandler;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE;
 
@@ -27,12 +28,11 @@ public class HandleFailedAuthenticationFilter implements GatewayFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        if(!Boolean.TRUE.equals(exchange.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
+        if (!Boolean.TRUE.equals(exchange.getAttribute(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE))) {
             var mutatedExchange = failedHandler.handleFailedAuthorization(exchange);
             return mutatedExchange.getResponse().setComplete();
         }
 
         return chain.filter(exchange);
     }
-
 }

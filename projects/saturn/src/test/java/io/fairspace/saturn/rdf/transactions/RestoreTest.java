@@ -1,14 +1,15 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
@@ -17,10 +18,12 @@ import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.junit.Assert.*;
 
 public class RestoreTest {
-    private final Statement stmt1 = createStatement(createResource("http://example.com/subject1"),
+    private final Statement stmt1 = createStatement(
+            createResource("http://example.com/subject1"),
             createProperty("http://example.com/property1"),
             createResource("http://example.com/object1"));
-    private final Statement stmt2 = createStatement(createResource("http://example.com/subject2"),
+    private final Statement stmt2 = createStatement(
+            createResource("http://example.com/subject2"),
             createProperty("http://example.com/property2"),
             createResource("http://example.com/object2"));
 
@@ -61,9 +64,14 @@ public class RestoreTest {
     @Test
     public void restoreListsWorksAsExpected() throws Exception {
         var txn1 = newDataset();
-        txn1.executeWrite(m -> m
-                .add(createResource("http://example.com/1"), createProperty("http://example.com/items"), m.createList(createTypedLiteral(1), createTypedLiteral(2)))
-                .add(createResource("http://example.com/2"), createProperty("http://example.com/children"), m.createList(createTypedLiteral("a"), createTypedLiteral("b"))));
+        txn1.executeWrite(m -> m.add(
+                        createResource("http://example.com/1"),
+                        createProperty("http://example.com/items"),
+                        m.createList(createTypedLiteral(1), createTypedLiteral(2)))
+                .add(
+                        createResource("http://example.com/2"),
+                        createProperty("http://example.com/children"),
+                        m.createList(createTypedLiteral("a"), createTypedLiteral("b"))));
 
         var before = txn1.calculateRead(m -> m.listStatements().toSet());
 

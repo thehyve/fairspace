@@ -31,8 +31,6 @@ data:
       blobStorePath: "/data/saturn/files/blobs"
     viewDatabase:
       enabled: true
-    services:
-{{ toYaml .Values.fairspace.services | indent 6 }}
     features:
 {{ toYaml .Values.fairspace.features | indent 6 }}
 {{ if has "ExtraStorage" .Values.fairspace.features }}

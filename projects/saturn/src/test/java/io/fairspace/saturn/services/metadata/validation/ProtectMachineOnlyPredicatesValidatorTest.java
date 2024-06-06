@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
@@ -9,9 +8,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.mockito.Mockito.*;
 
@@ -24,8 +26,8 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     private static final Property P1 = createProperty("https://fairspace.nl/ontology/P1");
     private static final Property P2 = createProperty("https://fairspace.nl/ontology/P2");
 
-
-    private final ProtectMachineOnlyPredicatesValidator validator = new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY);
+    private final ProtectMachineOnlyPredicatesValidator validator =
+            new ProtectMachineOnlyPredicatesValidator(SYSTEM_VOCABULARY);
 
     @Mock
     private ViolationHandler violationHandler;
@@ -34,13 +36,21 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     public void testContainsMachineOnlyPredicates() {
 
         var testModel = modelOf(
-        // A machine-only property may be used as subject or object
-        P1, RDF.type, RDF.Property,
-        MACHINE_ONLY_PROPERTY, RDF.value, P1,
+                // A machine-only property may be used as subject or object
+                P1,
+                RDF.type,
+                RDF.Property,
+                MACHINE_ONLY_PROPERTY,
+                RDF.value,
+                P1,
 
-        // Other statements are allowed as well
-        S1, P2, S2,
-        S2, P2, S1);
+                // Other statements are allowed as well
+                S1,
+                P2,
+                S2,
+                S2,
+                P2,
+                S1);
 
         validator.validate(EMPTY_MODEL, testModel, testModel, EMPTY_MODEL, violationHandler);
         verifyNoInteractions(violationHandler);
@@ -50,21 +60,37 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
     public void testHasMachineOnlyPredicatesRecognizesMachineOnlyStatements() {
         // Create a model that contains one machine only statement between several non-machine-only
         var testModel = modelOf(
-        S1, P2, S2,
-        S2, P2, S1,
-        S3, P2, S1,
-
-        S3, RDF.type, FS.File,
-        S3, MACHINE_ONLY_PROPERTY, S1,
-
-        S2, P2, S3,
-        S1, P2, S3,
-        S3, P2, S2);
+                S1,
+                P2,
+                S2,
+                S2,
+                P2,
+                S1,
+                S3,
+                P2,
+                S1,
+                S3,
+                RDF.type,
+                FS.File,
+                S3,
+                MACHINE_ONLY_PROPERTY,
+                S1,
+                S2,
+                P2,
+                S3,
+                S1,
+                P2,
+                S3,
+                S3,
+                P2,
+                S2);
 
         validator.validate(EMPTY_MODEL, testModel, EMPTY_MODEL, testModel, violationHandler);
 
-        verify(violationHandler).onViolation("The given model contains a machine-only predicate",
-                createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
+        verify(violationHandler)
+                .onViolation(
+                        "The given model contains a machine-only predicate",
+                        createStatement(S3, MACHINE_ONLY_PROPERTY, S1));
     }
 
     @Test
@@ -72,5 +98,4 @@ public class ProtectMachineOnlyPredicatesValidatorTest {
         validator.validate(EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, EMPTY_MODEL, violationHandler);
         verifyNoInteractions(violationHandler);
     }
-
 }

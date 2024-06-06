@@ -1,19 +1,19 @@
-import StringValue from "./StringValue";
-import * as constants from "../../../constants";
-import NumberValue from "./NumberValue";
-import DateTimeValue from "./DateTimeValue";
-import DateValue from "./DateValue";
-import TimeValue from "./TimeValue";
-import SwitchValue from "./SwitchValue";
-import ResourceValue from "./ResourceValue";
-import EnumerationDropdown from "./EnumerationDropdown";
-import LinkedDataDropdownWithAddition from "../LinkedDataDropdownWithAddition";
-import LinkedDataDropdown from "../LinkedDataDropdown";
-import ReferringValue from "./ReferringValue";
-import ExternalLinkValue from "./ExternalLinkValue";
-import MarkdownValue from "./MarkdownValue";
+import StringValue from './StringValue';
+import * as constants from '../../../constants';
+import NumberValue from './NumberValue';
+import DateTimeValue from './DateTimeValue';
+import DateValue from './DateValue';
+import TimeValue from './TimeValue';
+import SwitchValue from './SwitchValue';
+import ResourceValue from './ResourceValue';
+import EnumerationDropdown from './EnumerationDropdown';
+import LinkedDataDropdownWithAddition from '../LinkedDataDropdownWithAddition';
+import LinkedDataDropdown from '../LinkedDataDropdown';
+import ReferringValue from './ReferringValue';
+import ExternalLinkValue from './ExternalLinkValue';
+import MarkdownValue from './MarkdownValue';
 
-export const getInputComponent = (property) => {
+export const getInputComponent = property => {
     // If the property has a restricted set of allowed values
     // show a dropdown with these values
     if (property.allowedValues) {
@@ -59,7 +59,8 @@ export const getInputComponent = (property) => {
     }
 };
 
-const defaultAddComponent = property => (property.allowAdditionOfEntities ? LinkedDataDropdownWithAddition : LinkedDataDropdown);
+const defaultAddComponent = property =>
+    property.allowAdditionOfEntities ? LinkedDataDropdownWithAddition : LinkedDataDropdown;
 
 export default {
     editComponent: property => getInputComponent(property) || ReferringValue,

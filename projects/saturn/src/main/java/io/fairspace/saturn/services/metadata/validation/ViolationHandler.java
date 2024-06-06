@@ -19,5 +19,4 @@ public interface ViolationHandler {
     default void onViolation(String message, Statement statement) {
         onViolation(message, statement.getSubject(), statement.getPredicate(), statement.getObject());
     }
-
 }

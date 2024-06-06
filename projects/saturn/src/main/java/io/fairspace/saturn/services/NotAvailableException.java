@@ -1,8 +1,7 @@
 package io.fairspace.saturn.services;
 
 public class NotAvailableException extends RuntimeException {
-    public NotAvailableException() {
-    }
+    public NotAvailableException() {}
 
     public NotAvailableException(String message) {
         super(message);

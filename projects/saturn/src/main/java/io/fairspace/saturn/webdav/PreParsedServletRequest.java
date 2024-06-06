@@ -1,14 +1,15 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+
 import io.milton.http.FileItem;
 import io.milton.http.RequestParseException;
 import io.milton.servlet.ServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
+import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.milton.http.ResourceHandlerHelper.ATT_NAME_FILES;
 import static io.milton.http.ResourceHandlerHelper.ATT_NAME_PARAMS;
@@ -24,8 +25,7 @@ public class PreParsedServletRequest extends ServletRequest {
         super.parseRequestParameters(params, files);
 
         if ("upload_files".equals(params.get("action"))) {
-            files = files.entrySet()
-                    .stream()
+            files = files.entrySet().stream()
                     .collect(toMap(Map.Entry::getKey, e -> new BlobFileItem(e.getValue(), store)));
         }
 
@@ -34,8 +34,9 @@ public class PreParsedServletRequest extends ServletRequest {
     }
 
     @Override
-    public void parseRequestParameters(Map<String, String> params, Map<String, FileItem> files) throws RequestParseException {
-       params.putAll(getParams());
-       files.putAll(getFiles());
+    public void parseRequestParameters(Map<String, String> params, Map<String, FileItem> files)
+            throws RequestParseException {
+        params.putAll(getParams());
+        files.putAll(getFiles());
     }
 }

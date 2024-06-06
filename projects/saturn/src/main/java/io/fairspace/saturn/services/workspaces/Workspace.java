@@ -1,13 +1,14 @@
 package io.fairspace.saturn.services.workspaces;
 
+import java.util.List;
+
+import lombok.*;
+import org.apache.jena.vocabulary.RDFS;
+
 import io.fairspace.saturn.rdf.dao.LifecycleAwarePersistentEntity;
 import io.fairspace.saturn.rdf.dao.RDFProperty;
 import io.fairspace.saturn.rdf.dao.RDFType;
 import io.fairspace.saturn.services.users.User;
-import lombok.*;
-import org.apache.jena.vocabulary.RDFS;
-
-import java.util.List;
 
 import static io.fairspace.saturn.vocabulary.FS.WORKSPACE_URI;
 

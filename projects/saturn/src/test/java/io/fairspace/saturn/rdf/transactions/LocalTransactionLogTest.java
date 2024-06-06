@@ -1,5 +1,8 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,16 +10,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.File;
-import java.io.IOException;
-
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class LocalTransactionLogTest {
@@ -28,7 +27,6 @@ public class LocalTransactionLogTest {
 
     @Mock
     private TransactionCodec codec;
-
 
     @Before
     public void before() throws IOException {
@@ -76,6 +74,5 @@ public class LocalTransactionLogTest {
 
         assertEquals(0L, log.size());
         assertFalse(new File(new File(new File(logDir, "volume-1"), "chapter-1"), "tx-1").exists());
-
     }
 }

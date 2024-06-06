@@ -1,12 +1,12 @@
-import {render, screen} from "@testing-library/react";
-import userEvent from "@testing-library/user-event"
-import React from "react";
+import {render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {MetadataViewTable} from "../MetadataViewTable";
-// eslint-disable-next-line jest/no-mocks-import
-import {mockRows, mockViews} from "../__mocks__/MetadataViewAPI";
-import {RESOURCES_VIEW} from "../metadataViewUtils";
 import {ThemeProvider} from '@mui/material/styles';
+import {MetadataViewTable} from '../MetadataViewTable';
+// eslint-disable-next-line jest/no-mocks-import
+import {mockRows, mockViews} from '../__mocks__/MetadataViewAPI';
+import {RESOURCES_VIEW} from '../metadataViewUtils';
 import theme from '../../../App.theme';
 
 describe('MetadataViewTable', () => {
@@ -50,6 +50,10 @@ describe('MetadataViewTable', () => {
         expect(queryAllByText('DNA').length).toBe(2);
         expect(queryByText('Lip')).toBeInTheDocument();
         expect(queryByText('Tongue')).toBeInTheDocument();
+        expect(queryByText('Is reused')).toBeInTheDocument();
+        // check if the icons for boolean values are rendered
+        expect(screen.getByTestId('icon-true')).toBeInTheDocument();
+        expect(screen.getByTestId('icon-false')).toBeInTheDocument();
     });
 
     it('renders visible columns only', () => {
@@ -88,10 +92,14 @@ describe('MetadataViewTable', () => {
         expect(queryByText('Files')).not.toBeInTheDocument();
         expect(queryByText('DNA')).not.toBeInTheDocument();
         expect(queryByText('Tongue')).not.toBeInTheDocument();
+        expect(queryByText('Is reused')).not.toBeInTheDocument();
+        // check if the icons for boolean values are not rendered
+        expect(screen.queryByTestId('icon-true')).not.toBeInTheDocument();
+        expect(screen.queryByTestId('icon-false')).not.toBeInTheDocument();
     });
 
-    it('should redirect when opening collection entry', async() => {
-        const user = userEvent.setup()
+    it('should redirect when opening collection entry', async () => {
+        const user = userEvent.setup();
         const view = RESOURCES_VIEW;
         const {columns} = mockViews().find(v => v.name === view);
         const data = {rows: mockRows(view)};
@@ -113,9 +121,10 @@ describe('MetadataViewTable', () => {
                     checkboxes={{}}
                     setCheckboxState={() => {}}
                 />
-            </ThemeProvider>);
+            </ThemeProvider>
+        );
 
-        const tableRows = screen.queryAllByRole("row");
+        const tableRows = screen.queryAllByRole('row');
         expect(tableRows.length).toEqual(2);
 
         await user.dblClick(tableRows[1]);

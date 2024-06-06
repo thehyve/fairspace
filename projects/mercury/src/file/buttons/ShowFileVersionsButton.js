@@ -1,24 +1,23 @@
 import React, {useState} from 'react';
-import useIsMounted from "react-is-mounted-hook";
-import FileVersionsDialog from "../FileVersionsDialog";
+import useIsMounted from 'react-is-mounted-hook';
+import FileVersionsDialog from '../FileVersionsDialog';
 
 const ShowFileVersionsButton = ({children, disabled, selectedFile, onRevert, isWritingEnabled}) => {
     const [opened, setOpened] = useState(false);
     const isMounted = useIsMounted();
 
-    const openDialog = (e) => {
+    const openDialog = e => {
         if (e) e.stopPropagation();
         setOpened(true);
     };
 
-    const closeDialog = (e) => {
+    const closeDialog = e => {
         if (e) e.stopPropagation();
         setOpened(false);
     };
 
-    const revertVersion = (selectedVersion) => {
-        onRevert(selectedVersion)
-            .then(shouldClose => isMounted() && shouldClose && closeDialog());
+    const revertVersion = selectedVersion => {
+        onRevert(selectedVersion).then(shouldClose => isMounted() && shouldClose && closeDialog());
     };
 
     return (

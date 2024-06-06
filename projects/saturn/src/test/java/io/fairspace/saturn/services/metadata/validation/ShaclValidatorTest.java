@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -15,8 +14,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.rdf.ModelUtils.*;
 import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
 import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
@@ -34,7 +36,6 @@ public class ShaclValidatorTest {
 
     @Mock
     private ViolationHandler violationHandler;
-
 
     @Before
     public void setUp() {
@@ -63,9 +64,15 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithInvalidProperties() {
         var model = modelOf(
-                resource1, RDF.type, FS.User,
-                resource1, RDFS.label, createTypedLiteral(123),
-                resource1, RDFS.comment, createTypedLiteral(123));
+                resource1,
+                RDF.type,
+                FS.User,
+                resource1,
+                RDFS.label,
+                createTypedLiteral(123),
+                resource1,
+                RDFS.comment,
+                createTypedLiteral(123));
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
@@ -79,8 +86,12 @@ public class ShaclValidatorTest {
     @Test
     public void validateResourceWithUnknownProperty() {
         var model = modelOf(
-                resource1, RDF.type, closedClass,
-                resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
+                resource1,
+                RDF.type,
+                closedClass,
+                resource1,
+                createProperty("http://example.com#unknown"),
+                createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         expect(resource1, createProperty("http://example.com#unknown"), createTypedLiteral(123));
@@ -91,9 +102,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceMissingRequiredProperty() {
-        var model = modelOf(
-                resource1, RDF.type, FS.Workspace
-        );
+        var model = modelOf(resource1, RDF.type, FS.Workspace);
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
@@ -104,9 +113,7 @@ public class ShaclValidatorTest {
 
     @Test
     public void validateResourceWithWrongObjectsType() {
-        var model = modelOf(
-                resource1, RDF.type, FS.File,
-                resource1, FS.createdBy, createTypedLiteral(123));
+        var model = modelOf(resource1, RDF.type, FS.File, resource1, FS.createdBy, createTypedLiteral(123));
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
         expect(resource1, FS.createdBy, createTypedLiteral(123));
@@ -116,9 +123,7 @@ public class ShaclValidatorTest {
     public void canPerformTypeChecks() {
         var before = modelOf(resource2, RDF.type, FS.User);
 
-        var toAdd = modelOf(
-                resource1, RDF.type, FS.File,
-                resource1, FS.createdBy, resource2);
+        var toAdd = modelOf(resource1, RDF.type, FS.File, resource1, FS.createdBy, resource2);
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
@@ -139,8 +144,7 @@ public class ShaclValidatorTest {
         // information from the update, as there can not be any triple in the database
         // already that references this blank node
         var blankNode = createResource();
-        var model = modelOf(blankNode, RDF.type, closedClass,
-                blankNode, FS.md5, createStringLiteral("test"));
+        var model = modelOf(blankNode, RDF.type, closedClass, blankNode, FS.md5, createStringLiteral("test"));
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
@@ -152,14 +156,10 @@ public class ShaclValidatorTest {
         // If the update contains a blank node, it should be validated solely with the
         // information from the update, as there can not be any triple in the database
         // already that references this blank node
-        var before = modelOf(
-                resource2, RDF.type, FS.User,
-                createResource(), RDF.type, FS.Collection);
+        var before = modelOf(resource2, RDF.type, FS.User, createResource(), RDF.type, FS.Collection);
 
         var blankNode = createResource();
-        var toAdd = modelOf(
-                blankNode, RDF.type, FS.User,
-                blankNode, RDFS.label, createTypedLiteral("My label"));
+        var toAdd = modelOf(blankNode, RDF.type, FS.User, blankNode, RDFS.label, createTypedLiteral("My label"));
 
         validator.validate(before, before.union(toAdd), EMPTY_MODEL, toAdd, violationHandler);
 
@@ -177,12 +177,10 @@ public class ShaclValidatorTest {
                 .add(resource1, FS.connectionString, "a")
                 .add(resource1, FS.createdBy, blankNode);
 
-        //Resource newBlankNode = createResource();
-        var toAdd = createDefaultModel()
-                .add(resource1, RDFS.label, "new");
+        // Resource newBlankNode = createResource();
+        var toAdd = createDefaultModel().add(resource1, RDFS.label, "new");
 
-        var toRemove = createDefaultModel()
-                .add(resource1, RDFS.label, "collection");
+        var toRemove = createDefaultModel().add(resource1, RDFS.label, "collection");
 
         validator.validate(before, before.difference(toRemove).union(toAdd), toRemove, toAdd, violationHandler);
 
@@ -220,13 +218,13 @@ public class ShaclValidatorTest {
 
         validator.validate(EMPTY_MODEL, model, EMPTY_MODEL, model, violationHandler);
 
-        model.listSubjects().forEachRemaining(resource ->
-                expect(resource, FS.createdBy, createTypedLiteral(123)));
+        model.listSubjects().forEachRemaining(resource -> expect(resource, FS.createdBy, createTypedLiteral(123)));
 
         verifyNoMoreInteractions(violationHandler);
     }
 
     private void expect(Resource subject, Property predicate, RDFNode object) {
-        verify(violationHandler).onViolation(anyString(), eq(asNode(subject)), eq(asNode(predicate)), eq(asNode(object)));
+        verify(violationHandler)
+                .onViolation(anyString(), eq(asNode(subject)), eq(asNode(predicate)), eq(asNode(object)));
     }
 }

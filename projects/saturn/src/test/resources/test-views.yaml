@@ -99,6 +99,7 @@ views:
         source: https://institut-curie.org/ontology#tumorMorphology
         rdfType: https://institut-curie.org/ontology#Morphology
         type: termSet
+        displayIndex: 1
       - name: laterality
         title: Laterality
         source: https://institut-curie.org/ontology#tumorLaterality
@@ -177,6 +178,7 @@ views:
           - id
           - gender
           - ageAtDeath
+        displayIndex: 0
       - view: Sample
         on: https://institut-curie.org/ontology#diagnosis
         reverse: true

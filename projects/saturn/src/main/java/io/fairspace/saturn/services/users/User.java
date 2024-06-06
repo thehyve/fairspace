@@ -2,19 +2,22 @@ package io.fairspace.saturn.services.users;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.fairspace.saturn.rdf.dao.PersistentEntity;
-import io.fairspace.saturn.rdf.dao.RDFProperty;
-import io.fairspace.saturn.rdf.dao.RDFType;
-import io.fairspace.saturn.vocabulary.FS;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.jena.vocabulary.RDFS;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import io.fairspace.saturn.rdf.dao.PersistentEntity;
+import io.fairspace.saturn.rdf.dao.RDFProperty;
+import io.fairspace.saturn.rdf.dao.RDFType;
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.vocabulary.FS.*;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
 @RDFType(USER_URI)
-@Getter @Setter
+@Getter
+@Setter
 @JsonInclude(NON_NULL)
 public class User extends PersistentEntity {
     @RDFProperty(value = ID_URI, required = true)

@@ -6,10 +6,7 @@ import RenameButton from '../RenameButton';
 describe('<RenameButton />', () => {
     it('shows dialog when clicking on children', () => {
         const {container, queryByText} = render(
-            <RenameButton
-                onRename={() => {}}
-                currentName="filename"
-            >
+            <RenameButton onRename={() => {}} currentName="filename">
                 <div>something</div>
             </RenameButton>
         );
@@ -21,11 +18,7 @@ describe('<RenameButton />', () => {
 
     it('should not open dialog if disabled', () => {
         const {container, queryByText} = render(
-            <RenameButton
-                disabled
-                onRename={() => {}}
-                currentName="filename"
-            >
+            <RenameButton disabled onRename={() => {}} currentName="filename">
                 <div>something</div>
             </RenameButton>
         );
@@ -38,10 +31,7 @@ describe('<RenameButton />', () => {
     it('should call onRename if not disabled', () => {
         const onRename = jest.fn(() => Promise.resolve());
         const {container, getByTestId, getByLabelText} = render(
-            <RenameButton
-                onRename={onRename}
-                currentName="filename"
-            >
+            <RenameButton onRename={onRename} currentName="filename">
                 <div>something</div>
             </RenameButton>
         );
@@ -58,11 +48,7 @@ describe('<RenameButton />', () => {
     it('should not find input and not call onRename if disabled', () => {
         const onRename = jest.fn(() => Promise.resolve());
         const {container, queryByLabelText} = render(
-            <RenameButton
-                disabled
-                onRename={onRename}
-                currentName="filename"
-            >
+            <RenameButton disabled onRename={onRename} currentName="filename">
                 <div>something</div>
             </RenameButton>
         );
@@ -75,10 +61,7 @@ describe('<RenameButton />', () => {
     it('should disable if invalid file name', () => {
         const onRename = jest.fn(() => Promise.resolve());
         const {container, getByTestId, getByLabelText} = render(
-            <RenameButton
-                onRename={onRename}
-                currentName="filename"
-            >
+            <RenameButton onRename={onRename} currentName="filename">
                 <div>something</div>
             </RenameButton>
         );

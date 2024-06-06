@@ -11,15 +11,9 @@ import UserContext from '../users/UserContext';
 import type {Workspace} from './WorkspacesAPI';
 import WorkspaceContext from './WorkspaceContext';
 
-const WorkspaceInfoWithProvider = (props) => (
-    <LinkedDataMetadataProvider>
-        <WorkspaceInfo {...props} />
-    </LinkedDataMetadataProvider>
-);
-
 type WorkspaceInfoProps = {
-    workspace: Workspace;
-}
+    workspace: Workspace
+};
 
 const WorkspaceInfo = (props: WorkspaceInfoProps) => {
     const {workspace} = props;
@@ -67,4 +61,9 @@ const WorkspaceInfo = (props: WorkspaceInfoProps) => {
     );
 };
 
+const WorkspaceInfoWithProvider = props => (
+    <LinkedDataMetadataProvider>
+        <WorkspaceInfo {...props} />
+    </LinkedDataMetadataProvider>
+);
 export default WorkspaceInfoWithProvider;

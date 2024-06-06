@@ -1,9 +1,9 @@
 package io.fairspace.saturn.config;
 
-import lombok.extern.log4j.*;
-
 import java.io.File;
 import java.io.IOException;
+
+import lombok.extern.log4j.*;
 
 @Log4j2
 public class ConfigLoader {

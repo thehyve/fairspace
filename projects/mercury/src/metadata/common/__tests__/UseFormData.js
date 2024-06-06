@@ -1,7 +1,7 @@
 import {act} from 'react-dom/test-utils';
-import {SHACL_MAX_LENGTH, SHACL_MIN_COUNT} from "../../../constants";
-import useFormData from "../UseFormData";
-import {testHook} from "../../../common/utils/testUtils";
+import {SHACL_MAX_LENGTH, SHACL_MIN_COUNT} from '../../../constants';
+import useFormData from '../UseFormData';
+import {testHook} from '../../../common/utils/testUtils';
 
 const initialValues = {
     'http://a': [{value: 'text'}, {value: 'something'}],
@@ -103,7 +103,7 @@ describe('useFormData', () => {
                 formData.addValue(propertyB, {value: 'more-than-5-characters'});
             });
 
-            expect(Object.keys(formData.validationErrors)).toEqual(["http://b"]);
+            expect(Object.keys(formData.validationErrors)).toEqual(['http://b']);
         });
 
         it('should validate data upon updating', () => {
@@ -111,7 +111,7 @@ describe('useFormData', () => {
                 formData.updateValue(propertyB, {value: 'more-than-5-characters'}, 0);
             });
 
-            expect(Object.keys(formData.validationErrors)).toEqual(["http://b"]);
+            expect(Object.keys(formData.validationErrors)).toEqual(['http://b']);
         });
 
         it('should validate data upon deletion', () => {
@@ -119,7 +119,7 @@ describe('useFormData', () => {
                 formData.deleteValue(propertyA, 0);
             });
 
-            expect(Object.keys(formData.validationErrors)).toEqual(["http://a"]);
+            expect(Object.keys(formData.validationErrors)).toEqual(['http://a']);
         });
     });
 });

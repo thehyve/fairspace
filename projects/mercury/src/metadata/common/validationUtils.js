@@ -1,14 +1,15 @@
 import {isNonEmptyValue} from '../../common/utils/genericUtils';
 
-import {getFirstPredicateValue} from "./jsonLdUtils";
-import * as constants from "../../constants";
-import {getMaxCount} from "./vocabularyUtils";
+import {getFirstPredicateValue} from './jsonLdUtils';
+import * as constants from '../../constants';
+import {getMaxCount} from './vocabularyUtils';
 
 // remove the string values that only contain whitespace
-export const removeWhitespaceValues = (values) => (values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : []);
+export const removeWhitespaceValues = values =>
+    values ? values.filter(v => typeof v !== 'string' || v.trim().length > 0) : [];
 
-export const maxLengthValidation = (maxLength, values) => (values && values.some(v => v.length > maxLength)
-    ? `Please provide no more than ${maxLength} characters` : null);
+export const maxLengthValidation = (maxLength, values) =>
+    values && values.some(v => v.length > maxLength) ? `Please provide no more than ${maxLength} characters` : null;
 
 export const minCountValidation = (minCount, values) => {
     if (!values || values.length < minCount) {
@@ -17,7 +18,7 @@ export const minCountValidation = (minCount, values) => {
     return null;
 };
 
-export const iriValidation = (values) => {
+export const iriValidation = values => {
     try {
         if (values && values.length > 0) {
             values.forEach(v => {
@@ -35,14 +36,12 @@ export const iriValidation = (values) => {
 
 export const pushNonEmpty = (arr, value) => (value ? [...arr, value] : arr);
 
-export const maxCountValidation = (maxCount, values) => ((values && values.length > maxCount)
-    ? `Please provide no more than ${maxCount} values` : null);
+export const maxCountValidation = (maxCount, values) =>
+    values && values.length > maxCount ? `Please provide no more than ${maxCount} values` : null;
 
 export const validateValuesAgainstShape = ({shape, datatype, values, isGenericIriResource}) => {
     // ignore falsy values (null, NaN, undefined or '') with the exception of zero and false
-    const pureValues = values
-        .map(v => v.id || v.value)
-        .filter(isNonEmptyValue);
+    const pureValues = values.map(v => v.id || v.value).filter(isNonEmptyValue);
 
     const maxLength = getFirstPredicateValue(shape, constants.SHACL_MAX_LENGTH);
     const minCount = getFirstPredicateValue(shape, constants.SHACL_MIN_COUNT);

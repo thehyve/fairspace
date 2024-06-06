@@ -6,8 +6,7 @@ import org.apache.jena.sparql.core.QuadAction;
 public class DelegatingDatasetChanges extends AbstractDatasetChanges {
     private GraphChangeListener changeListener;
 
-    public DelegatingDatasetChanges() {
-    }
+    public DelegatingDatasetChanges() {}
 
     public DelegatingDatasetChanges(GraphChangeListener changeListener) {
         this.changeListener = changeListener;

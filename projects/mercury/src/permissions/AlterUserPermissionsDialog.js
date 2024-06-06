@@ -6,11 +6,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import withStyles from '@mui/styles/withStyles';
-import {Typography} from "@mui/material";
-import Divider from "@mui/material/Divider";
-import PermissionCandidateSelect from "./PermissionCandidateSelect";
-import type {Permission} from "../collections/CollectionAPI";
-import UserPermissionsTable from "./UserPermissionsTable";
+import {Typography} from '@mui/material';
+import Divider from '@mui/material/Divider';
+import PermissionCandidateSelect from './PermissionCandidateSelect';
+import type {Permission} from '../collections/CollectionAPI';
+import UserPermissionsTable from './UserPermissionsTable';
 
 export const styles = {
     dialog: {
@@ -22,7 +22,7 @@ export const styles = {
     },
     container: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap'
     },
     autocomplete: {
         width: '100%'
@@ -42,13 +42,13 @@ export const styles = {
         padding: 0
     },
     tableBody: {
-        display: "block",
-        overflow: "auto",
+        display: 'block',
+        overflow: 'auto',
         maxHeight: 150
     },
     tableRow: {
-        display: "table",
-        width: "100%",
+        display: 'table',
+        width: '100%',
         height: 48
     },
     nameCell: {
@@ -58,8 +58,16 @@ export const styles = {
     }
 };
 
-export const AlterUserPermissionsDialog = ({collection, permissionCandidates, workspaceUsers, currentUser, setPermission,
-    open = false, onClose, classes}) => {
+export const AlterUserPermissionsDialog = ({
+    collection,
+    permissionCandidates,
+    workspaceUsers,
+    currentUser,
+    setPermission,
+    open = false,
+    onClose,
+    classes
+}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleClose = () => {
@@ -92,9 +100,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
 
     const renderAccessLevelControl = () => (
         <div className={classes.accessLevelControl}>
-            <Typography component="p">
-                Selected users and access levels
-            </Typography>
+            <Typography component="p">Selected users and access levels</Typography>
             <UserPermissionsTable
                 selectedPermissions={selectedPermissions}
                 workspaceUsers={workspaceUsers}
@@ -113,8 +119,10 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
-            onChange={p => handleAddSelectedPermission({...p, access: "Read"})}
-            filter={p => ((!currentUser || p.iri !== currentUser.iri) && !selectedPermissions.some(sp => sp.iri === p.iri))}
+            onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
+            filter={p =>
+                (!currentUser || p.iri !== currentUser.iri) && !selectedPermissions.some(sp => sp.iri === p.iri)
+            }
             label="Select user"
             autoFocus
         />
@@ -145,9 +153,7 @@ export const AlterUserPermissionsDialog = ({collection, permissionCandidates, wo
                 >
                     Save
                 </Button>
-                <Button onClick={handleClose}>
-                    Cancel
-                </Button>
+                <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

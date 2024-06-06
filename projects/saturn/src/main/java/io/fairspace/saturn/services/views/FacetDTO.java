@@ -1,14 +1,16 @@
 package io.fairspace.saturn.services.views;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.*;
-import io.fairspace.saturn.config.*;
 import lombok.Value;
 
-import java.util.List;
+import io.fairspace.saturn.config.*;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.*;
 
-@Value @JsonInclude(NON_NULL)
+@Value
+@JsonInclude(NON_NULL)
 public class FacetDTO {
     String name;
     String title;

@@ -1,33 +1,46 @@
 import React, {useContext} from 'react';
-import PropTypes from "prop-types";
-import {Box, FormHelperText, FormLabel} from "@mui/material";
+import PropTypes from 'prop-types';
+import {Box, FormHelperText, FormLabel, FormControl, FormGroup} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import UserPermissionsComponent from "./UserPermissionsComponent";
-import UserContext from "../users/UserContext";
-import CollectionsContext from "../collections/CollectionsContext";
-import WorkspacePermissionsComponent from "./WorkspacePermissionsComponent";
-import {sortPermissions} from "../collections/collectionUtils";
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import UserPermissionsComponent from './UserPermissionsComponent';
+import UserContext from '../users/UserContext';
+import CollectionsContext from '../collections/CollectionsContext';
+import WorkspacePermissionsComponent from './WorkspacePermissionsComponent';
+import {sortPermissions} from '../collections/collectionUtils';
 
 const useStyles = makeStyles({
     root: {
-        marginLeft: 20,
-        marginBottom: 5
+        marginLeft: 0,
+        marginBottom: 8
     },
+    property: {
+        marginTop: 8
+    },
+    helperText: {
+        marginLeft: 0,
+        marginBottom: 0
+    }
 });
 
 export const PermissionViewer = ({
-    collection, workspaceUsers, collaboratingWorkspaces,
-    collaboratingUsers, currentUser, setPermission, error, loading
+    collection,
+    workspaceUsers,
+    collaboratingWorkspaces,
+    collaboratingUsers,
+    currentUser,
+    setPermission,
+    error,
+    loading
 }) => {
     const classes = useStyles();
 
     if (error) {
-        return (<MessageDisplay message="An error occurred loading permissions" />);
+        return <MessageDisplay message="An error occurred loading permissions" />;
     }
     if (loading) {
-        return (<LoadingInlay />);
+        return <LoadingInlay />;
     }
 
     const renderUserPermissionComponent = () => (
@@ -49,17 +62,21 @@ export const PermissionViewer = ({
     );
 
     return (
-        <div>
-            <FormLabel>Share with users</FormLabel>
-            <Box className={classes.root}>
-                {renderUserPermissionComponent()}
-                <FormHelperText>Members of the owner workspace can have modify rights, all others have read-only rights.</FormHelperText>
-            </Box>
-            <FormLabel>Share with workspaces</FormLabel>
-            <Box className={classes.root}>
-                {renderWorkspacePermissionComponent()}
-            </Box>
-        </div>
+        <FormGroup>
+            <FormControl className={classes.property}>
+                <FormLabel>Share with users</FormLabel>
+                <Box className={classes.root}>
+                    {renderUserPermissionComponent()}
+                    <FormHelperText className={classes.helperText}>
+                        Members of the owner workspace can have modify rights, all others have read-only rights.
+                    </FormHelperText>
+                </Box>
+            </FormControl>
+            <FormControl className={classes.property}>
+                <FormLabel>Share with workspaces</FormLabel>
+                <Box className={classes.root}>{renderWorkspacePermissionComponent()}</Box>
+            </FormControl>
+        </FormGroup>
     );
 };
 

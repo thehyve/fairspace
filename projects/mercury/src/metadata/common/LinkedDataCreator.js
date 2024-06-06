@@ -1,10 +1,10 @@
-import React, {useState} from "react";
-import PropTypes from "prop-types";
-import {Button} from "@mui/material";
-import useIsMounted from "react-is-mounted-hook";
+import React, {useState} from 'react';
+import PropTypes from 'prop-types';
+import {Button} from '@mui/material';
+import useIsMounted from 'react-is-mounted-hook';
 
-import LinkedDataShapeChooserDialog from "./LinkedDataShapeChooserDialog";
-import NewLinkedDataEntityDialog from "./NewLinkedDataEntityDialog";
+import LinkedDataShapeChooserDialog from './LinkedDataShapeChooserDialog';
+import NewLinkedDataEntityDialog from './NewLinkedDataEntityDialog';
 
 const CREATION_STATE_CHOOSE_SHAPE = 'CHOOSE_SHAPE';
 const CREATION_STATE_CREATE_ENTITY = 'CREATE_ENTITY';

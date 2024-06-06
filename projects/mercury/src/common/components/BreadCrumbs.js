@@ -1,9 +1,9 @@
 import React, {useContext} from 'react';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import {Link as RouterLink} from 'react-router-dom';
 import {Breadcrumbs, Link, SvgIcon, Typography} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import BreadcrumbsContext from "../contexts/BreadcrumbsContext";
+import BreadcrumbsContext from '../contexts/BreadcrumbsContext';
 
 /**
  * Renders a list of breadcrumbs
@@ -27,19 +27,14 @@ const BreadCrumbs = ({classes, additionalSegments = []}) => {
                     className={classes.link}
                     color={idx === allSegments.length - 1 ? 'textPrimary' : 'inherit'}
                 >
-                    { icon ? <div className={classes.icon}>{icon}</div> : undefined }
-                    { idx === allSegments.length - 1
-                        ? label
-                        : (
-                            <Link
-                                component={RouterLink}
-                                className={classes.link}
-                                color="inherit"
-                                to={href}
-                            >
-                                {label}
-                            </Link>
-                        ) }
+                    {icon ? <div className={classes.icon}>{icon}</div> : undefined}
+                    {idx === allSegments.length - 1 ? (
+                        label
+                    ) : (
+                        <Link component={RouterLink} className={classes.link} color="inherit" to={href}>
+                            {label}
+                        </Link>
+                    )}
                 </Typography>
             ))}
         </Breadcrumbs>
@@ -62,12 +57,12 @@ const styles = theme => ({
         display: 'flex'
     },
     link: {
-        display: 'flex',
+        display: 'flex'
     },
     icon: {
         marginRight: theme.spacing(1),
         width: 24,
-        height: 24,
+        height: 24
     }
 });
 

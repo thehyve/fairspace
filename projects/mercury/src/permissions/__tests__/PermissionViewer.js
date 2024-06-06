@@ -1,10 +1,10 @@
 /* eslint-disable jest/expect-expect */
 import React from 'react';
-import {configure, shallow} from "enzyme";
+import {configure, shallow} from 'enzyme';
 
-import {PermissionViewer} from "../PermissionViewer";
-import UserPermissionsComponent from "../UserPermissionsComponent";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {PermissionViewer} from '../PermissionViewer';
+import UserPermissionsComponent from '../UserPermissionsComponent';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
@@ -15,11 +15,12 @@ const testRenderingCollaborators = (wrapper, numberOfCollaborators) => {
     expect(permissionsListProps.permissions.length).toBe(numberOfCollaborators);
 };
 
-const testOrderingOfCollaborators = (wrapper) => {
+const testOrderingOfCollaborators = wrapper => {
     const permissionsListProps = wrapper.find(UserPermissionsComponent).first().props();
-    expect(permissionsListProps.permissions.map(p => p.iri)).toEqual(
-        ['http://localhost/iri/user4-id', 'http://localhost/iri/user3-id']
-    );
+    expect(permissionsListProps.permissions.map(p => p.iri)).toEqual([
+        'http://localhost/iri/user4-id',
+        'http://localhost/iri/user3-id'
+    ]);
 };
 
 describe('PermissionViewer', () => {
@@ -53,23 +54,11 @@ describe('PermissionViewer', () => {
         ownerWorkspace: 'http://localhost/iri/w1',
         access: 'Manage',
         canManage: true,
-        userPermissions: [
-            mockUsers[3],
-            mockUsers[2],
-            mockUsers[1],
-            mockUsers[0]
-        ],
+        userPermissions: [mockUsers[3], mockUsers[2], mockUsers[1], mockUsers[0]],
         workspacePermissions: []
     };
-    const mockWorkspaceUsers = [
-        mockUsers[3],
-        mockUsers[1],
-        mockUsers[0]
-    ];
-    const mockCollaborators = [
-        mockUsers[1],
-        mockUsers[3]
-    ];
+    const mockWorkspaceUsers = [mockUsers[3], mockUsers[1], mockUsers[0]];
+    const mockCollaborators = [mockUsers[1], mockUsers[3]];
     const mockOwnerWorkspace = {iri: 'http://localhost/iri/w1'};
     const mockWorkspaces = [mockOwnerWorkspace, {iri: 'http://localhost/iri/w2'}];
 

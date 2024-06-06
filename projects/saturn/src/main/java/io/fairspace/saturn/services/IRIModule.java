@@ -1,5 +1,7 @@
 package io.fairspace.saturn.services;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -8,8 +10,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import org.apache.jena.graph.Node;
-
-import java.io.IOException;
 
 import static org.apache.jena.graph.NodeFactory.createURI;
 

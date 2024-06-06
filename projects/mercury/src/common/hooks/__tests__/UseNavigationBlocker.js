@@ -1,10 +1,17 @@
-import React, {useEffect} from "react";
-import {renderHook} from "@testing-library/react-hooks";
+import React, {useEffect} from 'react';
+import {renderHook} from '@testing-library/react-hooks';
 import {act} from 'react-test-renderer';
-import {MemoryRouter, useHistory} from "react-router-dom";
+import {MemoryRouter, useHistory} from 'react-router-dom';
 
-import useNavigationBlocker from "../UseNavigationBlocker";
+import useNavigationBlocker from '../UseNavigationBlocker';
 
+const WrapperWithPushToHistory = ({children}) => {
+    const history = useHistory();
+
+    useEffect(() => history.push(), [history]);
+
+    return children;
+};
 describe.skip('UseFormSubmission', () => {
     it('sets event listener for beforeunload event when there are pending changes', () => {
         window.addEventListener = jest.fn();
@@ -30,9 +37,7 @@ describe.skip('UseFormSubmission', () => {
         const {result} = renderHook(() => useNavigationBlocker(true), {
             wrapper: ({children}) => (
                 <MemoryRouter>
-                    <WrapperWithPushToHistory>
-                        {children}
-                    </WrapperWithPushToHistory>
+                    <WrapperWithPushToHistory>{children}</WrapperWithPushToHistory>
                 </MemoryRouter>
             )
         });
@@ -44,9 +49,7 @@ describe.skip('UseFormSubmission', () => {
         const {result} = renderHook(() => useNavigationBlocker(true), {
             wrapper: ({children}) => (
                 <MemoryRouter>
-                    <WrapperWithPushToHistory>
-                        {children}
-                    </WrapperWithPushToHistory>
+                    <WrapperWithPushToHistory>{children}</WrapperWithPushToHistory>
                 </MemoryRouter>
             )
         });

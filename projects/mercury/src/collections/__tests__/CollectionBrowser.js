@@ -1,13 +1,13 @@
 import React from 'react';
-import {configure, mount, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {MemoryRouter} from "react-router-dom";
+import {configure, mount, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {MemoryRouter} from 'react-router-dom';
 
-import CollectionsContext from "../CollectionsContext";
-import ContextualCollectionBrowser, {CollectionBrowser} from "../CollectionBrowser";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import LoadingInlay from "../../common/components/LoadingInlay";
 import {ThemeProvider} from '@mui/material/styles';
+import CollectionsContext from '../CollectionsContext';
+import ContextualCollectionBrowser, {CollectionBrowser} from '../CollectionBrowser';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import LoadingInlay from '../../common/components/LoadingInlay';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -58,7 +58,7 @@ describe('<CollectionBrowser />', () => {
         saveButton.simulate('click');
         jest.runAllTimers();
 
-        expect(collectionsContextMock.addCollection).toBeCalledTimes(1);
+        expect(collectionsContextMock.addCollection).toHaveBeenCalledTimes(1);
     });
 
     it('should not show add button if adding disabled', async () => {

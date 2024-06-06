@@ -1,88 +1,59 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React from 'react';
-import {configure, mount} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-
-import {Router} from 'react-router-dom';
+import {configure} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {createMemoryHistory} from 'history';
-import LinkedDataLink from "../LinkedDataLink";
-import {METADATA_PATH} from "../../../constants";
+import {fireEvent, render} from '@testing-library/react';
+import {ThemeProvider} from '@mui/material/styles';
+import LinkedDataLink from '../LinkedDataLink';
+import theme from '../../../App.theme';
 import UserContext from '../../../users/UserContext';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
 // For new tests use React Testing Library. Consider migrating enzyme tests when refactoring.
 configure({adapter: new Adapter()});
+jest.mock('../LinkedDataEntityPage', () => () => <div>Mocked Metadata Page</div>);
 
 describe('LinkedDataLink', () => {
-    it('should render internal link for any uri', () => {
-        const history: History = createMemoryHistory();
-        history.push = jest.fn();
-
-        const wrapper = mount(
+    it('renders LinkedDataLink without crashing', () => {
+        const {getByText} = render(
             <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
-                <Router history={history}>
-                    <LinkedDataLink uri="http://google.nl/some-path?search#hash">Go</LinkedDataLink>
-                </Router>
+                <ThemeProvider theme={theme}>
+                    <LinkedDataLink uri="testUri">Test Content</LinkedDataLink>
+                </ThemeProvider>
             </UserContext.Provider>
         );
-
-        expect(wrapper.find('a').isEmpty()).toBeFalsy();
-        const anchor = wrapper.find('a').first();
-        const expectedLocation = `${METADATA_PATH}?iri=${encodeURIComponent("http://google.nl/some-path?search#hash")}`;
-        expect(anchor.prop('href')).toEqual(expectedLocation);
-        expect(anchor.text()).toEqual('Go');
-        expect(anchor.prop('onClick')).toBeTruthy();
-
-        anchor.prop('onClick')(new MouseEvent('click'));
-        expect(history.push).toBeCalledTimes(1);
-        expect(history.push).toBeCalledWith({
-            pathname: METADATA_PATH,
-            search: `?iri=${encodeURIComponent("http://google.nl/some-path?search#hash")}`
-        });
+        expect(getByText('Test Content')).toBeInTheDocument();
     });
 
-    it('should display child elements for users without access to public metadata', () => {
-        const history: History = createMemoryHistory();
-        history.push = jest.fn();
-
-        const wrapper = mount(
-            <UserContext.Provider value={{currentUser: {canViewPublicMetadata: false}}}>
-                <Router history={history}>
-                    <LinkedDataLink uri="http://google.nl/some-path?search#hash">Go</LinkedDataLink>
-                </Router>
+    it('shows the modal when clicked', () => {
+        const {getByText, queryByText} = render(
+            <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
+                <ThemeProvider theme={theme}>
+                    <LinkedDataLink uri="testUri">Test Content</LinkedDataLink>
+                </ThemeProvider>
             </UserContext.Provider>
         );
+        expect(queryByText('Mocked Metadata Page')).not.toBeInTheDocument();
 
-        expect(wrapper.find('a').isEmpty()).toBeTruthy();
-        expect(wrapper.text()).toEqual('Go');
+        fireEvent.click(getByText('Test Content'));
+        expect(getByText('Mocked Metadata Page')).toBeInTheDocument();
     });
 
-    it('should not break on an invalid url (return children only)', () => {
-        const uri = `some-invalid-url`;
-        const history: History = createMemoryHistory();
-        history.push = jest.fn();
-
-        const wrapper = mount(
+    it('closes the modal when close icon is clicked', () => {
+        const {getByText, getByTestId, queryByText} = render(
             <UserContext.Provider value={{currentUser: {canViewPublicMetadata: true}}}>
-                <Router history={history}>
-                    <LinkedDataLink uri={uri}>something</LinkedDataLink>
-                </Router>
+                <ThemeProvider theme={theme}>
+                    <LinkedDataLink uri="testUri">Test Content</LinkedDataLink>
+                </ThemeProvider>
             </UserContext.Provider>
         );
 
-        expect(wrapper.find('a').isEmpty()).toBeFalsy();
-        const anchor = wrapper.find('a').first();
-        const expectedLocation = `${METADATA_PATH}?iri=${encodeURIComponent(uri)}`;
-        expect(anchor.prop('href')).toEqual(expectedLocation);
-        expect(anchor.text()).toEqual('something');
-        expect(anchor.prop('onClick')).toBeTruthy();
+        fireEvent.click(getByText('Test Content'));
+        expect(getByText('Mocked Metadata Page')).toBeInTheDocument();
 
-        anchor.prop('onClick')(new MouseEvent('click'));
-        expect(history.push).toBeCalledTimes(1);
-        expect(history.push).toBeCalledWith({
-            pathname: METADATA_PATH,
-            search: `?iri=${encodeURIComponent(uri)}`
-        });
+        const close = getByTestId('CloseIcon');
+        fireEvent.click(close);
+        expect(queryByText('Mocked Metadata Page')).not.toBeInTheDocument();
     });
 });

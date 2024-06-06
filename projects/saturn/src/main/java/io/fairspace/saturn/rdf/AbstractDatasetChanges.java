@@ -7,14 +7,11 @@ import org.apache.jena.sparql.core.DatasetChanges;
  */
 public abstract class AbstractDatasetChanges implements DatasetChanges {
     @Override
-    public void start() {
-    }
+    public void start() {}
 
     @Override
-    public void finish() {
-    }
+    public void finish() {}
 
     @Override
-    public void reset() {
-    }
+    public void reset() {}
 }

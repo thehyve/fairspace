@@ -1,11 +1,11 @@
 package io.fairspace.saturn.webdav;
 
+import java.util.*;
+import java.util.stream.*;
+
 import io.milton.event.Event;
 import io.milton.event.EventListener;
 import io.milton.event.ResponseEvent;
-
-import java.util.*;
-import java.util.stream.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 
@@ -18,6 +18,7 @@ class AuditEventListener implements EventListener {
             var success = status != null && status.code < 300;
             var path = resourcePath(re.getRequest().getAbsolutePath());
 
+            // spotless:off
             switch (re.getRequest().getMethod()) {
                 case GET -> audit("FS_READ",
                         "path", path,
@@ -63,6 +64,7 @@ class AuditEventListener implements EventListener {
                     audit("FS_ACTION", params.toArray());
                 }
             }
+            // spotless:on
         }
     }
 

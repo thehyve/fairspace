@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import TextField from "@mui/material/TextField";
+import TextField from '@mui/material/TextField';
 
 const BaseInputValue = ({entry: {value}, property, currentValues, style, onChange = null, ...otherProps}) => {
     const [localValue, setLocalValue] = useState(value);
@@ -8,7 +8,7 @@ const BaseInputValue = ({entry: {value}, property, currentValues, style, onChang
         setLocalValue(value);
     }, [value]);
 
-    const handleChange = (e) => {
+    const handleChange = e => {
         setLocalValue(e.target.value);
         if (onChange) {
             onChange({value: e.target.value});

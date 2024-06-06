@@ -8,13 +8,37 @@ pluto:
   oauth2:
     base-url: http://localhost:5100
     realm: fairspace
+  icons:
+    jupyter: /icons/jupyter.svg
+    omics: /icons/omics.svg
+    metadata: /icons/metadata.svg
   storages:
     test:
        name: test
-       label: Test
+       label: "TEST Collections"
        url: http://localhost:8090/api/webdav
        search-url: http://localhost:8090/api/search/files
        root-directory-iri: http://localhost:8080/api/webdav
+  metadata-sources:
+    internal:
+      label: "Metadata"
+      icon-name: metadata
+    test:
+      name: test
+      label: "External Metadata"
+      url: http://localhost:8090/api/
+      icon-name: omics
+  services:
+    jupyterhub:
+      name: "JupyterHub"
+      url: https://jupyter.org/hub#
+      icon-name: jupyter
+    cbioportal:
+      name: "cBioPortal"
+      url: https://www.cbioportal.org
+    "test username":
+      name: "test username"
+      url: http://google.com?q=${username}
 
 spring:
   cloud:
@@ -32,6 +56,12 @@ spring:
         - Path=/api/storages/test/search/files
         filters:
         - RewritePath=/api/storages/test/search/files, /api/search/files
+      - id: metadata-test
+        uri: ${pluto.metadata-sources.test.url}
+        predicates:
+          - Path=/api/metadata-sources/test/**
+        filters:
+          - RewritePath=/api/metadata-sources/test/(?<segment>(views|vocabulary|metadata).*), /api/$\{segment}
       - id: saturn-post-request-size
         uri: http://localhost:8090/api/
         predicates:

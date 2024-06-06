@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import Grid from "@mui/material/Grid";
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import Grid from '@mui/material/Grid';
 import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {DatePicker} from '@mui/x-date-pickers/DatePicker';
 import {format} from 'date-fns';
 import TextField from '@mui/material/TextField';
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
-import {DATE_FORMAT} from "../../../constants";
+import type {MetadataViewFacetProperties} from '../MetadataViewFacetFactory';
+import {DATE_FORMAT} from '../../../constants';
 
 const getRangeLimit = (val: any, end: boolean = false): Date => {
     if (!val) {
@@ -41,26 +41,37 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
         if (val.toString() === 'Invalid Date') {
             return false;
         }
-        return (val >= minDate && val <= maxDate);
+        // lib.es5 Date constructor (used in the getRangeLimit method) converts two-digits (XX) input year to 1900+XX.
+        // For instance, 68 turns to 1900 + 68 -> 1968.
+        // Thus, only 4 digits year are considered as valid.
+        const fourDigitsYearEntered = val.getFullYear().toString().length === 4;
+        return val >= minDate && val <= maxDate && fourDigitsYearEntered;
     };
 
-    const handleChange = (newValue) => {
-        if (value !== newValue) {
-            setValue(newValue);
-            if (isValid(newValue[0]) && isValid(newValue[1])) {
-                onChange(newValue);
-            } else {
-                onChange(null);
-            }
+    const isValidInterval = (startDate: Date, endDate: Date): boolean => !startDate || !endDate || startDate <= endDate;
+
+    const handleChange = newDateInterval => {
+        if (isValidInterval(newDateInterval)) {
+            onChange(newDateInterval);
         }
     };
 
-    const handleMinDateChange = (newValue) => {
-        handleChange([getRangeLimit(newValue), value[1]]);
+    const handleMinDateChange = newValue => {
+        const oldEndDate = value[1];
+        setValue([newValue, oldEndDate]);
+        if (isValid(newValue)) {
+            const newDateInterval = [getRangeLimit(newValue), oldEndDate];
+            handleChange(newDateInterval);
+        }
     };
 
-    const handleMaxDateChange = (newValue) => {
-        handleChange([value[0], getRangeLimit(newValue, true)]);
+    const handleMaxDateChange = newValue => {
+        const oldStartDate = value[0];
+        setValue([oldStartDate, newValue]);
+        if (isValid(newValue)) {
+            const newDateInterval = [oldStartDate, getRangeLimit(newValue, true)];
+            handleChange(newDateInterval);
+        }
     };
 
     const renderDate = (val: any): string => {
@@ -79,7 +90,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
             <DatePicker
                 disableToolbar
                 variant="inline"
-                format={DATE_FORMAT}
+                inputFormat={DATE_FORMAT}
                 invalidDateMessage="Invalid date format"
                 margin="normal"
                 label={label}
@@ -88,10 +99,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 autoOk
                 minDate={min || minDate}
                 maxDate={max || maxDate}
-                initialFocusedDate={placeholderDate}
+                defaultCalendarMonth={placeholderDate}
                 placeholder={renderDate(placeholderDate)}
                 KeyboardButtonProps={{
-                    'aria-label': 'change date',
+                    'aria-label': 'change date'
                 }}
                 InputLabelProps={{
                     shrink: true
@@ -99,7 +110,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 InputProps={{
                     className: classes.input
                 }}
-                renderInput={(params) => <TextField {...params} />}
+                renderInput={params => <TextField {...params} />}
             />
         </LocalizationProvider>
     );
@@ -107,13 +118,10 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
     return (
         <Grid container>
             <Grid item>
-                {renderDatePicker(value[0], handleMinDateChange, "Start date", minDate, value[1], minDate)}
+                {renderDatePicker(value[0], handleMinDateChange, 'Start date', minDate, value[1], minDate)}
             </Grid>
-            <Grid item>
-                {renderDatePicker(value[1], handleMaxDateChange, "End date", value[0], maxDate, maxDate)}
-            </Grid>
+            <Grid item>{renderDatePicker(value[1], handleMaxDateChange, 'End date', value[0], maxDate, maxDate)}</Grid>
         </Grid>
-
     );
 };
 

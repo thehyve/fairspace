@@ -1,24 +1,21 @@
 // @flow
 import React, {useContext, useState} from 'react';
-import Button from "@mui/material/Button";
-import {useHistory, withRouter} from "react-router-dom";
+import Button from '@mui/material/Button';
+import {useHistory, withRouter} from 'react-router-dom';
 import WorkspaceList from './WorkspaceList';
 import WorkspaceContext from './WorkspaceContext';
 import type {Workspace} from './WorkspacesAPI';
-import {isAdmin} from "../users/userUtils";
-import UserContext from "../users/UserContext";
-import ErrorDialog from "../common/components/ErrorDialog";
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import WorkspaceDialog from "./WorkspaceDialog";
+import {isAdmin} from '../users/userUtils';
+import UserContext from '../users/UserContext';
+import ErrorDialog from '../common/components/ErrorDialog';
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import WorkspaceDialog from './WorkspaceDialog';
 
 const WorkspaceBrowser = () => {
     const history = useHistory();
     const {currentUser, currentUserError, currentUserLoading} = useContext(UserContext);
-    const {workspaces,
-        workspacesLoading,
-        workspacesError,
-        createWorkspace} = useContext(WorkspaceContext);
+    const {workspaces, workspacesLoading, workspacesError, createWorkspace} = useContext(WorkspaceContext);
 
     const loading = currentUserLoading || workspacesLoading;
     const error = currentUserError || workspacesError;
@@ -38,7 +35,7 @@ const WorkspaceBrowser = () => {
             })
             .catch(err => {
                 setLoadingCreatedWorkspace(false);
-                ErrorDialog.showError("An error occurred while creating a workspace", err);
+                ErrorDialog.showError('An error occurred while creating a workspace', err);
             });
     };
 
@@ -46,9 +43,7 @@ const WorkspaceBrowser = () => {
 
     const renderWorkspaceList = () => (
         <>
-            <WorkspaceList
-                workspaces={workspaces}
-            />
+            <WorkspaceList workspaces={workspaces} />
             {creatingWorkspace ? (
                 <WorkspaceDialog
                     onSubmit={handleSaveWorkspace}
@@ -80,7 +75,7 @@ const WorkspaceBrowser = () => {
     return (
         <>
             {loading ? <LoadingInlay /> : renderWorkspaceList()}
-            {isAdmin(currentUser) ? renderAddWorkspaceButton() : null }
+            {isAdmin(currentUser) ? renderAddWorkspaceButton() : null}
         </>
     );
 };

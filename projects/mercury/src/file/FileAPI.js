@@ -1,39 +1,32 @@
-import {createClient} from "webdav";
+import {createClient} from 'webdav';
 import qs from 'qs';
 import {compareBy, comparing} from '../common/utils/genericUtils';
 // eslint-disable-next-line import/no-cycle
-import {
-    decodeHTMLEntities,
-    encodePath,
-    generateUniqueFileName,
-    getFileName,
-    joinPaths,
-    joinPathsAvoidEmpty
-} from './fileUtils';
-import {handleHttpError} from "../common/utils/httpUtils";
+import {encodePath, generateUniqueFileName, getFileName, joinPaths, joinPathsAvoidEmpty} from './fileUtils';
+import {handleHttpError} from '../common/utils/httpUtils';
 
 // Ensure that the client passes along the credentials
-const defaultOptions = {withCredentials: true, headers: {"X-Requested-With": "XMLHttpRequest"}};
+const defaultOptions = {withCredentials: true, headers: {'X-Requested-With': 'XMLHttpRequest'}};
 
 // Keep all item properties
 const includeDetails = {...defaultOptions, details: true};
 
-export const ANALYSIS_EXPORT_SUBPATH = "/analysis-export";
+export const ANALYSIS_EXPORT_SUBPATH = '/analysis-export';
 
 export type File = {
-    iri: string;
-    filename: string;
-    basename: string;
-    lastmod: string;
-    version?: number;
-    size: number;
-    type: string;
-    dateCreated: string;
-    dateModified?: string;
-    dateDeleted?: string;
-    access?: string;
-    metadataLinks?: string[];
-}
+    iri: string,
+    filename: string,
+    basename: string,
+    lastmod: string,
+    version?: number,
+    size: number,
+    type: string,
+    dateCreated: string,
+    dateModified?: string,
+    dateDeleted?: string,
+    access?: string,
+    metadataLinks?: string[]
+};
 
 class FileAPI {
     constructor(remoteURL = '/api/webdav') {
@@ -47,26 +40,28 @@ class FileAPI {
     stat(path, showDeleted = false, includeMetadataLinks = false) {
         const options = {
             ...includeDetails,
-            data: "<propfind><allprop /></propfind>"
+            data: '<propfind><allprop /></propfind>'
         };
         if (showDeleted) {
-            options.headers = {...options.headers, "Show-Deleted": "on"};
+            options.headers = {...options.headers, 'Show-Deleted': 'on'};
         }
         if (includeMetadataLinks) {
-            options.headers = {...options.headers, "With-Metadata-Links": true};
+            options.headers = {...options.headers, 'With-Metadata-Links': true};
         }
-        return this.client().stat(path, options)
+        return this.client()
+            .stat(path, options)
             .then(result => this.mapToFile(result.data));
     }
 
     statForVersion(path, version) {
         const options = {
             ...includeDetails,
-            data: "<propfind><allprop /></propfind>"
+            data: '<propfind><allprop /></propfind>'
         };
         options.headers = {...options.headers, Version: version};
 
-        return this.client().stat(path, options)
+        return this.client()
+            .stat(path, options)
             .then(result => this.mapToFile(result.data));
     }
 
@@ -79,12 +74,11 @@ class FileAPI {
     list(path, showDeleted = false): File[] {
         const options = {...includeDetails, data: '<propfind><allprop /></propfind>'};
         if (showDeleted) {
-            options.headers = {...options.headers, "Show-Deleted": "on"};
+            options.headers = {...options.headers, 'Show-Deleted': 'on'};
         }
-        return this.client().getDirectoryContents(path, options)
-            .then(result => result.data
-                .sort(comparing(compareBy('type'), compareBy('filename')))
-                .map(this.mapToFile));
+        return this.client()
+            .getDirectoryContents(path, options)
+            .then(result => result.data.sort(comparing(compareBy('type'), compareBy('filename'))).map(this.mapToFile));
     }
 
     /**
@@ -94,17 +88,24 @@ class FileAPI {
      * @returns {*}
      */
     createDirectory(path, options = defaultOptions) {
-        return this.client().createDirectory(path, options)
+        return this.client()
+            .createDirectory(path, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 400:
-                            throw new Error("Unable to create the given directory. \nPlease check that the name does not contain special characters.");
+                            throw new Error(
+                                'Unable to create the given directory. \nPlease check that the name does not contain special characters.'
+                            );
                         case 403:
-                            throw new Error("You do not have authorization to create a directory \nin this collection.");
+                            throw new Error(
+                                'You do not have authorization to create a directory \nin this collection.'
+                            );
                         case 405:
-                            throw new Error("A directory or file with this name already exists. \nPlease choose another name");
+                            throw new Error(
+                                'A directory or file with this name already exists. \nPlease choose another name'
+                            );
                     }
                 }
 
@@ -122,23 +123,24 @@ class FileAPI {
      */
     upload(file, destinationFilename, destinationPath, deleteExistingBlob = false) {
         if (!file) {
-            return Promise.reject(Error("No file given"));
+            return Promise.reject(Error('No file given'));
         }
 
         const options = {...defaultOptions};
         if (deleteExistingBlob) {
-            options.headers = {...options.headers, "Delete-Existing-Blob": true};
+            options.headers = {...options.headers, 'Delete-Existing-Blob': true};
         }
 
-        return this.client().putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
+        return this.client()
+            .putFileContents(`${destinationPath}/${destinationFilename}`, file, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("You are not authorized to add files \nto this storage.");
+                            throw new Error('You are not authorized to add files \nto this storage.');
                         case 413:
-                            throw new Error("Payload too large");
+                            throw new Error('Payload too large');
                     }
                 }
 
@@ -149,19 +151,19 @@ class FileAPI {
     uploadMulti(destinationPath, files: File[], maxFileSizeBytes: number, onUploadProgress = () => {}) {
         const totalSize = files.reduce((size, file) => size + file.size, 0);
         if (totalSize > maxFileSizeBytes) {
-            return Promise.reject(new Error("Payload too large"));
+            return Promise.reject(new Error('Payload too large'));
         }
         const formData = new FormData();
         formData.append('action', 'upload_files');
         files.forEach(f => formData.append(encodeURIComponent(f.path), f));
         const requestOptions = {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Accept": "text/plain",
-                "Content-Type": "multipart/form-data",
-                "X-Requested-With": "XMLHttpRequest"
+                Accept: 'text/plain',
+                'Content-Type': 'multipart/form-data',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            responseType: "text",
+            responseType: 'text',
             onUploadProgress,
             data: formData
         };
@@ -172,10 +174,10 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 413:
-                            throw new Error("Payload too large");
+                            throw new Error('Payload too large');
                     }
                 }
-                handleHttpError("Error uploading files");
+                handleHttpError('Error uploading files');
             });
     }
 
@@ -205,17 +207,18 @@ class FileAPI {
     delete(path, showDeleted = false) {
         const options = {...defaultOptions};
         if (showDeleted) {
-            options.headers = {...options.headers, "Show-Deleted": "on"};
+            options.headers = {...options.headers, 'Show-Deleted': 'on'};
         }
-        if (!path) return Promise.reject(Error("No path specified for deletion"));
+        if (!path) return Promise.reject(Error('No path specified for deletion'));
 
-        return this.client().deleteFile(path, options)
+        return this.client()
+            .deleteFile(path, options)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not delete file or directory. Only admins can delete them.");
+                            throw new Error('Could not delete file or directory. Only admins can delete them.');
                     }
                 }
 
@@ -229,16 +232,15 @@ class FileAPI {
      * @returns Promise<any>
      */
     deleteAllInDirectory(path) {
-        if (!path) return Promise.reject(Error("No path specified for deletion"));
+        if (!path) return Promise.reject(Error('No path specified for deletion'));
 
-        return this.post(path, {action: 'delete_all_in_directory'})
-            .catch(e => {
-                if (e && e.response) {
-                    throw new Error("Could not delete content of a directory.");
-                }
+        return this.post(path, {action: 'delete_all_in_directory'}).catch(e => {
+            if (e && e.response) {
+                throw new Error('Could not delete content of a directory.');
+            }
 
-                return Promise.reject(e);
-            });
+            return Promise.reject(e);
+        });
     }
 
     /**
@@ -247,21 +249,19 @@ class FileAPI {
      * @returns Promise<any>
      */
     undelete(path) {
-        if (!path) return Promise.reject(new Error("No path specified for undeleting"));
-        return this.post(path, {action: 'undelete'}, true)
-            .catch(e => {
-                console.error("Could not undelete file or directory.", e);
-                throw new Error("Could not undelete file or directory.");
-            });
+        if (!path) return Promise.reject(new Error('No path specified for undeleting'));
+        return this.post(path, {action: 'undelete'}, true).catch(e => {
+            console.error('Could not undelete file or directory.', e);
+            throw new Error('Could not undelete file or directory.');
+        });
     }
 
     revertToVersion(path, version) {
-        if (!path) return Promise.reject(Error("No path specified for version reverting"));
+        if (!path) return Promise.reject(Error('No path specified for version reverting'));
 
-        return this.post(path, {action: 'revert', version})
-            .catch(() => {
-                throw new Error("Could not revert a file to a previous version.");
-            });
+        return this.post(path, {action: 'revert', version}).catch(() => {
+            throw new Error('Could not revert a file to a previous version.');
+        });
     }
 
     /**
@@ -272,10 +272,10 @@ class FileAPI {
      */
     move(source, destination) {
         if (!source) {
-            return Promise.reject(Error("No source specified to move"));
+            return Promise.reject(Error('No source specified to move'));
         }
         if (!destination) {
-            return Promise.reject(Error("No destination specified to move to"));
+            return Promise.reject(Error('No destination specified to move to'));
         }
 
         if (source === destination) {
@@ -284,18 +284,21 @@ class FileAPI {
 
         // We have to specify the destination ourselves, as the client() adds the fullpath
         // to the
-        return this.client().moveFile(source, destination, defaultOptions)
+        return this.client()
+            .moveFile(source, destination, defaultOptions)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 400:
-                            throw new Error("Could not move one or more files. Possibly the filename contains special characters.");
+                            throw new Error(
+                                'Could not move one or more files. Possibly the filename contains special characters.'
+                            );
                         case 403:
-                            throw new Error("Could not move one or more files. Only admins can move files.");
+                            throw new Error('Could not move one or more files. Only admins can move files.');
                         case 409:
                         case 412:
-                            throw new Error("Could not move one or more files. The destination file already exists.");
+                            throw new Error('Could not move one or more files. The destination file already exists.');
                     }
                 }
 
@@ -311,23 +314,28 @@ class FileAPI {
      */
     copy(source, destination) {
         if (!source) {
-            return Promise.reject(Error("No source specified to copy"));
+            return Promise.reject(Error('No source specified to copy'));
         }
         if (!destination) {
-            return Promise.reject(Error("No destination specified to copy to"));
+            return Promise.reject(Error('No destination specified to copy to'));
         }
 
-        return this.client().copyFile(source, destination, defaultOptions)
+        return this.client()
+            .copyFile(source, destination, defaultOptions)
             .catch(e => {
                 if (e && e.response) {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not copy one or more files. \nDo you have write permission to the destination collection?");
+                            throw new Error(
+                                'Could not copy one or more files. \nDo you have write permission to the destination collection?'
+                            );
                         case 409:
-                            throw new Error("Could not copy one or more files. \nThe destination can not be copied to.");
+                            throw new Error(
+                                'Could not copy one or more files. \nThe destination can not be copied to.'
+                            );
                         case 412:
-                            throw new Error("Could not copy one or more files. \nThe destination file already exists.");
+                            throw new Error('Could not copy one or more files. \nThe destination file already exists.');
                     }
                 }
 
@@ -342,8 +350,9 @@ class FileAPI {
      * @returns {*}
      */
     movePaths(filePaths, destinationDir) {
-        return this.uniqueDestinationPaths(filePaths, destinationDir)
-            .then(mapping => Promise.all(mapping.map(([src, dst]) => this.move(src, dst))));
+        return this.uniqueDestinationPaths(filePaths, destinationDir).then(mapping =>
+            Promise.all(mapping.map(([src, dst]) => this.move(src, dst)))
+        );
     }
 
     /**
@@ -360,11 +369,15 @@ class FileAPI {
                     // eslint-disable-next-line default-case
                     switch (e.response.status) {
                         case 403:
-                            throw new Error("Could not copy one or more files. \nDo you have write permission to the destination collection?");
+                            throw new Error(
+                                'Could not copy one or more files. \nDo you have write permission to the destination collection?'
+                            );
                         case 409:
-                            throw new Error("Could not copy one or more files. \nThe destination can not be copied to.");
+                            throw new Error(
+                                'Could not copy one or more files. \nThe destination can not be copied to.'
+                            );
                         case 412:
-                            throw new Error("Could not copy one or more files. \nThe destination file already exists.");
+                            throw new Error('Could not copy one or more files. \nThe destination file already exists.');
                     }
                 }
 
@@ -381,12 +394,14 @@ class FileAPI {
     uniqueDestinationPaths(filePaths, destinationDir) {
         return this.list(destinationDir)
             .then(files => files.map(f => f.basename))
-            .then(usedNames => filePaths.map(sourceFile => {
-                const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
-                usedNames.push(destinationFilename);
-                const destinationFile = joinPaths(destinationDir, destinationFilename);
-                return [sourceFile, destinationFile];
-            }));
+            .then(usedNames =>
+                filePaths.map(sourceFile => {
+                    const destinationFilename = generateUniqueFileName(getFileName(sourceFile), usedNames);
+                    usedNames.push(destinationFilename);
+                    const destinationFile = joinPaths(destinationDir, destinationFilename);
+                    return [sourceFile, destinationFile];
+                })
+            );
     }
 
     /**
@@ -397,7 +412,7 @@ class FileAPI {
      */
     deleteMultiple(filenames, showDeleted) {
         if (!filenames || filenames.length === 0) {
-            return Promise.reject(new Error("No filenames given to delete"));
+            return Promise.reject(new Error('No filenames given to delete'));
         }
 
         return Promise.all(filenames.map(filename => this.delete(filename, showDeleted)));
@@ -405,27 +420,27 @@ class FileAPI {
 
     undeleteMultiple(filenames) {
         if (!filenames || filenames.length === 0) {
-            return Promise.reject(new Error("No filenames given to undelete"));
+            return Promise.reject(new Error('No filenames given to undelete'));
         }
         return Promise.all(filenames.map(filename => this.undelete(filename)));
     }
 
     post(path, data, showDeleted = false) {
         const requestOptions = {
-            method: "POST",
+            method: 'POST',
             url: joinPathsAvoidEmpty(this.remoteURL, encodePath(path)),
             headers: {
-                "Accept": "text/plain",
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Show-Deleted": showDeleted ? "on" : "off",
-                "X-Requested-With": "XMLHttpRequest"
+                Accept: 'text/plain',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Show-Deleted': showDeleted ? 'on' : 'off',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            responseType: "text",
+            responseType: 'text',
             data: qs.stringify(data)
         };
         return this.client()
             .customRequest(path, requestOptions)
-            .catch(handleHttpError("Error performing POST request"));
+            .catch(handleHttpError('Error performing POST request'));
     }
 
     uploadMetadata(path, file) {
@@ -433,18 +448,16 @@ class FileAPI {
         formData.append('action', 'upload_metadata');
         formData.append('file', file);
         const requestOptions = {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "Accept": "text/plain",
-                "Content-Type": "multipart/form-data",
-                "X-Requested-With": "XMLHttpRequest"
+                Accept: 'text/plain',
+                'Content-Type': 'multipart/form-data',
+                'X-Requested-With': 'XMLHttpRequest'
             },
-            responseType: "text",
+            responseType: 'text',
             data: formData
         };
-        return this.client()
-            .customRequest(path, requestOptions)
-            .catch(handleHttpError("Error uploading metadata"));
+        return this.client().customRequest(path, requestOptions).catch(handleHttpError('Error uploading metadata'));
     }
 
     showFileHistory(file, startIndex, endIndex) {
@@ -456,15 +469,9 @@ class FileAPI {
         return Promise.all(versions.map(v => this.statForVersion(file.filename, v)));
     }
 
-    mapToFile = (fileObject) => {
+    mapToFile = fileObject => {
         const properties = {...fileObject, ...(fileObject.props || {})};
         delete properties.props;
-        Object.keys(properties).forEach(key => {
-            // The WebDAV client does not properly decode the XML response,
-            // so we need to do that here
-            const value = properties[key];
-            properties[key] = (typeof value === 'string') ? decodeHTMLEntities(value) : value;
-        });
         return properties;
     };
 }

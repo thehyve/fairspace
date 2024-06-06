@@ -1,6 +1,6 @@
 import React from 'react';
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
+import {configure, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import ConfirmationButton from '../ConfirmationButton';
 import ConfirmationDialog from '../ConfirmationDialog';
@@ -23,7 +23,7 @@ describe('<ConfirmationButton />', () => {
 
         expect(onClick.mock.calls.length).toEqual(0);
 
-        const agreeCallback = wrapper.find(ConfirmationDialog).prop("onAgree");
+        const agreeCallback = wrapper.find(ConfirmationDialog).prop('onAgree');
         agreeCallback({stopPropagation: () => {}});
         expect(wrapper.find(ConfirmationDialog).length).toEqual(0);
         expect(onClick.mock.calls.length).toEqual(1);

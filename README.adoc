@@ -1016,7 +1016,7 @@ curl -v -X PUT -H "Authorization: Basic $(echo -n "${KEYCLOAK_USERNAME}:${KEYCLO
 ===== API specification
 
 |===
-3+| ``GET /api/metadata/``
+3+| ``GET /api/metadata``
 
 3+| Retrieve metadata
 3+| _Parameters:_
@@ -1066,12 +1066,16 @@ curl -G -H "Accept: application/ld+json" \
 ====
 
 |===
-3+| ``PUT /api/metadata/``
+3+| ``PUT /api/metadata``
 
 3+| Add metadata. Existing metadata is left untouched.
     The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
     otherwise ``400`` is returned.
   Only available for users with _Add shared metadata_ role.
+3+| _Parameters:_
+| ``doViewsUpdate``
+| boolean
+| Flag to switch on and off materialized views refresh once metadata updated. The materialized views are used to speed up the metadata search. ``true`` by default. Recommended to set to ``false`` for batch update (e.g. for metadata uploading via pipeline). (_Optional_)
 3+| _Request body:_
 3+| Serialised RDF triples.
 |===
@@ -1104,7 +1108,10 @@ example:Study_001 a test:Study ;
     The data must be consistent with the data model after the update (see <<Data model and view configuration>>),
     otherwise ``400`` is returned.
   Only available for users with _Add shared metadata_ role.
-
+3+| _Parameters:_
+| ``doViewsUpdate``
+| boolean
+| Flag to switch on and off materialized views refresh once metadata updated. The materialized views are used to speed up the metadata search. ``true`` by default. Recommended to set to ``false`` for batch update (e.g. for metadata uploading via pipeline). (_Optional_)
 3+| _Request body:_
 3+| Serialised RDF triples.
 |===
@@ -1133,11 +1140,13 @@ If a request body is provided, the triples specified in the body will be deleted
 Otherwise, the subject specified in the subject parameter will be marked as deleted.
 Please note that the subject will still exist in the database.
 Only available for users with _Add shared metadata_ role.
-
 3+| _Parameters:_
 | ``subject``
 | string
 | The subject to filter on. (_Optional_)
+| ``doViewsUpdate``
+| boolean
+| Flag to switch on and off materialized views refresh once metadata updated. The materialized views are used to speed up the metadata search. ``true`` by default. Recommended to set to ``false`` for batch update (e.g. for metadata uploading via pipeline). (_Optional_)
 3+| _Request body:_
 3+| Serialised RDF triples. (_Optional_)
 |===
@@ -1634,6 +1643,25 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 ----
 ====
 
+===== Icons (SVG)
+
+|===
+| ``GET /api/iconsvg/{icon_name}``
+
+| Retrieve an SVG icon by name.
+|===
+
+Response contains an SVG icon (if configured).
+
+.Example retrieving icon (curl)
+[%collapsible]
+====
+[source, bash]
+----
+curl -H 'Accept: image/svg+xml' 'http://localhost:8080/api/iconsvg/{icon_name}'
+----
+====
+
 ===== Services
 
 |===
@@ -1643,7 +1671,8 @@ curl -H 'Accept: application/json' 'http://localhost:8080/api/features/'
 |===
 
 Response contains list of external services linked to Fairspace,
-e.g. JupyterHub, cBioPortal, etc.
+e.g. JupyterHub, cBioPortal, etc with their configuration details: name, url and icon name that can be used to retrieve
+the icon (using ``GET /api/iconsvg/{icon_name}``).
 
 .Example listing services (curl)
 [%collapsible]
@@ -1833,6 +1862,112 @@ storages:
     url: https://exstorage2/api/webdav
 ----
 
+=== Multi-Fairspace metadata views integration
+
+Fairspace works with a single data model configured. However, if there is a need to have data from multiple models,
+representing multiple domains that would be combined in single user interface, it is possible to integrate multiple Fairspace instances together.
+
+
+The main Fairspace instance can be configured as a view interface of metadata from another (external) Fairspace instance.
+External Fairspace can have a different metadata model configured than the main Fairspace.
+An important precondition is that the external instance has to be connected to the same Keycloak realm as the main instance.
+
+
+External metadata can be searched and browsed in the same way as the internal metadata views. When configured, there is an extra page,
+separate from internal metadata views, that allows to explore external metadata.
+Currently, cross-instance metadata search is not supported.
+
+
+For the external metadata pages, the tables and columns are created basing on the views configuration specified in that instance configuration.
+
+
+==== Access policy
+
+Connection to the same Keycloak realm allows to authenticate a user in all integrated Fairspace instances with a single set of login credentials (single sign-on).
+Each Fairspace instance is responsible for controlling the access to its own metadata and perform
+the required checks to ensure that users only get to see metadata of an instance, if has a view public metadata role assigned within that instance.
+
+==== Configuration
+
+Multiple external Fairspace metadata pages can be configured simultaneously. A list of configuration parameters is presented below.
+
+|===
+| Parameter | Description
+
+| ``name``
+| Unique name of the metadata source.
+| ``label``
+| String to be used as a display name of the metadata source.
+| ``url``
+| Fairspace instance to connect to. If the url is not specified, the metadata source will be treated as the internal one.
+| *Important!* There should only be a single configuration of internal metadata (only the first one will not be ignored).
+| ``icon-name``
+| Name of an icon configured in the "icons" section of values.yaml file. If the name is not specified, there will be a default icon used.
+|===
+
+Sample configuration of *external* metadata sources in YAML format:
+[source, bash]
+----
+fairspace:
+    ...
+    metadata-sources:
+      internal:
+        name: internal
+        label: "Internal metadata"
+        icon-name: "icon-internal-metadata"
+      additionalMetaSource1:
+        name: metadataSource1
+        label: "Test metadata 1"
+        url: https://fairspace-test1/api/
+        icon-name: "icon-1"
+      metaSource2:
+        name: metadataSource2
+        label: "Test metadata 2"
+        url: https://fairspace-test2/api/
+----
+
+Configuration of gateway redirection in `values.yaml`:
+[source, bash]
+----
+pluto:
+  ...
+  backends:
+    storageRoutes:
+      - id: additional-metadata-domain1
+        uri: https://fairspace-test1
+        predicates:
+        - Path=/api/metadata-sources/metadataSource1/**
+        filters:
+        - RewritePath=/api/metadata-sources/metadataSource1/(?<segment>(views|vocabulary|metadata).*),/api/$\{segment}
+        - RewriteResponseHeader=Set-Cookie, ^([^=]+)=, DO_$1=
+      - id: additional-metadata-domain2
+        uri: https://fairspace-test2
+        predicates:
+        - Path=/api/metadata-sources/metadataSource2/**
+        filters:
+        - RewritePath=/api/metadata-sources/metadataSource2/(?<segment>(views|vocabulary|metadata).*),/api/$\{segment}
+        - RewriteResponseHeader=Set-Cookie, ^([^=]+)=, DO_$1=
+----
+
+where **RewriteResponseHeader** is important filter that needs to be added not to overwrite an existing browser session, which would lead to authorization errors.
+
+Configuration above gets transformed to the following Spring Cloud Gateway config in the `application.yaml` configuration of Pluto:
+
+[source, bash]
+----
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: additional-metadata-domain1
+        uri: https://fairspace-test1
+        predicates:
+        - Path=/api/metadata-sources/metadataSource1/**
+        filters:
+        - RewritePath=/api/metadata-sources/metadataSource1/(?<segment>(views|vocabulary|metadata).*),/api/$\{segment}
+        - RewriteResponseHeader=Set-Cookie, ^([^=]+)=, DO_$1=
+      - ...
+----
 
 == Structure and terminology
 
@@ -2353,7 +2488,7 @@ Requires:
 
 * yarn
 * docker
-* Java 17
+* Java 21
 
 On MacOS the docker logging driver needs to be configured, because the default  is not available (``journald``).
 Override the logging driver by setting the ``DOCKER_LOGGING_DRIVER`` environment variable or adding a line the ``.env`` file in ``local-development``:
@@ -2405,12 +2540,12 @@ Now everything should be ready to start using Fairspace:
 
 Requires:
 
-* Helm >= 3.5.x
-* kubectl >= 1.17.x
+* Helm >= 3.14.x
+* kubectl >= 1.27.x
 
 You can deploy Fairspace on a Kubernetes cluster using link:https://helm.sh/[Helm].
 Helm charts for Fairspace are published to the public helm repository at
-https://storage.googleapis.com/fairspace-helm.
+ghcr.io/thehyve/helm-charts/fairspace (GitHub Packages of the Fairspace repository)
 
 We provide a number of charts for various components that can be used in combination, or separately:
 
@@ -2423,7 +2558,7 @@ We provide a number of charts for various components that can be used in combina
 
 ===== Download and install helm and gcloud
 
-* Download ``helm 3.6.0`` from https://github.com/helm/helm/releases/tag/v3.6.0
+* Download ``helm 3.14.3`` from https://github.com/helm/helm/releases/tag/v3.14.3
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
 [source, shell]
@@ -2431,7 +2566,7 @@ We provide a number of charts for various components that can be used in combina
 ~/bin/helm/helm version
 ----
 
-* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.6.x install version > 1.18.x).
+* Install link:https://kubernetes.io/docs/tasks/tools/install-kubectl/[kubectl] (for Helm 3.14.x install version > 1.27.x).
 * Download and install the link:https://cloud.google.com/sdk/docs/install[Google Cloud SDK] (requires Python).
 * Obtain credentials for Kubernetes:
 +
@@ -2465,15 +2600,13 @@ kubectl get ns
 ~/bin/helm/helm list -A
 ----
 
-===== Initialise helm and add fairspace repository
+===== Initialise helm and login to Fairspace GitHub Packages
 [source, shell]
 ----
-# Add the stable repo
-~/bin/helm/helm repo add stable https://charts.helm.sh/stable
-# Add the fairspace repo for reading
-~/bin/helm/helm repo add fairspace https://storage.googleapis.com/fairspace-helm
+# Add the stable repo (prepare and use personal access token, also known as PAT, within your GitHub account as a password)
+~/bin/helm/helm registry login ghcr.io/fairspace/helm-charts --username <your github account> --password-stdin
 # (Optional) Add the fairspace repo via the GCS plugin for writing
-~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.3.11
+~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.4.2
 gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
 ~/bin/helm/helm repo add fairspace-gcs gs://fairspace-helm
@@ -2496,11 +2629,11 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 # List available fairspace-keycloak chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace-keycloak
 # Fetch the fairspace-keycloak chart
-~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.6.4
+~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.7.0
 # List available fairspace chart versions
 ~/bin/helm/helm search repo --versions fairspace/fairspace
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 0.7.29
+~/bin/helm/helm pull fairspace/fairspace --version 1.0.0
 ----
 
 ===== Deploy Keycloak
@@ -2513,10 +2646,10 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace Keycloak chart:
 [source, shell]
 ----
-~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.6.4 --namespace keycloak-new \
+~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.7.0 --namespace keycloak-new \
 -f /path/to/fairspace-keycloak-values.yaml
 ----
-You can pass values files with ``-f``.
+You can pass values files with ``-f`` or ``--values``.
 
 Example ``fairspace-keycloak-values.yaml`` file:
 [source, yaml]
@@ -2541,6 +2674,8 @@ ingress:
     certificate:
       force: true
 ----
+
+You can pass values files with ``-f`` or ``--values``.
 
 ===== Configure a Keycloak realm for Fairspace
 
@@ -2586,7 +2721,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 0.7.29 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 1.0.0 --namespace fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2610,8 +2745,14 @@ fairspace:
   ingress:
     domain: fairspace.example.com
   features: []
+  icons:
+    jupyter: "/icons/jupyter.svg" # path to the icon svg file
+    extra-icon: "extra-icon.svg" # path to the custom svg file
   services:
-    JupyterHub: https://jupyterhub.example.com/user/${username}/lab
+    jupyterhub:
+        name: "JupyterHub"
+        url: https://jupyterhub.example.com/user/${username}/lab
+        icon-name: "jupyter"
   storages:
     external:
       name: external
@@ -2673,6 +2814,16 @@ postgres:
       storageClass: expandable
 ----
 
+Additionally, to include custom icons for `fairspace.icons` option, you need to pass paths to the icon svg files as `svgicons.<iconname>=<path/to/the/icon.svg` using `--set-file` option:
+
+[source, shell]
+----
+~/bin/helm/helm install fairspace-new fairspace/fairspace --version 1.0.0 --namespace fairspace-new \
+-f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml --set-file svgicons.extra-icon=/path/to/extra-icon.svg
+----
+
+It is possible to pass multiple icon files with the `--set-file` option. Each of the icons has to be included as child of the `svgicons` key.
+
 ===== Deploy Jupyter Hub
 Create a new Kubernetes namespace:
 [source, shell]
@@ -2723,7 +2874,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-0.7.29.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-1.0.0.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
@@ -2739,6 +2890,52 @@ kubectl delete statefulset fairspace-new --namespace fairspace-new --cascade=orp
 ----
 This will remove the ``StatefulSet``, but keep all pods and volumes intact.
 After running ``helm upgrade --install`` the ``StatefulSet`` will be recreated and the running pod will be replaced with a pod running the new application version.
+
+===== Keep existing volumes on update of StatefulSet
+
+Any changes on the StatefulSet will require a clean deployment, with new volumes. If you want to change the StatefulSet while keeping your existing volumes follow the procedure as described below.
+
+To preserve your volumes get the volume id's (pv-name's):
+
+[source,shell]
+----
+$ kubectl get pv -n <namespace>
+----
+
+Now patch the volumes so they are not deleted automatically when the VolumeClaim is removed:
+
+[source,shell]
+----
+$ kubectl patch pv <pv-name> -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+$ kubectl get pv # now shows status 'released'
+----
+
+Uninstall the statefulset and remove the VolumeClaims. In released status the volumes cannot bind to a new claim, therefore remove the claim reference:
+
+[source,shell]
+----
+$ kubectl edit pv <pv-name>
+----
+In the editor, remove the 'claimref' section.
+
+The final step is to add the previously gathered volume id's to the statefulset configuration:
+
+[source,yaml]
+----
+volumeClaimTemplates:
+- metadata:
+  name: postgres
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+  requests:
+    {...}
+  volumeName: "<volume-id>"
+----
+
+Now execute the deployment.
+
+For more details see https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd#pvc_to_pv
 
 ===== Clean up deployment
 To clean up an environment or completely reinstall an environment, you can use ``helm uninstall`` or ``kubectl delete``.
@@ -3062,6 +3259,16 @@ that makes it possible to (incrementally) backup full state of workspaces and me
 To improve the performance of metadata views, especially for counts and pagination, a simple relational database
 (PostgreSQL) is used. This database is flexible, created based on views configuration file and RDF storage,
 which enables recreation of the database at any point of time.
+
+For models containing multiple attributes of Set/TermSet types, additional tables are created to store the values of these attributes.
+These tables are then left-joined with the main table to retrieve their values.
+However, if there are many such attributes, the performance of data retrieval from the views may degrade.
+To address this issue, materialized views are used for enhanced performance.
+
+There are two types of materialized views: one for denormalized data, which includes the view ID and attribute data of Set/TermSet types, and another for joined views.
+For each joined view, there is one corresponding join materialized view (as specified in the views.yaml config).
+
+Materialized views are refreshed during database reindexing and metadata updates, provided that the doViewsUpdate flag is set to true in the metadata endpoints.
 
 ==== Extra file storage
 

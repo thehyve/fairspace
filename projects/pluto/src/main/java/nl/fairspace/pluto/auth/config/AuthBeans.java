@@ -1,12 +1,13 @@
 package nl.fairspace.pluto.auth.config;
 
+import java.net.MalformedURLException;
+
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.JwtTokenValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.net.MalformedURLException;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
 
 @Configuration
 @Slf4j

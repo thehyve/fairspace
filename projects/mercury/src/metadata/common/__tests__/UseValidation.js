@@ -1,7 +1,7 @@
 import {act} from 'react-dom/test-utils';
-import {testHook} from "../../../common/utils/testUtils";
-import useValidation from "../UseValidation";
-import {SHACL_MIN_COUNT} from "../../../constants";
+import {testHook} from '../../../common/utils/testUtils';
+import useValidation from '../UseValidation';
+import {SHACL_MIN_COUNT} from '../../../constants';
 
 let validation;
 beforeEach(() => {
@@ -20,7 +20,7 @@ describe('useValidation', () => {
             key: 'a',
             shape: {[SHACL_MIN_COUNT]: [{'@value': 1}]},
             datatype: '',
-            isGenericIriResource: false,
+            isGenericIriResource: false
         };
 
         act(() => {
@@ -36,7 +36,7 @@ describe('useValidation', () => {
             key: 'a',
             shape: {[SHACL_MIN_COUNT]: [{'@value': 1}]},
             datatype: '',
-            isGenericIriResource: false,
+            isGenericIriResource: false
         };
 
         act(() => {

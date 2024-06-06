@@ -1,31 +1,33 @@
 import React, {useContext} from 'react';
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from 'react-router-dom';
 
 import * as queryString from 'query-string';
-import WorkspaceOverview from "../workspaces/WorkspaceOverview";
-import Collections from "../collections/CollectionsPage";
-import FilesPage from "../file/FilesPage";
+import WorkspaceOverview from '../workspaces/WorkspaceOverview';
+import Collections from '../collections/CollectionsPage';
+import Dashboard from '../dashboard/DashboardPage';
+import FilesPage from '../file/FilesPage';
 import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
-import LinkedDataEntityPage from "../metadata/common/LinkedDataEntityPage";
-import LinkedDataMetadataProvider from "../metadata/LinkedDataMetadataProvider";
-import CollectionSearchResultList from "../search/SearchResultList";
-import WorkspacesPage from "../workspaces/WorkspacesPage";
-import {isAdmin} from "../users/userUtils";
-import UserContext from "../users/UserContext";
-import UserRolesPage from "../users/UserRolesPage";
+import LinkedDataEntityPage from '../metadata/common/LinkedDataEntityPage';
+import LinkedDataMetadataProvider from '../metadata/LinkedDataMetadataProvider';
+import CollectionSearchResultList from '../search/SearchResultList';
+import WorkspacesPage from '../workspaces/WorkspacesPage';
+import {isAdmin} from '../users/userUtils';
+import UserContext from '../users/UserContext';
+import UserRolesPage from '../users/UserRolesPage';
 import MetadataView from '../metadata/views/MetadataView';
 import BreadcrumbsContext from '../common/contexts/BreadcrumbsContext';
-import ExternalStoragePage from "../external-storage/ExternalStoragePage";
+import ExternalStoragePage from '../external-storage/ExternalStoragePage';
+import ExternalMetadataSourcesView from '../metadata/external-views/ExternalMetadataSourceView';
+import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
 
-const getSubject = () => (
-    document.location.search ? queryString.parse(document.location.search).iri : null
-);
+const getSubject = () => (document.location.search ? queryString.parse(document.location.search).iri : null);
 
 // wrapping MetadataView in memo to prevent it from re-rendering
 const MetadataViewMemo = React.memo(MetadataView);
 
 const WorkspaceRoutes = () => {
     const {currentUser} = useContext(UserContext);
+    const {internalMetadataLabel} = useContext(InternalMetadataSourceContext);
 
     return (
         <Switch>
@@ -33,10 +35,12 @@ const WorkspaceRoutes = () => {
 
             <Route path="/workspace" exact component={WorkspaceOverview} />
 
+            <Route path="/dashboard" exact render={() => <Dashboard />} />
+
             <Route
                 path="/collections"
                 exact
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <Collections history={props.history} showBreadCrumbs />
                     </LinkedDataMetadataProvider>
@@ -45,7 +49,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/collections/:collection/:path(.*)?"
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <FilesPage {...props} />
                     </LinkedDataMetadataProvider>
@@ -54,7 +58,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/text-search"
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <CollectionSearchResultList {...props} />
                     </LinkedDataMetadataProvider>
@@ -63,7 +67,7 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/external-storages/:storage"
-                render={(props) => (
+                render={props => (
                     <LinkedDataMetadataProvider>
                         <ExternalStoragePage {...props} />
                     </LinkedDataMetadataProvider>
@@ -82,6 +86,17 @@ const WorkspaceRoutes = () => {
             />
 
             <Route
+                path="/metadata-sources/:source"
+                render={props => (
+                    <BreadcrumbsContext.Provider value={{segments: []}}>
+                        <LinkedDataMetadataProvider>
+                            <ExternalMetadataSourcesView {...props} />
+                        </LinkedDataMetadataProvider>
+                    </BreadcrumbsContext.Provider>
+                )}
+            />
+
+            <Route
                 path="/metadata"
                 exact
                 render={() => {
@@ -93,7 +108,7 @@ const WorkspaceRoutes = () => {
                     if (subject) {
                         return (
                             <MetadataWrapper>
-                                <LinkedDataEntityPage title="Metadata" subject={subject} />
+                                <LinkedDataEntityPage title={internalMetadataLabel} subject={subject} />
                             </MetadataWrapper>
                         );
                     }
@@ -101,13 +116,9 @@ const WorkspaceRoutes = () => {
                 }}
             />
 
-            <Route
-                path="/users"
-                exact
-                render={() => (isAdmin(currentUser) && (<UserRolesPage />))}
-            />
+            <Route path="/users" exact render={() => isAdmin(currentUser) && <UserRolesPage />} />
 
-            <Redirect to="/workspaces" />
+            <Redirect to="/dashboard" />
         </Switch>
     );
 };

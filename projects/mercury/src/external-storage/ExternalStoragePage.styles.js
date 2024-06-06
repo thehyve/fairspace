@@ -1,4 +1,4 @@
-import * as consts from "../constants";
+import * as consts from '../constants';
 
 const styles = () => ({
     topBar: {

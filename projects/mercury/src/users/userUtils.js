@@ -1,5 +1,6 @@
-import type {User} from "./UsersAPI";
-import type {WorkspaceUserRole} from "../workspaces/WorkspacesAPI";
+// @flow
+import type {User} from './UsersAPI';
+import type {WorkspaceUserRole} from '../workspaces/WorkspacesAPI';
 
 export function getDisplayName(user: User) {
     return (user && user.name) || '';

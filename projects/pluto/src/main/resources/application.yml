@@ -11,7 +11,6 @@ server:
       enabled: false
   max-http-header-size: 65535
 
-
 spring:
   application:
     name: Pluto
@@ -90,3 +89,4 @@ security:
     - /logout
     - /authorize
     - /favicon.ico
+    - /icons/*

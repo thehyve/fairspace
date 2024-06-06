@@ -1,5 +1,12 @@
 package io.fairspace.saturn.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
@@ -13,13 +20,12 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
@@ -49,6 +55,8 @@ public class Config {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
+    public Caches caches = new Caches();
+
     public Search search = new Search();
 
     public static class Jena {
@@ -69,6 +77,7 @@ public class Config {
         public String clientId = "workspace-client";
         public boolean enableBasicAuth;
         public String superAdminUser = "organisation-admin";
+
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public final Set<String> defaultUserRoles = new HashSet<>();
     }
@@ -77,9 +86,25 @@ public class Config {
         public String blobStorePath = "data/blobs";
     }
 
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CacheConfig {
+        public String name;
+        public boolean autoRefreshEnabled = false;
+        public Long refreshFrequencyInHours = 240L;
+    }
+
+    public static class Caches {
+        public CacheConfig facets = CacheConfig.builder().name("facets").build();
+        public CacheConfig views = CacheConfig.builder().name("views").build();
+    }
+
     public static class Search {
         public long pageRequestTimeout = 10_000;
         public long countRequestTimeout = 100_1000;
+        /** maxJoinItems is used to limit number of joined entries (from the join view) to decrease the response size */
+        public int maxJoinItems = 50;
     }
 
     public static class ViewDatabase {
@@ -87,10 +112,14 @@ public class Config {
         public String url = String.format("jdbc:postgresql://%s:%d/%s", "localhost", 5432, "fairspace");
         public String username = "fairspace";
         public String password = "fairspace";
+        public int maxPoolSize = 50;
+        public long connectionTimeout = 1000;
+        public boolean autoCommit = false;
     }
 
     public static class ExtraStorage {
         public String blobStorePath = "data/extra-blobs";
+
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public final Set<String> defaultRootCollections = new HashSet<>(List.of("analysis-export"));
     }

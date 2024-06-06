@@ -1,30 +1,60 @@
-import {useContext, useEffect, useState} from "react";
-import type {User} from "../users/UsersAPI";
-import {formatDate, groupBy} from "../common/utils/genericUtils";
-import {getDisplayName} from "../users/userUtils";
-import MetadataAPI from "../metadata/common/MetadataAPI";
-import {getLabel, getTypeInfo} from "../metadata/common/metadataUtils";
-import VocabularyContext from "../metadata/vocabulary/VocabularyContext";
-import UsersContext from "../users/UsersContext";
-import FileAPI from "../file/FileAPI";
+import {useContext, useEffect, useState} from 'react';
+import type {User} from '../users/UsersAPI';
+import {formatDate, groupBy} from '../common/utils/genericUtils';
+import {getDisplayName} from '../users/userUtils';
+import MetadataAPI from '../metadata/common/MetadataAPI';
+import {getLabel, getTypeInfo} from '../metadata/common/metadataUtils';
+import VocabularyContext from '../metadata/vocabulary/VocabularyContext';
+import UsersContext from '../users/UsersContext';
+import FileAPI from '../file/FileAPI';
 
 export type LabelValueProperty = {
-    label: string;
-    value: any;
-}
+    label: string,
+    value: any
+};
 
 export type LinkedEntityProperty = {
-    id: string;
-    type: string;
-    label: string;
-}
+    id: string,
+    type: string,
+    label: string
+};
 
 const ignoredProperties = [
-    'filename', 'basename', 'displayname', 'name', 'type', 'iri', 'ownedBy', 'ownedByCode',
-    'access', 'canRead', 'canWrite', 'canManage', 'canDelete', 'canUndelete', 'canUnpublish', 'accessMode', 'isreadonly',
-    'userPermissions', 'availableStatuses', 'workspacePermissions', 'availableAccessModes',
-    'status', 'getcreated', 'getcontenttype', 'mime', 'etag', 'getetag', 'iscollection',
-    'supported-report-set', 'resourcetype', 'getlastmodified', 'getcontentlength', 'size', 'metadataLinks', 'version'
+    'filename',
+    'basename',
+    'displayname',
+    'name',
+    'type',
+    'iri',
+    'ownedBy',
+    'ownedByCode',
+    'access',
+    'canRead',
+    'canWrite',
+    'canManage',
+    'canDelete',
+    'canUndelete',
+    'canUnpublish',
+    'accessMode',
+    'isreadonly',
+    'userPermissions',
+    'availableStatuses',
+    'workspacePermissions',
+    'availableAccessModes',
+    'status',
+    'getcreated',
+    'getcontenttype',
+    'mime',
+    'etag',
+    'getetag',
+    'iscollection',
+    'supported-report-set',
+    'resourcetype',
+    'getlastmodified',
+    'getcontentlength',
+    'size',
+    'metadataLinks',
+    'version'
 ];
 
 const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, LabelValueProperty> => {
@@ -34,23 +64,23 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
 
     const defaultProperties = {
         comment: {
-            label: "Description",
+            label: 'Description',
             value: data.comment
         },
         lastmod: {
-            label: "Last modified",
+            label: 'Last modified',
             value: formatDate(data.lastmod)
         },
         createdBy: {
-            label: "Created by",
+            label: 'Created by',
             value: getDisplayName(users.find(u => u.iri === data.createdBy))
         },
         creationdate: {
-            label: "Created",
+            label: 'Created',
             value: formatDate(data.creationdate)
         },
         contentType: {
-            label: "Content type",
+            label: 'Content type',
             value: data.mime
         }
     };
@@ -58,7 +88,9 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
         k => !ignoredProperties.includes(k) && !Object.keys(defaultProperties).includes(k)
     );
     const otherProperties = {};
-    propertiesToDisplay.forEach(p => {otherProperties[p] = {value: data[p]};});
+    propertiesToDisplay.forEach(p => {
+        otherProperties[p] = {value: data[p]};
+    });
 
     return {...defaultProperties, ...otherProperties};
 };
@@ -66,12 +98,12 @@ const mapFileProperties = (data: any = {}, users: User[] = []): Map<string, Labe
 const mapLinkedMetadataProperties = (values: any[], vocabulary: any[]): Map<string, LinkedEntityProperty> => {
     const metadataEntities: LinkedEntityProperty[] = values
         .map(value => ({
-            id: value["@id"],
+            id: value['@id'],
             type: getTypeInfo(value, vocabulary).label,
             label: getLabel(value)
         }))
         .filter(value => value.type != null);
-    return groupBy(metadataEntities, "type");
+    return groupBy(metadataEntities, 'type');
 };
 
 const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
@@ -89,18 +121,22 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
         MetadataAPI.getForAllSubjects(subjects)
             .then(results => {
                 if (results) {
-                    const entityMap: Map<string, LinkedEntityProperty> = mapLinkedMetadataProperties(results, vocabulary);
+                    const entityMap: Map<string, LinkedEntityProperty> = mapLinkedMetadataProperties(
+                        results,
+                        vocabulary
+                    );
                     setLinkedMetadataEntities(entityMap);
                 }
             })
             .catch(() => null)
             .finally(() => setLinkedMetadataEntitiesLoading(false));
     };
-    const parseToArray = value => ((typeof value !== 'string') ? [] : value.split(','));
+    const parseToArray = value => (typeof value !== 'string' ? [] : value.split(','));
 
     const fetchMetadata = () => {
         setLoading(true);
-        fileAPI.stat(path, false, true)
+        fileAPI
+            .stat(path, false, true)
             .then(results => {
                 setMetadata(mapFileProperties(results, users));
                 setError(undefined);
@@ -109,14 +145,15 @@ const useExternalStorageMetadata = (path: string, fileAPI: FileAPI) => {
                 }
                 setError(undefined);
             })
-            .catch((e) => {
+            .catch(e => {
                 setError(e || true);
             })
             .finally(() => setLoading(false));
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => {fetchMetadata();}, [path]);
+    useEffect(() => {
+        fetchMetadata();
+    }, [path]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return {
         loading,

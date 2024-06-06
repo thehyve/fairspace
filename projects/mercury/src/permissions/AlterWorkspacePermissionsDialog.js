@@ -6,11 +6,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
 import withStyles from '@mui/styles/withStyles';
-import {Typography} from "@mui/material";
-import Divider from "@mui/material/Divider";
-import PermissionCandidateSelect from "./PermissionCandidateSelect";
-import type {Permission} from "../collections/CollectionAPI";
-import WorkspacePermissionsTable from "./WorkspacePermissionsTable";
+import {Typography} from '@mui/material';
+import Divider from '@mui/material/Divider';
+import PermissionCandidateSelect from './PermissionCandidateSelect';
+import type {Permission} from '../collections/CollectionAPI';
+import WorkspacePermissionsTable from './WorkspacePermissionsTable';
 
 export const styles = {
     dialog: {
@@ -22,7 +22,7 @@ export const styles = {
     },
     container: {
         display: 'flex',
-        flexWrap: 'wrap',
+        flexWrap: 'wrap'
     },
     autocomplete: {
         width: '100%'
@@ -36,8 +36,14 @@ export const styles = {
     }
 };
 
-export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidates, setPermission,
-    open = false, onClose, classes}) => {
+export const AlterWorkspacePermissionsDialog = ({
+    collection,
+    permissionCandidates,
+    setPermission,
+    open = false,
+    onClose,
+    classes
+}) => {
     const [selectedPermissions, setSelectedPermissions] = useState([]);
 
     const handleDeleteSelectedPermission = (selectedPermission: Permission) => {
@@ -64,9 +70,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
 
     const renderSelectedWorkspaceList = () => (
         <div className={classes.accessLevelControl}>
-            <Typography component="p">
-                Selected workspaces
-            </Typography>
+            <Typography component="p">Selected workspaces</Typography>
             <WorkspacePermissionsTable
                 emptyPermissionsText="No workspace selected."
                 selectedPermissions={selectedPermissions}
@@ -81,8 +85,8 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
             disableClearable
             loadOptionsOnMount={false}
             permissionCandidates={permissionCandidates}
-            onChange={p => handleAddSelectedPermission({...p, access: "Read"})}
-            filter={p => ((p.iri !== collection.ownerWorkspace) && !selectedPermissions.some(sp => sp.iri === p.iri))}
+            onChange={p => handleAddSelectedPermission({...p, access: 'Read'})}
+            filter={p => p.iri !== collection.ownerWorkspace && !selectedPermissions.some(sp => sp.iri === p.iri)}
             label="Select workspace"
             autoFocus
         />
@@ -113,9 +117,7 @@ export const AlterWorkspacePermissionsDialog = ({collection, permissionCandidate
                 >
                     Save
                 </Button>
-                <Button onClick={handleClose}>
-                    Cancel
-                </Button>
+                <Button onClick={handleClose}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

@@ -1,13 +1,14 @@
 package io.fairspace.saturn.services.views;
 
+import lombok.extern.slf4j.Slf4j;
+
 import io.fairspace.saturn.services.BaseApp;
 
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
+@Slf4j
 public class ViewApp extends BaseApp {
 
     private final ViewService viewService;
@@ -27,7 +28,8 @@ public class ViewApp extends BaseApp {
         });
 
         post("/", (req, res) -> {
-            var result = queryService.retrieveViewPage(mapper.readValue(req.body(), ViewRequest.class));
+            var requestBody = mapper.readValue(req.body(), ViewRequest.class);
+            var result = queryService.retrieveViewPage(requestBody);
             res.type(APPLICATION_JSON.asString());
             return mapper.writeValueAsString(result);
         });

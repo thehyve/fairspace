@@ -1,7 +1,6 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
-import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import lombok.extern.log4j.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
@@ -10,7 +9,10 @@ import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.QuadAction;
 import org.keycloak.representations.AccessToken;
 
+import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
+
 import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
+
 import static java.lang.System.currentTimeMillis;
 
 @Log4j2
@@ -20,7 +22,6 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     private final TransactionLog transactionLog;
     private volatile AccessToken user;
-
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
         super(dsg);
@@ -49,7 +50,6 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
     public void begin(TxnType type) {
         begin(TxnType.convert(type));
     }
-
 
     /**
      * Start either a READ or WRITE transaction.
@@ -94,7 +94,6 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
             action.run();
         } catch (Throwable t) {
             log.error(ERROR_MSG, t);
-
 
             // SLF4J has no flush method.
             System.err.println(ERROR_MSG);

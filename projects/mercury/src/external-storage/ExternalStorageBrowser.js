@@ -1,16 +1,16 @@
 import React, {useEffect} from 'react';
-import {withRouter} from "react-router-dom";
+import {withRouter} from 'react-router-dom';
 import withStyles from '@mui/styles/withStyles';
-import MessageDisplay from "../common/components/MessageDisplay";
-import LoadingInlay from "../common/components/LoadingInlay";
-import {useExternalStorage} from "./UseExternalStorage";
-import FileList from "../file/FileList";
-import {File} from "../file/FileAPI";
-import {splitPathIntoArray} from "../file/fileUtils";
-import FileOperations from "../file/FileOperations";
-import type {ExternalStorage} from "./externalStorageUtils";
-import {getExternalStorageAbsolutePath, getExternalStoragePathPrefix, getRelativePath} from "./externalStorageUtils";
-import * as consts from "../constants";
+import MessageDisplay from '../common/components/MessageDisplay';
+import LoadingInlay from '../common/components/LoadingInlay';
+import {useExternalStorage} from './UseExternalStorage';
+import FileList from '../file/FileList';
+import {File} from '../file/FileAPI';
+import {splitPathIntoArray} from '../file/fileUtils';
+import FileOperations from '../file/FileOperations';
+import type {ExternalStorage} from './externalStorageUtils';
+import {getExternalStorageAbsolutePath, getExternalStoragePathPrefix, getRelativePath} from './externalStorageUtils';
+import * as consts from '../constants';
 
 const styles = () => ({
     fileBrowser: {
@@ -22,22 +22,22 @@ const styles = () => ({
 });
 
 type ContextualExternalStorageBrowserProperties = {
-    pathname: string;
-    storage: ExternalStorage;
-    selection: any;
-    preselectedFile: File;
-    setBreadcrumbSegments: () => void;
-    history: History;
-    classes: any;
-    setAtLeastSingleRootFileExists: (boolean) => void;
+    pathname: string,
+    storage: ExternalStorage,
+    selection: any,
+    preselectedFile: File,
+    setBreadcrumbSegments: () => void,
+    history: History,
+    classes: any,
+    setAtLeastSingleRootFileExists: boolean => void
 };
 
 type ExternalStorageBrowserProperties = ContextualExternalStorageBrowserProperties & {
-    loading: boolean;
-    error: Error;
-    files: File[];
-    fileActions: any;
-    openedPath: string;
+    loading: boolean,
+    error: Error,
+    files: File[],
+    fileActions: any,
+    openedPath: string
 };
 
 export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) => {
@@ -50,7 +50,7 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
         selection,
         preselectedFile,
         setBreadcrumbSegments = () => {},
-        openedPath = "",
+        openedPath = '',
         history,
         classes
     } = props;
@@ -58,9 +58,13 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
     const pathSegments = splitPathIntoArray(openedPath);
     const breadcrumbSegments = pathSegments.map((segment, idx) => ({
         label: segment,
-        href: getExternalStoragePathPrefix(storage.name)
-            + consts.PATH_SEPARATOR
-            + pathSegments.slice(0, idx + 1).map(encodeURIComponent).join(consts.PATH_SEPARATOR)
+        href:
+            getExternalStoragePathPrefix(storage.name) +
+            consts.PATH_SEPARATOR +
+            pathSegments
+                .slice(0, idx + 1)
+                .map(encodeURIComponent)
+                .join(consts.PATH_SEPARATOR)
     }));
 
     useEffect(() => {
@@ -68,14 +72,14 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [openedPath]);
 
-    const handlePathDoubleClick = (path) => {
+    const handlePathDoubleClick = path => {
         selection.deselectAll();
         if (path.type === 'directory') {
             history.push(getExternalStorageAbsolutePath(path.filename, storage.name));
         }
     };
 
-    const handlePathClick = (path) => {
+    const handlePathClick = path => {
         selection.toggle(path.filename);
     };
 
@@ -91,7 +95,10 @@ export const ExternalStorageBrowser = (props: ExternalStorageBrowserProperties) 
             <FileList
                 selectionEnabled={false}
                 preselectedFile={preselectedFile}
-                files={files.map(item => ({...item, selected: selection.isSelected(item.filename)}))}
+                files={files.map(item => ({
+                    ...item,
+                    selected: selection.isSelected(item.filename)
+                }))}
                 onPathHighlight={handlePathClick}
                 onPathDoubleClick={handlePathDoubleClick}
                 onAllSelection={() => {}}

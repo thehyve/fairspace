@@ -1,11 +1,12 @@
 package io.fairspace.saturn.services.metadata;
 
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.vocabulary.FS;
 import io.fairspace.saturn.webdav.DavFactory;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
 
 public class MetadataPermissions {
     private final WorkspaceService workspaceService;
@@ -28,6 +29,13 @@ public class MetadataPermissions {
         if (resource.hasProperty(RDF.type, FS.Workspace)) {
             var ws = workspaceService.getWorkspace(resource.asNode());
             return ws.isCanCollaborate();
+        }
+        return userService.currentUser().isCanViewPublicMetadata();
+    }
+
+    public boolean canReadFacets() {
+        if (userService.currentUser().isAdmin()) {
+            return true;
         }
         return userService.currentUser().isCanViewPublicMetadata();
     }

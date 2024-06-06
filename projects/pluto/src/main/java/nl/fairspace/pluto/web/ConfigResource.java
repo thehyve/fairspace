@@ -1,12 +1,13 @@
 package nl.fairspace.pluto.web;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.web.dto.ConfigInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import nl.fairspace.pluto.web.dto.ConfigInfo;
 
 import static nl.fairspace.pluto.config.Urls.CONFIG_PATH;
 

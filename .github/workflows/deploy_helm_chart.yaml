@@ -1,0 +1,102 @@
+name: Deploy Helm Chart to FNS GKE
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version of the Helm chart to deploy (optional, defaults to latest snapshot)"
+        required: false
+      env:
+        type: choice
+        description: "Environment to deploy to"
+        required: true
+        default: "test"
+        options:
+          - "test"
+          - "prod"
+
+jobs:
+  setup-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout Fairspace repository
+        uses: actions/checkout@v4
+
+      - name: Checkout FNS model and values files
+        uses: actions/checkout@v4
+        with:
+          repository: 'thehyve/fnscloud-demonstrator'
+          path: './fns'
+          token: ${{ secrets.FNS_PAT }}
+
+      - name: Set environment
+        run: |
+          if [ -n "${{ github.event.inputs.environment }}" ]; then
+            ENVIRONMENT="${{ github.event.inputs.environment }}"
+          else
+            ENVIRONMENT="test"
+          fi
+          echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
+          echo "Starting deployment to the $ENVIRONMENT environment"
+
+      - name: Define Helm Chart version (taken from input or latest snapshot)
+        run: |
+          VERSION=$(cat ./VERSION)-SNAPSHOT
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          echo "Helm charts version to be deployed: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Auth to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.CICD_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.CICD_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Get GKE credentials to access the cluster
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: fns-cloud-f01
+          location: europe-west1
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.1.0
+        with:
+          version: ${{ vars.HELM_VERSION }}
+
+      - name: Login with Helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ vars.HELM_REGISTRY }} --username ${{ github.repository_owner }} --password-stdin
+
+      - name: Check if namespace exists (create if not)
+        id: check_namespace
+        run: |
+          if kubectl get namespace fairspace-${{ env.ENVIRONMENT }} &> /dev/null; then
+            echo "Namespace fairspace-${{ env.ENVIRONMENT }} exists."
+          else
+            echo "Namespace fairspace-${{ env.ENVIRONMENT }} does not exist. Creating namespace."
+            kubectl create namespace fairspace-${{ env.ENVIRONMENT }}
+          fi
+
+      - name: Delete StatefulSet (if exists) to force re-deploy
+        run: |
+          if kubectl get statefulset fairspace --namespace fairspace-${{ env.ENVIRONMENT }} &> /dev/null; then
+            kubectl delete statefulset fairspace --namespace fairspace-${{ env.ENVIRONMENT }} --cascade=orphan
+            echo "StatefulSet fairspace deleted."
+          else
+            echo "StatefulSet fairspace does not exist."
+          fi 
+
+      - name: Deploy Helm chart
+        run: |
+          helm upgrade --install fairspace oci://${{ vars.HELM_REGISTRY }}/fairspace \
+          --version ${{ env.VERSION }} \
+          --namespace=fairspace-${{ env.ENVIRONMENT }} \
+          --set-file saturn.vocabulary=./fns/fairspace/model/vocabulary.ttl \
+          --set-file saturn.views=./fns/fairspace/model/views.yaml \
+          --values ./fns/fairspace/deployment/${{ env.ENVIRONMENT }}/fairspace-test-values.yaml

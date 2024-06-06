@@ -1,5 +1,9 @@
 package nl.fairspace.pluto.auth;
 
+import java.net.URI;
+import java.time.Duration;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -8,10 +12,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
-import java.time.Duration;
-import java.util.Optional;
 
 import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR;
 
@@ -31,14 +31,23 @@ public class AuthorizationFailedHandler {
 
         if (shouldRedirect(exchange.getRequest())) {
             URI originalRequestUri = exchange.getRequest().getURI();
-            URI redirectURI = UriComponentsBuilder.fromUri(originalRequestUri).replacePath(LOGIN_PATH).build().toUri();
+            URI redirectURI = UriComponentsBuilder.fromUri(originalRequestUri)
+                    .replacePath(LOGIN_PATH)
+                    .build()
+                    .toUri();
             Optional<WebSession> session = exchange.getSession().blockOptional(Duration.ofMillis(500));
             if (session.isPresent()) {
-                session.get().getAttributes().put(AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE, exchange.getRequest().getURI().toString());
+                session.get()
+                        .getAttributes()
+                        .put(
+                                AuthConstants.PREVIOUS_REQUEST_SESSION_ATTRIBUTE,
+                                exchange.getRequest().getURI().toString());
                 session.get().save();
             }
-            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate().uri(redirectURI).build();
-            ServerWebExchange modifiedExchange = exchange.mutate().request(modifiedRequest).build();
+            ServerHttpRequest modifiedRequest =
+                    exchange.getRequest().mutate().uri(redirectURI).build();
+            ServerWebExchange modifiedExchange =
+                    exchange.mutate().request(modifiedRequest).build();
             modifiedExchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, redirectURI);
             modifiedExchange.getResponse().getHeaders().set(HttpHeaders.LOCATION, redirectURI.toString());
             modifiedExchange.getResponse().setStatusCode(HttpStatus.FOUND);
@@ -46,7 +55,8 @@ public class AuthorizationFailedHandler {
         } else {
             exchange.getResponse().getHeaders().add(LOGIN_PATH_HEADER, LOGIN_PATH);
             exchange.getResponse().getHeaders().add(WWW_AUTHENTICATE_HEADER, BEARER_AUTH);
-            if (!XHR_VALUE.equals(exchange.getRequest().getHeaders().getFirst(X_REQUESTED_WITH_HEADER)) && !isStaticResourceRequest(exchange.getRequest())) {
+            if (!XHR_VALUE.equals(exchange.getRequest().getHeaders().getFirst(X_REQUESTED_WITH_HEADER))
+                    && !isStaticResourceRequest(exchange.getRequest())) {
                 exchange.getResponse().getHeaders().add(WWW_AUTHENTICATE_HEADER, BASIC_AUTH);
             }
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -56,9 +66,10 @@ public class AuthorizationFailedHandler {
 
     private boolean shouldRedirect(ServerHttpRequest request) {
         String acceptHeader = request.getHeaders().getFirst(HttpHeaders.ACCEPT);
-        return HttpMethod.GET.matches(request.getMethod().name()) && acceptHeader != null &&
-                acceptHeader.contains("text/html") &&
-                !XHR_VALUE.equals(request.getHeaders().getFirst(X_REQUESTED_WITH_HEADER));
+        return HttpMethod.GET.matches(request.getMethod().name())
+                && acceptHeader != null
+                && acceptHeader.contains("text/html")
+                && !XHR_VALUE.equals(request.getHeaders().getFirst(X_REQUESTED_WITH_HEADER));
     }
 
     private boolean isStaticResourceRequest(ServerHttpRequest request) {

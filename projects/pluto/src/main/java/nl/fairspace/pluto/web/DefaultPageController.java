@@ -24,8 +24,7 @@ public class DefaultPageController implements ErrorController {
                 return "/";
             } else if (statusCode.is4xxClientError()) {
                 return "/error/4xx.html";
-            }
-            else if (statusCode.is5xxServerError()) {
+            } else if (statusCode.is5xxServerError()) {
                 return "/error/5xx.html";
             }
         }

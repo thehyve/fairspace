@@ -47,15 +47,21 @@ auth:
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"
-services:
-  jupyterhub: https://jupyter.org/hub#
-  cbioportal: https://www.cbioportal.org
-  "test username": http://google.com?q=${username}
 features:
   - ExtraStorage
 viewDatabase:
   enabled: true
   url: jdbc:postgresql://localhost:9432/fairspace
+  autoCommit: false
+  maxPoolSize: 50
+  connectionTimeout: 1000
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
+  maxJoinItems: 50
+caches:
+  facets:
+    name: "facets"
+  views:
+    name: "views"
+

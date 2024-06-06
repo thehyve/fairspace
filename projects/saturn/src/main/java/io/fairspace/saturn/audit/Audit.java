@@ -1,12 +1,11 @@
 package io.fairspace.saturn.audit;
 
+import java.util.Objects;
+
 import org.apache.logging.log4j.*;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Objects;
-
 import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
-
 
 public class Audit {
     private static final Logger log = LogManager.getLogger("audit");
@@ -30,7 +29,6 @@ public class Audit {
             ThreadContext.put("user_email", token.getEmail());
         }
         ThreadContext.put("user_id", token.getSubject());
-
 
         log.trace(event);
 
