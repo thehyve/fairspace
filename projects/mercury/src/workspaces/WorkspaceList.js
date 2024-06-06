@@ -12,22 +12,22 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    TableSortLabel,
-} from "@mui/material";
-import {Lock} from "@mui/icons-material";
+    TableSortLabel
+} from '@mui/material';
+import {Lock} from '@mui/icons-material';
 
-import TableContainer from "@mui/material/TableContainer";
+import TableContainer from '@mui/material/TableContainer';
 import type {Workspace} from './WorkspacesAPI';
-import MessageDisplay from "../common/components/MessageDisplay";
-import useSorting from "../common/hooks/UseSorting";
-import usePagination from "../common/hooks/UsePagination";
+import MessageDisplay from '../common/components/MessageDisplay';
+import useSorting from '../common/hooks/UseSorting';
+import usePagination from '../common/hooks/UsePagination';
 import {isAdmin} from '../users/userUtils';
 import UserContext from '../users/UserContext';
 import WorkspaceActionMenu from './WorkspaceActionMenu';
-import TablePaginationActions from "../common/components/TablePaginationActions";
+import TablePaginationActions from '../common/components/TablePaginationActions';
 
 type WorkspaceListProps = {
-    workspaces: Workspace[];
+    workspaces: Workspace[]
 };
 
 const columns = {
@@ -61,7 +61,11 @@ const columns = {
 const EmailChip = ({email, label}) => {
     const chip = <Chip style={{margin: 1, cursor: email ? 'pointer' : 'default'}} size="small" label={label} />;
     if (email) {
-        return <Link underline="hover" color="inherit" title={email} href={`mailto:${email}`}>{chip}</Link>;
+        return (
+            <Link underline="hover" color="inherit" title={email} href={`mailto:${email}`}>
+                {chip}
+            </Link>
+        );
     }
     return chip;
 };
@@ -98,19 +102,17 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {
-                                    Object.entries(columns).map(([key, column]) => (
-                                        <TableCell key={key} align={column.align ? column.align : 'inherit'}>
-                                            <TableSortLabel
-                                                active={orderBy === key}
-                                                direction={orderAscending ? 'asc' : 'desc'}
-                                                onClick={() => toggleSort(key)}
-                                            >
-                                                {column.label}
-                                            </TableSortLabel>
-                                        </TableCell>
-                                    ))
-                                }
+                                {Object.entries(columns).map(([key, column]) => (
+                                    <TableCell key={key} align={column.align ? column.align : 'inherit'}>
+                                        <TableSortLabel
+                                            active={orderBy === key}
+                                            direction={orderAscending ? 'asc' : 'desc'}
+                                            onClick={() => toggleSort(key)}
+                                        >
+                                            {column.label}
+                                        </TableSortLabel>
+                                    </TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -121,38 +123,57 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                                     onDoubleClick={() => onWorkspaceDoubleClick(workspace)}
                                 >
                                     <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="canCollaborate">
-                                        {!workspace.canCollaborate && (<Lock />)}
+                                        {!workspace.canCollaborate && <Lock />}
                                     </TableCell>
                                     <TableCell style={{minWidth: 250, maxWidth: 350}} scope="row" key="code">
                                         <ListItemText
                                             style={{margin: 0}}
-                                            primary={workspace.canCollaborate ? (
-                                                <Link
-                                                    component="button"
-                                                    onClick={(e) => {e.stopPropagation(); onWorkspaceDoubleClick(workspace);}}
-                                                    color="inherit"
-                                                    variant="body2"
-                                                    style={{textAlign: "left"}}
-                                                >
-                                                    {workspace.code}
-                                                </Link>
-                                            ) : workspace.code}
+                                            primary={
+                                                workspace.canCollaborate ? (
+                                                    <Link
+                                                        component="button"
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            onWorkspaceDoubleClick(workspace);
+                                                        }}
+                                                        color="inherit"
+                                                        variant="body2"
+                                                        style={{textAlign: 'left'}}
+                                                    >
+                                                        {workspace.code}
+                                                    </Link>
+                                                ) : (
+                                                    workspace.code
+                                                )
+                                            }
                                             secondary={workspace.title}
                                         />
                                     </TableCell>
-                                    <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="collectionCount">
+                                    <TableCell
+                                        align="right"
+                                        style={{maxWidth: 32, width: 32}}
+                                        scope="row"
+                                        key="collectionCount"
+                                    >
                                         {workspace.summary ? workspace.summary.nonDeletedCollectionCount : ''}
                                     </TableCell>
-                                    <TableCell align="right" style={{maxWidth: 32, width: 32}} scope="row" key="memberCount">
+                                    <TableCell
+                                        align="right"
+                                        style={{maxWidth: 32, width: 32}}
+                                        scope="row"
+                                        key="memberCount"
+                                    >
                                         {workspace.summary ? workspace.summary.memberCount : ''}
                                     </TableCell>
                                     <TableCell style={{maxWidth: 150, width: 150}} scope="row" key="managers">
-                                        {workspace.managers ? workspace.managers.map(m => (
-                                            <EmailChip key={m.iri} email={m.email} label={m.name} />
-                                        )) : ''}
+                                        {workspace.managers
+                                            ? workspace.managers.map(m => (
+                                                  <EmailChip key={m.iri} email={m.email} label={m.name} />
+                                              ))
+                                            : ''}
                                     </TableCell>
                                     <TableCell style={{maxWidth: 32, width: 32}} scope="row" key="menu">
-                                        { isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} /> }
+                                        {isAdmin(currentUser) && <WorkspaceActionMenu small workspace={workspace} />}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -166,7 +187,7 @@ const WorkspaceList = (props: WorkspaceListProps) => {
                         page={page}
                         onPageChange={(e, p) => setPage(p)}
                         onRowsPerPageChange={e => setRowsPerPage(e.target.value)}
-                        style={{overflowX: "hidden"}}
+                        style={{overflowX: 'hidden'}}
                         ActionsComponent={TablePaginationActions}
                     />
                 </TableContainer>

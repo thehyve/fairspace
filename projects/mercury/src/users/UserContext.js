@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-import onLogout from "../routes/logout";
+import onLogout from '../routes/logout';
 import {getUser} from './UsersAPI';
 
 const UserContext = React.createContext({});

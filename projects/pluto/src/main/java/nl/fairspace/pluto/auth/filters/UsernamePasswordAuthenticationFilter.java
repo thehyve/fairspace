@@ -1,9 +1,14 @@
 package nl.fairspace.pluto.auth.filters;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Base64;
+import java.util.Optional;
+
 import com.nimbusds.oauth2.sdk.ParseException;
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.OAuthFlow;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpStatus;
@@ -12,12 +17,8 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Base64;
-import java.util.Optional;
+import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
@@ -32,8 +33,10 @@ public class UsernamePasswordAuthenticationFilter implements GatewayFilter {
         this.oAuthFlow = oAuthFlow;
     }
 
-    private OAuthAuthenticationToken retrieveHeaderAuthorization(ServerWebExchange exchange) throws ParseException, IOException, URISyntaxException {
-        log.debug("Check authentication header for " + exchange.getRequest().getURI().getPath());
+    private OAuthAuthenticationToken retrieveHeaderAuthorization(ServerWebExchange exchange)
+            throws ParseException, IOException, URISyntaxException {
+        log.debug("Check authentication header for "
+                + exchange.getRequest().getURI().getPath());
 
         String authorizationHeader = exchange.getRequest().getHeaders().getFirst(AUTHORIZATION_HEADER);
 
@@ -87,6 +90,6 @@ public class UsernamePasswordAuthenticationFilter implements GatewayFilter {
                 session.get().save();
             }
         }
-       return chain.filter(exchange);
+        return chain.filter(exchange);
     }
 }

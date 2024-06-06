@@ -3,7 +3,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import {Fade} from '@mui/material';
 import LoadingInlay from './LoadingInlay';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     container: {
         position: 'relative'
     },
@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
         top: 0,
         left: 0,
         width: '100%',
-        height: '100%',
+        height: '100%'
     }
 }));
 
@@ -47,9 +47,7 @@ const LoadingOverlayWrapper = React.forwardRef(({children, loading}, ref) => {
                     <LoadingInlay />
                 </div>
             )}
-            <div ref={ref}>
-                {children}
-            </div>
+            <div ref={ref}>{children}</div>
         </div>
     );
 });

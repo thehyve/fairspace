@@ -1,5 +1,7 @@
 package nl.fairspace.pluto.config;
 
+import java.io.ByteArrayInputStream;
+
 import org.apache.http.entity.InputStreamEntity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,8 +12,6 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.server.ServerWebExchange;
-
-import java.io.ByteArrayInputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -35,7 +35,7 @@ public class WebDAVHostRoutingFilterTest {
         GatewayFilterChain filterChain = mock(GatewayFilterChain.class);
 
         filter.filter(exchange, filterChain);
-        assertEquals("value",  exchange.getRequest().getHeaders().get("key").get(0));
+        assertEquals("value", exchange.getRequest().getHeaders().get("key").get(0));
         assertEquals("PROPFIND", exchange.getRequest().getMethod().toString());
     }
 }

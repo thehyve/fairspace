@@ -4,7 +4,7 @@ import {fireEvent, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 // eslint-disable-next-line jest/no-mocks-import
 import '../__mocks__/clipboard.mock';
-import CopyButton from "../CopyButton";
+import CopyButton from '../CopyButton';
 
 describe('<CopyButton />', () => {
     beforeEach(() => {
@@ -12,10 +12,7 @@ describe('<CopyButton />', () => {
     });
 
     it('changes the icon and title after copying', () => {
-        render(<CopyButton
-            labelPreCopy="Copy full IRI"
-            labelAfterCopy="Copied!"
-        />);
+        render(<CopyButton labelPreCopy="Copy full IRI" labelAfterCopy="Copied!" />);
 
         const uncopiedIcon = screen.getByTestId('uncopied');
         expect(screen.getByLabelText(/Copy full IRI/i)).toBeInTheDocument();

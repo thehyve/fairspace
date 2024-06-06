@@ -48,6 +48,6 @@ popd
 ${helm_cmd} dependency update ../../charts/fairspace && \
 ${helm_cmd} package ../../charts/fairspace && \
 ${helm_cmd} upgrade fairspace-local --install --namespace fairspace-dev fairspace-0.0.0-RELEASEVERSION.tgz \
-  -f local-values.yaml
+  -f local-values.yaml --set-file svgicons.test=../icons/test.svg
 
 popd

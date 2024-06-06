@@ -1,9 +1,13 @@
 package io.fairspace.saturn.webdav;
 
+import java.io.IOException;
+import java.util.Vector;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.pivovarit.function.ThrowingConsumer;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.resource.FolderResource;
 import org.junit.Before;
@@ -12,14 +16,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Vector;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -27,23 +29,29 @@ import static org.mockito.Mockito.*;
 public class WebDAVServletTest {
     @Mock
     ResourceFactory factory;
+
     @Mock
     Transactions txn;
+
     @Mock
     BlobStore store;
+
     @Mock
     HttpServletRequest req;
+
     @Mock
     HttpServletResponse res;
+
     @Mock
     ServletInputStream in;
+
     @Mock
     ServletOutputStream out;
+
     @Mock
     FolderResource resource;
 
     WebDAVServlet servlet;
-
 
     @Before
     public void before() throws Exception {
@@ -62,16 +70,20 @@ public class WebDAVServletTest {
         setupRequestContext();
 
         doAnswer(invocation -> {
-            ThrowingConsumer job = invocation.getArgument(0);
-            job.accept(null);
-            return null;
-        }).when(txn).executeRead(any());
+                    ThrowingConsumer job = invocation.getArgument(0);
+                    job.accept(null);
+                    return null;
+                })
+                .when(txn)
+                .executeRead(any());
 
         doAnswer(invocation -> {
-            ThrowingConsumer job = invocation.getArgument(0);
-            job.accept(null);
-            return null;
-        }).when(txn).executeWrite(any());
+                    ThrowingConsumer job = invocation.getArgument(0);
+                    job.accept(null);
+                    return null;
+                })
+                .when(txn)
+                .executeWrite(any());
     }
 
     @Test

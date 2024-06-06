@@ -1,8 +1,8 @@
-import {renderHook} from "@testing-library/react-hooks";
+import {renderHook} from '@testing-library/react-hooks';
 import {act} from 'react-test-renderer';
 
-import React from "react";
-import {useFormSubmission} from "../UseFormSubmission";
+import React from 'react';
+import {useFormSubmission} from '../UseFormSubmission';
 import ValidationErrorsDisplay from '../ValidationErrorsDisplay';
 
 // same as UseLinkedData
@@ -43,7 +43,7 @@ describe.skip('UseFormSubmission', () => {
     it('should show the default error component for general errors', async () => {
         const submitFunc = jest.fn(() => Promise.reject(new Error()));
         const errorDialogMock = {
-            showError: jest.fn(),
+            showError: jest.fn()
         };
         const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', [], errorDialogMock));
 
@@ -66,17 +66,19 @@ describe.skip('UseFormSubmission', () => {
         ];
         const details = [
             {
-                message: "Cannot add a machine-only property",
-                subject: "https://fairspace.nl/ontology#collectionTypeShape",
-                predicate: "https://fairspace.nl/ontology#domainIncludes",
-                value: "http://workspace.ci.fairway.app/vocabulary/AnalysisShape"
+                message: 'Cannot add a machine-only property',
+                subject: 'https://fairspace.nl/ontology#collectionTypeShape',
+                predicate: 'https://fairspace.nl/ontology#domainIncludes',
+                value: 'http://workspace.ci.fairway.app/vocabulary/AnalysisShape'
             }
         ];
 
         // eslint-disable-next-line prefer-promise-reject-errors
         const submitFunc = jest.fn(() => Promise.reject({details, message: 'Validation Error'}));
         const showError = jest.fn();
-        const {result, waitForNextUpdate} = renderHook(() => useFormSubmission(submitFunc, '', namespaces, {showError}));
+        const {result, waitForNextUpdate} = renderHook(() =>
+            useFormSubmission(submitFunc, '', namespaces, {showError})
+        );
 
         act(() => {
             result.current.submitForm();
@@ -84,17 +86,17 @@ describe.skip('UseFormSubmission', () => {
         await waitForNextUpdate();
 
         expect(showError).toHaveBeenCalledWith(
-            (<ValidationErrorsDisplay
+            <ValidationErrorsDisplay
                 entityErrors={[]}
-                otherErrors={
-                    [{
-                        message: "Cannot add a machine-only property",
-                        predicate: "fs:ontology#domainIncludes",
-                        subject: "fs:ontology#collectionTypeShape",
-                        value: "http://workspace.ci.fairway.app/vocabulary/AnalysisShape"
-                    }]
-                }
-            />)
+                otherErrors={[
+                    {
+                        message: 'Cannot add a machine-only property',
+                        predicate: 'fs:ontology#domainIncludes',
+                        subject: 'fs:ontology#collectionTypeShape',
+                        value: 'http://workspace.ci.fairway.app/vocabulary/AnalysisShape'
+                    }
+                ]}
+            />
         );
     });
 });

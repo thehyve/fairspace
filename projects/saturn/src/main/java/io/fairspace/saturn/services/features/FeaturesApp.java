@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.features;
 
+import java.util.Set;
+
 import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.services.BaseApp;
-
-import java.util.Set;
 
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;

@@ -3,7 +3,7 @@ import {Grid} from '@mui/material';
 import AssignmentOutlined from '@mui/icons-material/AssignmentOutlined';
 import MessageDisplay from './MessageDisplay';
 
-const EmptyInformationDrawer = (props) => {
+const EmptyInformationDrawer = props => {
     const {message} = props;
     return (
         <Grid container direction="column" justifyContent="center" alignItems="center">
@@ -25,7 +25,7 @@ const EmptyInformationDrawer = (props) => {
 };
 
 EmptyInformationDrawer.defaultProps = {
-    message: "Select an element to display its metadata"
+    message: 'Select an element to display its metadata'
 };
 
 export default EmptyInformationDrawer;

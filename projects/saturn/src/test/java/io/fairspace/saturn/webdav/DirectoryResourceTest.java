@@ -1,22 +1,10 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
-import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.fairspace.saturn.webdav.resources.DirectoryResource;
-import io.fairspace.saturn.webdav.resources.FileResource;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+
 import io.milton.http.FileItem;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -38,14 +26,28 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
+import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.resources.DirectoryResource;
+import io.fairspace.saturn.webdav.resources.FileResource;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
+
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.junit.Assert.*;
@@ -61,16 +63,22 @@ public class DirectoryResourceTest {
 
     @Mock
     BlobStore store;
+
     @Mock
     UserService userService;
+
     @Mock
     MetadataService metadataService;
+
     @Mock
     FileItem file;
+
     @Mock
     BlobFileItem blobFileItem;
+
     @Mock
     InputStream input;
+
     @Mock
     private MetadataPermissions permissions;
 
@@ -96,7 +104,8 @@ public class DirectoryResourceTest {
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         Context context = new Context();
-        metadataService = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        metadataService =
+                new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
         context.set(METADATA_SERVICE, metadataService);
         davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
@@ -110,9 +119,10 @@ public class DirectoryResourceTest {
         selectAdmin();
 
         var taxonomies = model.read("test-taxonomies.ttl");
-        metadataService.put(taxonomies);
+        metadataService.put(taxonomies, Boolean.FALSE);
 
-        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
+        var workspace = workspaceService.createWorkspace(
+                Workspace.builder().code("Test").build());
 
         when(request.getHeader("Owner")).thenReturn(workspace.getIri().getURI());
         var blob = new BlobInfo("id", FILE_SIZE, "md5");
@@ -125,7 +135,7 @@ public class DirectoryResourceTest {
         coll1.createNew("coffee.jpg", null, 0L, "image/jpeg");
 
         var testdata = model.read("testdata.ttl");
-        metadataService.put(testdata);
+        metadataService.put(testdata, Boolean.FALSE);
     }
 
     @Test
@@ -147,7 +157,8 @@ public class DirectoryResourceTest {
     }
 
     @Test
-    public void testDeleteAllInDirectory() throws NotAuthorizedException, ConflictException, BadRequestException, IOException {
+    public void testDeleteAllInDirectory()
+            throws NotAuthorizedException, ConflictException, BadRequestException, IOException {
         dir = new DirectoryResource(davFactory, model.getResource(baseUri + "/dir"), Access.Manage);
         dir.subject.addProperty(RDF.type, FS.Directory);
 
@@ -181,11 +192,9 @@ public class DirectoryResourceTest {
     }
 
     @Test
-    public void testTypedLiteralMetadataUploadSuccess() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv =
-                "Path,Description\n" +
-                        ".,\"Blah\"\n" +
-                        "./coffee.jpg,\"Blah blah\"\n";
+    public void testTypedLiteralMetadataUploadSuccess()
+            throws NotAuthorizedException, ConflictException, BadRequestException {
+        String csv = "Path,Description\n" + ".,\"Blah\"\n" + "./coffee.jpg,\"Blah blah\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         DirectoryResource dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
@@ -197,10 +206,9 @@ public class DirectoryResourceTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void testMetadataUploadUnknownProperty() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv =
-                "Path,Unknown\n" +
-                        "./coll1,\"Blah blah\"\n";
+    public void testMetadataUploadUnknownProperty()
+            throws NotAuthorizedException, ConflictException, BadRequestException {
+        String csv = "Path,Unknown\n" + "./coll1,\"Blah blah\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
 
@@ -209,9 +217,7 @@ public class DirectoryResourceTest {
 
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadEmptyHeader() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv =
-                ",\n" +
-                        "./coll1,\"Blah blah\"\n";
+        String csv = ",\n" + "./coll1,\"Blah blah\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
 
@@ -220,9 +226,7 @@ public class DirectoryResourceTest {
 
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadUnknownFile() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv =
-                "Path,Description\n" +
-                        "./subdir,\"Blah blah\"\n";
+        String csv = "Path,Description\n" + "./subdir,\"Blah blah\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
 
@@ -231,9 +235,7 @@ public class DirectoryResourceTest {
 
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadDeletedFile() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv =
-                "Path,Description\n" +
-                        "./subdir,\"Blah blah\"\n";
+        String csv = "Path,Description\n" + "./subdir,\"Blah blah\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         var subdir = (DirectoryResource) dir.createCollection("subdir");
@@ -243,14 +245,13 @@ public class DirectoryResourceTest {
     }
 
     @Test
-    public void testLinkedMetadataUploadByIRISuccess() throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void testLinkedMetadataUploadByIRISuccess()
+            throws NotAuthorizedException, ConflictException, BadRequestException {
         Property sampleProp = createProperty("https://institut-curie.org/ontology#sample");
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         assert !dir.subject.hasProperty(sampleProp);
 
-        String csv =
-                "Path,Is about biological sample\n" +
-                        ".,\"http://example.com/samples#s2-b\"\n";
+        String csv = "Path,Is about biological sample\n" + ".,\"http://example.com/samples#s2-b\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
 
@@ -258,14 +259,13 @@ public class DirectoryResourceTest {
     }
 
     @Test
-    public void testLinkedMetadataUploadByLabelSuccess() throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void testLinkedMetadataUploadByLabelSuccess()
+            throws NotAuthorizedException, ConflictException, BadRequestException {
         Property sampleProp = createProperty("https://institut-curie.org/ontology#sample");
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         assert !dir.subject.hasProperty(sampleProp);
 
-        String csv =
-                "Path,Is about biological sample\n" +
-                        ".,\"Sample A for subject 1\"\n";
+        String csv = "Path,Is about biological sample\n" + ".,\"Sample A for subject 1\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
 
@@ -273,14 +273,13 @@ public class DirectoryResourceTest {
     }
 
     @Test(expected = BadRequestException.class)
-    public void testLinkedMetadataUploadByUnknownIRI() throws NotAuthorizedException, ConflictException, BadRequestException {
+    public void testLinkedMetadataUploadByUnknownIRI()
+            throws NotAuthorizedException, ConflictException, BadRequestException {
         Property sampleProp = createProperty("https://institut-curie.org/ontology#sample");
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         assert !dir.subject.hasProperty(sampleProp);
 
-        String csv =
-                "Path,Is about biological sample\n" +
-                        ".,\"http://example.com/samples#unknown-sample\"\n";
+        String csv = "Path,Is about biological sample\n" + ".,\"http://example.com/samples#unknown-sample\"\n";
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
     }

@@ -1,3 +1,5 @@
+export const APPLICATION_NAME = 'Fairspace';
+export const DEFAULT_METADATA_VIEW_MENU_LABEL = 'Metadata';
 export const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
 export const CUT = 'CUT';
 export const COPY = 'COPY';
@@ -13,6 +15,10 @@ export const METADATA_PATH = '/metadata';
 export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';
 export const TOOLTIP_ENTER_DELAY = 350;
 export const DATE_FORMAT = 'dd-MM-yyyy';
+
+// The maximum number of items in a list in the right panel, for performance reasons.
+// If you change this, also change it in 'MetadataService.java'
+export const MAX_LIST_LENGTH = 100;
 
 // Metadata schemas
 export const SHACL_NS = 'http://www.w3.org/ns/shacl#';

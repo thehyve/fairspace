@@ -4,7 +4,9 @@ import {
     Card,
     CardContent,
     CardHeader,
-    FormControl, FormGroup, FormLabel,
+    FormControl,
+    FormGroup,
+    FormLabel,
     IconButton,
     Link,
     List,
@@ -17,28 +19,28 @@ import {
 import {CloudDownload, Folder, MoreVert} from '@mui/icons-material';
 import {useHistory, withRouter} from 'react-router-dom';
 
-import CollectionEditor from "./CollectionEditor";
+import CollectionEditor from './CollectionEditor';
 import type {Collection, Resource, Status} from './CollectionAPI';
 import CollectionsContext from './CollectionsContext';
 import type {History} from '../types';
-import WorkspaceContext from "../workspaces/WorkspaceContext";
-import type {Workspace} from "../workspaces/WorkspacesAPI";
-import ErrorDialog from "../common/components/ErrorDialog";
-import LoadingInlay from "../common/components/LoadingInlay";
-import ConfirmationDialog from "../common/components/ConfirmationDialog";
-import PermissionCard from "../permissions/PermissionCard";
-import MessageDisplay from "../common/components/MessageDisplay";
-import UsersContext from "../users/UsersContext";
-import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from "../workspaces/WorkspaceUserRolesContext";
-import CollectionStatusChangeDialog from "./CollectionStatusChangeDialog";
-import CollectionOwnerChangeDialog from "./CollectionOwnerChangeDialog";
-import {descriptionForStatus, isCollectionPage} from "./collectionUtils";
+import WorkspaceContext from '../workspaces/WorkspaceContext';
+import type {Workspace} from '../workspaces/WorkspacesAPI';
+import ErrorDialog from '../common/components/ErrorDialog';
+import LoadingInlay from '../common/components/LoadingInlay';
+import ConfirmationDialog from '../common/components/ConfirmationDialog';
+import PermissionCard from '../permissions/PermissionCard';
+import MessageDisplay from '../common/components/MessageDisplay';
+import UsersContext from '../users/UsersContext';
+import WorkspaceUserRolesContext, {WorkspaceUserRolesProvider} from '../workspaces/WorkspaceUserRolesContext';
+import CollectionStatusChangeDialog from './CollectionStatusChangeDialog';
+import CollectionOwnerChangeDialog from './CollectionOwnerChangeDialog';
+import {descriptionForStatus, isCollectionPage} from './collectionUtils';
 import {getDisplayName} from '../users/userUtils';
 import {camelCaseToWords, formatDateTime} from '../common/utils/genericUtils';
 import type {User} from '../users/UsersAPI';
 import LinkedDataLink from '../metadata/common/LinkedDataLink';
-import UserContext from "../users/UserContext";
-import ProgressButton from "../common/components/ProgressButton";
+import UserContext from '../users/UserContext';
+import ProgressButton from '../common/components/ProgressButton';
 
 export const ICONS = {
     LOCAL_STORAGE: <Folder aria-label="Local storage" />,
@@ -50,28 +52,28 @@ export const ICONS = {
 const DEFAULT_COLLECTION_TYPE = 'LOCAL_STORAGE';
 
 type CollectionDetailsProps = {
-    loading: boolean;
-    collection: Collection;
-    onChangeOwner: () => void;
-    workspaces: Workspace[];
-    deleteCollection: (Resource) => Promise<void>;
-    undeleteCollection: (Resource) => Promise<void>;
-    unpublish: (Resource) => Promise<void>;
-    setStatus: (name: string, status: Status) => Promise<void>;
-    setOwnedBy: (name: string, owner: string) => Promise<void>;
-    setBusy: (boolean) => void;
-    history: History;
+    loading: boolean,
+    collection: Collection,
+    onChangeOwner: () => void,
+    workspaces: Workspace[],
+    deleteCollection: Resource => Promise<void>,
+    undeleteCollection: Resource => Promise<void>,
+    unpublish: Resource => Promise<void>,
+    setStatus: (name: string, status: Status) => Promise<void>,
+    setOwnedBy: (name: string, owner: string) => Promise<void>,
+    setBusy: boolean => void,
+    history: History
 };
 
 type CollectionDetailsState = {
-    editing: boolean;
+    editing: boolean,
     changingStatus: boolean,
     changingOwner: boolean,
-    deleting: boolean;
-    undeleting: boolean;
-    unpublishing: boolean;
-    anchorEl: any;
-}
+    deleting: boolean,
+    undeleting: boolean,
+    unpublishing: boolean,
+    anchorEl: any
+};
 
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
@@ -96,7 +98,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         this.unmounting = true;
     }
 
-    handleCollectionOperation = (operationPromise) => {
+    handleCollectionOperation = operationPromise => {
         this.setState({isActiveOperation: true});
         return operationPromise
             .then(r => {
@@ -184,33 +186,31 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     history.push('/collections');
                 }
             })
-            .catch(e => ErrorDialog.showError(
-                "An error occurred while deleting a collection",
-                e,
-                () => this.handleCollectionDelete(collection)
-            ));
+            .catch(e =>
+                ErrorDialog.showError('An error occurred while deleting a collection', e, () =>
+                    this.handleCollectionDelete(collection)
+                )
+            );
     };
 
     handleCollectionUndelete = (collection: Collection) => {
         const {undeleteCollection} = this.props;
         this.handleCloseUndelete();
-        this.handleCollectionOperation(undeleteCollection(collection))
-            .catch(e => ErrorDialog.showError(
-                "An error occurred while undeleting a collection",
-                e,
-                () => this.handleCollectionUndelete(collection)
-            ));
+        this.handleCollectionOperation(undeleteCollection(collection)).catch(e =>
+            ErrorDialog.showError('An error occurred while undeleting a collection', e, () =>
+                this.handleCollectionUndelete(collection)
+            )
+        );
     };
 
     handleCollectionUnpublish = (collection: Collection) => {
         const {unpublish} = this.props;
         this.handleCloseUnpublish();
-        this.handleCollectionOperation(unpublish(collection))
-            .catch(err => ErrorDialog.showError(
-                "An error occurred while unpublishing a collection",
-                err,
-                () => this.handleCollectionUnpublish(collection)
-            ));
+        this.handleCollectionOperation(unpublish(collection)).catch(err =>
+            ErrorDialog.showError('An error occurred while unpublishing a collection', err, () =>
+                this.handleCollectionUnpublish(collection)
+            )
+        );
     };
 
     handleCollectionOwnerChange = (collection: Collection, selectedOwner: Workspace) => {
@@ -223,16 +223,15 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     history.push('/collections');
                 }
             })
-            .catch(err => ErrorDialog.showError(
-                "An error occurred while changing an owner of a collection",
-                err,
-                () => this.handleCollectionOwnerChange(collection, selectedOwner)
-            ));
+            .catch(err =>
+                ErrorDialog.showError('An error occurred while changing an owner of a collection', err, () =>
+                    this.handleCollectionOwnerChange(collection, selectedOwner)
+                )
+            );
     };
 
-    renderCollectionOwner = (workspace: Workspace) => (
-        workspace
-        && (
+    renderCollectionOwner = (workspace: Workspace) =>
+        workspace && (
             <FormControl>
                 <FormLabel>Owner workspace</FormLabel>
                 <FormGroup>
@@ -240,7 +239,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         color="inherit"
                         underline="hover"
                         href={`/workspace?iri=${encodeURI(workspace.iri)}`}
-                        onClick={(e) => {
+                        onClick={e => {
                             e.preventDefault();
                             this.props.history.push(`/workspace?iri=${encodeURI(workspace.iri)}`);
                         }}
@@ -249,33 +248,28 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </Link>
                 </FormGroup>
             </FormControl>
-        )
-    );
+        );
 
-    renderCollectionStatus = () => (
-        this.props.collection.status
-        && (
+    renderCollectionStatus = () =>
+        this.props.collection.status && (
             <FormControl>
                 <FormLabel>Status</FormLabel>
                 <FormGroup>
                     <ListItemText
-                        primary={camelCaseToWords(this.props.collection.status, "-")}
+                        primary={camelCaseToWords(this.props.collection.status, '-')}
                         secondary={descriptionForStatus(this.props.collection.status)}
                     />
                 </FormGroup>
             </FormControl>
-        )
-    );
+        );
 
-    renderDeleted = (dateDeleted: string, deletedBy: User) => (
+    renderDeleted = (dateDeleted: string, deletedBy: User) =>
         dateDeleted && [
             <ListItem key="dateDeleted" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted</FormLabel>
                     <FormGroup>
-                        <Typography variant="body2">
-                            {formatDateTime(dateDeleted)}
-                        </Typography>
+                        <Typography variant="body2">{formatDateTime(dateDeleted)}</Typography>
                     </FormGroup>
                 </FormControl>
             </ListItem>,
@@ -284,15 +278,12 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <FormLabel>Deleted by</FormLabel>
                     <FormGroup>
                         <Typography variant="body2">
-                            <LinkedDataLink uri={deletedBy.iri}>
-                                {getDisplayName(deletedBy)}
-                            </LinkedDataLink>
+                            <LinkedDataLink uri={deletedBy.iri}>{getDisplayName(deletedBy)}</LinkedDataLink>
                         </Typography>
                     </FormGroup>
                 </FormControl>
             </ListItem>
-        ]
-    );
+        ];
 
     render() {
         const {loading, error, collection, users, workspaceRoles, workspaces} = this.props;
@@ -300,7 +291,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         const iconName = collection.type && ICONS[collection.type] ? collection.type : DEFAULT_COLLECTION_TYPE;
 
         if (error) {
-            return (<MessageDisplay message="An error occurred loading collection details." />);
+            return <MessageDisplay message="An error occurred loading collection details." />;
         }
 
         if (loading) {
@@ -322,11 +313,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         }
         if (collection.canManage) {
             menuItems.push([
-                <MenuItem
-                    key="ownership"
-                    onClick={this.handleChangeOwner}
-                    disabled={workspaces.length <= 1}
-                >
+                <MenuItem key="ownership" onClick={this.handleChangeOwner} disabled={workspaces.length <= 1}>
                     Transfer ownership &hellip;
                 </MenuItem>,
                 <MenuItem
@@ -348,8 +335,8 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         if (collection.canDelete) {
             menuItems.push(
                 <MenuItem key="delete" onClick={this.handleDelete}>
-                    <Typography color={collection.dateDeleted ? "error" : "inherit"}>
-                        {collection.dateDeleted ? "Delete permanently" : "Delete"} &hellip;
+                    <Typography color={collection.dateDeleted ? 'error' : 'inherit'}>
+                        {collection.dateDeleted ? 'Delete permanently' : 'Delete'} &hellip;
                     </Typography>
                 </MenuItem>
             );
@@ -357,9 +344,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
         if (collection.canUnpublish) {
             menuItems.push(
                 <MenuItem key="unpublish" onClick={this.handleUnpublish}>
-                    <Typography color="error">
-                        Unpublish &hellip;
-                    </Typography>
+                    <Typography color="error">Unpublish &hellip;</Typography>
                 </MenuItem>
             );
         }
@@ -368,44 +353,43 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
             <>
                 <Card>
                     <CardHeader
-                        action={menuItems && menuItems.length > 0 && (
-                            <>
-                                <ProgressButton active={this.state.isActiveOperation}>
-                                    <IconButton
-                                        aria-label="More"
-                                        aria-owns={anchorEl ? 'long-menu' : undefined}
-                                        aria-haspopup="true"
-                                        onClick={this.handleMenuClick}
+                        action={
+                            menuItems &&
+                            menuItems.length > 0 && (
+                                <>
+                                    <ProgressButton active={this.state.isActiveOperation}>
+                                        <IconButton
+                                            aria-label="More"
+                                            aria-owns={anchorEl ? 'long-menu' : undefined}
+                                            aria-haspopup="true"
+                                            onClick={this.handleMenuClick}
+                                        >
+                                            <MoreVert />
+                                        </IconButton>
+                                    </ProgressButton>
+                                    <Menu
+                                        id="simple-menu"
+                                        anchorEl={anchorEl}
+                                        open={Boolean(anchorEl)}
+                                        onClose={this.handleMenuClose}
                                     >
-                                        <MoreVert />
-                                    </IconButton>
-                                </ProgressButton>
-                                <Menu
-                                    id="simple-menu"
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={this.handleMenuClose}
-                                >
-                                    {menuItems}
-                                </Menu>
-                            </>
-                        )}
+                                        {menuItems}
+                                    </Menu>
+                                </>
+                            )
+                        }
                         titleTypographyProps={{variant: 'h6'}}
                         title={collection.name}
                         avatar={ICONS[iconName]}
                         style={{wordBreak: 'break-word'}}
                     />
-                    <CardContent style={{paddingTop: 0}}>
+                    <CardContent style={{paddingTop: 8, paddingBottom: 16}}>
                         <Typography component="p" style={{whiteSpace: 'pre-line'}}>
                             {collection.description}
                         </Typography>
                         <List>
-                            <ListItem disableGutters>
-                                {this.renderCollectionOwner(ownerWorkspace)}
-                            </ListItem>
-                            <ListItem disableGutters>
-                                {this.renderCollectionStatus()}
-                            </ListItem>
+                            <ListItem disableGutters>{this.renderCollectionOwner(ownerWorkspace)}</ListItem>
+                            <ListItem disableGutters>{this.renderCollectionStatus()}</ListItem>
                             {this.renderDeleted(collection.dateDeleted, deletedBy)}
                         </List>
                     </CardContent>
@@ -425,7 +409,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                         workspace={ownerWorkspace}
                         updateExisting
                         setBusy={this.props.setBusy}
-                        onClose={() => { if (!this.unmounting) { this.setState({editing: false});} }}
+                        onClose={() => {
+                            if (!this.unmounting) {
+                                this.setState({editing: false});
+                            }
+                        }}
                     />
                 ) : null}
                 {changingStatus ? (
@@ -447,11 +435,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={(
+                        content={
                             <span>
                                 Are you sure you want to <b>undelete</b> collection <em>{collection.name}</em>?
                             </span>
-                        )}
+                        }
                         dangerous
                         agreeButtonText="Undelete"
                         onAgree={() => this.handleCollectionUndelete(this.props.collection)}
@@ -463,12 +451,13 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={(
+                        content={
                             <span>
-                                Collection {collection.name} is already marked as deleted.<br />
+                                Collection {collection.name} is already marked as deleted.
+                                <br />
                                 <b>Are you sure you want to delete it permanently</b>?
                             </span>
-                        )}
+                        }
                         dangerous
                         agreeButtonText="Delete permanently"
                         onAgree={() => this.handleCollectionDelete(this.props.collection)}
@@ -480,11 +469,11 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={(
+                        content={
                             <span>
                                 Are you sure you want to <b>delete</b> collection <em>{collection.name}</em>?
                             </span>
-                        )}
+                        }
                         dangerous
                         agreeButtonText="Delete"
                         onAgree={() => this.handleCollectionDelete(this.props.collection)}
@@ -496,14 +485,17 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     <ConfirmationDialog
                         open
                         title="Confirmation"
-                        content={(
+                        content={
                             <span>
-
-                                <b>Warning: The action is not recommended! Collection (meta)data may already be referenced in other systems.</b><br />
+                                <b>
+                                    Warning: The action is not recommended! Collection (meta)data may already be
+                                    referenced in other systems.
+                                </b>
+                                <br />
                                 Are you sure you want to <b>unpublish</b> collection <em>{collection.name}</em>?<br />
                                 Collection view mode will be changed to <em>Metadata published</em>.
                             </span>
-                        )}
+                        }
                         dangerous
                         agreeButtonText="Unpublish"
                         onAgree={() => this.handleCollectionUnpublish(this.props.collection)}
@@ -516,7 +508,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
     }
 }
 
-const ContextualCollectionDetails = (props) => {
+const ContextualCollectionDetails = props => {
     const history = useHistory();
     const {users} = useContext(UsersContext);
     const {currentUser} = useContext(UserContext);

@@ -1,15 +1,7 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceRole;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import java.util.Arrays;
+
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -25,10 +17,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.util.Arrays;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -68,31 +70,31 @@ public class DavFactoryAccessTest {
     @Parameterized.Parameters(name = "{index}: access(granted:{0}, status:{1}, mode:{2}) = {3}")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                { Access.Manage, Status.Active, AccessMode.Restricted, Access.Manage },
-                { Access.Manage, Status.ReadOnly, AccessMode.Restricted, Access.Read },
-                { Access.Manage, Status.Archived, AccessMode.Restricted, Access.List },
-                { Access.Manage, Status.Active, AccessMode.DataPublished, Access.Read },
-                { Access.Manage, Status.Active, AccessMode.MetadataPublished, Access.Manage },
-                { Access.Write, Status.Active, AccessMode.Restricted, Access.Write },
-                { Access.Write, Status.ReadOnly, AccessMode.Restricted, Access.Read },
-                { Access.Write, Status.Archived, AccessMode.Restricted, Access.List },
-                { Access.Write, Status.Active, AccessMode.DataPublished, Access.Read },
-                { Access.Write, Status.Active, AccessMode.MetadataPublished, Access.Write },
-                { Access.Read, Status.Active, AccessMode.Restricted, Access.Read },
-                { Access.Read, Status.ReadOnly, AccessMode.Restricted, Access.Read },
-                { Access.Read, Status.Archived, AccessMode.Restricted, Access.List },
-                { Access.Read, Status.Active, AccessMode.DataPublished, Access.Read },
-                { Access.Read, Status.Active, AccessMode.MetadataPublished, Access.Read },
-                { Access.List, Status.Active, AccessMode.Restricted, Access.List },
-                { Access.List, Status.ReadOnly, AccessMode.Restricted, Access.List },
-                { Access.List, Status.Archived, AccessMode.Restricted, Access.List },
-                { Access.List, Status.Active, AccessMode.DataPublished, Access.Read },
-                { Access.List, Status.Active, AccessMode.MetadataPublished, Access.List },
-                { Access.None, Status.Active, AccessMode.Restricted, Access.None },
-                { Access.None, Status.ReadOnly, AccessMode.Restricted, Access.None },
-                { Access.None, Status.Archived, AccessMode.Restricted, Access.None },
-                { Access.None, Status.Active, AccessMode.DataPublished, Access.Read },
-                { Access.None, Status.Active, AccessMode.MetadataPublished, Access.List }
+            {Access.Manage, Status.Active, AccessMode.Restricted, Access.Manage},
+            {Access.Manage, Status.ReadOnly, AccessMode.Restricted, Access.Read},
+            {Access.Manage, Status.Archived, AccessMode.Restricted, Access.List},
+            {Access.Manage, Status.Active, AccessMode.DataPublished, Access.Read},
+            {Access.Manage, Status.Active, AccessMode.MetadataPublished, Access.Manage},
+            {Access.Write, Status.Active, AccessMode.Restricted, Access.Write},
+            {Access.Write, Status.ReadOnly, AccessMode.Restricted, Access.Read},
+            {Access.Write, Status.Archived, AccessMode.Restricted, Access.List},
+            {Access.Write, Status.Active, AccessMode.DataPublished, Access.Read},
+            {Access.Write, Status.Active, AccessMode.MetadataPublished, Access.Write},
+            {Access.Read, Status.Active, AccessMode.Restricted, Access.Read},
+            {Access.Read, Status.ReadOnly, AccessMode.Restricted, Access.Read},
+            {Access.Read, Status.Archived, AccessMode.Restricted, Access.List},
+            {Access.Read, Status.Active, AccessMode.DataPublished, Access.Read},
+            {Access.Read, Status.Active, AccessMode.MetadataPublished, Access.Read},
+            {Access.List, Status.Active, AccessMode.Restricted, Access.List},
+            {Access.List, Status.ReadOnly, AccessMode.Restricted, Access.List},
+            {Access.List, Status.Archived, AccessMode.Restricted, Access.List},
+            {Access.List, Status.Active, AccessMode.DataPublished, Access.Read},
+            {Access.List, Status.Active, AccessMode.MetadataPublished, Access.List},
+            {Access.None, Status.Active, AccessMode.Restricted, Access.None},
+            {Access.None, Status.ReadOnly, AccessMode.Restricted, Access.None},
+            {Access.None, Status.Archived, AccessMode.Restricted, Access.None},
+            {Access.None, Status.Active, AccessMode.DataPublished, Access.Read},
+            {Access.None, Status.Active, AccessMode.MetadataPublished, Access.List}
         });
     }
 
@@ -123,7 +125,8 @@ public class DavFactoryAccessTest {
         new DAO(model).write(admin);
 
         selectAdmin();
-        var workspace = workspaceService.createWorkspace(Workspace.builder().code("Test").build());
+        var workspace = workspaceService.createWorkspace(
+                Workspace.builder().code("Test").build());
         workspaceService.setUserRole(workspace.getIri(), user.getIri(), WorkspaceRole.Member);
 
         selectRegularUser();
@@ -154,5 +157,4 @@ public class DavFactoryAccessTest {
             case Manage -> principal.addProperty(FS.canManage, subject);
         }
     }
-
 }

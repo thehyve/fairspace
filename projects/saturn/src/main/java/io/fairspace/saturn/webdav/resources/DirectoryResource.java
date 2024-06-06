@@ -1,13 +1,14 @@
 package io.fairspace.saturn.webdav.resources;
 
-import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.Access;
-import io.fairspace.saturn.webdav.DavFactory;
-import io.fairspace.saturn.webdav.WebDAVServlet;
-import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Stream;
+
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Range;
@@ -26,14 +27,14 @@ import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.stream.Stream;
+import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.WebDAVServlet;
+import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
@@ -42,6 +43,7 @@ import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.*;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.setErrorMessage;
+
 import static java.util.stream.Collectors.joining;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.jena.graph.NodeFactory.createURI;
@@ -66,18 +68,21 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
     }
 
     @Override
-    public io.milton.resource.CollectionResource createCollection(String newName) throws NotAuthorizedException, ConflictException, BadRequestException {
+    public io.milton.resource.CollectionResource createCollection(String newName)
+            throws NotAuthorizedException, ConflictException, BadRequestException {
         var subj = createResource(newName).addProperty(RDF.type, FS.Directory);
 
         return (io.milton.resource.CollectionResource) factory.getResource(subj, access);
     }
 
     @Override
-    public Resource createNew(String name, InputStream inputStream, Long length, String contentType) throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
+    public Resource createNew(String name, InputStream inputStream, Long length, String contentType)
+            throws IOException, ConflictException, NotAuthorizedException, BadRequestException {
         return createNew(name, getBlob(), contentType);
     }
 
-    private Resource createNew(String name, BlobInfo blob, String contentType) throws NotAuthorizedException, ConflictException, BadRequestException {
+    private Resource createNew(String name, BlobInfo blob, String contentType)
+            throws NotAuthorizedException, ConflictException, BadRequestException {
         var subj = createResource(name)
                 .addProperty(RDF.type, FS.File)
                 .addLiteral(FS.currentVersion, 1)
@@ -90,7 +95,8 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
         return factory.getResource(subj, access);
     }
 
-    private org.apache.jena.rdf.model.Resource createResource(String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+    private org.apache.jena.rdf.model.Resource createResource(String name)
+            throws ConflictException, NotAuthorizedException, BadRequestException {
         if (name != null) {
             name = name.trim();
         }
@@ -98,8 +104,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
             throw new BadRequestException("The name is empty.");
         }
         if (name.contains("\\")) {
-            throw new BadRequestException(
-                    "The name contains an illegal character (\\)");
+            throw new BadRequestException("The name contains an illegal character (\\)");
         }
 
         var existing = factory.getResourceByType(childSubject(subject, name), access);
@@ -143,8 +148,8 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
     }
 
     @Override
-    public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
-    }
+    public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType)
+            throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {}
 
     @Override
     public Long getMaxAgeSeconds(Auth auth) {
@@ -167,23 +172,25 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
     }
 
     @Override
-    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files)
+            throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
-            // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
-            // -F 'action=upload_files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
-            // -F '/dir/subdir/file2.ext=@/dir/subdir/file2.ext' \
-            // http://localhost:8080/api/webdav/c1/
+                // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
+                // -F 'action=upload_files' -F '/dir/subdir/file1.ext=@/dir/subdir/file1.ext' \
+                // -F '/dir/subdir/file2.ext=@/dir/subdir/file2.ext' \
+                // http://localhost:8080/api/webdav/c1/
             case "upload_files" -> uploadFiles(files);
-            // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
-            // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/webdav/c1/
+                // curl -i -H 'Authorization: Basic b3JnYW5pc2F0aW9uLWFkbWluOmZhaXJzcGFjZTEyMw==' \
+                // -F 'action=upload_metadata' -F 'file=@meta.csv' http://localhost:8080/api/webdav/c1/
             case "upload_metadata" -> uploadMetadata(files.get("file"));
             case "delete_all_in_directory" -> deleteAllInDirectory();
             default -> super.performAction(action, parameters, files);
         }
     }
 
-    private void uploadFiles(Map<String, FileItem> files) throws NotAuthorizedException, ConflictException, BadRequestException {
-        for(var entry: files.entrySet()) {
+    private void uploadFiles(Map<String, FileItem> files)
+            throws NotAuthorizedException, ConflictException, BadRequestException {
+        for (var entry : files.entrySet()) {
             uploadFile(entry.getKey(), entry.getValue());
         }
     }
@@ -194,7 +201,8 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
         }
     }
 
-    private void uploadFile(String path, FileItem file) throws NotAuthorizedException, BadRequestException, ConflictException {
+    private void uploadFile(String path, FileItem file)
+            throws NotAuthorizedException, BadRequestException, ConflictException {
         path = normalizePath(URLDecoder.decode(path, StandardCharsets.UTF_8));
         if (path.contains("/")) {
             var segments = splitPath(path);
@@ -206,9 +214,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
                 throw new ConflictException(child);
             }
             var dir = (DirectoryResource) child;
-            var relPath = Stream.of(segments)
-                    .skip(1)
-                    .collect(joining("/"));
+            var relPath = Stream.of(segments).skip(1).collect(joining("/"));
             dir.uploadFile(relPath, file);
         } else {
             var blob = ((BlobFileItem) file).getBlob();
@@ -233,15 +239,16 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
         var model = createDefaultModel();
 
         try (var is = file.getInputStream();
-             var reader = new InputStreamReader(is);
-             var csvParser = CSVFormat.DEFAULT
-                     .withFirstRecordAsHeader()
-                     .withCommentMarker('#')
-                     .withIgnoreEmptyLines()
-                     .parse(reader)) {
+                var reader = new InputStreamReader(is);
+                var csvParser = CSVFormat.DEFAULT
+                        .withFirstRecordAsHeader()
+                        .withCommentMarker('#')
+                        .withIgnoreEmptyLines()
+                        .parse(reader)) {
             var headers = new HashSet<>(csvParser.getHeaderNames());
             if (!headers.contains("Path")) {
-                setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Invalid file format. 'Path' column is missing.");
+                setErrorMessage("Line " + csvParser.getCurrentLineNumber()
+                        + ". Invalid file format. 'Path' column is missing.");
                 throw new BadRequestException(this);
             }
             try {
@@ -258,24 +265,30 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
                         s = subject.getModel().createResource(subject + "/" + encodePath(path));
                     }
                     if (!s.getModel().containsResource(s)) {
-                        setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". File \"" + path + "\" not found");
+                        setErrorMessage(
+                                "Line " + csvParser.getCurrentLineNumber() + ". File \"" + path + "\" not found");
                         throw new BadRequestException(this);
                     }
 
                     if (s.hasProperty(FS.dateDeleted)) {
-                        setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". File \"" + path + "\" was deleted");
+                        setErrorMessage(
+                                "Line " + csvParser.getCurrentLineNumber() + ". File \"" + path + "\" was deleted");
                         throw new BadRequestException(this);
                     }
 
                     var classShape = s.getPropertyResourceValue(RDF.type).inModel(VOCABULARY);
                     var propertyShapes = new HashMap<String, org.apache.jena.rdf.model.Resource>();
 
-                    classShape.listProperties(SHACLM.property)
+                    classShape
+                            .listProperties(SHACLM.property)
                             .mapWith(Statement::getObject)
                             .mapWith(RDFNode::asResource)
                             .filterKeep(propertyShape -> propertyShape.hasProperty(SHACLM.name)
                                     && propertyShape.hasProperty(SHACLM.path)
-                                    && propertyShape.getProperty(SHACLM.path).getObject().isURIResource())
+                                    && propertyShape
+                                            .getProperty(SHACLM.path)
+                                            .getObject()
+                                            .isURIResource())
                             .forEachRemaining(propertyShape -> {
                                 var name = getStringProperty(propertyShape, SHACLM.name);
                                 if (name != null) {
@@ -297,11 +310,14 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
                         var propertyShape = propertyShapes.get(header);
 
                         if (propertyShape == null) {
-                            setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Unknown attribute: " + header);
+                            setErrorMessage(
+                                    "Line " + csvParser.getCurrentLineNumber() + ". Unknown attribute: " + header);
                             throw new BadRequestException(this);
                         }
 
-                        var property = model.createProperty(propertyShape.getPropertyResourceValue(SHACLM.path).getURI());
+                        var property = model.createProperty(propertyShape
+                                .getPropertyResourceValue(SHACLM.path)
+                                .getURI());
                         var datatype = propertyShape.getPropertyResourceValue(SHACLM.datatype);
                         var class_ = propertyShape.getPropertyResourceValue(SHACLM.class_);
                         assert (datatype != null) ^ (class_ != null);
@@ -310,18 +326,19 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
 
                         for (var value : values) {
                             if (class_ != null) {
-                                var object = subject.getModel().listResourcesWithProperty(RDF.type, class_)
+                                var object = subject.getModel()
+                                        .listResourcesWithProperty(RDF.type, class_)
                                         .filterKeep(r -> r.getURI().equals(value) || r.hasProperty(RDFS.label, value))
                                         .toList();
                                 if (object.size() == 1) {
                                     model.add(s, property, object.get(0));
                                 } else if (object.size() > 1) {
-                                    setErrorMessage("Line " + csvParser.getCurrentLineNumber()
-                                            + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" is not unique.");
+                                    setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Object \"" + value
+                                            + "\" of class " + "\"" + class_ + "\" is not unique.");
                                     throw new BadRequestException(this);
                                 } else {
-                                    setErrorMessage("Line " + csvParser.getCurrentLineNumber()
-                                            + ". Object \"" + value + "\" of class " + "\"" + class_ + "\" does not exist.");
+                                    setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Object \"" + value
+                                            + "\" of class " + "\"" + class_ + "\" does not exist.");
                                     throw new BadRequestException(this);
                                 }
                             } else {
@@ -332,7 +349,8 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
                     }
                 }
             } catch (IllegalStateException e) {
-                setErrorMessage("Line " + csvParser.getCurrentLineNumber() + ". Metadata file is not a valid comma separated values file (CSV).");
+                setErrorMessage("Line " + csvParser.getCurrentLineNumber()
+                        + ". Metadata file is not a valid comma separated values file (CSV).");
                 throw new BadRequestException("Error parsing file " + file.getName(), e);
             }
         } catch (IllegalArgumentException | IOException e) {
@@ -342,11 +360,11 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
 
         MetadataService metadataService = factory.context.get(METADATA_SERVICE);
         try {
-            metadataService.patch(model);
+            metadataService.patch(model, Boolean.TRUE);
         } catch (ValidationException e) {
             var message = new StringBuilder("Validation of the uploaded metadata failed.\n");
             var n = 0;
-            for (var v: e.getViolations()) {
+            for (var v : e.getViolations()) {
                 var path = v.getSubject().replaceFirst(subject.getURI(), "");
                 path = URLDecoder.decode(path, StandardCharsets.UTF_8);
                 var propertyShapes = VOCABULARY.listResourcesWithProperty(SHACLM.path, createURI(v.getPredicate()));
@@ -362,7 +380,9 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
                         .append(".\n");
                 if (++n == 5) {
                     if (e.getViolations().size() > n) {
-                        message.append("+ ").append(e.getViolations().size() - n).append(" more errors.");
+                        message.append("+ ")
+                                .append(e.getViolations().size() - n)
+                                .append(" more errors.");
                     }
                     break;
                 }

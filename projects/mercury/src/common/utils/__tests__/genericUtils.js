@@ -1,12 +1,18 @@
 import {
+    camelCaseToWords,
     compareBy,
     comparePrimitives,
-    comparing, first,
+    comparing,
+    first,
     flattenShallow,
     formatDateTime,
+    groupBy,
+    isEmptyObject,
     isNonEmptyValue,
-    joinWithSeparator, stableSort, camelCaseToWords, groupBy, isEmptyObject
-} from "../genericUtils";
+    joinWithSeparator,
+    stableSort,
+    stringToBooleanValueOrNull
+} from '../genericUtils';
 
 describe('array Utils', () => {
     describe('flattenShallow', () => {
@@ -19,16 +25,31 @@ describe('array Utils', () => {
         });
 
         it('goes only one level deep', () => {
-            expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([[1, 2, 3], [4, 5]]);
+            expect(flattenShallow([[[1, 2, 3]], [[4, 5]]])).toEqual([
+                [1, 2, 3],
+                [4, 5]
+            ]);
         });
     });
 
     describe('groupBy', () => {
         it('group an array by key', () => {
-            expect(groupBy(
-                [{name: "x", type: "a"}, {name: "y", type: "a"}, {name: "z", type: "b"}],
-                "type"
-            )).toEqual({a: [{name: "x", type: "a"}, {name: "y", type: "a"}], b: [{name: "z", type: "b"}]});
+            expect(
+                groupBy(
+                    [
+                        {name: 'x', type: 'a'},
+                        {name: 'y', type: 'a'},
+                        {name: 'z', type: 'b'}
+                    ],
+                    'type'
+                )
+            ).toEqual({
+                a: [
+                    {name: 'x', type: 'a'},
+                    {name: 'y', type: 'a'}
+                ],
+                b: [{name: 'z', type: 'b'}]
+            });
         });
     });
 });
@@ -87,7 +108,7 @@ describe('isNonEmptyValue', () => {
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [undefined, null, '', NaN, "", ``];
+        const values = [undefined, null, '', NaN, '', ``]; // eslint-disable-line quotes
 
         values.forEach(v => expect(isNonEmptyValue(v)).toBe(false));
     });
@@ -100,7 +121,7 @@ describe('isEmptyObject', () => {
         values.forEach(v => expect(isEmptyObject(v)).toBe(true));
     });
     it('Returns false for the given values', () => {
-        const values = [{x: "test"}, {y: false}, {z: null}];
+        const values = [{x: 'test'}, {y: false}, {z: null}];
 
         values.forEach(v => expect(isEmptyObject(v)).toBe(false));
     });
@@ -148,9 +169,7 @@ describe('formatDateTime', () => {
     });
 
     it('should return the given value for invalid dates', () => {
-        const invalidDates = [
-            '2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN
-        ];
+        const invalidDates = ['2014-25-23', '23/25/2014', [], 'x', null, undefined, '', NaN];
 
         invalidDates.forEach(date => {
             expect(formatDateTime(date)).toEqual(date);
@@ -160,13 +179,13 @@ describe('formatDateTime', () => {
 
 describe('stableSort', () => {
     it('respects sorting direction', () => {
-        const a = ["c", "a", "b"];
+        const a = ['c', 'a', 'b'];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a']);
     });
 
     it('respects sorting direction with empty values', () => {
-        const a = ["c", "a", "", "b"];
+        const a = ['c', 'a', '', 'b'];
         expect(stableSort(a, comparePrimitives, true)).toEqual(['', 'a', 'b', 'c']);
         expect(stableSort(a, comparePrimitives, false)).toEqual(['c', 'b', 'a', '']);
     });
@@ -190,5 +209,35 @@ describe('camelCaseToWords', () => {
     });
     it('should return empty string for non-string value', () => {
         expect(camelCaseToWords(['test'])).toEqual('');
+    });
+});
+
+describe('renderBooleanIcon', () => {
+    it('should return true for true', () => {
+        expect(stringToBooleanValueOrNull(true)).toEqual(true);
+    });
+    it('should return true for "t"', () => {
+        expect(stringToBooleanValueOrNull('t')).toEqual(true);
+    });
+    it('should return true for "True"', () => {
+        expect(stringToBooleanValueOrNull('True')).toEqual(true);
+    });
+    it('should return false for false', () => {
+        expect(stringToBooleanValueOrNull(false)).toEqual(false);
+    });
+    it('should return false for "f"', () => {
+        expect(stringToBooleanValueOrNull('f')).toEqual(false);
+    });
+    it('should return a false icon for "False"', () => {
+        expect(stringToBooleanValueOrNull('False')).toEqual(false);
+    });
+    it('should return null for null', () => {
+        expect(stringToBooleanValueOrNull(null)).toEqual(null);
+    });
+    it('should return null for undefined', () => {
+        expect(stringToBooleanValueOrNull(undefined)).toEqual(null);
+    });
+    it('should return null for non-boolean values', () => {
+        expect(stringToBooleanValueOrNull('test')).toEqual(null);
     });
 });

@@ -13,7 +13,7 @@ public class SearchApp extends BaseApp {
     public SearchApp(String basePath, SearchService searchService, QueryService queryService) {
         super(basePath);
         this.searchService = searchService;
-        this.queryService= queryService;
+        this.queryService = queryService;
     }
 
     @Override

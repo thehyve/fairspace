@@ -9,7 +9,7 @@ import {
     TableHead,
     TableRow,
     Typography
-} from "@mui/material";
+} from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 export default ({entityErrors, otherErrors}) => {
@@ -26,12 +26,8 @@ export default ({entityErrors, otherErrors}) => {
             <TableBody>
                 {entityErrors.map(({predicate, message}) => (
                     <TableRow key={predicate + message}>
-                        <TableCell>
-                            {predicate}
-                        </TableCell>
-                        <TableCell>
-                            {message}
-                        </TableCell>
+                        <TableCell>{predicate}</TableCell>
+                        <TableCell>{message}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -40,17 +36,17 @@ export default ({entityErrors, otherErrors}) => {
 
     return (
         <>
-            {hasEntityErrors && (
-                hasOtherErrors ? ( // No expansion panel if only entity errors
+            {hasEntityErrors &&
+                (hasOtherErrors ? ( // No expansion panel if only entity errors
                     <Accordion defaultExpanded>
                         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                             <Typography>Current entity</Typography>
                         </AccordionSummary>
-                        <AccordionDetails>
-                            {entityErrorsTable}
-                        </AccordionDetails>
+                        <AccordionDetails>{entityErrorsTable}</AccordionDetails>
                     </Accordion>
-                ) : entityErrorsTable)}
+                ) : (
+                    entityErrorsTable
+                ))}
 
             {hasOtherErrors && (
                 <Accordion defaultExpanded={!hasEntityErrors}>
@@ -69,15 +65,9 @@ export default ({entityErrors, otherErrors}) => {
                             <TableBody>
                                 {otherErrors.map(({subject, predicate, message}) => (
                                     <TableRow key={subject + predicate + message}>
-                                        <TableCell>
-                                            {subject}
-                                        </TableCell>
-                                        <TableCell>
-                                            {predicate}
-                                        </TableCell>
-                                        <TableCell>
-                                            {message}
-                                        </TableCell>
+                                        <TableCell>{subject}</TableCell>
+                                        <TableCell>{predicate}</TableCell>
+                                        <TableCell>{message}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

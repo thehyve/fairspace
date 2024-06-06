@@ -1,25 +1,25 @@
 import React from 'react';
 import withStyles from '@mui/styles/withStyles';
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import type {MetadataViewOptions, MetadataViewFilter, MetadataViewColumn} from "./MetadataViewAPI";
-import {RESOURCES_VIEW} from "./metadataViewUtils";
-import {TabPanel} from "../../workspaces/WorkspaceOverview";
-import MetadataViewTableContainer from "./MetadataViewTableContainer";
-import CollectionsContext from "../../collections/CollectionsContext";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import type {MetadataViewOptions, MetadataViewFilter, MetadataViewColumn} from './MetadataViewAPI';
+import {RESOURCES_VIEW} from './metadataViewUtils';
+import {TabPanel} from '../../workspaces/WorkspaceOverview';
+import MetadataViewTableContainer from './MetadataViewTableContainer';
+import CollectionsContext from '../../collections/CollectionsContext';
 
 type MetadataViewTabsProperties = {
-    currentViewIndex: Number;
-    idColumn: MetadataViewColumn;
-    changeTab: () => {};
-    views: MetadataViewOptions[];
-    filters: MetadataViewFilter[];
-    locationContext: string;
-    selected: [];
-    toggleRow: () => [];
-    hasInactiveFilters: Boolean;
-    collections: CollectionsContext;
-    classes: any;
+    currentViewIndex: Number,
+    idColumn: MetadataViewColumn,
+    changeTab: () => {},
+    views: MetadataViewOptions[],
+    filters: MetadataViewFilter[],
+    locationContext: string,
+    selected: [],
+    toggleRow: () => [],
+    hasInactiveFilters: Boolean,
+    collections: CollectionsContext,
+    classes: any
 };
 
 const styles = () => ({
@@ -28,24 +28,36 @@ const styles = () => ({
     },
     tab: {
         '& .MuiBox-root': {
-            padding: 0,
-        },
+            padding: 0
+        }
     }
 });
 
 export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
-    const {currentViewIndex, idColumn, changeTab, views, filters, locationContext, selected, toggleRow, hasInactiveFilters, collections, classes} = props;
+    const {
+        currentViewIndex,
+        idColumn,
+        changeTab,
+        views,
+        filters,
+        locationContext,
+        selected,
+        toggleRow,
+        hasInactiveFilters,
+        collections,
+        classes
+    } = props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
-    const a11yProps = (index) => ({
-        'key': `metadata-view-tab-${index}`,
-        'aria-controls': `metadata-view-tab-${index}`,
+    const a11yProps = index => ({
+        key: `metadata-view-tab-${index}`,
+        'aria-controls': `metadata-view-tab-${index}`
     });
 
     const appendCustomColumns = (view: MetadataViewOptions) => {
         if (view.name === RESOURCES_VIEW) {
-            const pathColumn = {title: "Path", name: "path", type: "Custom"};
-            const accessColumn = {title: "Access", name: "access", type: "Custom"};
+            const pathColumn = {title: 'Path', name: 'path', type: 'Custom'};
+            const accessColumn = {title: 'Access', name: 'access', type: 'Custom'};
             return [
                 view.columns.find(c => c.name === RESOURCES_VIEW),
                 pathColumn,
@@ -53,7 +65,7 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                 accessColumn
             ];
         }
-        return view.columns;
+        return view.columns.sort((a, b) => a.displayIndex - b.displayIndex);
     };
 
     return (

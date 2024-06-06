@@ -1,16 +1,17 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.*;
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.services.views.*;
+import java.sql.*;
+
 import lombok.extern.log4j.*;
 import org.apache.jena.fuseki.main.FusekiServer;
 import org.apache.jena.fuseki.server.*;
 import org.apache.jena.riot.*;
 import org.eclipse.jetty.server.session.SessionHandler;
 
-import java.sql.*;
+import io.fairspace.saturn.auth.*;
+import io.fairspace.saturn.config.*;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.views.*;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
@@ -25,27 +26,26 @@ public class App {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (CONFIG.viewDatabase.enabled) {
             try {
-                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase);
+                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase, CONFIG.search);
             } catch (SQLException e) {
                 log.error("Error connecting to the view database.", e);
                 throw new RuntimeException("Error connecting to the view database", e); // Terminates Saturn
             }
         }
-        var ds = SaturnDatasetFactory.connect(
-                CONFIG.jena,
-                viewStoreClientFactory
-        );
+        var ds = SaturnDatasetFactory.connect(CONFIG.jena, viewStoreClientFactory);
 
         var svc = new Services(CONFIG, VIEWS_CONFIG, ds, viewStoreClientFactory);
 
         var operationRegistry = OperationRegistry.createStd();
-        operationRegistry.register(Operation.Query, WebContent.contentTypeSPARQLQuery,
+        operationRegistry.register(
+                Operation.Query,
+                WebContent.contentTypeSPARQLQuery,
                 new Protected_SPARQL_QueryDataset(svc.getUserService()));
         var serverBuilder = FusekiServer.create(operationRegistry)
                 .securityHandler(new SaturnSecurityHandler(CONFIG.auth))
                 .add(API_PREFIX + "/rdf/", svc.getFilteredDatasetGraph(), false)
                 .addServlet(API_PREFIX + "/webdav/*", svc.getDavServlet())
-                .addFilter( "/*", createSparkFilter(API_PREFIX, svc, CONFIG))
+                .addFilter("/*", createSparkFilter(API_PREFIX, svc, CONFIG))
                 .port(CONFIG.port);
         if (CONFIG.features.contains(Feature.ExtraStorage)) {
             serverBuilder.addServlet(API_PREFIX + "/extra-storage/*", svc.getExtraDavServlet());

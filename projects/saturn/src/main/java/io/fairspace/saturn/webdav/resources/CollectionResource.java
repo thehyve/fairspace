@@ -1,7 +1,10 @@
 package io.fairspace.saturn.webdav.resources;
 
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import io.milton.http.Auth;
 import io.milton.http.FileItem;
 import io.milton.http.Request;
@@ -13,13 +16,12 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.*;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.webdav.DavFactory.getGrantedPermission;
+
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.util.stream.Collectors.joining;
 
@@ -39,7 +41,8 @@ public class CollectionResource extends DirectoryResource {
     }
 
     @Override
-    public void moveTo(io.milton.resource.CollectionResource rDest, String name) throws ConflictException, NotAuthorizedException, BadRequestException {
+    public void moveTo(io.milton.resource.CollectionResource rDest, String name)
+            throws ConflictException, NotAuthorizedException, BadRequestException {
         if (!canManage()) {
             throw new NotAuthorizedException("Not authorized to copy the resource.", this, SC_FORBIDDEN);
         }
@@ -57,7 +60,8 @@ public class CollectionResource extends DirectoryResource {
     }
 
     @Override
-    public void copyTo(io.milton.resource.CollectionResource toCollection, String name) throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void copyTo(io.milton.resource.CollectionResource toCollection, String name)
+            throws NotAuthorizedException, BadRequestException, ConflictException {
         if (!(toCollection instanceof CollectionRootResource)) {
             throw new BadRequestException(this, "Cannot copy a collection to a non-root folder.");
         }
@@ -77,7 +81,9 @@ public class CollectionResource extends DirectoryResource {
 
     @Property
     public String getOwnedBy() {
-        return Optional.ofNullable(subject.getPropertyResourceValue(FS.ownedBy)).map(Resource::getURI).orElse(null);
+        return Optional.ofNullable(subject.getPropertyResourceValue(FS.ownedBy))
+                .map(Resource::getURI)
+                .orElse(null);
     }
 
     public void setOwnedBy(Resource owner) throws NotAuthorizedException, BadRequestException {
@@ -100,10 +106,13 @@ public class CollectionResource extends DirectoryResource {
         updateParents(subject);
 
         if (old != null) {
-            subject.getModel().listResourcesWithProperty(FS.isMemberOf, old)
+            subject.getModel()
+                    .listResourcesWithProperty(FS.isMemberOf, old)
                     .andThen(subject.getModel().listResourcesWithProperty(FS.isManagerOf, old))
-                    .filterDrop(user -> user.hasProperty(FS.isMemberOf, owner) || user.hasProperty(FS.isManagerOf, owner))
-                    .filterKeep(user -> user.hasProperty(FS.canManage, subject) || user.hasProperty(FS.canWrite, subject))
+                    .filterDrop(
+                            user -> user.hasProperty(FS.isMemberOf, owner) || user.hasProperty(FS.isManagerOf, owner))
+                    .filterKeep(
+                            user -> user.hasProperty(FS.canManage, subject) || user.hasProperty(FS.canWrite, subject))
                     .toList()
                     .forEach(user -> user.getModel()
                             .remove(user, FS.canManage, subject)
@@ -143,10 +152,7 @@ public class CollectionResource extends DirectoryResource {
 
     @Property
     public String getAvailableAccessModes() {
-        return availableAccessModes()
-                .stream()
-                .map(Enum::name)
-                .collect(joining(","));
+        return availableAccessModes().stream().map(Enum::name).collect(joining(","));
     }
 
     /**
@@ -195,8 +201,11 @@ public class CollectionResource extends DirectoryResource {
 
     @Property
     public String getCreatedBy() {
-        return subject.listProperties(FS.createdBy).nextOptional().map(Statement::getResource).map(Resource::getURI).orElse(null);
-
+        return subject.listProperties(FS.createdBy)
+                .nextOptional()
+                .map(Statement::getResource)
+                .map(Resource::getURI)
+                .orElse(null);
     }
 
     @Property
@@ -206,10 +215,7 @@ public class CollectionResource extends DirectoryResource {
 
     @Property
     public String getAvailableStatuses() {
-        return availableStatuses()
-                .stream()
-                .map(Enum::name)
-                .collect(joining(","));
+        return availableStatuses().stream().map(Enum::name).collect(joining(","));
     }
 
     public Set<Status> availableStatuses() {
@@ -259,8 +265,10 @@ public class CollectionResource extends DirectoryResource {
         return builder.toString();
     }
 
-    private void dumpPermissions(org.apache.jena.rdf.model.Property property, Access access, Resource type, StringBuilder builder) {
-        subject.getModel().listSubjectsWithProperty(property, subject)
+    private void dumpPermissions(
+            org.apache.jena.rdf.model.Property property, Access access, Resource type, StringBuilder builder) {
+        subject.getModel()
+                .listSubjectsWithProperty(property, subject)
                 .filterKeep(r -> r.hasProperty(RDF.type, type))
                 .filterDrop(r -> r.hasProperty(FS.dateDeleted))
                 .mapWith(Resource::getURI)
@@ -273,11 +281,14 @@ public class CollectionResource extends DirectoryResource {
     }
 
     @Override
-    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files) throws BadRequestException, NotAuthorizedException, ConflictException {
+    protected void performAction(String action, Map<String, String> parameters, Map<String, FileItem> files)
+            throws BadRequestException, NotAuthorizedException, ConflictException {
         switch (action) {
             case "set_access_mode" -> setAccessMode(getEnumParameter(parameters, "mode", AccessMode.class));
             case "set_status" -> setStatus(getEnumParameter(parameters, "status", Status.class));
-            case "set_permission" -> setPermission(getResourceParameter(parameters, "principal"), getEnumParameter(parameters, "access", Access.class));
+            case "set_permission" -> setPermission(
+                    getResourceParameter(parameters, "principal"),
+                    getEnumParameter(parameters, "access", Access.class));
             case "set_owned_by" -> setOwnedBy(getResourceParameter(parameters, "owner"));
             case "unpublish" -> unpublish();
             default -> super.performAction(action, parameters, files);
@@ -286,22 +297,23 @@ public class CollectionResource extends DirectoryResource {
 
     private void setStatus(Status status) throws NotAuthorizedException, ConflictException {
         if (!canManage()) {
-            throw new NotAuthorizedException("Not authorized to change the status of this resource.", this, SC_FORBIDDEN);
+            throw new NotAuthorizedException(
+                    "Not authorized to change the status of this resource.", this, SC_FORBIDDEN);
         }
         if (!availableStatuses().contains(status)) {
             throw new ConflictException(this);
         }
         if (status == Status.Deleted) {
-            throw new ConflictException(this, "Cannot set 'Deleted' status using 'set_status' action. " +
-                    "Use resource deletion instead."
-            );
+            throw new ConflictException(
+                    this, "Cannot set 'Deleted' status using 'set_status' action. " + "Use resource deletion instead.");
         }
         subject.removeAll(FS.status).addProperty(FS.status, status.name());
     }
 
     private void setAccessMode(AccessMode mode) throws NotAuthorizedException, ConflictException {
         if (!canManage()) {
-            throw new NotAuthorizedException("Not authorized to change the access mode of this resource.", this, SC_FORBIDDEN);
+            throw new NotAuthorizedException(
+                    "Not authorized to change the access mode of this resource.", this, SC_FORBIDDEN);
         }
         if (!availableAccessModes().contains(mode)) {
             throw new ConflictException(this);
@@ -309,9 +321,11 @@ public class CollectionResource extends DirectoryResource {
         subject.removeAll(FS.accessMode).addProperty(FS.accessMode, mode.name());
     }
 
-    private void setPermission(Resource principal, Access grantedAccess) throws BadRequestException, NotAuthorizedException {
+    private void setPermission(Resource principal, Access grantedAccess)
+            throws BadRequestException, NotAuthorizedException {
         if (!canManage()) {
-            throw new NotAuthorizedException("Not authorized to change permissions on this resource.", this, SC_FORBIDDEN);
+            throw new NotAuthorizedException(
+                    "Not authorized to change permissions on this resource.", this, SC_FORBIDDEN);
         }
         if (principal.hasProperty(RDF.type, FS.User)) {
             if (grantedAccess == Access.Write || grantedAccess == Access.Manage) {
@@ -321,7 +335,8 @@ public class CollectionResource extends DirectoryResource {
                 }
             }
         } else if (principal.hasProperty(RDF.type, FS.Workspace)) {
-            if ((grantedAccess == Access.Write || grantedAccess == Access.Manage) && !subject.hasProperty(FS.ownedBy, principal)) {
+            if ((grantedAccess == Access.Write || grantedAccess == Access.Manage)
+                    && !subject.hasProperty(FS.ownedBy, principal)) {
                 throw new BadRequestException(this);
             }
         } else {
@@ -348,7 +363,8 @@ public class CollectionResource extends DirectoryResource {
     }
 
     private boolean canUnpublish() {
-        return getAccessMode() == AccessMode.DataPublished && factory.userService.currentUser().isAdmin();
+        return getAccessMode() == AccessMode.DataPublished
+                && factory.userService.currentUser().isAdmin();
     }
 
     private void unpublish() throws NotAuthorizedException, ConflictException {
@@ -386,7 +402,8 @@ public class CollectionResource extends DirectoryResource {
 
     @Override
     protected boolean canUndelete() {
-        return subject.hasProperty(FS.dateDeleted) && factory.userService.currentUser().isAdmin();
+        return subject.hasProperty(FS.dateDeleted)
+                && factory.userService.currentUser().isAdmin();
     }
 
     @Override
@@ -406,7 +423,8 @@ public class CollectionResource extends DirectoryResource {
         subject.removeAll(FS.status).addProperty(FS.status, Status.Archived.name());
     }
 
-    private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type) throws BadRequestException {
+    private <T extends Enum<T>> T getEnumParameter(Map<String, String> parameters, String name, Class<T> type)
+            throws BadRequestException {
         checkParameterPresence(parameters, name);
         try {
             return Enum.valueOf(type, parameters.get(name));

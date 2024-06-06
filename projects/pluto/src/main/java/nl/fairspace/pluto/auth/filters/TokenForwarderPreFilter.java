@@ -1,13 +1,14 @@
 package nl.fairspace.pluto.auth.filters;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 
@@ -17,7 +18,8 @@ public class TokenForwarderPreFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        OAuthAuthenticationToken token = (OAuthAuthenticationToken) exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
+        OAuthAuthenticationToken token =
+                (OAuthAuthenticationToken) exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE);
         // If no token was provided, the request is probably not authenticated.
         // In that case, we can not send along any request header
         if (token == null) {
@@ -33,6 +35,7 @@ public class TokenForwarderPreFilter implements GlobalFilter, Ordered {
 
         return chain.filter(modifiedExchange);
     }
+
     @Override
     public int getOrder() {
         return -1;

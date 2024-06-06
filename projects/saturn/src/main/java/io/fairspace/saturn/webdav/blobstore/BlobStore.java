@@ -1,13 +1,12 @@
 package io.fairspace.saturn.webdav.blobstore;
 
-import org.apache.commons.io.input.CountingInputStream;
-import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
+
+import org.apache.commons.io.input.CountingInputStream;
+import org.apache.commons.io.input.MessageDigestCalculatingInputStream;
 
 import static org.apache.commons.codec.binary.Hex.encodeHexString;
 
@@ -23,7 +22,12 @@ public interface BlobStore {
 
             var id = write(messageDigestCalculatingInputStream);
 
-            return new BlobInfo(id, countingInputStream.getByteCount(), encodeHexString(messageDigestCalculatingInputStream.getMessageDigest().digest()));
+            return new BlobInfo(
+                    id,
+                    countingInputStream.getByteCount(),
+                    encodeHexString(messageDigestCalculatingInputStream
+                            .getMessageDigest()
+                            .digest()));
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }

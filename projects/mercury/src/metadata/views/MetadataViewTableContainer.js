@@ -7,49 +7,49 @@ import {
     TableContainer,
     TablePagination,
     Tooltip,
-    Typography,
+    Typography
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {useHistory} from "react-router-dom";
-import {Addchart, ViewColumn, Check} from "@mui/icons-material";
-import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
-import Popover from "@mui/material/Popover";
-import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import GetAppIcon from "@mui/icons-material/GetApp";
-import FormGroup from "@mui/material/FormGroup";
-import useDeepCompareEffect from "use-deep-compare-effect";
+import {useHistory} from 'react-router-dom';
+import {Addchart, ViewColumn, Check} from '@mui/icons-material';
+import Checkbox from '@mui/material/Checkbox';
+import FormControl from '@mui/material/FormControl';
+import Popover from '@mui/material/Popover';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import GetAppIcon from '@mui/icons-material/GetApp';
+import FormGroup from '@mui/material/FormGroup';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
-import type {MetadataViewColumn, MetadataViewFilter} from "./MetadataViewAPI";
-import MessageDisplay from "../../common/components/MessageDisplay";
-import type {MetadataViewEntityWithLinkedFiles} from "./metadataViewUtils";
-import useViewData from "./UseViewData";
-import MetadataViewTable from "./MetadataViewTable";
-import useStateWithLocalStorage from "../../common/hooks/UseLocalStorage";
-import {Collection} from "../../collections/CollectionAPI";
+import type {MetadataViewColumn, MetadataViewFilter} from './MetadataViewAPI';
+import MessageDisplay from '../../common/components/MessageDisplay';
+import type {MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
+import useViewData from './UseViewData';
+import MetadataViewTable from './MetadataViewTable';
+import useStateWithLocalStorage from '../../common/hooks/UseLocalStorage';
+import {Collection} from '../../collections/CollectionAPI';
 import LoadingOverlayWrapper from '../../common/components/LoadingOverlayWrapper';
-import {isNonEmptyValue} from "../../common/utils/genericUtils";
-import MetadataViewActiveTextFilters from "./MetadataViewActiveTextFilters";
-import TablePaginationActions from "../../common/components/TablePaginationActions";
-import FeaturesContext from "../../common/contexts/FeaturesContext";
-import ProgressButton from "../../common/components/ProgressButton";
-import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from "../../file/FileAPI";
-import ErrorDialog from "../../common/components/ErrorDialog";
+import {isNonEmptyValue} from '../../common/utils/genericUtils';
+import MetadataViewActiveTextFilters from './MetadataViewActiveTextFilters';
+import TablePaginationActions from '../../common/components/TablePaginationActions';
+import FeaturesContext from '../../common/contexts/FeaturesContext';
+import ProgressButton from '../../common/components/ProgressButton';
+import {ANALYSIS_EXPORT_SUBPATH, ExtraLocalStorage} from '../../file/FileAPI';
+import ErrorDialog from '../../common/components/ErrorDialog';
 
 type MetadataViewTableContainerProperties = {
-    columns: MetadataViewColumn[];
-    idColumn: MetadataViewColumn;
-    filters: MetadataViewFilter[];
-    textFiltersObject: Object;
-    setTextFiltersObject: () => {};
-    toggleRow: () => {};
-    view: string;
-    collections: Collection[];
-    locationContext: string;
-    selected: MetadataViewEntityWithLinkedFiles;
-    hasInactiveFilters: boolean;
-    classes: any;
+    columns: MetadataViewColumn[],
+    idColumn: MetadataViewColumn,
+    filters: MetadataViewFilter[],
+    textFiltersObject: Object,
+    setTextFiltersObject: () => {},
+    toggleRow: () => {},
+    view: string,
+    collections: Collection[],
+    locationContext: string,
+    selected: MetadataViewEntityWithLinkedFiles,
+    hasInactiveFilters: boolean,
+    classes: any
 };
 
 const styles = () => ({
@@ -68,12 +68,12 @@ const styles = () => ({
         padding: 2
     },
     tableContents: {
-        "minHeight": '200px',
-        "maxHeight": 'calc(100vh - 310px)',
-        "overflowY": 'auto',
-        "overflowX": 'auto',
+        minHeight: '200px',
+        maxHeight: 'calc(100vh - 310px)',
+        overflowY: 'auto',
+        overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {
-            backgroundColor: "white"
+            backgroundColor: 'white'
         }
     },
     tableFooter: {
@@ -117,7 +117,13 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(view, filters, textFiltersObject, locationContext, rowsPerPage);
+    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(
+        view,
+        filters,
+        textFiltersObject,
+        locationContext,
+        rowsPerPage
+    );
     const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
     const resetRowCheckboxes = () => {
@@ -139,13 +145,13 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         refreshDataOnly(p, rowsPerPage);
     };
 
-    const handleChangeRowsPerPage = (e) => {
+    const handleChangeRowsPerPage = e => {
         setRowsPerPage(e.target.value);
         setPage(0);
         refreshDataOnly(0, e.target.value);
     };
 
-    const handleVisibleColumnsChange = (event) => {
+    const handleVisibleColumnsChange = event => {
         if (event.target.checked) {
             setVisibleColumnNames([...visibleColumnNames, event.target.name]);
         } else if (event.target.name !== idColumn.name) {
@@ -153,7 +159,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         }
     };
 
-    const handleColumnSelectorButtonClick = (event) => {
+    const handleColumnSelectorButtonClick = event => {
         setAnchorEl(event.currentTarget);
     };
 
@@ -162,11 +168,11 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     };
 
     const getCsvHeader = () => {
-        let header = "id";
+        let header = 'id';
 
         if (data && data.rows) {
-            header += ";";
-            header += visibleColumnNames.join(";");
+            header += ';';
+            header += visibleColumnNames.join(';');
         }
 
         return header;
@@ -175,22 +181,22 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     // each row contains attributes with values. Each value is a dictionary with 'label' and 'value'
     const getCsvValuesForAttribute = (row, attribute) => {
         if (row[attribute] === undefined) {
-            return "-";
+            return '-';
         }
         return Object.values(row[attribute])
-            .map(value => ((value && value.label) ?? "-").replaceAll(";", ".,"))
-            .join(",");
+            .map(value => ((value && value.label) ?? '-').replaceAll(';', '.,'))
+            .join(',');
     };
 
     const getCsvValues = () => {
-        let values = "";
+        let values = '';
         if (Object.keys(rowCheckboxes).length > 0) {
             data.rows.forEach(row => {
                 const rowKey = row[idColumn.name][0].value;
                 if (Object.keys(rowCheckboxes).includes(rowKey) && rowCheckboxes[rowKey]) {
                     values += '\n' + rowKey;
                     visibleColumnNames.forEach(attribute => {
-                        values += ";" + getCsvValuesForAttribute(row, attribute);
+                        values += ';' + getCsvValuesForAttribute(row, attribute);
                     });
                 }
             });
@@ -206,14 +212,15 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const exportTable = () => {
         const blob = createCsvBlob();
-        const fileName = "fairspace_export.csv";
-        const link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
+        const fileName = 'fairspace_export.csv';
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            // feature detection
             // Browsers that support HTML5 download attribute
             const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            link.style = "visibility:hidden";
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName);
+            link.style = 'visibility:hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -228,17 +235,20 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         ExtraLocalStorage.deleteAllInDirectory(ANALYSIS_EXPORT_SUBPATH)
             .then(() => ExtraLocalStorage.upload(csvFile, fileName, ANALYSIS_EXPORT_SUBPATH, true))
             .then(() => setCurrentSelectionExported(true))
-            .catch((err: Error) => (ErrorDialog.showError('Could not export the selection to analysis', err.message)))
-            .finally(() => (setExportToAnalysisLoading(false)));
+            .catch((err: Error) => ErrorDialog.showError('Could not export the selection to analysis', err.message))
+            .finally(() => setExportToAnalysisLoading(false));
     };
 
     const renderMessages = () => (
         <div className={classes.messageBox}>
-            {count.timeout && (
-                <MessageDisplay small message="The count request timed out." />
-            )}
+            {count.timeout && <MessageDisplay small message="The count request timed out." />}
             {hasInactiveFilters && (
-                <MessageDisplay color="primary" isError={false} small message="Apply filters to see data matching your current selection." />
+                <MessageDisplay
+                    color="primary"
+                    isError={false}
+                    small
+                    message="Apply filters to see data matching your current selection."
+                />
             )}
         </div>
     );
@@ -252,14 +262,12 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             transformOrigin={{vertical: 'top', horizontal: 'right'}}
         >
             <FormControl className={classes.viewColumnsFormControl}>
-                <Typography variant="caption">
-                    Show/hide columns
-                </Typography>
+                <Typography variant="caption">Show/hide columns</Typography>
                 <FormGroup>
-                    {columns.map((column) => (
+                    {columns.map(column => (
                         <FormControlLabel
                             key={column.name}
-                            control={(
+                            control={
                                 <Checkbox
                                     checked={visibleColumnNames.includes(column.name)}
                                     disabled={column.name === idColumn.name}
@@ -268,7 +276,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                                     icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                                     checkedIcon={<CheckBoxIcon fontSize="small" />}
                                 />
-                            )}
+                            }
                             label={column.title}
                         />
                     ))}
@@ -293,9 +301,11 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const labelDisplayedRows = ({from, to, count: totalCount, countIsLoading}) => (
         <span>
-            <Typography variant="body2" component="span" display="inline">{from}-{to} of </Typography>
-            <Typography variant="body2" component="span" display="inline" style={{fontWeight: "bold"}}>
-                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : ("more than " + to)}
+            <Typography variant="body2" component="span" display="inline">
+                {from}-{to} of{' '}
+            </Typography>
+            <Typography variant="body2" component="span" display="inline" style={{fontWeight: 'bold'}}>
+                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : 'more than ' + to}
                 {countIsLoading && <CircularProgress size={14} style={{marginLeft: 3}} />}
             </Typography>
         </span>
@@ -342,7 +352,9 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         }
     }, [rowCheckboxes]);
 
-    const checkedCount = (Object.values(rowCheckboxes) ? Object.values(rowCheckboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0) : 0);
+    const checkedCount = Object.values(rowCheckboxes)
+        ? Object.values(rowCheckboxes).reduce((sum, item) => (item === true ? sum + 1 : sum), 0)
+        : 0;
 
     return (
         <Paper>
@@ -377,7 +389,11 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     </Tooltip>
                     {exportToAnalysisEnabled && (
                         <ProgressButton active={exportToAnalysisLoading}>
-                            <Tooltip title="Export to Jupiter Analysis" className={classes.exportButton}>
+                            <Tooltip
+                                title="Export to Jupiter Analysis"
+                                className={classes.exportButton}
+                                component="span"
+                            >
                                 <span>
                                     <IconButton
                                         aria-label="Export to Jupiter Analysis"
@@ -385,7 +401,11 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                                         disabled={checkedCount === 0 || currentSelectionExported}
                                         onClick={saveTableExtraStorage}
                                     >
-                                        {currentSelectionExported ? (<Check fontSize="small" />) : (<Addchart fontSize="small" />)}
+                                        {currentSelectionExported ? (
+                                            <Check fontSize="small" />
+                                        ) : (
+                                            <Addchart fontSize="small" />
+                                        )}
                                     </IconButton>
                                 </span>
                             </Tooltip>
@@ -400,7 +420,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                         className={classes.tableFooter}
-                        labelDisplayedRows={(d) => labelDisplayedRows({...d, countIsLoading: loadingCount})}
+                        labelDisplayedRows={d => labelDisplayedRows({...d, countIsLoading: loadingCount})}
                         ActionsComponent={TablePaginationActions}
                     />
                 </div>

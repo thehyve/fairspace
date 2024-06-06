@@ -1,10 +1,5 @@
 package io.fairspace.saturn.services.metadata;
 
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
-import io.fairspace.saturn.services.metadata.validation.ValidationException;
-import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;
@@ -19,25 +14,39 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.metadata.validation.MetadataRequestValidator;
+import io.fairspace.saturn.services.metadata.validation.ValidationException;
+import io.fairspace.saturn.services.metadata.validation.ViolationHandler;
+
 import static io.fairspace.saturn.TestUtils.isomorphic;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
 import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MetadataServiceValidationTest {
     @Mock
-    MetadataRequestValidator validator;
+    private MetadataRequestValidator validator;
+
     @Mock
-    MetadataPermissions permissions;
+    private MetadataPermissions permissions;
 
     private static final Resource resource1 = createResource("http://localhost/iri/S1");
     private static final Resource resource2 = createResource("http://localhost/iri/S2");
@@ -71,7 +80,7 @@ public class MetadataServiceValidationTest {
 
     @Test
     public void testPutShouldSucceedOnValidationSuccess() {
-        api.put(modelOf(LBL_STMT1));
+        api.put(modelOf(LBL_STMT1), Boolean.FALSE);
 
         Model model = ds.getDefaultModel();
         assertTrue(model.contains(LBL_STMT1));
@@ -81,21 +90,23 @@ public class MetadataServiceValidationTest {
     public void testPutShouldFailOnValidationError() {
         produceValidationError();
 
-        api.put(createDefaultModel());
+        api.put(createDefaultModel(), Boolean.FALSE);
     }
 
     private void produceValidationError() {
         doAnswer(invocation -> {
-            ViolationHandler handler = invocation.getArgument(4);
-            handler.onViolation("ERROR", createResource(), null, null);
+                    ViolationHandler handler = invocation.getArgument(4);
+                    handler.onViolation("ERROR", createResource(), null, null);
 
-            return null;
-        }).when(validator).validate(any(), any(), any(), any(), any());
+                    return null;
+                })
+                .when(validator)
+                .validate(any(), any(), any(), any(), any());
     }
 
     @Test
     public void testPatchShouldSucceedOnValidationSuccess() {
-        api.patch(modelOf(LBL_STMT1));
+        api.patch(modelOf(LBL_STMT1), Boolean.FALSE);
 
         Model model = ds.getDefaultModel();
         assertTrue(model.contains(LBL_STMT1));
@@ -104,7 +115,7 @@ public class MetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void patchShouldNotAcceptMachineOnlyTriples() {
         produceValidationError();
-        api.patch(createDefaultModel());
+        api.patch(createDefaultModel(), Boolean.FALSE);
     }
 
     @Test
@@ -120,14 +131,14 @@ public class MetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void deleteShouldFailOnMachineOnValidationFailure() {
         produceValidationError();
-        api.delete(modelOf(resource1, property1, resource2));
+        api.delete(modelOf(resource1, property1, resource2), Boolean.FALSE);
     }
 
     @Test
     public void testDeleteModelShouldSucceedOnValidationSuccess() {
         txn.executeWrite(m -> m.add(STMT1));
 
-        api.delete(modelOf(LBL_STMT1));
+        api.delete(modelOf(LBL_STMT1), Boolean.FALSE);
 
         Model model = ds.getDefaultModel();
         assertFalse(model.contains(LBL_STMT1));
@@ -136,7 +147,7 @@ public class MetadataServiceValidationTest {
     @Test(expected = ValidationException.class)
     public void deleteModelShouldNotAcceptMachineOnlyTriples() {
         produceValidationError();
-        api.delete(createDefaultModel());
+        api.delete(createDefaultModel(), Boolean.FALSE);
     }
 
     @Test
@@ -146,18 +157,17 @@ public class MetadataServiceValidationTest {
         var toAdd = modelOf(resource1, property1, createTypedLiteral(1));
 
         txn.executeWrite(ds -> {
-            api.put(toAdd);
+            api.put(toAdd, Boolean.FALSE);
             ds.abort();
         });
 
-        verify(validator).validate(
-                isomorphic(modelOf(resource1, RDF.type, class1)),
-                isomorphic(modelOf(
-                        resource1, RDF.type, class1,
-                        resource1, property1, createTypedLiteral(1))),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(toAdd),
-                any());
+        verify(validator)
+                .validate(
+                        isomorphic(modelOf(resource1, RDF.type, class1)),
+                        isomorphic(modelOf(resource1, RDF.type, class1, resource1, property1, createTypedLiteral(1))),
+                        isomorphic(EMPTY_MODEL),
+                        isomorphic(toAdd),
+                        any());
     }
 
     @Test
@@ -167,18 +177,17 @@ public class MetadataServiceValidationTest {
         var toAdd = modelOf(resource1, property1, resource2);
 
         txn.executeWrite(ds -> {
-            api.put(toAdd);
+            api.put(toAdd, Boolean.FALSE);
             ds.abort();
         });
 
-        verify(validator).validate(
-                isomorphic(modelOf(resource2, RDF.type, class2)),
-                isomorphic(modelOf(
-                        resource2, RDF.type, class2,
-                        resource1, property1, resource2)),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(toAdd),
-                any());
+        verify(validator)
+                .validate(
+                        isomorphic(modelOf(resource2, RDF.type, class2)),
+                        isomorphic(modelOf(resource2, RDF.type, class2, resource1, property1, resource2)),
+                        isomorphic(EMPTY_MODEL),
+                        isomorphic(toAdd),
+                        any());
     }
 
     @Test
@@ -187,31 +196,49 @@ public class MetadataServiceValidationTest {
         var node2 = createResource();
         var node3 = createResource();
         var modelWithList = modelOf(
-                resource1, property1, node1,
-                node1, RDF.first, createTypedLiteral(1),
-                node1, RDF.rest, node2,
-                node2, RDF.first, createTypedLiteral(2),
-                node2, RDF.rest, node3,
-                node3, RDF.first, resource2,
-                resource2, RDF.type, class2,
-                node3, RDF.rest, RDF.nil,
-                resource2, RDF.type, class2);
+                resource1,
+                property1,
+                node1,
+                node1,
+                RDF.first,
+                createTypedLiteral(1),
+                node1,
+                RDF.rest,
+                node2,
+                node2,
+                RDF.first,
+                createTypedLiteral(2),
+                node2,
+                RDF.rest,
+                node3,
+                node3,
+                RDF.first,
+                resource2,
+                resource2,
+                RDF.type,
+                class2,
+                node3,
+                RDF.rest,
+                RDF.nil,
+                resource2,
+                RDF.type,
+                class2);
 
         ds.setDefaultModel(modelWithList);
 
         var toAdd = modelOf(resource1, property2, resource2);
 
         txn.executeWrite(ds -> {
-            api.put(toAdd);
+            api.put(toAdd, Boolean.FALSE);
             ds.abort();
         });
 
-        verify(validator).validate(
-                isomorphic(modelWithList),
-                isomorphic(modelWithList.union(toAdd)),
-                isomorphic(EMPTY_MODEL),
-                isomorphic(toAdd),
-                any());
+        verify(validator)
+                .validate(
+                        isomorphic(modelWithList),
+                        isomorphic(modelWithList.union(toAdd)),
+                        isomorphic(EMPTY_MODEL),
+                        isomorphic(toAdd),
+                        any());
     }
 }
-

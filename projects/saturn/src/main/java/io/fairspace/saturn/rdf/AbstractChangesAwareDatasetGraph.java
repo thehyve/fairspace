@@ -23,8 +23,7 @@ public abstract class AbstractChangesAwareDatasetGraph extends DatasetGraphMonit
         ((DelegatingDatasetChanges) getMonitor()).setChangeListener(this::onChange); // delegates handling to itself
     }
 
-    protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
-    }
+    protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {}
 
     @Override
     public String toString() {

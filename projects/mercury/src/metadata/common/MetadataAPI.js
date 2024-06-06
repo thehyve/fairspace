@@ -1,11 +1,11 @@
 import axios from 'axios';
-import LinkedDataAPI from "./LinkedDataAPI";
-import {toJsonLd} from "./jsonLdConverter";
-import {handleHttpError} from "../../common/utils/httpUtils";
+import LinkedDataAPI from './LinkedDataAPI';
+import {toJsonLd} from './jsonLdConverter';
+import {handleHttpError} from '../../common/utils/httpUtils';
 
-class MetadataAPI extends LinkedDataAPI {
-    constructor() {
-        super('metadata');
+export class MetadataAPI extends LinkedDataAPI {
+    constructor(remoteURLPrefix = '/api') {
+        super('metadata', remoteURLPrefix);
     }
 
     /**
@@ -23,7 +23,7 @@ class MetadataAPI extends LinkedDataAPI {
      */
     updateEntity(subject, properties, vocabulary, type = null) {
         if (!subject || !properties) {
-            return Promise.reject(Error("No subject or properties given"));
+            return Promise.reject(Error('No subject or properties given'));
         }
 
         const jsonLd = Object.keys(properties).map(p => toJsonLd(subject, p, properties[p], vocabulary));
@@ -31,8 +31,7 @@ class MetadataAPI extends LinkedDataAPI {
             jsonLd.push({'@id': subject, '@type': type});
         }
 
-        return this.patch(jsonLd)
-            .catch(handleHttpError("Failure when updating entity"));
+        return this.patch(jsonLd).catch(handleHttpError('Failure when updating entity'));
     }
 
     /**
@@ -52,8 +51,9 @@ class MetadataAPI extends LinkedDataAPI {
      * @returns {Promise<Response>}
      */
     delete(subject) {
-        return axios.delete(this.getStatementsUrl() + "?subject=" + encodeURIComponent(subject))
-            .catch(handleHttpError("Failure when deleting subject"));
+        return axios
+            .delete(this.getStatementsUrl() + '?subject=' + encodeURIComponent(subject))
+            .catch(handleHttpError('Failure when deleting subject'));
     }
 }
 

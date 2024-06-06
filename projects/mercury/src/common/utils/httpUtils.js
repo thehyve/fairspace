@@ -7,34 +7,36 @@
  * @returns {Function}
  */
 import axios, {AxiosError} from 'axios';
-import ErrorDialog from "../components/ErrorDialog";
+import ErrorDialog from '../components/ErrorDialog';
 
-export const handleAuthError = (status) => {
+export const handleAuthError = status => {
     switch (status) {
         case 401:
             sessionStorage.clear();
-            ErrorDialog.showError('Your session has expired. Please log in again.',
-                null,
-                () => window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`));
+            window.location.assign(`/login?redirectUrl=${encodeURI(window.location.href)}`);
             break;
         case 403:
-            ErrorDialog.showError('You have no access to this resource. Ask your administrator to grant you access.',
+            ErrorDialog.showError(
+                'You have no access to this resource. Ask your administrator to grant you access.',
                 null,
-                () => window.location.assign('/workspaces'));
+                () => window.location.assign('/workspaces')
+            );
             break;
         default:
     }
 };
 
 export function handleHttpError(defaultMessage) {
-    return (e: Error|AxiosError) => {
+    return (e: Error | AxiosError) => {
         if (e && axios.isCancel(e)) {
             return;
         }
         if (!e || !e.response) {
             throw Error(defaultMessage);
         }
-        const {response: {status, data}} = e;
+        const {
+            response: {status, data}
+        } = e;
 
         switch (status) {
             case 401:
@@ -53,6 +55,27 @@ export function handleHttpError(defaultMessage) {
     };
 }
 
+export function handleRemoteSourceHttpError(defaultMessage) {
+    return (e: Error | AxiosError) => {
+        if (e && axios.isCancel(e)) {
+            return;
+        }
+        if (!e || !e.response) {
+            throw Error(defaultMessage);
+        }
+        const {
+            response: {status, data}
+        } = e;
+        if (status === 400 && data) {
+            if (typeof data === 'string') {
+                throw Error(data);
+            }
+            throw data;
+        }
+        throw Error(defaultMessage);
+    };
+}
+
 /**
  * This function will extract the data property of the axios response if the content-type in the headers contains 'json'
  * otherwise it will throw an error
@@ -60,7 +83,7 @@ export function handleHttpError(defaultMessage) {
  */
 export function extractJsonData(response) {
     if (!response) {
-        throw Error(`Cannot parse empty response`);
+        throw Error('Cannot parse empty response');
     }
     const {headers, data} = response;
     const contentType = headers ? headers['content-type'] : '';

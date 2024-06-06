@@ -4,8 +4,7 @@ package io.fairspace.saturn.services;
  * Can represent an error that happened during parsing of HTTP request body, etc
  */
 public class PayloadParsingException extends RuntimeException {
-    public PayloadParsingException() {
-    }
+    public PayloadParsingException() {}
 
     public PayloadParsingException(String message) {
         super(message);
@@ -19,7 +18,8 @@ public class PayloadParsingException extends RuntimeException {
         super(cause);
     }
 
-    public PayloadParsingException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public PayloadParsingException(
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

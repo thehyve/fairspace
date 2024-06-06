@@ -1,28 +1,47 @@
 import React, {useContext} from 'react';
-import {Link as RouterLink} from "react-router-dom";
-import * as PropTypes from "prop-types";
-import {Link} from '@mui/material';
-import {METADATA_PATH} from "../../constants";
+import * as PropTypes from 'prop-types';
+import {Box, Modal, Tooltip} from '@mui/material';
+import withStyles from '@mui/styles/withStyles';
+import CloseIcon from '@mui/icons-material/Close';
+import LinkedDataEntityPage from './LinkedDataEntityPage';
 import UserContext from '../../users/UserContext';
-
+import styles from './LinkedDataLink.styles';
 /**
- * Renders a link to the metadata editor.
- *
- * @param props
- * @constructor
+ * Renders a link to the metadata editor in a modal dialog when clicked.
  */
-const LinkedDataLink = ({uri, children}) => {
+
+const renderModal = (classes, open, handleClose, uri) => (
+    <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+    >
+        <div className={classes.modalContent}>
+            <Box className={classes.modalDialog}>
+                <Tooltip title="Close - click or press 'Esc'">
+                    <CloseIcon onClick={handleClose} className={classes.closeButton} />
+                </Tooltip>
+                <LinkedDataEntityPage title="Metadata" subject={uri} />
+            </Box>
+        </div>
+    </Modal>
+);
+
+const LinkedDataLink = ({classes, uri, children}) => {
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
     const {currentUser} = useContext(UserContext);
     if (currentUser && currentUser.canViewPublicMetadata) {
         return (
-            <Link
-                component={RouterLink}
-                to={{pathname: METADATA_PATH, search: "?iri=" + encodeURIComponent(uri)}}
-                color="inherit"
-                underline="hover"
-            >
-                {children}
-            </Link>
+            <span>
+                <span onClick={handleOpen} className={classes.clickableDiv}>
+                    {children}
+                </span>
+                {renderModal(classes, open, handleClose, uri)}
+            </span>
         );
     }
     return children;
@@ -33,4 +52,4 @@ LinkedDataLink.propTypes = {
     children: PropTypes.any.isRequired
 };
 
-export default LinkedDataLink;
+export default withStyles(styles)(LinkedDataLink);

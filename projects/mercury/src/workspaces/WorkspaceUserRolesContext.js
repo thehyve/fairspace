@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import WorkspacesAPI from './WorkspacesAPI';
-import useAsync from "../common/hooks/UseAsync";
-import WorkspaceContext from "./WorkspaceContext";
+import useAsync from '../common/hooks/UseAsync';
+import WorkspaceContext from './WorkspaceContext';
 
 const WorkspaceUserRolesContext = React.createContext({});
 
@@ -15,11 +15,8 @@ export const WorkspaceUserRolesProvider = ({iri, children, workspacesAPI = Works
 
     const {refreshWorkspaces} = useContext(WorkspaceContext);
 
-    const setWorkspaceRole = (userIri: string, role: string) => (
-        workspacesAPI.setWorkspaceRole(iri, userIri, role)
-            .then(refreshWorkspaceRoles)
-            .then(refreshWorkspaces)
-    );
+    const setWorkspaceRole = (userIri: string, role: string) =>
+        workspacesAPI.setWorkspaceRole(iri, userIri, role).then(refreshWorkspaceRoles).then(refreshWorkspaces);
 
     return (
         <WorkspaceUserRolesContext.Provider

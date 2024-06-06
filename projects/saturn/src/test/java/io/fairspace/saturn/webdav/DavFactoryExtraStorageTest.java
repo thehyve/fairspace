@@ -1,17 +1,10 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
-import io.fairspace.saturn.webdav.resources.DirectoryResource;
-import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
-import io.fairspace.saturn.webdav.resources.FileResource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import javax.xml.namespace.QName;
+
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -27,13 +20,22 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
+import io.fairspace.saturn.webdav.resources.DirectoryResource;
+import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
+import io.fairspace.saturn.webdav.resources.FileResource;
 
 import static io.fairspace.saturn.TestUtils.*;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static java.lang.String.format;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.*;
@@ -51,8 +53,10 @@ public class DavFactoryExtraStorageTest {
 
     @Mock
     InputStream input;
+
     @Mock
     UserService userService;
+
     Context context = new Context();
     User user;
     Authentication.User userAuthentication;
@@ -105,7 +109,8 @@ public class DavFactoryExtraStorageTest {
     }
 
     @Test
-    public void testCreateRootExtraStorageFolder() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testCreateRootExtraStorageFolder()
+            throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
         var coll = root.createCollection(defaultExtraStorageRootName);
 
@@ -165,7 +170,8 @@ public class DavFactoryExtraStorageTest {
     }
 
     @Test
-    public void testExtraStorageAccess() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+    public void testExtraStorageAccess()
+            throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = factory.getResource(null, EXTRA_STORAGE_PATH);
         var rootResource = model.createResource(extraStorageUri);
         var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection(defaultExtraStorageRootName);
@@ -188,12 +194,13 @@ public class DavFactoryExtraStorageTest {
     }
 
     @Test
-    public void testDeleteExtraStoreFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+    public void testDeleteExtraStoreFile()
+            throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var extraStorageSubdir1 = ((DavFactory) factory).root.createCollection(defaultExtraStorageRootName);
         var file = ((FolderResource) extraStorageSubdir1).createNew("file", input, FILE_SIZE, "text/abc");
 
         assertTrue(file instanceof DeletableResource);
-        ((DeletableResource)file).delete();
+        ((DeletableResource) file).delete();
 
         verify(store, times(1)).delete("id"); // check if blob is deleted
 
@@ -202,14 +209,16 @@ public class DavFactoryExtraStorageTest {
     }
 
     @Test
-    public void testDeleteAllInFolder() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+    public void testDeleteAllInFolder()
+            throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
         var coll = (FolderResource) root.createCollection(defaultExtraStorageRootName);
         var file1 = coll.createNew("file1", input, FILE_SIZE, "text/abc");
         var file2 = coll.createNew("file2", input, FILE_SIZE, "text/abc");
         var file3 = coll.createNew("file3", input, FILE_SIZE, "text/abc");
 
-        ((PostableResource)root.child(defaultExtraStorageRootName)).processForm(Map.of("action", "delete_all_in_directory"), Map.of());
+        ((PostableResource) root.child(defaultExtraStorageRootName))
+                .processForm(Map.of("action", "delete_all_in_directory"), Map.of());
 
         verify(store, times(3)).delete(any()); // check if all blob are deleted
 
@@ -220,13 +229,15 @@ public class DavFactoryExtraStorageTest {
     }
 
     @Test(expected = NotAuthorizedException.class)
-    public void testThrowsErrorWhenNonDefaultRootDirectoryName() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testThrowsErrorWhenNonDefaultRootDirectoryName()
+            throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
         var coll = (FolderResource) root.createCollection("coll1");
     }
 
     @Test()
-    public void testThrowsErrorWhenDeletingRootDirectory() throws NotAuthorizedException, BadRequestException, ConflictException {
+    public void testThrowsErrorWhenDeletingRootDirectory()
+            throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, EXTRA_STORAGE_PATH);
         var coll = (FolderResource) root.createCollection(defaultExtraStorageRootName);
         assertThrows(NotAuthorizedException.class, coll::delete);

@@ -1,9 +1,9 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import io.fairspace.saturn.vocabulary.FS;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 
+import io.fairspace.saturn.vocabulary.FS;
 
 public class DeletionValidator implements MetadataRequestValidator {
     @Override
@@ -13,7 +13,6 @@ public class DeletionValidator implements MetadataRequestValidator {
                 .filterKeep(Resource::isURIResource)
                 .filterKeep(resource -> resource.inModel(before).hasProperty(FS.dateDeleted))
                 .forEachRemaining(resource ->
-                        violationHandler.onViolation("Cannot modify deleted resource", resource, null, null)
-                );
+                        violationHandler.onViolation("Cannot modify deleted resource", resource, null, null));
     }
 }

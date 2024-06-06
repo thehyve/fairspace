@@ -1,18 +1,19 @@
 package nl.fairspace.pluto.auth.filters;
 
+import java.time.Duration;
+import java.util.Map;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.auth.JwtTokenValidator;
-import nl.fairspace.pluto.auth.OAuthFlow;
-import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebSession;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
-import java.util.Map;
-import java.util.Optional;
+import nl.fairspace.pluto.auth.JwtTokenValidator;
+import nl.fairspace.pluto.auth.OAuthFlow;
+import nl.fairspace.pluto.auth.model.OAuthAuthenticationToken;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_REQUEST_ATTRIBUTE;
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_SESSION_ATTRIBUTE;
@@ -34,7 +35,7 @@ public class SessionAuthenticationFilter implements GatewayFilter {
         OAuthAuthenticationToken token = getTokenFromSession(session);
 
         // Nothing in session
-        if(token == null) {
+        if (token == null) {
             log.trace("No JWT has been found in the user session");
             return null;
         }
@@ -45,29 +46,33 @@ public class SessionAuthenticationFilter implements GatewayFilter {
         Map<String, Object> claims = jwtTokenValidator.parseAndValidate(token.getAccessToken());
 
         // If it validates, return
-        if(claims != null) {
+        if (claims != null) {
             log.trace("Valid JWT found in the user session");
             return token.toBuilder().claimsSet(claims).build();
         }
 
         // If it does not validate, but we have a valid refresh token, perform a refresh
         log.trace("JWT in user session is not valid anymore.");
-        if(token.getRefreshToken() != null) {
+        if (token.getRefreshToken() != null) {
             try {
-                log.debug("Access token has expired and a valid refresh token was found in the user session. Try refreshing the access token");
+                log.debug(
+                        "Access token has expired and a valid refresh token was found in the user session. Try refreshing the access token");
 
                 // Refresh the token
                 OAuthAuthenticationToken refreshedToken = oAuthFlow.refreshToken(token);
 
                 log.trace("Refreshed authentication token: {}", refreshedToken);
 
-                if(refreshedToken != null) {
+                if (refreshedToken != null) {
                     // Parse the refreshed token and return the data
-                    Map<String, Object> refreshedTokenClaims = jwtTokenValidator.parseAndValidate(refreshedToken.getAccessToken());
+                    Map<String, Object> refreshedTokenClaims =
+                            jwtTokenValidator.parseAndValidate(refreshedToken.getAccessToken());
 
-                    if(refreshedTokenClaims != null) {
+                    if (refreshedTokenClaims != null) {
                         log.trace("The access token has been refreshed. Storing the new access token in session.");
-                        OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder().claimsSet(refreshedTokenClaims).build();
+                        OAuthAuthenticationToken tokenWithClaims = refreshedToken.toBuilder()
+                                .claimsSet(refreshedTokenClaims)
+                                .build();
                         storeTokenInSession(tokenWithClaims, session);
                         return tokenWithClaims;
                     } else {
@@ -79,14 +84,15 @@ public class SessionAuthenticationFilter implements GatewayFilter {
                 // If for some reasons the validation failed, the authentication is invalid
                 log.trace("Refreshing the access token has failed.");
                 return null;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 log.error("An error occurred while refreshing oAuth token", e);
                 return null;
             }
         }
 
         // In this case, both the accesstoken and the refresh token have expired
-        log.info("A token was found in session, but both the access_token has expired and no refresh token was available");
+        log.info(
+                "A token was found in session, but both the access_token has expired and no refresh token was available");
         return null;
     }
 
@@ -94,7 +100,7 @@ public class SessionAuthenticationFilter implements GatewayFilter {
         log.trace("Retrieving oAuth token from session with id {}", session.getId());
         Object authenticationToken = session.getAttribute(AUTHORIZATION_SESSION_ATTRIBUTE);
 
-        if(authenticationToken instanceof OAuthAuthenticationToken) {
+        if (authenticationToken instanceof OAuthAuthenticationToken) {
             return (OAuthAuthenticationToken) authenticationToken;
         } else {
             return null;
@@ -109,7 +115,7 @@ public class SessionAuthenticationFilter implements GatewayFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         // If the authorization is already set, skip this filter
-        if(exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
+        if (exchange.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE) != null) {
             return chain.filter(exchange);
         }
         Optional<WebSession> session = exchange.getSession().blockOptional(Duration.ofMillis(500));

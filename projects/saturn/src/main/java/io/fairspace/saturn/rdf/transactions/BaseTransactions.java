@@ -6,9 +6,11 @@ import com.pivovarit.function.ThrowingRunnable;
 import com.pivovarit.function.ThrowingSupplier;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.util.Symbol;
 import org.apache.jena.system.Txn;
 
 public abstract class BaseTransactions implements Transactions {
+
     protected final Dataset ds;
 
     protected BaseTransactions(Dataset ds) {
@@ -28,5 +30,10 @@ public abstract class BaseTransactions implements Transactions {
     @Override
     public void close() throws Exception {
         ds.close();
+    }
+
+    @Override
+    public void setContextValue(Symbol symbol, Object object) {
+        ds.getContext().set(symbol, object);
     }
 }

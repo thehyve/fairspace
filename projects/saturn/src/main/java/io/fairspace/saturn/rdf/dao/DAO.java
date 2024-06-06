@@ -1,17 +1,5 @@
 package io.fairspace.saturn.rdf.dao;
 
-import com.pivovarit.function.ThrowingBiConsumer;
-import io.fairspace.saturn.vocabulary.FS;
-import lombok.Getter;
-import lombok.SneakyThrows;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.vocabulary.RDF;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
@@ -22,9 +10,23 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import static com.fasterxml.jackson.databind.type.TypeFactory.rawClass;
+import com.pivovarit.function.ThrowingBiConsumer;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
+
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+
+import static com.fasterxml.jackson.databind.type.TypeFactory.rawClass;
 import static java.lang.String.format;
 import static java.time.Instant.now;
 import static java.time.Instant.ofEpochMilli;
@@ -95,7 +97,9 @@ public class DAO {
                 basicEntity.setDateModified(now());
                 basicEntity.setModifiedBy(user);
 
-                if (entity.getIri() == null || !graph.contains(entity.getIri(), Node.ANY, Node.ANY) || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
+                if (entity.getIri() == null
+                        || !graph.contains(entity.getIri(), Node.ANY, Node.ANY)
+                        || graph.contains(entity.getIri(), FS.dateDeleted.asNode(), Node.ANY)) {
                     basicEntity.setDateCreated(basicEntity.getDateModified());
                     basicEntity.setCreatedBy(user);
                 }
@@ -118,7 +122,8 @@ public class DAO {
                 graph.remove(entity.getIri(), propertyNode, null);
 
                 if (value instanceof Iterable) {
-                    ((Iterable<?>) value).forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
+                    ((Iterable<?>) value)
+                            .forEach(item -> graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(item))));
                 } else if (value != null) {
                     graph.add(new Triple(entity.getIri(), propertyNode, valueToNode(value)));
                 }
@@ -171,7 +176,7 @@ public class DAO {
      * @param iri
      */
     public void delete(Node iri) {
-       model.removeAll(model.asRDFNode(iri).asResource(), null, null);
+        model.removeAll(model.asRDFNode(iri).asResource(), null, null);
     }
 
     /**
@@ -190,7 +195,6 @@ public class DAO {
         return null;
     }
 
-
     /**
      * Restores an entity previously marked as deleted
      *
@@ -206,7 +210,6 @@ public class DAO {
         }
         return null;
     }
-
 
     /**
      * Lists entities of a specific type (except to marked as deleted)
@@ -228,7 +231,8 @@ public class DAO {
      * @return
      */
     public <T extends PersistentEntity> List<T> list(Class<T> type, boolean includeDeleted) {
-        return model.listSubjectsWithProperty(RDF.type, createResource(getRdfType(type).getURI()))
+        return model.listSubjectsWithProperty(
+                        RDF.type, createResource(getRdfType(type).getURI()))
                 .filterKeep(r -> includeDeleted || !r.hasProperty(FS.dateDeleted))
                 .mapWith(r -> entityFromResource(type, r))
                 .toList();
@@ -357,7 +361,8 @@ public class DAO {
                 return literal.getBoolean();
             }
             if (type == Instant.class) {
-                return ofEpochMilli(((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
+                return ofEpochMilli(
+                        ((XSDDateTime) literal.getValue()).asCalendar().getTimeInMillis());
             }
             if (Enum.class.isAssignableFrom(type)) {
                 return Enum.valueOf((Class<Enum>) type, literal.getString());

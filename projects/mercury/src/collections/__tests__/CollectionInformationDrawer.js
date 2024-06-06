@@ -1,8 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {CollectionInformationDrawer} from "../CollectionInformationDrawer";
+import {configure, shallow} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
+import {CollectionInformationDrawer} from '../CollectionInformationDrawer';
 import CollectionDetails from '../CollectionDetails';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -26,9 +26,7 @@ describe('CollectionInformationDrawer', () => {
     };
 
     it('renders collection details for the selected collection', () => {
-        const wrapper = shallow(<CollectionInformationDrawer
-            {...defaultProps}
-        />);
+        const wrapper = shallow(<CollectionInformationDrawer {...defaultProps} />);
 
         const collectionDetailsProps = wrapper.find(CollectionDetails).first().props();
         expect(collectionDetailsProps.collection.name).toBe('My collection');

@@ -1,7 +1,7 @@
 package io.fairspace.saturn.services.health;
 
-import javax.sql.*;
 import java.util.Collections;
+import javax.sql.*;
 
 public class HealthService {
     private final DataSource dataSource;
@@ -31,5 +31,4 @@ public class HealthService {
             return HealthStatus.DOWN;
         }
     }
-
 }

@@ -1,9 +1,9 @@
-import {useState} from "react";
-import useDeepCompareEffect from "use-deep-compare-effect";
+import {useState} from 'react';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 import _ from 'lodash';
-import useValidation from "./UseValidation";
-import {first} from "../../common/utils/genericUtils";
-import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from "../../constants";
+import useValidation from './UseValidation';
+import {first} from '../../common/utils/genericUtils';
+import {DECIMAL_URI, INTEGER_URI, LONG_URI, MARKDOWN_URI, STRING_URI} from '../../constants';
 
 const DEFAULTABLE_DATATYPES = [STRING_URI, INTEGER_URI, DECIMAL_URI, LONG_URI, MARKDOWN_URI];
 
@@ -11,9 +11,11 @@ const populateDefaultFormValues = (initialProperties, values, setFormValues) => 
     // Values of some properties have to be set to empty strings
     // not to dynamically add single-value fields when these values are updated.
     initialProperties.forEach(p => {
-        const defaultValue = [{value: ""}];
-        const newValues = !values[p.key] && p.maxValuesCount === 1 && DEFAULTABLE_DATATYPES.includes(p.datatype)
-            ? defaultValue : values[p.key];
+        const defaultValue = [{value: ''}];
+        const newValues =
+            !values[p.key] && p.maxValuesCount === 1 && DEFAULTABLE_DATATYPES.includes(p.datatype)
+                ? defaultValue
+                : values[p.key];
         setFormValues(prev => ({
             ...prev,
             [p.key]: newValues
@@ -50,15 +52,16 @@ const useFormData = (values, initialProperties = []) => {
 
     let updatesToReturn = updates;
 
-    const deleteUpdate = (propertyKey) => {
+    const deleteUpdate = propertyKey => {
         const newUpdates = {...updates};
         delete newUpdates[propertyKey];
         setUpdates(newUpdates);
     };
 
     const save = (property, newValue: any[]) => {
-        const equalToInitialValue = ((!initialFormValues[property.key]) && newValue.length === 0)
-            || _.isEqual(newValue, initialFormValues[property.key]);
+        const equalToInitialValue =
+            (!initialFormValues[property.key] && newValue.length === 0) ||
+            _.isEqual(newValue, initialFormValues[property.key]);
         if (equalToInitialValue) {
             // Remove property from updated values if the current value equals its initial value.
             updatesToReturn = {...updates};
@@ -89,7 +92,7 @@ const useFormData = (values, initialProperties = []) => {
 
     const updateValue = (property, value, index) => {
         if (!first(initialFormValues[property.key]) || first(initialFormValues[property.key]).value !== value.value) {
-            const newValue = current(property.key).map((el, idx) => ((idx === index) ? value : el));
+            const newValue = current(property.key).map((el, idx) => (idx === index ? value : el));
             save(property, newValue);
         } else if (updates[property.key]) {
             deleteUpdate(property.key);
@@ -99,7 +102,7 @@ const useFormData = (values, initialProperties = []) => {
     const deleteValue = (property, index) => {
         if (property.maxValuesCount === 1 && !property.allowedValues) {
             if (DEFAULTABLE_DATATYPES.includes(property.datatype)) {
-                updateValue(property, {value: ""}, index);
+                updateValue(property, {value: ''}, index);
             } else {
                 save(property, []);
             }

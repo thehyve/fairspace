@@ -1,4 +1,4 @@
-import {createTheme} from "@mui/material";
+import {createTheme} from '@mui/material';
 import {blue, indigo, pink} from '@mui/material/colors';
 
 export default createTheme({
@@ -10,25 +10,25 @@ export default createTheme({
         MuiMenu: {
             defaultProps: {
                 elevation: 1
-            },
+            }
         },
         MuiTextField: {
             styleOverrides: {
                 root: {
                     marginTop: 0
-                },
+                }
             },
             defaultProps: {
-                size: "small",
-                variant: "standard"
+                size: 'small',
+                variant: 'standard'
             }
         },
         MuiDivider: {
             styleOverrides: {
                 root: {
-                    margin: 0,
+                    margin: 0
                 },
-                margin: 0,
+                margin: 0
             }
         },
         MuiMenuItem: {
@@ -46,7 +46,7 @@ export default createTheme({
                     margin: 0,
                     padding: 0
                 }
-            },
+            }
         },
         MuiList: {
             styleOverrides: {
@@ -55,7 +55,7 @@ export default createTheme({
                     padding: 0,
                     border: 0
                 }
-            },
+            }
         },
         MuiListItem: {
             styleOverrides: {
@@ -67,7 +67,7 @@ export default createTheme({
                 }
             },
             defaultProps: {
-                size: "small"
+                size: 'small'
             }
         },
         MuiListItemText: {
@@ -84,14 +84,14 @@ export default createTheme({
                 root: {
                     margin: 0,
                     paddingBottom: 0,
-                    border: 0,
+                    border: 0
                 }
             }
         },
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: "whitesmoke",
+                    backgroundColor: 'whitesmoke',
                     marginBottom: 0,
                     padding: 5
                 }
@@ -106,17 +106,17 @@ export default createTheme({
         },
         MuiToolbar: {
             defaultProps: {
-                variant: "dense"
+                variant: 'dense'
             }
         },
         MuiAutocomplete: {
             styleOverrides: {
                 listbox: {
                     '& .MuiAutocomplete-option': {
-                        display: "block"
+                        display: 'block'
                     }
                 }
             }
         }
-    },
+    }
 });

@@ -1,8 +1,8 @@
 import mockAxios from 'axios';
 
-jest.mock('axios');
+import MetadataAPI from '../MetadataAPI';
 
-import MetadataAPI from "../MetadataAPI";
+jest.mock('axios');
 
 beforeEach(() => {
     mockAxios.get.mockResolvedValue({data: [], headers: {'content-type': 'application/json'}});
@@ -11,10 +11,12 @@ beforeEach(() => {
 
 describe('MetadataAPI', () => {
     it('fetches metadata with provided parameters', () => {
-        mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-            data: [],
-            headers: {'content-type': 'application/json'}
-        }));
+        mockAxios.get.mockImplementationOnce(() =>
+            Promise.resolve({
+                data: [],
+                headers: {'content-type': 'application/json'}
+            })
+        );
 
         MetadataAPI.get({subject: 'a', predicate: 'b', object: 'c', withValueProperties: true});
 
@@ -23,15 +25,19 @@ describe('MetadataAPI', () => {
     });
 
     it('calls the correct url without any parameters', () => {
-        mockAxios.get.mockImplementationOnce(() => Promise.resolve({
-            data: [],
-            headers: {'content-type': 'application/json'}
-        }));
+        mockAxios.get.mockImplementationOnce(() =>
+            Promise.resolve({
+                data: [],
+                headers: {'content-type': 'application/json'}
+            })
+        );
 
         MetadataAPI.get({});
 
         expect(mockAxios.get).toHaveBeenCalledTimes(1);
-        expect(mockAxios.get).toHaveBeenCalledWith('/api/metadata/?', {headers: {Accept: 'application/ld+json'}});
+        expect(mockAxios.get).toHaveBeenCalledWith('/api/metadata/?', {
+            headers: {Accept: 'application/ld+json'}
+        });
     });
 
     it('stores metadata as jsonld', () => {
@@ -39,7 +45,7 @@ describe('MetadataAPI', () => {
             'http://thehyve.nl',
             {
                 hasEmployees: [{value: 'John Snow'}, {value: 'Ygritte'}],
-                hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}],
+                hasFriends: [{value: 'John Sand'}, {value: 'Ettirgy'}]
             },
             [],
             'http://examle.com/Company'
@@ -48,25 +54,21 @@ describe('MetadataAPI', () => {
         const expected = [
             {
                 '@id': 'http://thehyve.nl',
-                'hasEmployees': [
-                    {'@value': 'John Snow'},
-                    {'@value': 'Ygritte'}
-                ]
+                hasEmployees: [{'@value': 'John Snow'}, {'@value': 'Ygritte'}]
             },
             {
                 '@id': 'http://thehyve.nl',
-                'hasFriends': [
-                    {'@value': 'John Sand'},
-                    {'@value': 'Ettirgy'}
-                ]
+                hasFriends: [{'@value': 'John Sand'}, {'@value': 'Ettirgy'}]
             },
             {
                 '@id': 'http://thehyve.nl',
-                '@type': 'http://examle.com/Company',
+                '@type': 'http://examle.com/Company'
             }
         ];
 
         expect(mockAxios.patch).toHaveBeenCalledTimes(1);
-        expect(mockAxios.patch).toHaveBeenCalledWith('/api/metadata/', JSON.stringify(expected), {headers: {'Content-type': 'application/ld+json'}});
+        expect(mockAxios.patch).toHaveBeenCalledWith('/api/metadata/', JSON.stringify(expected), {
+            headers: {'Content-type': 'application/ld+json'}
+        });
     });
 });

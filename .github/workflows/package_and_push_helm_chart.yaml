@@ -1,0 +1,51 @@
+name: Package and Push Helm Chart
+
+on:
+  push:
+    branches:
+      - dev
+      - release
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version of the Helm chart to push"
+        required: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4.1.0
+        with:
+          version: ${{ vars.HELM_VERSION }}
+
+      - name: Login with Helm
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | helm registry login ${{ vars.HELM_REGISTRY }} --username ${{ github.actor }} --password-stdin
+
+      - name: Prepare version
+        run: |
+          VERSION=$(cat ./VERSION)
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Building images from the branch: $BRANCH"
+          if [ $BRANCH != "release" ]; then
+            VERSION=$VERSION-SNAPSHOT
+          fi
+          # override version of custom input is provided
+          if [[ -n "${{ github.event.inputs.version }}" ]]; then
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          echo "Helm charts version to be deployed: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Push Helm chart to repository
+        run: |
+          helm dependency update "charts/fairspace"
+          helm package "charts/fairspace" --version ${{ env.VERSION }}
+          helm push "fairspace-${{ env.VERSION }}.tgz" "oci://${{ vars.HELM_REGISTRY }}"
+          echo "Pushed package to repository"

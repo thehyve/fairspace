@@ -1,6 +1,6 @@
 import React from 'react';
-import {withRouter} from "react-router-dom";
-import {Alert, Snackbar} from "@mui/material";
+import {withRouter} from 'react-router-dom';
+import {Alert, Snackbar} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 
 const styles = theme => ({
@@ -15,11 +15,7 @@ const styles = theme => ({
 });
 
 const StatusAlert = ({children, classes}) => (
-    <Snackbar
-        anchorOrigin={{vertical: 'top', horizontal: 'right'}}
-        className={classes.snackbarRoot}
-        open
-    >
+    <Snackbar anchorOrigin={{vertical: 'top', horizontal: 'right'}} className={classes.snackbarRoot} open>
         <Alert severity="error" className={classes.alertRoot}>
             {children}
         </Alert>

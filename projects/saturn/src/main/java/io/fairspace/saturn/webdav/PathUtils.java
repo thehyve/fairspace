@@ -22,7 +22,7 @@ public class PathUtils {
 
     public static String name(String path) {
         var parts = splitPath(path);
-        return (parts.length == 0) ? "" :  parts[parts.length - 1];
+        return (parts.length == 0) ? "" : parts[parts.length - 1];
     }
 
     public static void validateCollectionName(String name) throws BadRequestException {
@@ -34,8 +34,7 @@ public class PathUtils {
                     "The collection name exceeds maximum length " + MAX_COLLECTION_NAME_LENGTH + ".");
         }
         if (name.contains("\\")) {
-            throw new BadRequestException(
-                    "The collection name contains an illegal character (\\)");
+            throw new BadRequestException("The collection name contains an illegal character (\\)");
         }
     }
 }

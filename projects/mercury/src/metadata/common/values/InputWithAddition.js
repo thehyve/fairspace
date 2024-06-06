@@ -1,18 +1,15 @@
 import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
-import {Grid, IconButton} from "@mui/material";
+import {Grid, IconButton} from '@mui/material';
 import Add from '@mui/icons-material/Add';
 
-import NewLinkedDataEntityDialog from "../NewLinkedDataEntityDialog";
-import LoadingInlay from "../../../common/components/LoadingInlay";
-import MessageDisplay from "../../../common/components/MessageDisplay";
-import {canAddSharedMetadata} from "../../../users/userUtils";
-import UserContext from "../../../users/UserContext";
+import NewLinkedDataEntityDialog from '../NewLinkedDataEntityDialog';
+import LoadingInlay from '../../../common/components/LoadingInlay';
+import MessageDisplay from '../../../common/components/MessageDisplay';
+import {canAddSharedMetadata} from '../../../users/userUtils';
+import UserContext from '../../../users/UserContext';
 
-const InputWithAddition = ({
-    children, onChange,
-    pending, error, shape, requireIdentifier = true
-}) => {
+const InputWithAddition = ({children, onChange, pending, error, shape, requireIdentifier = true}) => {
     const {currentUser} = useContext(UserContext);
     const [adding, setAdding] = useState(false);
 
@@ -34,12 +31,7 @@ const InputWithAddition = ({
 
         return (
             <>
-                <IconButton
-                    aria-label="Add"
-                    title="Add a new"
-                    onClick={() => setAdding(true)}
-                    size="medium"
-                >
+                <IconButton aria-label="Add" title="Add a new" onClick={() => setAdding(true)} size="medium">
                     <Add />
                 </IconButton>
                 {adding && (

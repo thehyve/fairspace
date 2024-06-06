@@ -1,23 +1,23 @@
-import React from "react";
+import React from 'react';
 import PropTypes from 'prop-types';
-import {FormControl, FormHelperText, FormLabel} from "@mui/material";
+import {FormControl, FormHelperText, FormLabel} from '@mui/material';
 
-import IriValueContainer from "./values/IriValueContainer";
+import IriValueContainer from './values/IriValueContainer';
 
 export const LinkedDataIdentifierField = props => (
     <FormControl
         required={props.required}
         style={{
             width: '100%',
-            margin: 4,
+            margin: 4
         }}
     >
-        <FormLabel component="legend">
-            Identifier
-        </FormLabel>
+        <FormLabel component="legend">Identifier</FormLabel>
         <IriValueContainer {...props} />
         <FormHelperText>
-            {props.required ? 'Enter a valid identifier for this entity' : 'If not provided, the identifier will be inferred from the other properties'}
+            {props.required
+                ? 'Enter a valid identifier for this entity'
+                : 'If not provided, the identifier will be inferred from the other properties'}
         </FormHelperText>
     </FormControl>
 );

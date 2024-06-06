@@ -1,48 +1,50 @@
 import React, {useContext, useEffect, useState} from 'react';
 import Grid from '@mui/material/Grid';
 import withStyles from '@mui/styles/withStyles';
-import {useHistory} from "react-router-dom";
-import queryString from "query-string";
-import usePageTitleUpdater from "../common/hooks/UsePageTitleUpdater";
+import {useHistory} from 'react-router-dom';
+import queryString from 'query-string';
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 
-import {useSingleSelection} from "../file/UseSelection";
-import SearchBar from "../search/SearchBar";
-import BreadCrumbs from "../common/components/BreadCrumbs";
-import styles from "./ExternalStoragePage.styles";
-import ExternalStorageBrowser from "./ExternalStorageBrowser";
-import ExternalStoragesContext from "./ExternalStoragesContext";
-import MessageDisplay from "../common/components/MessageDisplay";
-import ExternalStorageBreadcrumbsContextProvider from "./ExternalStorageBreadcrumbsContextProvider";
-import type {ExternalStorage} from "./externalStorageUtils";
-import {getRelativePath} from "./externalStorageUtils";
-import type {Match} from "../types";
-import ExternalStorageInformationDrawer from "./ExternalStorageInformationDrawer";
-import {handleTextSearchRedirect} from "../search/searchUtils";
-import {joinPathsAvoidEmpty} from "../file/fileUtils";
-import {PATH_SEPARATOR} from "../constants";
+import {useSingleSelection} from '../file/UseSelection';
+import SearchBar from '../search/SearchBar';
+import BreadCrumbs from '../common/components/BreadCrumbs';
+import styles from './ExternalStoragePage.styles';
+import ExternalStorageBrowser from './ExternalStorageBrowser';
+import ExternalStoragesContext from './ExternalStoragesContext';
+import MessageDisplay from '../common/components/MessageDisplay';
+import ExternalStorageBreadcrumbsContextProvider from './ExternalStorageBreadcrumbsContextProvider';
+import type {ExternalStorage} from './externalStorageUtils';
+import {getRelativePath} from './externalStorageUtils';
+import type {Match} from '../types';
+import ExternalStorageInformationDrawer from './ExternalStorageInformationDrawer';
+import {handleTextSearchRedirect} from '../search/searchUtils';
+import {joinPathsAvoidEmpty} from '../file/fileUtils';
+import {PATH_SEPARATOR} from '../constants';
 
 type ContextualExternalStoragePageProperties = {
-    match: Match;
-    location: Location;
-    classes: any;
-}
+    match: Match,
+    location: Location,
+    classes: any
+};
 
 type ExternalStoragePageProperties = ContextualExternalStoragePageProperties & {
-    externalStorages: ExternalStorage[];
-    history: History;
-}
+    externalStorages: ExternalStorage[],
+    history: History
+};
 
 export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
-    const {externalStorages, match, location, history, classes = {}} = props;
+    const {externalStorages = [], match, location, history, classes = {}} = props;
 
     const [breadcrumbSegments, setBreadcrumbSegments] = useState([]);
     const [atLeastSingleRootFileExists, setAtLeastSingleRootFileExists] = useState(false);
     const storage: ExternalStorage = externalStorages.find(s => s.name === match.params.storage);
     const selection = useSingleSelection();
     const isSearchAvailable = storage && !!storage.searchPath;
-    const preselectedFile = location.search ? decodeURIComponent(queryString.parse(location.search).selection) : undefined;
+    const preselectedFile = location.search
+        ? decodeURIComponent(queryString.parse(location.search).selection)
+        : undefined;
 
-    usePageTitleUpdater(storage ? storage.label : "External storage");
+    usePageTitleUpdater(storage ? storage.label : 'External storage');
 
     useEffect(() => {
         if (preselectedFile) {
@@ -53,7 +55,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
 
     const handleSearch = (value: string) => {
         const relativePath = getRelativePath(location.pathname, storage.name);
-        let context = "";
+        let context = '';
         if (relativePath && relativePath !== PATH_SEPARATOR) {
             context = encodeURI(joinPathsAvoidEmpty(storage.rootDirectoryIri, relativePath));
         }
@@ -67,7 +69,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
     const getSearchPlaceholder = () => {
         const openedPath = getRelativePath(location.pathname, storage.name);
         const parentFolderName = openedPath ? openedPath.substring(openedPath.lastIndexOf('/') + 1) : null;
-        return parentFolderName ? `Search in ${parentFolderName}` : `Search in all folders`;
+        return parentFolderName ? `Search in ${parentFolderName}` : 'Search in all folders';
     };
 
     return (
@@ -76,11 +78,7 @@ export const ExternalStoragePage = (props: ExternalStoragePageProperties) => {
             {isSearchAvailable && (
                 <Grid container justifyContent="space-between" spacing={1}>
                     <Grid item className={classes.topBar}>
-                        <SearchBar
-                            placeholder={getSearchPlaceholder()}
-                            onSearchChange={handleSearch}
-                            width="50%"
-                        />
+                        <SearchBar placeholder={getSearchPlaceholder()} onSearchChange={handleSearch} width="50%" />
                     </Grid>
                 </Grid>
             )}
@@ -112,13 +110,7 @@ const ContextualExternalStoragePage = (props: ContextualExternalStoragePagePrope
     const {externalStorages = []} = useContext(ExternalStoragesContext);
     const history = useHistory();
 
-    return (
-        <ExternalStoragePage
-            {...props}
-            externalStorages={externalStorages}
-            history={history}
-        />
-    );
+    return <ExternalStoragePage {...props} externalStorages={externalStorages} history={history} />;
 };
 
 export default withStyles(styles)(ContextualExternalStoragePage);

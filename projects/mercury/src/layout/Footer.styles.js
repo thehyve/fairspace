@@ -10,9 +10,8 @@ const styles = theme => ({
         zIndex: theme.zIndex.drawer + 1
     },
     text: {
-        color: theme.palette.common.white,
+        color: theme.palette.common.white
     }
-
 });
 
 export default styles;

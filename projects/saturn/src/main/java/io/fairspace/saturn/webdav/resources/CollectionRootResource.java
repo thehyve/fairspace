@@ -1,10 +1,9 @@
 package io.fairspace.saturn.webdav.resources;
 
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.Access;
-import io.fairspace.saturn.webdav.AccessMode;
-import io.fairspace.saturn.webdav.DavFactory;
-import io.fairspace.saturn.webdav.Status;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import io.milton.http.Response;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -16,14 +15,17 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.Access;
+import io.fairspace.saturn.webdav.AccessMode;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.Status;
 
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 import static io.fairspace.saturn.webdav.PathUtils.validateCollectionName;
 import static io.fairspace.saturn.webdav.WebDAVServlet.owner;
 import static io.fairspace.saturn.webdav.WebDAVServlet.timestampLiteral;
+
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 
 @Log4j2
@@ -32,16 +34,18 @@ public class CollectionRootResource extends RootResource {
     public CollectionRootResource(DavFactory factory) {
         super(factory);
     }
-    
+
     @Override
     public List<? extends Resource> getChildren() {
-        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
+        return factory.rootSubject
+                .getModel()
+                .listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(factory::getResource)
                 .filterDrop(Objects::isNull)
-                .filterKeep(r -> ((io.fairspace.saturn.webdav.resources.CollectionResource)r).access.canList())
+                .filterKeep(r -> ((io.fairspace.saturn.webdav.resources.CollectionResource) r).access.canList())
                 .toList();
     }
-    
+
     /**
      * Creates a new collection resource, sets the owner workspaces and assigns
      * manage permission on the collection to the current user.
@@ -58,7 +62,8 @@ public class CollectionRootResource extends RootResource {
      * @throws BadRequestException if the name is invalid (@see {@link #validateTargetCollectionName(String)}).
      */
     @Override
-    public io.milton.resource.CollectionResource createCollection(String name) throws NotAuthorizedException, ConflictException, BadRequestException {
+    public io.milton.resource.CollectionResource createCollection(String name)
+            throws NotAuthorizedException, ConflictException, BadRequestException {
         if (name != null) {
             name = name.trim();
         }
@@ -97,7 +102,8 @@ public class CollectionRootResource extends RootResource {
         if (!factory.currentUserResource().hasProperty(FS.isMemberOf, ws)
                 && !factory.currentUserResource().hasProperty(FS.isManagerOf, ws)
                 && !factory.userService.currentUser().isAdmin()) {
-            throw new NotAuthorizedException("Not authorized to create a new collection in this workspace.", this, SC_FORBIDDEN);
+            throw new NotAuthorizedException(
+                    "Not authorized to create a new collection in this workspace.", this, SC_FORBIDDEN);
         }
 
         subj.addProperty(FS.ownedBy, ws).addProperty(FS.belongsTo, ws);
@@ -115,7 +121,9 @@ public class CollectionRootResource extends RootResource {
     }
 
     private Optional<Resource> findCollectionWithName(String name) {
-        return factory.rootSubject.getModel().listSubjectsWithProperty(RDF.type, FS.Collection)
+        return factory.rootSubject
+                .getModel()
+                .listSubjectsWithProperty(RDF.type, FS.Collection)
                 .mapWith(child -> factory.getResourceByType(child, Access.List))
                 .filterDrop(Objects::isNull)
                 .filterKeep(collection -> collection.getName().equals(name))

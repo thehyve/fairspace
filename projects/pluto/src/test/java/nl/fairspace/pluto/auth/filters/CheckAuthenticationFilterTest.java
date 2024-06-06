@@ -11,6 +11,7 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 
 import static nl.fairspace.pluto.auth.AuthConstants.AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,7 +34,8 @@ public class CheckAuthenticationFilterTest {
             }
         };
         isAuthorized = true;
-        MockServerHttpRequest request = MockServerHttpRequest.get("http://localhost").build();
+        MockServerHttpRequest request =
+                MockServerHttpRequest.get("http://localhost").build();
         exchange = MockServerWebExchange.from(request);
     }
 
@@ -43,7 +45,7 @@ public class CheckAuthenticationFilterTest {
         filter.filter(exchange, filterChain);
 
         assertEquals(Boolean.TRUE, exchange.getAttributes().get(AUTHORIZATION_CHECKED_REQUEST_ATTRIBUTE));
-        assertEquals(originalAttributesSize+1, exchange.getAttributes().size());
+        assertEquals(originalAttributesSize + 1, exchange.getAttributes().size());
     }
 
     @Test

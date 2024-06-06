@@ -1,8 +1,11 @@
 package nl.fairspace.pluto.auth.filters;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+
 import lombok.extern.slf4j.Slf4j;
-import nl.fairspace.pluto.config.dto.AppSecurityUrlConfig;
-import nl.fairspace.pluto.config.dto.PlutoConfig;
 import org.springframework.boot.web.reactive.filter.OrderedWebFilter;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -19,10 +22,8 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
+import nl.fairspace.pluto.config.dto.AppSecurityUrlConfig;
+import nl.fairspace.pluto.config.dto.PlutoConfig;
 
 import static nl.fairspace.pluto.auth.AuthorizationFailedHandler.XHR_VALUE;
 import static nl.fairspace.pluto.auth.AuthorizationFailedHandler.X_REQUESTED_WITH_HEADER;
@@ -69,12 +70,14 @@ public class WebClientHtmlRequestFilter implements OrderedWebFilter {
 
     private boolean shouldFilter(ServerHttpRequest request) {
         String acceptHeader = request.getHeaders().getFirst(HttpHeaders.ACCEPT);
-        return HttpMethod.GET.matches(request.getMethod().name()) && acceptHeader != null &&
-                acceptHeader.contains("text/html") &&
-                !XHR_VALUE.equals(request.getHeaders().getFirst(X_REQUESTED_WITH_HEADER)) &&
-                (Arrays.stream(this.urlConfig.getPermitAll()).noneMatch(url -> request.getPath().toString().startsWith(url) ||
-                        request.getPath().toString().equals("/") || request.getPath().toString().equals(""))
-                );
+        return HttpMethod.GET.matches(request.getMethod().name())
+                && acceptHeader != null
+                && acceptHeader.contains("text/html")
+                && !XHR_VALUE.equals(request.getHeaders().getFirst(X_REQUESTED_WITH_HEADER))
+                && (Arrays.stream(this.urlConfig.getPermitAll())
+                        .noneMatch(url -> request.getPath().toString().startsWith(url)
+                                || request.getPath().toString().equals("/")
+                                || request.getPath().toString().equals("")));
     }
 
     @Override

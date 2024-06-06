@@ -5,6 +5,7 @@ import io.fairspace.saturn.services.BaseApp;
 import static io.fairspace.saturn.services.metadata.Serialization.getFormat;
 import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
+
 import static spark.Spark.get;
 
 public class VocabularyApp extends BaseApp {

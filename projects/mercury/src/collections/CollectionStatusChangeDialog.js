@@ -10,12 +10,12 @@ import {
     FormControlLabel,
     ListItemText,
     Radio,
-    RadioGroup,
-} from "@mui/material";
+    RadioGroup
+} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
-import {camelCaseToWords} from "../common/utils/genericUtils";
-import ConfirmationButton from "../common/components/ConfirmationButton";
-import {descriptionForStatus} from "./collectionUtils";
+import {camelCaseToWords} from '../common/utils/genericUtils';
+import ConfirmationButton from '../common/components/ConfirmationButton';
+import {descriptionForStatus} from './collectionUtils';
 import {statuses} from './CollectionAPI';
 import type {Status} from './CollectionAPI';
 
@@ -36,7 +36,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
     const [selectedValue, setSelectedValue] = useState(collection.status);
     const [openDialog, setOpenDialog] = useState(true);
 
-    const handleValueChange = (event) => {
+    const handleValueChange = event => {
         setSelectedValue(event.target.value);
     };
 
@@ -82,11 +82,7 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
     };
 
     return (
-        <Dialog
-            open={openDialog}
-            data-testid="property-change-dialog"
-            onClose={handleCancel}
-        >
+        <Dialog open={openDialog} data-testid="property-change-dialog" onClose={handleCancel}>
             <DialogTitle id="property-change-dialog-title">Change collection status</DialogTitle>
             <DialogContent>
                 <div>
@@ -98,18 +94,19 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                             value={selectedValue}
                             onChange={handleValueChange}
                         >
-                            {statuses.filter(status => collection.availableStatuses.includes(status))
+                            {statuses
+                                .filter(status => collection.availableStatuses.includes(status))
                                 .map(status => (
                                     <FormControlLabel
                                         key={status}
                                         value={status}
                                         control={<Radio />}
-                                        label={(
+                                        label={
                                             <ListItemText
-                                                primary={camelCaseToWords(status, "-")}
+                                                primary={camelCaseToWords(status, '-')}
                                                 secondary={descriptionForStatus(status)}
                                             />
-                                        )}
+                                        }
                                     />
                                 ))}
                         </RadioGroup>
@@ -124,17 +121,11 @@ export const CollectionStatusChangeDialog = ({collection, setValue, onClose, cla
                     agreeButtonText="Yes"
                     dangerous
                 >
-                    <Button
-                        color="primary"
-                        disabled={Boolean(!selectedValue)}
-                        data-testid="submit"
-                    >
+                    <Button color="primary" disabled={Boolean(!selectedValue)} data-testid="submit">
                         Save
                     </Button>
                 </ConfirmationButton>
-                <Button onClick={handleCancel}>
-                    Cancel
-                </Button>
+                <Button onClick={handleCancel}>Cancel</Button>
             </DialogActions>
         </Dialog>
     );

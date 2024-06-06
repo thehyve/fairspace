@@ -1,12 +1,10 @@
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 import App from '../App';
-import {LocalFileAPI} from "../file/FileAPI";
+import {LocalFileAPI} from '../file/FileAPI';
 
 beforeEach(() => {
-    const getDirectoryContents = jest.fn(() => Promise.resolve(
-        {data: []}
-    ));
+    const getDirectoryContents = jest.fn(() => Promise.resolve({data: []}));
     LocalFileAPI.client = () => ({getDirectoryContents});
 });
 

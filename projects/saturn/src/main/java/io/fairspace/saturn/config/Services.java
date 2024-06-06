@@ -1,5 +1,17 @@
 package io.fairspace.saturn.config;
 
+import java.io.File;
+import javax.servlet.http.HttpServlet;
+
+import io.milton.resource.Resource;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.log4j.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.util.Symbol;
+
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
@@ -17,17 +29,6 @@ import io.fairspace.saturn.webdav.*;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
-import io.milton.resource.Resource;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.extern.log4j.*;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.util.Symbol;
-
-import javax.servlet.http.HttpServlet;
-import java.io.File;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
@@ -58,19 +59,32 @@ public class Services {
     private final HealthService healthService;
     private final MaintenanceService maintenanceService;
 
-    public Services(@NonNull Config config, @NonNull ViewsConfig viewsConfig, @NonNull Dataset dataset, ViewStoreClientFactory viewStoreClientFactory) {
+    public Services(
+            @NonNull Config config,
+            @NonNull ViewsConfig viewsConfig,
+            @NonNull Dataset dataset,
+            ViewStoreClientFactory viewStoreClientFactory) {
         this.config = config;
-        this.transactions = config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
+        this.transactions =
+                config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions);
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
-        davFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"), blobStore, userService, dataset.getContext());
+        davFactory = new DavFactory(
+                dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"),
+                blobStore,
+                userService,
+                dataset.getContext());
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
         if (CONFIG.features.contains(Feature.ExtraStorage)) {
             extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
-            extraDavFactory = new DavFactory(dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"), extraBlobStore, userService, dataset.getContext());
+            extraDavFactory = new DavFactory(
+                    dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"),
+                    extraBlobStore,
+                    userService,
+                    dataset.getContext());
             extraDavServlet = new WebDAVServlet(extraDavFactory, transactions, extraBlobStore);
             initExtraStorageRootDirectories();
         } else {
@@ -94,15 +108,16 @@ public class Services {
         metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
 
-        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory);
-
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
         queryService = viewStoreClientFactory == null
                 ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
                 : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
-        viewService = new ViewService(config.search, viewsConfig, filteredDataset, viewStoreClientFactory);
+        viewService =
+                new ViewService(config, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
+
+        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
 
         searchService = new SearchService(filteredDataset);
 

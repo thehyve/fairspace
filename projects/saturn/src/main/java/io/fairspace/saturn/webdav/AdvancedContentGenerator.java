@@ -1,12 +1,12 @@
 package io.fairspace.saturn.webdav;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import io.milton.http.Request;
 import io.milton.http.Response;
 import io.milton.http.http11.ContentGenerator;
 import io.milton.resource.Resource;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static io.fairspace.saturn.webdav.WebDAVServlet.getErrorMessage;
 
@@ -22,8 +22,7 @@ public class AdvancedContentGenerator implements ContentGenerator {
                 case SC_CONFLICT -> "Conflict";
                 case SC_INTERNAL_SERVER_ERROR -> "Server error";
                 case SC_UNAUTHORIZED -> "Not authorised";
-                default -> "Unknown error";
-            };
+                default -> "Unknown error";};
         }
 
         try {

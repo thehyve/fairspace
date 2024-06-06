@@ -1,5 +1,7 @@
 package io.fairspace.saturn.rdf;
 
+import java.util.*;
+
 import org.apache.jena.enhanced.EnhGraph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.compose.Difference;
@@ -10,8 +12,6 @@ import org.apache.jena.rdf.model.impl.PropertyImpl;
 import org.apache.jena.sparql.graph.GraphZero;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-
-import java.util.*;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
@@ -101,7 +101,6 @@ public class ModelUtils {
         return (resource instanceof Property)
                 ? (Property) resource
                 : new PropertyImpl(resource.asNode(), (EnhGraph) resource.getModel());
-
     }
 
     public static Set<Resource> getAllInstances(Resource cls) {
@@ -171,7 +170,6 @@ public class ModelUtils {
     public static Integer getIntegerProperty(Resource subject, Property predicate) {
         var s = subject.getProperty(predicate);
         return (s != null && s.getObject().isLiteral()) ? s.getInt() : null;
-
     }
 
     public static RDFList getListProperty(Resource subject, Property predicate) {
@@ -310,8 +308,7 @@ public class ModelUtils {
 
     public static void copyProperties(Resource from, Resource to, Property... props) {
         for (var p : props) {
-            from
-                    .listProperties(p)
+            from.listProperties(p)
                     .toSet() // convert to set, to prevent updating a model while iterating over its elements
                     .forEach(s -> to.addProperty(p, s.getObject()));
         }
@@ -322,8 +319,7 @@ public class ModelUtils {
                 .toSet() // convert to set, to prevent updating a model while iterating over its elements
                 .forEach(s -> {
                     var label = model.getProperty(s, RDFS.label);
-                    model
-                            .removeAll(s, RDFS.label, null)
+                    model.removeAll(s, RDFS.label, null)
                             .add(s, RDFS.label, label.getString().trim());
                 });
     }

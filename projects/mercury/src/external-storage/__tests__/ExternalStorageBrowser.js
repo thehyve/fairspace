@@ -2,12 +2,11 @@
 import React from 'react';
 import {cleanup, render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import {configure, shallow} from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import {ExternalStorageBrowser} from "../ExternalStorageBrowser";
-import type {ExternalStorage} from "../ExternalStoragesContext";
-import LoadingInlay from "../../common/components/LoadingInlay";
+import {configure} from 'enzyme';
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 import {ThemeProvider} from '@mui/material/styles';
+import {ExternalStorageBrowser} from '../ExternalStorageBrowser';
+import type {ExternalStorage} from '../ExternalStoragesContext';
 import theme from '../../App.theme';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -27,9 +26,9 @@ const selectionMock = {
 };
 
 const storageMock: ExternalStorage = {
-    name: "testStorage",
-    label: "Test storage",
-    url: "https://example.com/api/webdav"
+    name: 'testStorage',
+    label: 'Test storage',
+    url: 'https://example.com/api/webdav'
 };
 
 const initialProps = {
@@ -38,9 +37,11 @@ const initialProps = {
         listen: () => {}
     },
     storage: storageMock,
-    files: [{
-        filename: 'a'
-    }],
+    files: [
+        {
+            filename: 'a'
+        }
+    ],
     fileActions: fileActionsMock,
     selection: selectionMock,
     classes: {}
@@ -50,9 +51,7 @@ describe('ExternalStorageBrowser', () => {
     it('renders proper view', () => {
         const {queryByTestId} = render(
             <ThemeProvider theme={theme}>
-                <ExternalStorageBrowser
-                    {...initialProps}
-                />
+                <ExternalStorageBrowser {...initialProps} />
             </ThemeProvider>
         );
 
@@ -62,26 +61,20 @@ describe('ExternalStorageBrowser', () => {
     it('show data loading error when ehn error on fetching files occurs', () => {
         const {getByText} = render(
             <ThemeProvider theme={theme}>
-                <ExternalStorageBrowser
-                    {...initialProps}
-                    error="some error"
-                />
+                <ExternalStorageBrowser {...initialProps} error="some error" />
             </ThemeProvider>
         );
 
-        expect(getByText("An error occurred while loading data from Test storage.")).toBeInTheDocument();
+        expect(getByText('An error occurred while loading data from Test storage.')).toBeInTheDocument();
     });
 
     it('show loading inlay as long as the files are pending', () => {
         render(
             <ThemeProvider theme={theme}>
-                <ExternalStorageBrowser
-                    {...initialProps}
-                    loading
-                />
+                <ExternalStorageBrowser {...initialProps} loading />
             </ThemeProvider>
         );
 
-        expect(screen.getByTestId("loading")).toBeInTheDocument();
+        expect(screen.getByTestId('loading')).toBeInTheDocument();
     });
 });

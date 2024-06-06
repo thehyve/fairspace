@@ -1,30 +1,34 @@
 package io.fairspace.saturn.services.users;
 
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
+import javax.servlet.ServletException;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import jakarta.ws.rs.NotFoundException;
+import lombok.extern.log4j.*;
+import org.apache.commons.lang3.*;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.util.Symbol;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.UsersResource;
+
+import io.fairspace.saturn.auth.RequestContext;
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.dao.PersistentEntity;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
-import lombok.extern.log4j.*;
-import org.apache.commons.lang3.*;
-import org.apache.jena.graph.Node;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.UsersResource;
-
-import javax.servlet.ServletException;
-import javax.ws.rs.NotFoundException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.*;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
+
 import static java.lang.System.getenv;
 import static java.util.stream.Collectors.toMap;
 
@@ -51,17 +55,20 @@ public class UserService {
     }
 
     public UserService(Config.Auth config, Transactions transactions) {
-        this(config, transactions, KeycloakBuilder.builder()
-                .serverUrl(config.authServerUrl)
-                .realm(config.realm)
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .clientId(config.clientId)
-                .clientSecret(getenv("KEYCLOAK_CLIENT_SECRET"))
-                .username(config.clientId)
-                .password(getenv("KEYCLOAK_CLIENT_SECRET"))
-                .build()
-                .realm(config.realm)
-                .users());
+        this(
+                config,
+                transactions,
+                KeycloakBuilder.builder()
+                        .serverUrl(config.authServerUrl)
+                        .realm(config.realm)
+                        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                        .clientId(config.clientId)
+                        .clientSecret(getenv("KEYCLOAK_CLIENT_SECRET"))
+                        .username(config.clientId)
+                        .password(getenv("KEYCLOAK_CLIENT_SECRET"))
+                        .build()
+                        .realm(config.realm)
+                        .users());
     }
 
     public Collection<User> getUsers() {
@@ -80,8 +87,13 @@ public class UserService {
         }
     }
 
+    public static Symbol currentUserAsSymbol() {
+        var uri = RequestContext.getCurrentUserStringUri().orElse("anonymous");
+        return Symbol.create(uri);
+    }
+
     private Map<Node, User> fetchUsers() {
-        var userCount = usersResource.count(); // TODO [FNS-126] implement proper pagination based on client request parameters
+        var userCount = usersResource.count();
         var keycloakUsers = usersResource.list(0, userCount);
         var updated = new HashSet<User>();
         var users = transactions.calculateRead(model -> {
@@ -133,7 +145,8 @@ public class UserService {
                         }
 
                         return user;
-                    }).collect(toMap(PersistentEntity::getIri, u -> u));
+                    })
+                    .collect(toMap(PersistentEntity::getIri, u -> u));
         });
 
         if (!updated.isEmpty()) {
@@ -170,7 +183,8 @@ public class UserService {
             if (user.isSuperadmin()) {
                 if (Stream.of(roles.getAdmin(), roles.getCanViewPublicData(), roles.getCanViewPublicMetadata())
                         .anyMatch(role -> role != null && !role)) {
-                    throw new IllegalArgumentException("Cannot revoke admin or public access roles from superadmin user.");
+                    throw new IllegalArgumentException(
+                            "Cannot revoke admin or public access roles from superadmin user.");
                 }
             }
             username[0] = user.getUsername();
@@ -201,8 +215,8 @@ public class UserService {
             }
 
             if (user.isAdmin() && !user.isCanViewPublicData()
-            || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()
-            || user.isCanQueryMetadata() && !user.isCanViewPublicMetadata()) {
+                    || user.isCanViewPublicData() && !user.isCanViewPublicMetadata()
+                    || user.isCanQueryMetadata() && !user.isCanViewPublicMetadata()) {
                 throw new IllegalArgumentException("Inconsistent organisation-level roles");
             }
 

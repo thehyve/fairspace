@@ -1,5 +1,11 @@
 package io.fairspace.saturn.rdf.dao;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
@@ -8,16 +14,11 @@ import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -59,7 +60,6 @@ public class DAOTest {
         assertEquals(iri, entity.getIri());
         assertNotEquals(iri, dao.write(new Entity()).getIri());
     }
-
 
     @Test
     public void testNodeProperty() {
@@ -123,37 +123,37 @@ public class DAOTest {
 
     @Test
     public void testShortPrimitiveProperty() {
-        entity.setShortPrimitiveValue((short)123);
+        entity.setShortPrimitiveValue((short) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testShortObjectProperty() {
-        entity.setShortObjectValue((short)123);
+        entity.setShortObjectValue((short) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testCharPrimitiveProperty() {
-        entity.setCharPrimitiveValue((char)123);
+        entity.setCharPrimitiveValue((char) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testCharObjectProperty() {
-        entity.setCharacterObjectValue((char)123);
+        entity.setCharacterObjectValue((char) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testBytePrimitiveProperty() {
-        entity.setBytePrimitiveValue((byte)123);
+        entity.setBytePrimitiveValue((byte) 123);
         testWriteAndRead(entity);
     }
 
     @Test
     public void testByteObjectProperty() {
-        entity.setByteObjectValue((byte)123);
+        entity.setByteObjectValue((byte) 123);
         testWriteAndRead(entity);
     }
 
@@ -187,7 +187,9 @@ public class DAOTest {
         entity.setInstantValue(now());
         dao.write(entity);
         // There can be some rounding within 1 ms
-        assertEquals(entity.getInstantValue().toEpochMilli(), dao.read(Entity.class, entity.getIri()).getInstantValue().toEpochMilli());
+        assertEquals(
+                entity.getInstantValue().toEpochMilli(),
+                dao.read(Entity.class, entity.getIri()).getInstantValue().toEpochMilli());
     }
 
     @Test
@@ -205,7 +207,6 @@ public class DAOTest {
         entity.setStringValue("str2");
         testWriteAndRead(entity);
     }
-
 
     @Test
     public void testInheritance() {
@@ -256,7 +257,11 @@ public class DAOTest {
         var e = new WithRequired();
         e.setRequiredField("xxx");
         dao.write(e);
-        dataset.getDefaultModel().removeAll(createResource(e.getIri().getURI()), createProperty("http://example.com/iri/requiredField"), null);
+        dataset.getDefaultModel()
+                .removeAll(
+                        createResource(e.getIri().getURI()),
+                        createProperty("http://example.com/iri/requiredField"),
+                        null);
         dao.read(WithRequired.class, e.getIri());
     }
 
@@ -282,7 +287,11 @@ public class DAOTest {
     public void testTooManyValues() {
         entity.setIntPrimitiveValue(1);
         dao.write(entity);
-        dataset.getDefaultModel().add(createResource(entity.getIri().getURI()), createProperty("http://example.com/iri/intPrimitiveValue"), createTypedLiteral(2));
+        dataset.getDefaultModel()
+                .add(
+                        createResource(entity.getIri().getURI()),
+                        createProperty("http://example.com/iri/intPrimitiveValue"),
+                        createTypedLiteral(2));
         dao.read(Entity.class, entity.getIri());
     }
 
@@ -294,12 +303,10 @@ public class DAOTest {
         testWriteAndRead(e);
     }
 
-
     private void testWriteAndRead(PersistentEntity entity) {
         dao.write(entity);
         assertEquals(entity, dao.read(entity.getClass(), entity.getIri()));
     }
-
 
     @Data
     @EqualsAndHashCode(callSuper = true)
@@ -380,8 +387,7 @@ public class DAOTest {
     @Data
     @EqualsAndHashCode(callSuper = true)
     @RDFType("http://example.com/iri/BasicEntity")
-    private static class LifecycleAwareEntity extends LifecycleAwarePersistentEntity {
-    }
+    private static class LifecycleAwareEntity extends LifecycleAwarePersistentEntity {}
 
     @Data
     @EqualsAndHashCode(callSuper = true)

@@ -1,26 +1,18 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState} from 'react';
 import PropTypes from 'prop-types';
-import {
-    Button,
-    CircularProgress,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Typography
-} from "@mui/material";
+import {Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Typography} from '@mui/material';
 
-import {generateUuid, getLabel, isValidLinkedDataIdentifier} from "./metadataUtils";
-import {getFirstPredicateId, getFirstPredicateValue} from "./jsonLdUtils";
-import * as consts from "../../constants";
-import LinkedDataIdentifierField from "./LinkedDataIdentifierField";
+import {generateUuid, getLabel, isValidLinkedDataIdentifier} from './metadataUtils';
+import {getFirstPredicateId, getFirstPredicateValue} from './jsonLdUtils';
+import * as consts from '../../constants';
+import LinkedDataIdentifierField from './LinkedDataIdentifierField';
 import useFormData from './UseFormData';
 import LinkedDataEntityForm from './LinkedDataEntityForm';
-import LinkedDataContext from "../LinkedDataContext";
-import useFormSubmission from "./UseFormSubmission";
-import useNavigationBlocker from "../../common/hooks/UseNavigationBlocker";
-import {getPropertiesForNodeShape} from "./vocabularyUtils";
-import ConfirmationDialog from "../../common/components/ConfirmationDialog";
+import LinkedDataContext from '../LinkedDataContext';
+import useFormSubmission from './UseFormSubmission';
+import useNavigationBlocker from '../../common/hooks/UseNavigationBlocker';
+import {getPropertiesForNodeShape} from './vocabularyUtils';
+import ConfirmationDialog from '../../common/components/ConfirmationDialog';
 
 const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, onCreate = () => {}}) => {
     const [localPart, setLocalPart] = useState(requireIdentifier ? generateUuid() : '');
@@ -48,15 +40,25 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
     // Apply context-specific logic to the properties and filter on visibility
     const extendedProperties = extendProperties({properties, isEntityEditable: true});
 
-    const {addValue, updateValue, deleteValue,
-        getUpdates, valuesWithUpdates,
-        validateAll, validationErrors, isValid,
-        hasFormUpdates, clearForm} = useFormData({}, extendedProperties);
-    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(!formSubmitted && hasFormUpdates);
+    const {
+        addValue,
+        updateValue,
+        deleteValue,
+        getUpdates,
+        valuesWithUpdates,
+        validateAll,
+        validationErrors,
+        isValid,
+        hasFormUpdates,
+        clearForm
+    } = useFormData({}, extendedProperties);
+    const {confirmationShown, hideConfirmation, showConfirmation} = useNavigationBlocker(
+        !formSubmitted && hasFormUpdates
+    );
 
     const {isUpdating, submitForm} = useFormSubmission(
-        () => createLinkedDataEntity(getIdentifier(), getUpdates(), type)
-            .then(result => {
+        () =>
+            createLinkedDataEntity(getIdentifier(), getUpdates(), type).then(result => {
                 clearForm();
                 setFormSubmitted(true);
                 onCreate(result);
@@ -66,14 +68,14 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
 
     const typeLabel = getLabel(shape);
 
-    const createEntity = (event) => {
+    const createEntity = event => {
         if (event) event.stopPropagation();
 
         const hasErrors = validateAll(extendedProperties);
         if (!hasErrors) submitForm(typeLabel);
     };
 
-    const handleCloseDialog = (e) => {
+    const handleCloseDialog = e => {
         if (e) e.stopPropagation();
         if (hasFormUpdates) {
             showConfirmation();
@@ -135,9 +137,7 @@ const NewLinkedDataEntityDialog = ({shape, requireIdentifier = true, onClose, on
                     <Typography variant="h5">{typeLabel}</Typography>
                     <Typography variant="subtitle1">{typeDescription}</Typography>
                 </DialogTitle>
-                <DialogContent style={{overflowX: 'hidden'}}>
-                    {renderDialogContent()}
-                </DialogContent>
+                <DialogContent style={{overflowX: 'hidden'}}>{renderDialogContent()}</DialogContent>
                 <DialogActions>
                     <Button
                         data-testid="submit-button"

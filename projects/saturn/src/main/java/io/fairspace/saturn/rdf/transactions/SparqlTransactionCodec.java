@@ -1,5 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import java.io.*;
+
 import org.apache.jena.atlas.io.IndentedLineBuffer;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.core.Prologue;
@@ -9,8 +11,6 @@ import org.apache.jena.sparql.serializer.SerializationContext;
 import org.apache.jena.sparql.util.NodeToLabelMap;
 import org.apache.jena.update.Update;
 import org.apache.jena.update.UpdateFactory;
-
-import java.io.*;
 
 import static java.lang.Long.parseLong;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -52,7 +52,7 @@ public class SparqlTransactionCodec implements TransactionCodec {
             }
 
             private void save(Update update) throws IOException {
-                var buff = new IndentedLineBuffer() ;
+                var buff = new IndentedLineBuffer();
                 var sc = new SerializationContext(PROLOGUE, new NodeToLabelMap("b", true));
                 UpdateWriter.output(update, buff, sc);
                 writer.append(buff.toString().replace('\n', ' ')).append(";\n");
@@ -108,7 +108,8 @@ public class SparqlTransactionCodec implements TransactionCodec {
                 for (var update : UpdateFactory.create(line)) {
                     if (update instanceof UpdateDataDelete) {
                         for (var quad : ((UpdateDataDelete) update).getQuads()) {
-                            listener.onDelete(quad.getGraph(), quad.getSubject(), quad.getPredicate(), quad.getObject());
+                            listener.onDelete(
+                                    quad.getGraph(), quad.getSubject(), quad.getPredicate(), quad.getObject());
                         }
                     } else if (update instanceof UpdateDataInsert) {
                         for (var quad : ((UpdateDataInsert) update).getQuads()) {

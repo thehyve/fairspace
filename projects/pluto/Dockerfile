@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:21
 
 ADD build/distributions/pluto-boot-*.tar /opt/
 # Requires the contents of ../mercury/build to be copied to build/mercury

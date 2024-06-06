@@ -1,9 +1,10 @@
 package io.fairspace.saturn.services.errors;
 
-import io.fairspace.saturn.vocabulary.FS;
 import ioinformarics.oss.jackson.module.jsonld.annotation.JsonldProperty;
 import ioinformarics.oss.jackson.module.jsonld.annotation.JsonldType;
 import lombok.Value;
+
+import io.fairspace.saturn.vocabulary.FS;
 
 @Value
 @JsonldType(FS.ERROR_URI)

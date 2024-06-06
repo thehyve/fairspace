@@ -1,8 +1,8 @@
 import React from 'react';
-import {AdapterDateFns} from "@mui/x-date-pickers/AdapterDateFns";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {DatePicker} from "@mui/x-date-pickers/DatePicker";
-import {TextField} from "@mui/material";
+import {AdapterDateFns} from '@mui/x-date-pickers/AdapterDateFns';
+import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
+import {DatePicker} from '@mui/x-date-pickers/DatePicker';
+import {TextField} from '@mui/material';
 import {format} from 'date-fns';
 
 import {DATE_FORMAT} from '../../../constants';
@@ -20,7 +20,7 @@ class DateValue extends React.Component {
         }
     }
 
-    handleChange = (date) => {
+    handleChange = date => {
         // Formatting is required because the backend expect the date with no time
         const value = date && format(date, 'yyyy-MM-dd', {awareOfUnicodeTokens: true});
         this.props.onChange({value});
@@ -34,11 +34,11 @@ class DateValue extends React.Component {
         return (
             <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker
-                    format={DATE_FORMAT}
+                    inputFormat={DATE_FORMAT}
                     invalidDateMessage="Invalid date format"
                     value={this.state.value}
                     onChange={this.handleChange}
-                    renderInput={(params) => <TextField {...params} />}
+                    renderInput={params => <TextField {...params} />}
                 />
             </LocalizationProvider>
         );
@@ -46,7 +46,7 @@ class DateValue extends React.Component {
 }
 
 DateValue.defaultProps = {
-    entry: {value: undefined},
+    entry: {value: undefined}
 };
 
 export default DateValue;

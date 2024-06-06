@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useState} from 'react';
 
 export const useFormField = (initialValue, validator) => {
     const [value, setValue] = useState(initialValue);
@@ -13,6 +13,6 @@ export const useFormField = (initialValue, validator) => {
         setValue,
         valid: validator(value),
         touched,
-        declareTouched,
+        declareTouched
     };
 };

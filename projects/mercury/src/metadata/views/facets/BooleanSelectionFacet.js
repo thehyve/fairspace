@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import useDeepCompareEffect from "use-deep-compare-effect";
-import {ToggleButton, ToggleButtonGroup} from "@mui/material";
-import type {MetadataViewFacetProperties} from "../MetadataViewFacetFactory";
+import useDeepCompareEffect from 'use-deep-compare-effect';
+import {ToggleButton, ToggleButtonGroup} from '@mui/material';
+import type {MetadataViewFacetProperties} from '../MetadataViewFacetFactory';
 
 const BooleanSelectionFacet = (props: MetadataViewFacetProperties) => {
     const {onChange = () => {}, activeFilterValues = [], classes} = props;
@@ -26,18 +26,15 @@ const BooleanSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     return (
         <div className={classes.booleanContent}>
-            <ToggleButtonGroup
-                size="small"
-                value={booleanFilterValue}
-                fullWidth
-                exclusive
-                onChange={handleChange}
-            >
-                <ToggleButton color="success" variant="contained" value="true">True</ToggleButton>
-                <ToggleButton color="error" variant="contained" value="false">False</ToggleButton>
+            <ToggleButtonGroup size="small" value={booleanFilterValue} fullWidth exclusive onChange={handleChange}>
+                <ToggleButton color="success" variant="contained" value="true">
+                    True
+                </ToggleButton>
+                <ToggleButton color="error" variant="contained" value="false">
+                    False
+                </ToggleButton>
             </ToggleButtonGroup>
         </div>
-
     );
 };
 
