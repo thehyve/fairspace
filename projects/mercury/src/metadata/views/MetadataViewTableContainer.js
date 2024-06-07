@@ -70,7 +70,7 @@ const styles = theme => ({
     },
     tableContents: {
         minHeight: '200px',
-        maxHeight: 'calc(100vh - 310px)',
+        maxHeight: 'calc(100vh - 250px)',
         overflowY: 'auto',
         overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {

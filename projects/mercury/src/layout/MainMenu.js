@@ -19,7 +19,8 @@ import {COLORS} from '../App.theme';
 const styles = theme => ({
     buttonStack: {
         paddingLeft: 20,
-        paddingRight: 20
+        paddingRight: 20,
+        overflowY: 'auto'
     },
     buttonStackCollapsed: {
         paddingLeft: 10,

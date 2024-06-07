@@ -25,6 +25,10 @@ const globalTheme = createTheme({
         },
         background: {
             default: '#eef0eb'
+        },
+        text: {
+            primary: COLORS.fsBlueDark,
+            secondary: COLORS.fsBlueMedium
         }
     },
     shape: {
@@ -32,7 +36,7 @@ const globalTheme = createTheme({
     }
 });
 
-const scrollbarStyles = {
+export const scrollbarStyles = {
     '&::-webkit-scrollbar': {
         width: '0.3em',
         height: '0.3em'
@@ -221,6 +225,13 @@ export default createTheme({
             }
         },
         MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    ...scrollbarStyles
+                }
+            }
+        },
+        MuiTablePagination: {
             styleOverrides: {
                 root: {
                     ...scrollbarStyles

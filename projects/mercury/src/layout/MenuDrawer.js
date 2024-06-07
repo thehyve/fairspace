@@ -23,7 +23,7 @@ const MenuDrawer = ({open, renderMenu, toggleMenuExpansion, onMouseEnter, onMous
                 <img src="/public/images/icon_white.png" alt="Fairspace" width="40" />
             )}
         </div>
-        <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <div className={classes.menu} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             {renderMenu(open)}
         </div>
         <div className={open ? classes.toolbar : classes.toolbarCollapsed}>

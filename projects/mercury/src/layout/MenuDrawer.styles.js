@@ -1,3 +1,5 @@
+import {scrollbarStyles} from '../App.theme';
+
 const styles = theme => ({
     drawerPaper: {
         position: 'fixed',
@@ -60,6 +62,10 @@ const styles = theme => ({
         position: 'absolute',
         bottom: 50,
         height: 100
+    },
+    menu: {
+        overflowY: 'auto',
+        ...scrollbarStyles
     }
 });
 
