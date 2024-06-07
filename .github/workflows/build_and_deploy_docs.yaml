@@ -1,0 +1,39 @@
+# This workflow is triggered on any PR's changes
+
+name: Build and deploy docs to Github Pages
+
+on:
+  push:
+    branches:
+      - bugfix/FAIRSPC-87
+
+
+jobs:
+  build-saturn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Set up Ruby (required for gem installation)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+
+      - name: Install Asciidoctor
+        run: |
+          gem install asciidoctor
+          gem install asciidoctor-pdf
+          gem install rouge
+
+      - name: Run Build Docs script
+        run: ./docs/build.sh
+
+      - name: Run Deploy Docs script
+        run: ./docs/deploy.sh
+
