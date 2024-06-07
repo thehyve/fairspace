@@ -14,12 +14,13 @@ import ExternalMetadataSourceContext from '../metadata/metadata-sources/External
 import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
 import {getExternalMetadataSourcePathPrefix} from '../metadata/external-views/externalMetadataSourceUtils';
 import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
-import {COLORS} from '../App.theme';
+import {COLORS, scrollbarStyles} from '../App.theme';
 
 const styles = theme => ({
     buttonStack: {
         paddingLeft: 20,
-        paddingRight: 20
+        paddingRight: 20,
+        overflowY: 'auto'
     },
     buttonStackCollapsed: {
         paddingLeft: 10,
