@@ -1,7 +1,6 @@
 package io.fairspace.saturn.config;
 
-import javax.servlet.FilterConfig;
-
+import jakarta.servlet.FilterConfig;
 import spark.servlet.SparkApplication;
 import spark.servlet.SparkFilter;
 

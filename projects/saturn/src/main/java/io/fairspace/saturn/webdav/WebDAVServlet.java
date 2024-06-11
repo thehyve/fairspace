@@ -3,9 +3,6 @@ package io.fairspace.saturn.webdav;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import io.milton.config.HttpManagerBuilder;
 import io.milton.event.ResponseEvent;
@@ -15,13 +12,16 @@ import io.milton.http.webdav.ResourceTypeHelper;
 import io.milton.http.webdav.WebDavResponseHandler;
 import io.milton.resource.Resource;
 import io.milton.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.jena.rdf.model.Literal;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
-import static io.fairspace.saturn.App.API_PREFIX;
+import static io.fairspace.saturn.FusekiConfig.API_PREFIX;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 
@@ -31,6 +31,7 @@ import static io.milton.servlet.MiltonServlet.setThreadlocals;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.eclipse.jetty.server.Request.extractQueryParameters;
 
 /**
  * Ensures that all operations are handled in one transaction.
@@ -123,27 +124,31 @@ public class WebDAVServlet extends HttpServlet {
 
     public static Integer fileVersion() {
         return Optional.ofNullable(getCurrentRequest())
-                .map(r -> (isEmpty(r.getParameter("version")) ? r.getHeader("Version") : r.getParameter("version")))
+                .map(r -> (isEmpty(extractQueryParameters(r).getValue("version"))
+                        ? r.getHeaders().get("Version")
+                        : extractQueryParameters(r).getValue("version")))
                 .map(Integer::parseInt)
                 .orElse(null);
     }
 
     public static String owner() {
         return Optional.ofNullable(getCurrentRequest())
-                .map(r -> r.getHeader("Owner"))
+                .map(r -> r.getHeaders().get("Owner"))
                 .orElse(null);
     }
 
     public static boolean showDeleted() {
-        return "on".equalsIgnoreCase(getCurrentRequest().getHeader("Show-Deleted"));
+        return "on".equalsIgnoreCase(getCurrentRequest().getHeaders().get("Show-Deleted"));
     }
 
     public static boolean includeMetadataLinks() {
-        return "true".equalsIgnoreCase(getCurrentRequest().getHeader("With-Metadata-Links"));
+        return "true".equalsIgnoreCase(getCurrentRequest().getHeaders().get("With-Metadata-Links"));
     }
 
     public static boolean isMetadataRequest() {
-        return (API_PREFIX + "/metadata/").equalsIgnoreCase(getCurrentRequest().getServletPath());
+        // todo: test the change
+        return (API_PREFIX + "/metadata/")
+                .equalsIgnoreCase(getCurrentRequest().getHttpURI().getCanonicalPath());
     }
 
     public static BlobInfo getBlob() {

@@ -17,10 +17,10 @@ import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static java.lang.Boolean.FALSE;
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.delete;

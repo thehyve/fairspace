@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        jena_version = '4.10.0' // todo: upgrade to 5+ (FAIRSPC-69)
-        milton_version = '3.1.1.488' // Milton >= 4 is migrated to Jakarta EE 9, which is not compatible with Jena < 5 (no stable release of Jena 5 yet). To be updated when Jena 5 is released.
+        jena_version = '5.0.0'
+        milton_version = '4.0.2.2101' // Milton >= 4 is migrated to Jakarta EE 9, which is not compatible with Jena < 5 (no stable release of Jena 5 yet). To be updated when Jena 5 is released.
         mockitoVersion = '5.11.0'
         jacksonVersion = '2.15.3' // check what version is used by Jena
         postgresqlVersion = '42.7.2'
@@ -10,6 +10,8 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
     id "io.freefair.lombok" version "8.6"
     id 'application'
     id 'jacoco'
@@ -38,21 +40,23 @@ repositories {
     }
 }
 
-lombok.version = "1.18.30"
+lombok.version = "1.18.32"
 
 jacoco.toolVersion = "0.8.11"
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: '*.jar') // jena-fuseki-server-*.jar jena-text-es-*.jar
-    implementation "org.apache.jena:jena-fuseki-main:${jena_version}"
+    implementation 'org.springframework.boot:spring-boot-starter-oath2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     implementation "org.apache.jena:jena-text:${jena_version}"
     implementation "io.milton:milton-server-ce:${milton_version}"
+
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
-    implementation "com.sparkjava:spark-core:2.9.4"
+
+    implementation "org.zoomba-lang:spark-core:3.0" // todo: to be replaced with Spring MVC
     implementation 'com.pivovarit:throwing-function:1.5.1'
     implementation 'com.google.guava:guava:33.0.0-jre'
-//    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0' // To be updated when Jena 5 is released.
     implementation('com.io-informatics.oss:jackson-jsonld:0.1.1') {
         exclude group: 'com.github.jsonld-java'
     }
@@ -60,9 +64,8 @@ dependencies {
 
     implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.23.0'
 
-    implementation 'org.eclipse.jetty:jetty-proxy:9.4.54.v20240208'
+    implementation 'org.eclipse.jetty:jetty-proxy:9.4.54.v20240208' // todo: remove
 
-    implementation 'org.keycloak:keycloak-jetty94-adapter:23.0.7'
     implementation 'org.keycloak:keycloak-admin-client:23.0.7'
     implementation 'org.keycloak:keycloak-policy-enforcer:23.0.7'
 

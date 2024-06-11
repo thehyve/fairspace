@@ -5,7 +5,7 @@ import io.fairspace.saturn.services.BaseApp;
 
 import static io.fairspace.saturn.auth.RequestContext.getIdTokenString;
 
-import static javax.servlet.http.HttpServletResponse.SC_SEE_OTHER;
+import static jakarta.servlet.http.HttpServletResponse.SC_SEE_OTHER;
 import static spark.Spark.get;
 
 public class LogoutApp extends BaseApp {

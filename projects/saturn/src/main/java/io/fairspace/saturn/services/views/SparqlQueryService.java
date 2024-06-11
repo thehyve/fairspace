@@ -1,15 +1,36 @@
 package io.fairspace.saturn.services.views;
 
-import java.time.*;
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-import lombok.extern.log4j.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.query.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryCancelledException;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.sparql.expr.*;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_GreaterThanOrEqual;
+import org.apache.jena.sparql.expr.E_LessThanOrEqual;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_OneOf;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.E_StrStartsWith;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
 
@@ -27,11 +48,17 @@ import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
-import static org.apache.jena.sparql.expr.NodeValue.*;
+import static org.apache.jena.sparql.expr.NodeValue.makeBoolean;
+import static org.apache.jena.sparql.expr.NodeValue.makeDate;
+import static org.apache.jena.sparql.expr.NodeValue.makeDecimal;
+import static org.apache.jena.sparql.expr.NodeValue.makeNode;
 import static org.apache.jena.sparql.expr.NodeValue.makeString;
 import static org.apache.jena.system.Txn.calculateRead;
 
@@ -60,34 +87,37 @@ public class SparqlQueryService implements QueryService {
 
         log.debug("Query with filters and pagination applied: \n{}", query);
 
-        var selectExecution = QueryExecutionFactory.create(query, ds);
-        selectExecution.setTimeout(config.pageRequestTimeout);
+        try (var selectExecution = QueryExecution.create()
+                .dataset(ds)
+                .query(query)
+                .timeout(config.countRequestTimeout)
+                .build()) {
+            return calculateRead(ds, () -> {
+                var iris = new ArrayList<Resource>();
+                var timeout = false;
+                var hasNext = false;
+                try (selectExecution) {
+                    var rs = selectExecution.execSelect();
+                    rs.forEachRemaining(row -> iris.add(row.getResource(request.getView())));
+                } catch (QueryCancelledException e) {
+                    timeout = true;
+                }
+                while (iris.size() > size) {
+                    iris.remove(iris.size() - 1);
+                    hasNext = true;
+                }
 
-        return calculateRead(ds, () -> {
-            var iris = new ArrayList<Resource>();
-            var timeout = false;
-            var hasNext = false;
-            try (selectExecution) {
-                var rs = selectExecution.execSelect();
-                rs.forEachRemaining(row -> iris.add(row.getResource(request.getView())));
-            } catch (QueryCancelledException e) {
-                timeout = true;
-            }
-            while (iris.size() > size) {
-                iris.remove(iris.size() - 1);
-                hasNext = true;
-            }
+                var rows = iris.stream()
+                        .map(resource -> fetch(resource, request.getView()))
+                        .collect(toList());
 
-            var rows = iris.stream()
-                    .map(resource -> fetch(resource, request.getView()))
-                    .collect(toList());
-
-            return ViewPageDTO.builder()
-                    .rows(rows)
-                    .hasNext(hasNext)
-                    .timeout(timeout)
-                    .build();
-        });
+                return ViewPageDTO.builder()
+                        .rows(rows)
+                        .hasNext(hasNext)
+                        .timeout(timeout)
+                        .build();
+            });
+        }
     }
 
     private Map<String, Set<ValueDTO>> fetch(Resource resource, String viewName) {
@@ -380,19 +410,22 @@ public class SparqlQueryService implements QueryService {
 
         log.debug("Querying the total number of matches: \n{}", query);
 
-        var execution = QueryExecutionFactory.create(query, ds);
-        execution.setTimeout(config.countRequestTimeout);
-
-        return calculateRead(ds, () -> {
-            long count = 0;
-            try (execution) {
-                for (var it = execution.execSelect(); it.hasNext(); it.next()) {
-                    count++;
+        try (var execution = QueryExecution.create()
+                .dataset(ds)
+                .query(query)
+                .timeout(config.countRequestTimeout)
+                .build()) {
+            return calculateRead(ds, () -> {
+                long count = 0;
+                try (execution) {
+                    for (var it = execution.execSelect(); it.hasNext(); it.next()) {
+                        count++;
+                    }
+                    return new CountDTO(count, false);
+                } catch (QueryCancelledException e) {
+                    return new CountDTO(count, true);
                 }
-                return new CountDTO(count, false);
-            } catch (QueryCancelledException e) {
-                return new CountDTO(count, true);
-            }
-        });
+            });
+        }
     }
 }

@@ -1,12 +1,12 @@
 package io.fairspace.saturn.rdf.transactions;
 
 import com.pivovarit.function.ThrowingRunnable;
-import lombok.extern.log4j.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.TxnType;
+import org.apache.jena.query.text.changes.TextQuadAction;
 import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.QuadAction;
 import org.keycloak.representations.AccessToken;
 
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
@@ -32,7 +32,7 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
      * Collects changes
      */
     @Override
-    protected void onChange(QuadAction action, Node graph, Node subject, Node predicate, Node object) {
+    protected void onChange(TextQuadAction action, Node graph, Node subject, Node predicate, Node object) {
         critical(() -> {
             var currentUser = getAccessToken();
             if (currentUser != user) {

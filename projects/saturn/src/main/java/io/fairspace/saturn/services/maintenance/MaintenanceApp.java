@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.maintenance;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static javax.servlet.http.HttpServletResponse.*;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static spark.Spark.post;
 
 public class MaintenanceApp extends BaseApp {

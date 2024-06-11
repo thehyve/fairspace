@@ -2,7 +2,7 @@ package io.fairspace.saturn.services.workspaces;
 
 import io.fairspace.saturn.services.BaseApp;
 
-import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.*;

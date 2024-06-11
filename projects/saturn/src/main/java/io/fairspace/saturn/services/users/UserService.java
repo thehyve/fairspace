@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.users;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;
-import javax.servlet.ServletException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -25,7 +24,6 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 
@@ -161,12 +159,13 @@ public class UserService {
         return users;
     }
 
+    // todo: implement logout
     public void logoutCurrent() {
-        try {
-            getCurrentRequest().logout();
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        }
+        //        try {
+        //            getCurrentRequest().logout();
+        //        } catch (ServletException e) {
+        //            throw new RuntimeException(e);
+        //        }
     }
 
     public void update(UserRolesUpdate roles) {
