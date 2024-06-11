@@ -1900,7 +1900,8 @@ Multiple external Fairspace metadata pages can be configured simultaneously. A l
 | String to be used as a display name of the metadata source.
 | ``url``
 | Fairspace instance to connect to. If the url is not specified, the metadata source will be treated as the internal one.
-| *Important!* There should only be a single configuration of internal metadata (only the first one will not be ignored).
+
+*Important!* There should only be a single configuration of internal metadata (only the first one will not be ignored).
 | ``icon-name``
 | Name of an icon configured in the "icons" section of values.yaml file. If the name is not specified, there will be a default icon used.
 |===
