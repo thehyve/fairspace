@@ -3,7 +3,6 @@ package io.fairspace.saturn.services.users;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;
-import javax.servlet.ServletException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -13,8 +12,6 @@ import lombok.extern.log4j.*;
 import org.apache.commons.lang3.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.util.Symbol;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.UsersResource;
 
 import io.fairspace.saturn.auth.RequestContext;
@@ -25,11 +22,9 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.AccessDeniedException;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
 
-import static java.lang.System.getenv;
 import static java.util.stream.Collectors.toMap;
 
 @Log4j2
@@ -49,26 +44,9 @@ public class UserService {
                 .build(new CacheLoader<>() {
                     @Override
                     public Map<Node, User> load(Boolean key) {
-                        return fetchUsers();
+                        return fetchAndUpdateUsers();
                     }
                 });
-    }
-
-    public UserService(Config.Auth config, Transactions transactions) {
-        this(
-                config,
-                transactions,
-                KeycloakBuilder.builder()
-                        .serverUrl(config.authServerUrl)
-                        .realm(config.realm)
-                        .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                        .clientId(config.clientId)
-                        .clientSecret(getenv("KEYCLOAK_CLIENT_SECRET"))
-                        .username(config.clientId)
-                        .password(getenv("KEYCLOAK_CLIENT_SECRET"))
-                        .build()
-                        .realm(config.realm)
-                        .users());
     }
 
     public Collection<User> getUsers() {
@@ -92,7 +70,11 @@ public class UserService {
         return Symbol.create(uri);
     }
 
-    private Map<Node, User> fetchUsers() {
+    /**
+     * Fetches users from Keycloak and updates the users in the database
+     * if a user does not exist or if the user details have changed.
+     */
+    private Map<Node, User> fetchAndUpdateUsers() {
         var userCount = usersResource.count();
         var keycloakUsers = usersResource.list(0, userCount);
         var updated = new HashSet<User>();
@@ -161,12 +143,13 @@ public class UserService {
         return users;
     }
 
+    // todo: implement logout
     public void logoutCurrent() {
-        try {
-            getCurrentRequest().logout();
-        } catch (ServletException e) {
-            throw new RuntimeException(e);
-        }
+        //        try {
+        //            getCurrentRequest().logout();
+        //        } catch (ServletException e) {
+        //            throw new RuntimeException(e);
+        //        }
     }
 
     public void update(UserRolesUpdate roles) {

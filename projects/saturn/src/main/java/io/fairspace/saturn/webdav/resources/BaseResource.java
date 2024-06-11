@@ -17,6 +17,7 @@ import io.milton.property.PropertySource.PropertySetException;
 import io.milton.resource.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACL;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;

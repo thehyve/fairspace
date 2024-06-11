@@ -91,7 +91,11 @@ public class Config {
     @AllArgsConstructor
     public static class CacheConfig {
         public String name;
+
+        @Builder.Default
         public boolean autoRefreshEnabled = false;
+
+        @Builder.Default
         public Long refreshFrequencyInHours = 240L;
     }
 

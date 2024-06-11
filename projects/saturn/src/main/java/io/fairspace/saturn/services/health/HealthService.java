@@ -1,7 +1,7 @@
 package io.fairspace.saturn.services.health;
 
 import java.util.Collections;
-import javax.sql.*;
+import javax.sql.DataSource;
 
 public class HealthService {
     private final DataSource dataSource;
@@ -10,6 +10,7 @@ public class HealthService {
         this.dataSource = dataSource;
     }
 
+    // todo: customize the health check with the logic
     public Health getHealth() {
         Health health = new Health();
         if (dataSource != null) {

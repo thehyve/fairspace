@@ -1,5 +1,5 @@
 # Application's port
-port: 8090
+#port: 8090
 livenessPort: 8091
 publicUrl: http://localhost:8080
 jena:
@@ -36,14 +36,14 @@ jena:
   # Path of the transaction log
   transactionLogPath: "data/log"
   bulkTransactions: true
-auth:
-  authServerUrl: http://localhost:5100/
-  realm: fairspace
-  clientId: workspace-client
-  enableBasicAuth: true
-  superAdminUser: organisation-admin
-  defaultUserRoles:
-    - canViewPublicMetadata
+#auth:
+#  authServerUrl: http://localhost:5100/
+#  realm: fairspace
+#  clientId: workspace-client
+#  enableBasicAuth: true
+#  superAdminUser: organisation-admin
+#  defaultUserRoles:
+#    - canViewPublicMetadata
 webDAV:
   # Path of the WebDAV's local blob store
   blobStorePath: "data/blobs"

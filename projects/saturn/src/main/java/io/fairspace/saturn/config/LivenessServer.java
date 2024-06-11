@@ -1,7 +1,6 @@
 package io.fairspace.saturn.config;
 
-import javax.servlet.http.*;
-
+import jakarta.servlet.http.*;
 import lombok.extern.log4j.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.*;

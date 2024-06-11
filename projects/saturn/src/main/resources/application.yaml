@@ -1,0 +1,25 @@
+server:
+  port: 8090
+
+# Configuration to access the Keycloak server (user lists, user count, etc.)
+keycloak:
+  auth-server-url: http://localhost:5100
+  realm: fairspace
+  client-id: workspace-client
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:**********}
+
+# Configuration of Saturn as a resource server
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${keycloak.auth-server-url}/realms/fairspace
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+# Configuration for JWT token conversion
+jwt:
+  auth:
+    converter:
+      resource-id: workspace-client
+      principal-attribute: preferred_username

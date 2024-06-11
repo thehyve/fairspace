@@ -1,0 +1,3437 @@
+@prefix fs: <https://fairspace.nl/ontology#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix curie: <https://institut-curie.org/ontology#> .
+@prefix icdo3t: <https://bioportal.bioontology.org/ontologies/ICD-O-3-T/> .
+@prefix icdo3m: <https://bioportal.bioontology.org/ontologies/ICD-O-3-M/> .
+@prefix gender: <http://hl7.org/fhir/administrative-gender#> .
+@prefix ncbitaxon: <https://bioportal.bioontology.org/ontologies/NCBITAXON/> .
+@prefix evs: <http://ncicb.nci.nih.gov/xml/owl/EVS/Thesaurus.owl#> .
+@prefix workspaceType: <https://institut-curie.org/workspace-type#> .
+@prefix availabilityForResearch: <https://institut-curie.org/availabilityForResearch#> .
+@prefix consentAnswer: <https://institut-curie.org/consentAnswer#> .
+@prefix tumorGradeValue: <https://institut-curie.org/tumorGradeValue#> .
+@prefix tnmT: <https://institut-curie.org/TNM-T#> .
+@prefix tnmN: <https://institut-curie.org/TNM-N#> .
+@prefix tnmM: <https://institut-curie.org/TNM-M#> .
+@prefix osiris: <https://institut-curie.org/osiris#> .
+
+fs:File rdfs:label "File" .
+fs:Directory rdfs:label "Directory" .
+fs:Collection rdfs:label "Collection" .
+fs:Workspace rdfs:label "Workspace" .
+
+workspaceType:personal a curie:WorkspaceType ;
+  rdfs:label "Personal" .
+workspaceType:researchProject a curie:WorkspaceType ;
+  rdfs:label "Research project" .
+workspaceType:clinicalTrial a curie:WorkspaceType ;
+  rdfs:label "Clinical trial" .
+workspaceType:team a curie:WorkspaceType ;
+  rdfs:label "Team" .
+
+gender:male a curie:Gender ;
+  rdfs:label "Male" .
+gender:female a curie:Gender ;
+  rdfs:label "Female" .
+gender:undifferentiated a curie:Gender ;
+  rdfs:label "Undifferentiated" .
+
+availabilityForResearch:yes a curie:AvailabilityForResearch ;
+  rdfs:label "Yes" .
+availabilityForResearch:yesAfterPatientInformation a curie:AvailabilityForResearch ;
+  rdfs:label "Yes after patient information" .
+availabilityForResearch:no a curie:AvailabilityForResearch ;
+  rdfs:label "No" .
+
+consentAnswer:yes a curie:ConsentAnswer ;
+  rdfs:label "Yes" .
+consentAnswer:no a curie:ConsentAnswer ;
+  rdfs:label "No" .
+consentAnswer:noInformation a curie:ConsentAnswer ;
+  rdfs:label "No information" .
+
+icdo3t:C00 a curie:Topography ;
+  rdfs:label "LIP" .
+icdo3t:C00.0 a curie:Topography ;
+  rdfs:label "External upper lip" .
+icdo3t:C00.1 a curie:Topography ;
+  rdfs:label "External lower lip" .
+icdo3t:C00.2 a curie:Topography ;
+  rdfs:label "External lip, NOS" .
+icdo3t:C00.3 a curie:Topography ;
+  rdfs:label "Mucosa of upper lip" .
+icdo3t:C00.4 a curie:Topography ;
+  rdfs:label "Mucosa of lower lip" .
+icdo3t:C00.5 a curie:Topography ;
+  rdfs:label "Mucosa of lip, NOS" .
+icdo3t:C00.6 a curie:Topography ;
+  rdfs:label "Commissure of lip" .
+icdo3t:C00.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of lip" .
+icdo3t:C00.9 a curie:Topography ;
+  rdfs:label "Lip, NOS" .
+icdo3t:C01 a curie:Topography ;
+  rdfs:label "BASE OF TONGUE" .
+icdo3t:C01.9 a curie:Topography ;
+  rdfs:label "Base of tongue, NOS" .
+icdo3t:C02 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED PARTS OF TONGUE" .
+icdo3t:C02.0 a curie:Topography ;
+  rdfs:label "Dorsal surface of tongue, NOS" .
+icdo3t:C02.1 a curie:Topography ;
+  rdfs:label "Border of tongue" .
+icdo3t:C02.2 a curie:Topography ;
+  rdfs:label "Ventral surface of tongue, NOS" .
+icdo3t:C02.3 a curie:Topography ;
+  rdfs:label "Anterior 2/3 of tongue, NOS" .
+icdo3t:C02.4 a curie:Topography ;
+  rdfs:label "Lingual tonsil" .
+icdo3t:C02.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of tongue" .
+icdo3t:C02.9 a curie:Topography ;
+  rdfs:label "Tongue, NOS" .
+icdo3t:C03 a curie:Topography ;
+  rdfs:label "GUM" .
+icdo3t:C03.0 a curie:Topography ;
+  rdfs:label "Upper gum" .
+icdo3t:C03.1 a curie:Topography ;
+  rdfs:label "Lower gum" .
+icdo3t:C03.9 a curie:Topography ;
+  rdfs:label "Gum, NOS" .
+icdo3t:C04 a curie:Topography ;
+  rdfs:label "FLOOR OF MOUTH" .
+icdo3t:C04.0 a curie:Topography ;
+  rdfs:label "Anterior floor of mouth" .
+icdo3t:C04.1 a curie:Topography ;
+  rdfs:label "Lateral floor of mouth" .
+icdo3t:C04.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of floor of mouth" .
+icdo3t:C04.9 a curie:Topography ;
+  rdfs:label "Floor of mouth, NOS" .
+icdo3t:C05 a curie:Topography ;
+  rdfs:label "PALATE" .
+icdo3t:C05.0 a curie:Topography ;
+  rdfs:label "Hard palate" .
+icdo3t:C05.1 a curie:Topography ;
+  rdfs:label "Soft palate, NOS" .
+icdo3t:C05.2 a curie:Topography ;
+  rdfs:label "Uvula" .
+icdo3t:C05.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of palate" .
+icdo3t:C05.9 a curie:Topography ;
+  rdfs:label "Palate, NOS" .
+icdo3t:C06 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED PARTS OF MOUTH" .
+icdo3t:C06.0 a curie:Topography ;
+  rdfs:label "Cheek mucosa" .
+icdo3t:C06.1 a curie:Topography ;
+  rdfs:label "Vestibule of mouth" .
+icdo3t:C06.2 a curie:Topography ;
+  rdfs:label "Retromolar area" .
+icdo3t:C06.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of other and unspecified parts of mouth" .
+icdo3t:C06.9 a curie:Topography ;
+  rdfs:label "Mouth, NOS" .
+icdo3t:C07 a curie:Topography ;
+  rdfs:label "PAROTID GLAND" .
+icdo3t:C07.9 a curie:Topography ;
+  rdfs:label "Parotid gland" .
+icdo3t:C08 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED MAJOR SALIVARY GLANDS" .
+icdo3t:C08.0 a curie:Topography ;
+  rdfs:label "Submandibular gland" .
+icdo3t:C08.1 a curie:Topography ;
+  rdfs:label "Sublingual gland" .
+icdo3t:C08.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of major salivary glands" .
+icdo3t:C08.9 a curie:Topography ;
+  rdfs:label "Major salivary gland, NOS" .
+icdo3t:C09 a curie:Topography ;
+  rdfs:label "TONSIL" .
+icdo3t:C09.0 a curie:Topography ;
+  rdfs:label "Tonsillar fossa" .
+icdo3t:C09.1 a curie:Topography ;
+  rdfs:label "Tonsillar pillar" .
+icdo3t:C09.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of tonsil" .
+icdo3t:C09.9 a curie:Topography ;
+  rdfs:label "Tonsil, NOS" .
+icdo3t:C10 a curie:Topography ;
+  rdfs:label "OROPHARYNX" .
+icdo3t:C10.0 a curie:Topography ;
+  rdfs:label "Vallecula" .
+icdo3t:C10.1 a curie:Topography ;
+  rdfs:label "Anterior surface of epiglottis" .
+icdo3t:C10.2 a curie:Topography ;
+  rdfs:label "Lateral wall of oropharynx" .
+icdo3t:C10.3 a curie:Topography ;
+  rdfs:label "Posterior wall of oropharynx" .
+icdo3t:C10.4 a curie:Topography ;
+  rdfs:label "Branchial cleft" .
+icdo3t:C10.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of oropharynx" .
+icdo3t:C10.9 a curie:Topography ;
+  rdfs:label "Oropharynx, NOS" .
+icdo3t:C11 a curie:Topography ;
+  rdfs:label "NASOPHARYNX" .
+icdo3t:C11.0 a curie:Topography ;
+  rdfs:label "Superior wall of nasopharynx" .
+icdo3t:C11.1 a curie:Topography ;
+  rdfs:label "Posterior wall of nasopharynx" .
+icdo3t:C11.2 a curie:Topography ;
+  rdfs:label "Lateral wall of nasopharynx" .
+icdo3t:C11.3 a curie:Topography ;
+  rdfs:label "Anterior wall of nasopharynx" .
+icdo3t:C11.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of nasopharynx" .
+icdo3t:C11.9 a curie:Topography ;
+  rdfs:label "Nasopharynx, NOS" .
+icdo3t:C12 a curie:Topography ;
+  rdfs:label "PYRIFORM SINUS" .
+icdo3t:C12.9 a curie:Topography ;
+  rdfs:label "Pyriform sinus" .
+icdo3t:C13 a curie:Topography ;
+  rdfs:label "HYPOPHARYNX" .
+icdo3t:C13.0 a curie:Topography ;
+  rdfs:label "Postcricoid region" .
+icdo3t:C13.1 a curie:Topography ;
+  rdfs:label "Hypopharyngeal aspect of aryepiglottic fold" .
+icdo3t:C13.2 a curie:Topography ;
+  rdfs:label "Posterior wall of hypopharynx" .
+icdo3t:C13.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of hypopharynx" .
+icdo3t:C13.9 a curie:Topography ;
+  rdfs:label "Hypopharynx, NOS" .
+icdo3t:C14 a curie:Topography ;
+  rdfs:label "OTHER AND ILL-DEFINED SITES IN LIP, ORAL CAVITY AND PHARYNX" .
+icdo3t:C14.0 a curie:Topography ;
+  rdfs:label "Pharynx, NOS" .
+icdo3t:C14.2 a curie:Topography ;
+  rdfs:label "Waldeyer ring" .
+icdo3t:C14.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of lip, oral cavity and pharynx" .
+icdo3t:C15 a curie:Topography ;
+  rdfs:label "ESOPHAGUS" .
+icdo3t:C15.0 a curie:Topography ;
+  rdfs:label "Cervical esophagus" .
+icdo3t:C15.1 a curie:Topography ;
+  rdfs:label "Thoracic esophagus" .
+icdo3t:C15.2 a curie:Topography ;
+  rdfs:label "Abdominal esophagus" .
+icdo3t:C15.3 a curie:Topography ;
+  rdfs:label "Upper third of esophagus" .
+icdo3t:C15.4 a curie:Topography ;
+  rdfs:label "Middle third of esophagus" .
+icdo3t:C15.5 a curie:Topography ;
+  rdfs:label "Lower third of esophagus" .
+icdo3t:C15.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of esophagus" .
+icdo3t:C15.9 a curie:Topography ;
+  rdfs:label "Esophagus, NOS" .
+icdo3t:C16 a curie:Topography ;
+  rdfs:label "STOMACH" .
+icdo3t:C16.0 a curie:Topography ;
+  rdfs:label "Cardia, NOS" .
+icdo3t:C16.1 a curie:Topography ;
+  rdfs:label "Fundus of stomach" .
+icdo3t:C16.2 a curie:Topography ;
+  rdfs:label "Body of stomach" .
+icdo3t:C16.3 a curie:Topography ;
+  rdfs:label "Gastric antrum" .
+icdo3t:C16.4 a curie:Topography ;
+  rdfs:label "Pylorus" .
+icdo3t:C16.5 a curie:Topography ;
+  rdfs:label "Lesser curvature of stomach, NOS" .
+icdo3t:C16.6 a curie:Topography ;
+  rdfs:label "Greater curvature of stomach, NOS" .
+icdo3t:C16.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of stomach" .
+icdo3t:C16.9 a curie:Topography ;
+  rdfs:label "Stomach, NOS" .
+icdo3t:C17 a curie:Topography ;
+  rdfs:label "SMALL INTESTINE" .
+icdo3t:C17.0 a curie:Topography ;
+  rdfs:label "Duodenum" .
+icdo3t:C17.1 a curie:Topography ;
+  rdfs:label "Jejunum" .
+icdo3t:C17.2 a curie:Topography ;
+  rdfs:label "Ileum" .
+icdo3t:C17.3 a curie:Topography ;
+  rdfs:label "Meckel diverticulum" .
+icdo3t:C17.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of smallintestine" .
+icdo3t:C17.9 a curie:Topography ;
+  rdfs:label "Small intestine, NOS" .
+icdo3t:C18 a curie:Topography ;
+  rdfs:label "COLON" .
+icdo3t:C18.0 a curie:Topography ;
+  rdfs:label "Cecum" .
+icdo3t:C18.1 a curie:Topography ;
+  rdfs:label "Appendix" .
+icdo3t:C18.2 a curie:Topography ;
+  rdfs:label "Ascending colon" .
+icdo3t:C18.3 a curie:Topography ;
+  rdfs:label "Hepatic flexure of colon" .
+icdo3t:C18.4 a curie:Topography ;
+  rdfs:label "Transverse colon" .
+icdo3t:C18.5 a curie:Topography ;
+  rdfs:label "Splenic flexure of colon" .
+icdo3t:C18.6 a curie:Topography ;
+  rdfs:label "Descending colon" .
+icdo3t:C18.7 a curie:Topography ;
+  rdfs:label "Sigmoid colon" .
+icdo3t:C18.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of colon" .
+icdo3t:C18.9 a curie:Topography ;
+  rdfs:label "Colon, NOS" .
+icdo3t:C19 a curie:Topography ;
+  rdfs:label "RECTOSIGMOID JUNCTION" .
+icdo3t:C19.9 a curie:Topography ;
+  rdfs:label "Rectosigmoid junction" .
+icdo3t:C20 a curie:Topography ;
+  rdfs:label "RECTUM" .
+icdo3t:C20.9 a curie:Topography ;
+  rdfs:label "Rectum, NOS" .
+icdo3t:C21 a curie:Topography ;
+  rdfs:label "ANUS AND ANAL CANAL" .
+icdo3t:C21.0 a curie:Topography ;
+  rdfs:label "Anus, NOS" .
+icdo3t:C21.1 a curie:Topography ;
+  rdfs:label "Anal canal" .
+icdo3t:C21.2 a curie:Topography ;
+  rdfs:label "Cloacogenic zone" .
+icdo3t:C21.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of rectum, anus and anal canal" .
+icdo3t:C22 a curie:Topography ;
+  rdfs:label "LIVER AND INTRAHEPATIC BILE DUCTS" .
+icdo3t:C22.0 a curie:Topography ;
+  rdfs:label "Liver" .
+icdo3t:C22.1 a curie:Topography ;
+  rdfs:label "Intrahepatic bile duct" .
+icdo3t:C23 a curie:Topography ;
+  rdfs:label "GALLBLADDER" .
+icdo3t:C23.9 a curie:Topography ;
+  rdfs:label "Gallbladder" .
+icdo3t:C24 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED PARTS OF BILIARY TRACT" .
+icdo3t:C24.0 a curie:Topography ;
+  rdfs:label "Extrahepatic bile duct" .
+icdo3t:C24.1 a curie:Topography ;
+  rdfs:label "Ampulla of Vater" .
+icdo3t:C24.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of biliary tract Note:" .
+icdo3t:C24.9 a curie:Topography ;
+  rdfs:label "Biliary tract, NOS" .
+icdo3t:C25 a curie:Topography ;
+  rdfs:label "PANCREAS" .
+icdo3t:C25.0 a curie:Topography ;
+  rdfs:label "Head of pancreas" .
+icdo3t:C25.1 a curie:Topography ;
+  rdfs:label "Body of pancreas" .
+icdo3t:C25.2 a curie:Topography ;
+  rdfs:label "Tail of pancreas" .
+icdo3t:C25.3 a curie:Topography ;
+  rdfs:label "Pancreatic duct" .
+icdo3t:C25.4 a curie:Topography ;
+  rdfs:label "Islets of Langerhans" .
+icdo3t:C25.7 a curie:Topography ;
+  rdfs:label "Other specified parts of pancreas" .
+icdo3t:C25.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of pancreas" .
+icdo3t:C25.9 a curie:Topography ;
+  rdfs:label "Pancreas, NOS" .
+icdo3t:C26 a curie:Topography ;
+  rdfs:label "OTHER AND ILL-DEFINED DIGESTIVE ORGANS" .
+icdo3t:C26.0 a curie:Topography ;
+  rdfs:label "Intestinal tract, NOS" .
+icdo3t:C26.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of digestive system" .
+icdo3t:C26.9 a curie:Topography ;
+  rdfs:label "Gastrointestinal tract, NOS" .
+icdo3t:C30 a curie:Topography ;
+  rdfs:label "NASAL CAVITY AND MIDDLE EAR" .
+icdo3t:C30.0 a curie:Topography ;
+  rdfs:label "Nasal cavity" .
+icdo3t:C30.1 a curie:Topography ;
+  rdfs:label "Middle ear" .
+icdo3t:C31 a curie:Topography ;
+  rdfs:label "ACCESSORY SINUSES" .
+icdo3t:C31.0 a curie:Topography ;
+  rdfs:label "Maxillary sinus" .
+icdo3t:C31.1 a curie:Topography ;
+  rdfs:label "Ethmoid sinus" .
+icdo3t:C31.2 a curie:Topography ;
+  rdfs:label "Frontal sinus" .
+icdo3t:C31.3 a curie:Topography ;
+  rdfs:label "Sphenoid sinus" .
+icdo3t:C31.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of accessory sinuses" .
+icdo3t:C31.9 a curie:Topography ;
+  rdfs:label "Accessory sinus, NOS" .
+icdo3t:C32 a curie:Topography ;
+  rdfs:label "LARYNX" .
+icdo3t:C32.0 a curie:Topography ;
+  rdfs:label "Glottis" .
+icdo3t:C32.1 a curie:Topography ;
+  rdfs:label "Supraglottis" .
+icdo3t:C32.2 a curie:Topography ;
+  rdfs:label "Subglottis" .
+icdo3t:C32.3 a curie:Topography ;
+  rdfs:label "Laryngeal cartilage" .
+icdo3t:C32.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of larynx" .
+icdo3t:C32.9 a curie:Topography ;
+  rdfs:label "Larynx, NOS" .
+icdo3t:C33 a curie:Topography ;
+  rdfs:label "TRACHEA" .
+icdo3t:C33.9 a curie:Topography ;
+  rdfs:label "Trachea" .
+icdo3t:C34 a curie:Topography ;
+  rdfs:label "BRONCHUS AND LUNG" .
+icdo3t:C34.0 a curie:Topography ;
+  rdfs:label "Main bronchus" .
+icdo3t:C34.1 a curie:Topography ;
+  rdfs:label "Upper lobe, lung" .
+icdo3t:C34.2 a curie:Topography ;
+  rdfs:label "Middle lobe, lung" .
+icdo3t:C34.3 a curie:Topography ;
+  rdfs:label "Lower lobe, lung" .
+icdo3t:C34.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of lung" .
+icdo3t:C34.9 a curie:Topography ;
+  rdfs:label "Lung, NOS" .
+icdo3t:C37 a curie:Topography ;
+  rdfs:label "THYMUS" .
+icdo3t:C37.9 a curie:Topography ;
+  rdfs:label "Thymus" .
+icdo3t:C38 a curie:Topography ;
+  rdfs:label "HEART, MEDIASTINUM, AND PLEURA" .
+icdo3t:C38.0 a curie:Topography ;
+  rdfs:label "Heart" .
+icdo3t:C38.1 a curie:Topography ;
+  rdfs:label "Anterior mediastinum" .
+icdo3t:C38.2 a curie:Topography ;
+  rdfs:label "Posterior mediastinum" .
+icdo3t:C38.3 a curie:Topography ;
+  rdfs:label "Mediastinum, NOS" .
+icdo3t:C38.4 a curie:Topography ;
+  rdfs:label "Pleura, NOS" .
+icdo3t:C38.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of heart, mediastinum and pleura" .
+icdo3t:C39 a curie:Topography ;
+  rdfs:label "OTHER AND ILL-DEFINED SITES WITHIN RESPIRATORY SYSTEM AND INTRATHORACIC ORGANS" .
+icdo3t:C39.0 a curie:Topography ;
+  rdfs:label "Upper respiratory tract, NOS" .
+icdo3t:C39.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of respiratory system and intrathoracic organs" .
+icdo3t:C39.9 a curie:Topography ;
+  rdfs:label "Ill-defined sites within respiratory system" .
+icdo3t:C40 a curie:Topography ;
+  rdfs:label "BONES, JOINTS AND ARTICULAR CARTILAGE OF LIMBS" .
+icdo3t:C40.0 a curie:Topography ;
+  rdfs:label "Long bones of upper limb, scapula and associated joints" .
+icdo3t:C40.1 a curie:Topography ;
+  rdfs:label "Short bones of upper limb and associated joints" .
+icdo3t:C40.2 a curie:Topography ;
+  rdfs:label "Long bones of lower limb and associated joints" .
+icdo3t:C40.3 a curie:Topography ;
+  rdfs:label "Short bones of lower limb and associated joints" .
+icdo3t:C40.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of bones, joints and articular cartilage of limbs" .
+icdo3t:C40.9 a curie:Topography ;
+  rdfs:label "Bone of limb, NOS" .
+icdo3t:C41 a curie:Topography ;
+  rdfs:label "BONES, JOINTS AND ARTICULAR CARTILAGE OF OTHER AND UNSPECIFIED SITES" .
+icdo3t:C41.0 a curie:Topography ;
+  rdfs:label "Bones of skull and face and associated joints" .
+icdo3t:C41.1 a curie:Topography ;
+  rdfs:label "Mandible" .
+icdo3t:C41.2 a curie:Topography ;
+  rdfs:label "Vertebral column" .
+icdo3t:C41.3 a curie:Topography ;
+  rdfs:label "Rib, sternum, clavicle and associated joints" .
+icdo3t:C41.4 a curie:Topography ;
+  rdfs:label "Pelvic bones, sacrum, coccyx and associated joints" .
+icdo3t:C41.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of bones, joints and articular cartilage" .
+icdo3t:C41.9 a curie:Topography ;
+  rdfs:label "Bone, NOS" .
+icdo3t:C42 a curie:Topography ;
+  rdfs:label "HEMATOPOIETIC AND RETICULOENDOTHELIAL SYSTEMS" .
+icdo3t:C42.0 a curie:Topography ;
+  rdfs:label "Blood" .
+icdo3t:C42.1 a curie:Topography ;
+  rdfs:label "Bone marrow" .
+icdo3t:C42.2 a curie:Topography ;
+  rdfs:label "Spleen" .
+icdo3t:C42.3 a curie:Topography ;
+  rdfs:label "Reticuloendothelial system,NOS" .
+icdo3t:C42.4 a curie:Topography ;
+  rdfs:label "Hematopoietic system, NOS" .
+icdo3t:C44 a curie:Topography ;
+  rdfs:label "SKIN" .
+icdo3t:C44.0 a curie:Topography ;
+  rdfs:label "Skin of lip, NOS" .
+icdo3t:C44.1 a curie:Topography ;
+  rdfs:label "Eyelid" .
+icdo3t:C44.2 a curie:Topography ;
+  rdfs:label "External ear" .
+icdo3t:C44.3 a curie:Topography ;
+  rdfs:label "Skin of other and unspecified parts of face" .
+icdo3t:C44.4 a curie:Topography ;
+  rdfs:label "Skin of scalp and neck" .
+icdo3t:C44.5 a curie:Topography ;
+  rdfs:label "Skin of trunk" .
+icdo3t:C44.6 a curie:Topography ;
+  rdfs:label "Skin of upper limb and shoulder" .
+icdo3t:C44.7 a curie:Topography ;
+  rdfs:label "Skin of lower limb and hip" .
+icdo3t:C44.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of skin" .
+icdo3t:C44.9 a curie:Topography ;
+  rdfs:label "Skin, NOS" .
+icdo3t:C47 a curie:Topography ;
+  rdfs:label "PERIPHERAL NERVES AND AUTONOMIC NERVOUS SYSTEM" .
+icdo3t:C47.0 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of head, face, and neck" .
+icdo3t:C47.1 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of upper limb and shoulder" .
+icdo3t:C47.2 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of lower limband hip" .
+icdo3t:C47.3 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of thorax" .
+icdo3t:C47.4 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of abdomen" .
+icdo3t:C47.5 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of pelvis" .
+icdo3t:C47.6 a curie:Topography ;
+  rdfs:label "Peripheral nerves and autonomic nervous system of trunk, NOS" .
+icdo3t:C47.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of peripheral nerves and autonomic nervous system" .
+icdo3t:C47.9 a curie:Topography ;
+  rdfs:label "Autonomic nervous system, NOS" .
+icdo3t:C48 a curie:Topography ;
+  rdfs:label "RETROPERITONEUM AND PERITONEUM" .
+icdo3t:C48.0 a curie:Topography ;
+  rdfs:label "Retroperitoneum" .
+icdo3t:C48.1 a curie:Topography ;
+  rdfs:label "Specified parts of peritoneum" .
+icdo3t:C48.2 a curie:Topography ;
+  rdfs:label "Peritoneum, NOS" .
+icdo3t:C48.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of retroperitoneum and peritoneum" .
+icdo3t:C49 a curie:Topography ;
+  rdfs:label "CONNECTIVE, SUBCUTANEOUS AND OTHER SOFT TISSUES" .
+icdo3t:C49.0 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of head, face, and neck" .
+icdo3t:C49.1 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of upper limb and shoulder" .
+icdo3t:C49.2 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of lower limb and hip" .
+icdo3t:C49.3 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of thorax" .
+icdo3t:C49.4 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of abdomen" .
+icdo3t:C49.5 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of pelvis" .
+icdo3t:C49.6 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues of trunk NOS" .
+icdo3t:C49.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of connective, subcutaneous and other soft tissues" .
+icdo3t:C49.9 a curie:Topography ;
+  rdfs:label "Connective, subcutaneous and other soft tissues, NOS" .
+icdo3t:C50 a curie:Topography ;
+  rdfs:label "BREAST" .
+icdo3t:C50.0 a curie:Topography ;
+  rdfs:label "Nipple" .
+icdo3t:C50.1 a curie:Topography ;
+  rdfs:label "Central portion of breast" .
+icdo3t:C50.2 a curie:Topography ;
+  rdfs:label "Upper-inner quadrant of breast" .
+icdo3t:C50.3 a curie:Topography ;
+  rdfs:label "Lower-inner quadrant of breast" .
+icdo3t:C50.4 a curie:Topography ;
+  rdfs:label "Upper-outer quadrant of breast" .
+icdo3t:C50.5 a curie:Topography ;
+  rdfs:label "Lower-outer quadrant of breast" .
+icdo3t:C50.6 a curie:Topography ;
+  rdfs:label "Axillary tail of breast" .
+icdo3t:C50.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of breast" .
+icdo3t:C50.9 a curie:Topography ;
+  rdfs:label "Breast, NOS" .
+icdo3t:C51 a curie:Topography ;
+  rdfs:label "VULVA" .
+icdo3t:C51.0 a curie:Topography ;
+  rdfs:label "Labium majus" .
+icdo3t:C51.1 a curie:Topography ;
+  rdfs:label "Labium minus" .
+icdo3t:C51.2 a curie:Topography ;
+  rdfs:label "Clitoris" .
+icdo3t:C51.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of vulva" .
+icdo3t:C51.9 a curie:Topography ;
+  rdfs:label "Vulva, NOS" .
+icdo3t:C52 a curie:Topography ;
+  rdfs:label "VAGINA" .
+icdo3t:C52.9 a curie:Topography ;
+  rdfs:label "Vagina, NOS" .
+icdo3t:C53 a curie:Topography ;
+  rdfs:label "CERVIX UTERI" .
+icdo3t:C53.0 a curie:Topography ;
+  rdfs:label "Endocervix" .
+icdo3t:C53.1 a curie:Topography ;
+  rdfs:label "Exocervix" .
+icdo3t:C53.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of cervix uteri" .
+icdo3t:C53.9 a curie:Topography ;
+  rdfs:label "Cervix uteri" .
+icdo3t:C54 a curie:Topography ;
+  rdfs:label "CORPUS UTERI" .
+icdo3t:C54.0 a curie:Topography ;
+  rdfs:label "Isthmus uteri" .
+icdo3t:C54.1 a curie:Topography ;
+  rdfs:label "Endometrium" .
+icdo3t:C54.2 a curie:Topography ;
+  rdfs:label "Myometrium" .
+icdo3t:C54.3 a curie:Topography ;
+  rdfs:label "Fundus uteri" .
+icdo3t:C54.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of corpus uteri" .
+icdo3t:C54.9 a curie:Topography ;
+  rdfs:label "Corpus uteri" .
+icdo3t:C55 a curie:Topography ;
+  rdfs:label "UTERUS, NOS" .
+icdo3t:C55.9 a curie:Topography ;
+  rdfs:label "Uterus, NOS" .
+icdo3t:C56 a curie:Topography ;
+  rdfs:label "OVARY" .
+icdo3t:C56.9 a curie:Topography ;
+  rdfs:label "Ovary" .
+icdo3t:C57 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED FEMALE GENITAL ORGANS" .
+icdo3t:C57.0 a curie:Topography ;
+  rdfs:label "Fallopian tube" .
+icdo3t:C57.1 a curie:Topography ;
+  rdfs:label "Broad ligament" .
+icdo3t:C57.2 a curie:Topography ;
+  rdfs:label "Round ligament" .
+icdo3t:C57.3 a curie:Topography ;
+  rdfs:label "Parametrium" .
+icdo3t:C57.4 a curie:Topography ;
+  rdfs:label "Uterine adnexa" .
+icdo3t:C57.7 a curie:Topography ;
+  rdfs:label "Other specified parts of female genital organs" .
+icdo3t:C57.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of female genital organs" .
+icdo3t:C57.9 a curie:Topography ;
+  rdfs:label "Female genital tract, NOS" .
+icdo3t:C58 a curie:Topography ;
+  rdfs:label "PLACENTA" .
+icdo3t:C58.9 a curie:Topography ;
+  rdfs:label "Placenta" .
+icdo3t:C60 a curie:Topography ;
+  rdfs:label "PENIS" .
+icdo3t:C60.0 a curie:Topography ;
+  rdfs:label "Prepuce" .
+icdo3t:C60.1 a curie:Topography ;
+  rdfs:label "Glans penis" .
+icdo3t:C60.2 a curie:Topography ;
+  rdfs:label "Body of penis" .
+icdo3t:C60.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of penis" .
+icdo3t:C60.9 a curie:Topography ;
+  rdfs:label "Penis, NOS" .
+icdo3t:C61 a curie:Topography ;
+  rdfs:label "PROSTATE GLAND" .
+icdo3t:C61.9 a curie:Topography ;
+  rdfs:label "Prostate gland" .
+icdo3t:C62 a curie:Topography ;
+  rdfs:label "TESTIS" .
+icdo3t:C62.0 a curie:Topography ;
+  rdfs:label "Undescended testis" .
+icdo3t:C62.1 a curie:Topography ;
+  rdfs:label "Descended testis" .
+icdo3t:C62.9 a curie:Topography ;
+  rdfs:label "Testis, NOS" .
+icdo3t:C63 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED MALE GENITAL ORGANS" .
+icdo3t:C63.0 a curie:Topography ;
+  rdfs:label "Epididymis" .
+icdo3t:C63.1 a curie:Topography ;
+  rdfs:label "Spermatic cord" .
+icdo3t:C63.2 a curie:Topography ;
+  rdfs:label "Scrotum, NOS" .
+icdo3t:C63.7 a curie:Topography ;
+  rdfs:label "Other specified parts of male genital organs" .
+icdo3t:C63.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of male genital organs Note:" .
+icdo3t:C63.9 a curie:Topography ;
+  rdfs:label "Male genital organs, NOS" .
+icdo3t:C64 a curie:Topography ;
+  rdfs:label "KIDNEY" .
+icdo3t:C64.9 a curie:Topography ;
+  rdfs:label "Kidney, NOS" .
+icdo3t:C65 a curie:Topography ;
+  rdfs:label "RENAL PELVIS" .
+icdo3t:C65.9 a curie:Topography ;
+  rdfs:label "Renal pelvis" .
+icdo3t:C66 a curie:Topography ;
+  rdfs:label "URETER" .
+icdo3t:C66.9 a curie:Topography ;
+  rdfs:label "Ureter" .
+icdo3t:C67 a curie:Topography ;
+  rdfs:label "BLADDER" .
+icdo3t:C67.0 a curie:Topography ;
+  rdfs:label "Trigone of bladder" .
+icdo3t:C67.1 a curie:Topography ;
+  rdfs:label "Dome of bladder" .
+icdo3t:C67.2 a curie:Topography ;
+  rdfs:label "Lateral wall of bladder" .
+icdo3t:C67.3 a curie:Topography ;
+  rdfs:label "Anterior wall of bladder" .
+icdo3t:C67.4 a curie:Topography ;
+  rdfs:label "Posterior wall of bladder" .
+icdo3t:C67.5 a curie:Topography ;
+  rdfs:label "Bladder neck" .
+icdo3t:C67.6 a curie:Topography ;
+  rdfs:label "Ureteric orifice" .
+icdo3t:C67.7 a curie:Topography ;
+  rdfs:label "Urachus" .
+icdo3t:C67.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of bladder" .
+icdo3t:C67.9 a curie:Topography ;
+  rdfs:label "Bladder, NOS" .
+icdo3t:C68 a curie:Topography ;
+  rdfs:label "OTHER AND UNSPECIFIED URINARY ORGANS" .
+icdo3t:C68.0 a curie:Topography ;
+  rdfs:label "Urethra" .
+icdo3t:C68.1 a curie:Topography ;
+  rdfs:label "Paraurethral gland" .
+icdo3t:C68.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of urinary organs" .
+icdo3t:C68.9 a curie:Topography ;
+  rdfs:label "Urinary system, NOS" .
+icdo3t:C69 a curie:Topography ;
+  rdfs:label "EYE AND ADNEXA" .
+icdo3t:C69.0 a curie:Topography ;
+  rdfs:label "Conjunctiva" .
+icdo3t:C69.1 a curie:Topography ;
+  rdfs:label "Cornea, NOS" .
+icdo3t:C69.2 a curie:Topography ;
+  rdfs:label "Retina" .
+icdo3t:C69.3 a curie:Topography ;
+  rdfs:label "Choroid" .
+icdo3t:C69.4 a curie:Topography ;
+  rdfs:label "Ciliary body" .
+icdo3t:C69.5 a curie:Topography ;
+  rdfs:label "Lacrimal gland" .
+icdo3t:C69.6 a curie:Topography ;
+  rdfs:label "Orbit, NOS" .
+icdo3t:C69.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of eye and adnexa" .
+icdo3t:C69.9 a curie:Topography ;
+  rdfs:label "Eye, NOS" .
+icdo3t:C70 a curie:Topography ;
+  rdfs:label "MENINGES" .
+icdo3t:C70.0 a curie:Topography ;
+  rdfs:label "Cerebral meninges" .
+icdo3t:C70.1 a curie:Topography ;
+  rdfs:label "Spinal meninges" .
+icdo3t:C70.9 a curie:Topography ;
+  rdfs:label "Meninges, NOS" .
+icdo3t:C71 a curie:Topography ;
+  rdfs:label "BRAIN" .
+icdo3t:C71.0 a curie:Topography ;
+  rdfs:label "Cerebrum" .
+icdo3t:C71.1 a curie:Topography ;
+  rdfs:label "Frontal lobe" .
+icdo3t:C71.2 a curie:Topography ;
+  rdfs:label "Temporal lobe" .
+icdo3t:C71.3 a curie:Topography ;
+  rdfs:label "Parietal lobe" .
+icdo3t:C71.4 a curie:Topography ;
+  rdfs:label "Occipital lobe" .
+icdo3t:C71.5 a curie:Topography ;
+  rdfs:label "Ventricle, NOS" .
+icdo3t:C71.6 a curie:Topography ;
+  rdfs:label "Cerebellum, NOS" .
+icdo3t:C71.7 a curie:Topography ;
+  rdfs:label "Brain stem" .
+icdo3t:C71.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of brain" .
+icdo3t:C71.9 a curie:Topography ;
+  rdfs:label "Brain, NOS" .
+icdo3t:C72 a curie:Topography ;
+  rdfs:label "SPINAL CORD, CRANIAL NERVES, AND OTHER PARTS OF CENTRAL NERVOUS SYSTEM" .
+icdo3t:C72.0 a curie:Topography ;
+  rdfs:label "Spinal cord" .
+icdo3t:C72.1 a curie:Topography ;
+  rdfs:label "Cauda equina" .
+icdo3t:C72.2 a curie:Topography ;
+  rdfs:label "Olfactory nerve" .
+icdo3t:C72.3 a curie:Topography ;
+  rdfs:label "Optic nerve" .
+icdo3t:C72.4 a curie:Topography ;
+  rdfs:label "Acoustic nerve" .
+icdo3t:C72.5 a curie:Topography ;
+  rdfs:label "Cranial nerve, NOS" .
+icdo3t:C72.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of brain and central nervous system" .
+icdo3t:C72.9 a curie:Topography ;
+  rdfs:label "Nervous system, NOS" .
+icdo3t:C73 a curie:Topography ;
+  rdfs:label "THYROID GLAND" .
+icdo3t:C73.9 a curie:Topography ;
+  rdfs:label "Thyroid gland" .
+icdo3t:C74 a curie:Topography ;
+  rdfs:label "ADRENAL GLAND" .
+icdo3t:C74.0 a curie:Topography ;
+  rdfs:label "Cortex of adrenal gland" .
+icdo3t:C74.1 a curie:Topography ;
+  rdfs:label "Medulla of adrenal gland" .
+icdo3t:C74.9 a curie:Topography ;
+  rdfs:label "Adrenal gland, NOS" .
+icdo3t:C75 a curie:Topography ;
+  rdfs:label "OTHER ENDOCRINE GLANDS AND RELATED STRUCTURES" .
+icdo3t:C75.0 a curie:Topography ;
+  rdfs:label "Parathyroid gland" .
+icdo3t:C75.1 a curie:Topography ;
+  rdfs:label "Pituitary gland" .
+icdo3t:C75.2 a curie:Topography ;
+  rdfs:label "Craniopharyngeal duct" .
+icdo3t:C75.3 a curie:Topography ;
+  rdfs:label "Pineal gland" .
+icdo3t:C75.4 a curie:Topography ;
+  rdfs:label "Carotid body" .
+icdo3t:C75.5 a curie:Topography ;
+  rdfs:label "Aortic body and other paraganglia" .
+icdo3t:C75.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of endocrine glands and related structures" .
+icdo3t:C75.9 a curie:Topography ;
+  rdfs:label "Endocrine gland, NOS" .
+icdo3t:C76 a curie:Topography ;
+  rdfs:label "OTHER AND ILL-DEFINED SITES" .
+icdo3t:C76.0 a curie:Topography ;
+  rdfs:label "Head, face or neck, NOS" .
+icdo3t:C76.1 a curie:Topography ;
+  rdfs:label "Thorax, NOS" .
+icdo3t:C76.2 a curie:Topography ;
+  rdfs:label "Abdomen, NOS" .
+icdo3t:C76.3 a curie:Topography ;
+  rdfs:label "Pelvis, NOS" .
+icdo3t:C76.4 a curie:Topography ;
+  rdfs:label "Upper limb, NOS" .
+icdo3t:C76.5 a curie:Topography ;
+  rdfs:label "Lower limb, NOS" .
+icdo3t:C76.7 a curie:Topography ;
+  rdfs:label "Other ill-defined sites" .
+icdo3t:C76.8 a curie:Topography ;
+  rdfs:label "Overlapping lesion of ill-defined sites" .
+icdo3t:C77 a curie:Topography ;
+  rdfs:label "LYMPH NODES" .
+icdo3t:C77.0 a curie:Topography ;
+  rdfs:label "Lymph nodes of head, face and neck" .
+icdo3t:C77.1 a curie:Topography ;
+  rdfs:label "Intrathoracic lymph nodes" .
+icdo3t:C77.2 a curie:Topography ;
+  rdfs:label "Intra-abdominal lymph nodes" .
+icdo3t:C77.3 a curie:Topography ;
+  rdfs:label "Lymph nodes of axilla or arm" .
+icdo3t:C77.4 a curie:Topography ;
+  rdfs:label "Lymph nodes of inguinal region or leg" .
+icdo3t:C77.5 a curie:Topography ;
+  rdfs:label "Pelvic lymph nodes" .
+icdo3t:C77.8 a curie:Topography ;
+  rdfs:label "Lymph nodes of multiple regions" .
+icdo3t:C77.9 a curie:Topography ;
+  rdfs:label "Lymph node, NOS" .
+icdo3t:C80 a curie:Topography ;
+  rdfs:label "UNKNOWN PRIMARY SITE" .
+icdo3t:C80.9 a curie:Topography ;
+  rdfs:label "Unknown primary site" .
+icdo3m:8000\/0 a curie:Morphology ;
+  rdfs:label "Neoplasm, benign" .
+icdo3m:8000\/1 a curie:Morphology ;
+  rdfs:label "Neoplasm, uncertain whether benign or malignant" .
+icdo3m:8000\/3 a curie:Morphology ;
+  rdfs:label "Neoplasm, malignant" .
+icdo3m:8000\/6 a curie:Morphology ;
+  rdfs:label "Neoplasm, metastatic" .
+icdo3m:8000\/9 a curie:Morphology ;
+  rdfs:label "Neoplasm, malignant, uncertain whether primary or metastatic" .
+icdo3m:8001\/0 a curie:Morphology ;
+  rdfs:label "Tumor cells, benign" .
+icdo3m:8001\/1 a curie:Morphology ;
+  rdfs:label "Tumor cells, uncertain whether benign or malignant" .
+icdo3m:8001\/3 a curie:Morphology ;
+  rdfs:label "Tumor cells, malignant" .
+icdo3m:8002\/3 a curie:Morphology ;
+  rdfs:label "Malignant tumor, small cell type" .
+icdo3m:8003\/3 a curie:Morphology ;
+  rdfs:label "Malignant tumor, giant cell type" .
+icdo3m:8004\/3 a curie:Morphology ;
+  rdfs:label "Malignant tumor, spindle cell type" .
+icdo3m:8005\/0 a curie:Morphology ;
+  rdfs:label "Clear cell tumor, NOS" .
+icdo3m:8005\/3 a curie:Morphology ;
+  rdfs:label "Malignant tumor, clear cell type" .
+icdo3m:8010\/0 a curie:Morphology ;
+  rdfs:label "Epithelial tumor, benign" .
+icdo3m:8010\/2 a curie:Morphology ;
+  rdfs:label "Carcinoma in situ, NOS" .
+icdo3m:8010\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma, NOS" .
+icdo3m:8010\/6 a curie:Morphology ;
+  rdfs:label "Carcinoma, metastatic, NOS" .
+icdo3m:8010\/9 a curie:Morphology ;
+  rdfs:label "Carcinomatosis" .
+icdo3m:8011\/0 a curie:Morphology ;
+  rdfs:label "Epithelioma, benign" .
+icdo3m:8011\/3 a curie:Morphology ;
+  rdfs:label "Epithelioma, malignant" .
+icdo3m:8012\/3 a curie:Morphology ;
+  rdfs:label "Large cell carcinoma, NOS" .
+icdo3m:8013\/3 a curie:Morphology ;
+  rdfs:label "Large cell neuroendocrine carcinoma" .
+icdo3m:8014\/3 a curie:Morphology ;
+  rdfs:label "Large cell carcinoma with rhabdoid phenotype" .
+icdo3m:8015\/3 a curie:Morphology ;
+  rdfs:label "Glassy cell carcinoma" .
+icdo3m:8020\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma, undifferentiated, NOS" .
+icdo3m:8021\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma, anaplastic, NOS" .
+icdo3m:8022\/3 a curie:Morphology ;
+  rdfs:label "Pleomorphic carcinoma" .
+icdo3m:8030\/3 a curie:Morphology ;
+  rdfs:label "Giant cell and spindle cell carcinoma" .
+icdo3m:8031\/3 a curie:Morphology ;
+  rdfs:label "Giant cell carcinoma" .
+icdo3m:8032\/3 a curie:Morphology ;
+  rdfs:label "Spindle cell carcinoma, NOS" .
+icdo3m:8033\/3 a curie:Morphology ;
+  rdfs:label "Pseudosarcomatous carcinoma" .
+icdo3m:8034\/3 a curie:Morphology ;
+  rdfs:label "Polygonal cell carcinoma" .
+icdo3m:8035\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma with osteoclast-like giant cells" .
+icdo3m:8040\/0 a curie:Morphology ;
+  rdfs:label "Tumorlet, benign" .
+icdo3m:8040\/1 a curie:Morphology ;
+  rdfs:label "Tumorlet, NOS" .
+icdo3m:8041\/3 a curie:Morphology ;
+  rdfs:label "Small cell carcinoma, NOS" .
+icdo3m:8042\/3 a curie:Morphology ;
+  rdfs:label "Oat cell carcinoma" .
+icdo3m:8043\/3 a curie:Morphology ;
+  rdfs:label "Small cell carcinoma, fusiform cell" .
+icdo3m:8044\/3 a curie:Morphology ;
+  rdfs:label "Small cell carcinoma, intermediate cell" .
+icdo3m:8045\/3 a curie:Morphology ;
+  rdfs:label "Combined small cell carcinoma" .
+icdo3m:8046\/3 a curie:Morphology ;
+  rdfs:label "Non-small cell carcinoma" .
+icdo3m:8050\/0 a curie:Morphology ;
+  rdfs:label "Papilloma, NOS" .
+icdo3m:8050\/2 a curie:Morphology ;
+  rdfs:label "Papillary carcinoma in situ" .
+icdo3m:8050\/3 a curie:Morphology ;
+  rdfs:label "Papillary carcinoma, NOS" .
+icdo3m:8051\/0 a curie:Morphology ;
+  rdfs:label "Verrucous papilloma" .
+icdo3m:8051\/3 a curie:Morphology ;
+  rdfs:label "Verrucous carcinoma, NOS" .
+icdo3m:8052\/0 a curie:Morphology ;
+  rdfs:label "Squamous cell papilloma, NOS" .
+icdo3m:8052\/2 a curie:Morphology ;
+  rdfs:label "Papillary squamous cell carcinoma, non-invasive" .
+icdo3m:8052\/3 a curie:Morphology ;
+  rdfs:label "Papillary squamous cell carcinoma" .
+icdo3m:8053\/0 a curie:Morphology ;
+  rdfs:label "Squamous cell papilloma, inverted" .
+icdo3m:8060\/0 a curie:Morphology ;
+  rdfs:label "Squamous papillomatosis" .
+icdo3m:8070\/2 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma in situ, NOS" .
+icdo3m:8070\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, NOS" .
+icdo3m:8070\/6 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, metastatic, NOS" .
+icdo3m:8071\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, keratinizing, NOS" .
+icdo3m:8072\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, large cell, nonkeratinizing, NOS" .
+icdo3m:8073\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, small cell, nonkeratinizing" .
+icdo3m:8074\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, spindle cell" .
+icdo3m:8075\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, adenoid" .
+icdo3m:8076\/2 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma in situ with questionable stromal invasion" .
+icdo3m:8076\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, microinvasive" .
+icdo3m:8077\/2 a curie:Morphology ;
+  rdfs:label "Squamous intraepithelial neoplasia, grade III" .
+icdo3m:8078\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma with horn formation" .
+icdo3m:8080\/2 a curie:Morphology ;
+  rdfs:label "Queyrat erythroplasia" .
+icdo3m:8081\/2 a curie:Morphology ;
+  rdfs:label "Bowen disease" .
+icdo3m:8082\/3 a curie:Morphology ;
+  rdfs:label "Lymphoepithelial carcinoma" .
+icdo3m:8083\/3 a curie:Morphology ;
+  rdfs:label "Basaloid squamous cell carcinoma" .
+icdo3m:8084\/3 a curie:Morphology ;
+  rdfs:label "Squamous cell carcinoma, clear cell type" .
+icdo3m:8090\/1 a curie:Morphology ;
+  rdfs:label "Basal cell tumor" .
+icdo3m:8090\/3 a curie:Morphology ;
+  rdfs:label "Basal cell carcinoma, NOS" .
+icdo3m:8091\/3 a curie:Morphology ;
+  rdfs:label "Multifocal superficial basal cell carcinoma" .
+icdo3m:8092\/3 a curie:Morphology ;
+  rdfs:label "Infiltrating basal cell carcinoma, NOS" .
+icdo3m:8093\/3 a curie:Morphology ;
+  rdfs:label "Basal cell carcinoma, fibroepithelial" .
+icdo3m:8094\/3 a curie:Morphology ;
+  rdfs:label "Basosquamous carcinoma" .
+icdo3m:8095\/3 a curie:Morphology ;
+  rdfs:label "Metatypical carcinoma" .
+icdo3m:8096\/0 a curie:Morphology ;
+  rdfs:label "Intraepidermal epithelioma of Jadassohn" .
+icdo3m:8097\/3 a curie:Morphology ;
+  rdfs:label "Basal cell carcinoma, nodular" .
+icdo3m:8098\/3 a curie:Morphology ;
+  rdfs:label "Adenoid basal carcinoma" .
+icdo3m:8100\/0 a curie:Morphology ;
+  rdfs:label "Trichoepithelioma" .
+icdo3m:8101\/0 a curie:Morphology ;
+  rdfs:label "Trichofolliculoma" .
+icdo3m:8102\/0 a curie:Morphology ;
+  rdfs:label "Trichilemmoma" .
+icdo3m:8102\/3 a curie:Morphology ;
+  rdfs:label "Trichilemmocarcinoma" .
+icdo3m:8103\/0 a curie:Morphology ;
+  rdfs:label "Pilar tumor" .
+icdo3m:8110\/0 a curie:Morphology ;
+  rdfs:label "Pilomatrixoma, NOS" .
+icdo3m:8110\/3 a curie:Morphology ;
+  rdfs:label "Pilomatrix carcinoma" .
+icdo3m:8120\/0 a curie:Morphology ;
+  rdfs:label "Transitional cell papilloma, benign" .
+icdo3m:8120\/1 a curie:Morphology ;
+  rdfs:label "Urothelial papilloma, NOS" .
+icdo3m:8120\/2 a curie:Morphology ;
+  rdfs:label "Transitional cell carcinoma in situ" .
+icdo3m:8120\/3 a curie:Morphology ;
+  rdfs:label "Transitional cell carcinoma, NOS" .
+icdo3m:8121\/0 a curie:Morphology ;
+  rdfs:label "Schneiderian papilloma, NOS" .
+icdo3m:8121\/1 a curie:Morphology ;
+  rdfs:label "Transitional cell papilloma, inverted, NOS" .
+icdo3m:8121\/3 a curie:Morphology ;
+  rdfs:label "Schneiderian carcinoma" .
+icdo3m:8122\/3 a curie:Morphology ;
+  rdfs:label "Transitional cell carcinoma, spindle cell" .
+icdo3m:8123\/3 a curie:Morphology ;
+  rdfs:label "Basaloid carcinoma" .
+icdo3m:8124\/3 a curie:Morphology ;
+  rdfs:label "Cloacogenic carcinoma" .
+icdo3m:8130\/1 a curie:Morphology ;
+  rdfs:label "Papillary transitional cell neoplasm of low malignant potential" .
+icdo3m:8130\/2 a curie:Morphology ;
+  rdfs:label "Papillary transitional cell carcinoma, non-invasive" .
+icdo3m:8130\/3 a curie:Morphology ;
+  rdfs:label "Papillary transitional cell carcinoma" .
+icdo3m:8131\/3 a curie:Morphology ;
+  rdfs:label "Transitional cell carcinoma, micropapillary" .
+icdo3m:8140\/0 a curie:Morphology ;
+  rdfs:label "Adenoma, NOS" .
+icdo3m:8140\/1 a curie:Morphology ;
+  rdfs:label "Atypical adenoma" .
+icdo3m:8140\/2 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in situ, NOS" .
+icdo3m:8140\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma, NOS" .
+icdo3m:8140\/6 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma, metastatic, NOS" .
+icdo3m:8141\/3 a curie:Morphology ;
+  rdfs:label "Scirrhous adenocarcinoma" .
+icdo3m:8142\/3 a curie:Morphology ;
+  rdfs:label "Linitis plastica" .
+icdo3m:8143\/3 a curie:Morphology ;
+  rdfs:label "Superficial spreading adenocarcinoma" .
+icdo3m:8144\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma, intestinal type" .
+icdo3m:8145\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma, diffuse type" .
+icdo3m:8146\/0 a curie:Morphology ;
+  rdfs:label "Monomorphic adenoma" .
+icdo3m:8147\/0 a curie:Morphology ;
+  rdfs:label "Basal cell adenoma" .
+icdo3m:8147\/3 a curie:Morphology ;
+  rdfs:label "Basal cell adenocarcinoma" .
+icdo3m:8148\/2 a curie:Morphology ;
+  rdfs:label "Glandular intraepithelial neoplasia, grade III" .
+icdo3m:8149\/0 a curie:Morphology ;
+  rdfs:label "Canalicular adenoma" .
+icdo3m:8150\/0 a curie:Morphology ;
+  rdfs:label "Islet cell adenoma" .
+icdo3m:8150\/1 a curie:Morphology ;
+  rdfs:label "Islet cell tumor, NOS" .
+icdo3m:8150\/3 a curie:Morphology ;
+  rdfs:label "Islet cell carcinoma" .
+icdo3m:8151\/0 a curie:Morphology ;
+  rdfs:label "Insulinoma, NOS" .
+icdo3m:8151\/3 a curie:Morphology ;
+  rdfs:label "Insulinoma, malignant" .
+icdo3m:8152\/1 a curie:Morphology ;
+  rdfs:label "Glucagonoma, NOS" .
+icdo3m:8152\/3 a curie:Morphology ;
+  rdfs:label "Glucagonoma, malignant" .
+icdo3m:8153\/1 a curie:Morphology ;
+  rdfs:label "Gastrinoma, NOS" .
+icdo3m:8153\/3 a curie:Morphology ;
+  rdfs:label "Gastrinoma, malignant" .
+icdo3m:8154\/3 a curie:Morphology ;
+  rdfs:label "Mixed islet cell and exocrine adenocarcinoma" .
+icdo3m:8155\/1 a curie:Morphology ;
+  rdfs:label "Vipoma, NOS" .
+icdo3m:8155\/3 a curie:Morphology ;
+  rdfs:label "Vipoma, malignant" .
+icdo3m:8156\/1 a curie:Morphology ;
+  rdfs:label "Somatostatinoma, NOS" .
+icdo3m:8156\/3 a curie:Morphology ;
+  rdfs:label "Somatostatinoma, malignant" .
+icdo3m:8157\/1 a curie:Morphology ;
+  rdfs:label "Enteroglucagonoma, NOS" .
+icdo3m:8157\/3 a curie:Morphology ;
+  rdfs:label "Enteroglucagonoma, malignant" .
+icdo3m:8160\/0 a curie:Morphology ;
+  rdfs:label "Bile duct adenoma" .
+icdo3m:8160\/3 a curie:Morphology ;
+  rdfs:label "Cholangiocarcinoma" .
+icdo3m:8161\/0 a curie:Morphology ;
+  rdfs:label "Bile duct cystadenoma" .
+icdo3m:8161\/3 a curie:Morphology ;
+  rdfs:label "Bile duct cystadenocarcinoma" .
+icdo3m:8162\/3 a curie:Morphology ;
+  rdfs:label "Klatskin tumor" .
+icdo3m:8170\/0 a curie:Morphology ;
+  rdfs:label "Liver cell adenoma" .
+icdo3m:8170\/3 a curie:Morphology ;
+  rdfs:label "Hepatocellular carcinoma, NOS" .
+icdo3m:8171\/3 a curie:Morphology ;
+  rdfs:label "Hepatocellular carcinoma, fibrolamellar" .
+icdo3m:8172\/3 a curie:Morphology ;
+  rdfs:label "Hepatocellular carcinoma, scirrhous" .
+icdo3m:8173\/3 a curie:Morphology ;
+  rdfs:label "Hepatocellular carcinoma, spindle cell variant" .
+icdo3m:8174\/3 a curie:Morphology ;
+  rdfs:label "Hepatocellular carcinoma, clear cell type" .
+icdo3m:8175\/3 a curie:Morphology ;
+  rdfs:label "Hepatocellular carcinoma, pleomorphic type" .
+icdo3m:8180\/3 a curie:Morphology ;
+  rdfs:label "Combined hepatocellular carcinoma and cholangiocarcinoma" .
+icdo3m:8190\/0 a curie:Morphology ;
+  rdfs:label "Trabecular adenoma" .
+icdo3m:8190\/3 a curie:Morphology ;
+  rdfs:label "Trabecular adenocarcinoma" .
+icdo3m:8191\/0 a curie:Morphology ;
+  rdfs:label "Embryonal adenoma" .
+icdo3m:8200\/0 a curie:Morphology ;
+  rdfs:label "Eccrine dermal cylindroma" .
+icdo3m:8200\/3 a curie:Morphology ;
+  rdfs:label "Adenoid cystic carcinoma" .
+icdo3m:8201\/2 a curie:Morphology ;
+  rdfs:label "Cribriform carcinoma in situ" .
+icdo3m:8201\/3 a curie:Morphology ;
+  rdfs:label "Cribriform carcinoma, NOS" .
+icdo3m:8202\/0 a curie:Morphology ;
+  rdfs:label "Microcystic adenoma" .
+icdo3m:8204\/0 a curie:Morphology ;
+  rdfs:label "Lactating adenoma" .
+icdo3m:8210\/0 a curie:Morphology ;
+  rdfs:label "Adenomatous polyp, NOS" .
+icdo3m:8210\/2 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in situ in adenomatous polyp" .
+icdo3m:8210\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in adenomatous polyp" .
+icdo3m:8211\/0 a curie:Morphology ;
+  rdfs:label "Tubular adenoma, NOS" .
+icdo3m:8211\/3 a curie:Morphology ;
+  rdfs:label "Tubular adenocarcinoma" .
+icdo3m:8212\/0 a curie:Morphology ;
+  rdfs:label "Flat adenoma" .
+icdo3m:8213\/0 a curie:Morphology ;
+  rdfs:label "Serrated adenoma" .
+icdo3m:8214\/3 a curie:Morphology ;
+  rdfs:label "Parietal cell carcinoma" .
+icdo3m:8215\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma of anal glands" .
+icdo3m:8220\/0 a curie:Morphology ;
+  rdfs:label "Adenomatous polyposis coli" .
+icdo3m:8220\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in adenomatous polyposis coli" .
+icdo3m:8221\/0 a curie:Morphology ;
+  rdfs:label "Multiple adenomatous polyps" .
+icdo3m:8221\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in multiple adenomatous polyps" .
+icdo3m:8230\/2 a curie:Morphology ;
+  rdfs:label "Ductal carcinoma in situ, solid type" .
+icdo3m:8230\/3 a curie:Morphology ;
+  rdfs:label "Solid carcinoma, NOS" .
+icdo3m:8231\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma simplex" .
+icdo3m:8240\/1 a curie:Morphology ;
+  rdfs:label "Carcinoid tumor of uncertain malignant potential" .
+icdo3m:8240\/3 a curie:Morphology ;
+  rdfs:label "Carcinoid tumor, NOS" .
+icdo3m:8241\/3 a curie:Morphology ;
+  rdfs:label "Enterochromaffin cell carcinoid" .
+icdo3m:8242\/1 a curie:Morphology ;
+  rdfs:label "Enterochromaffin-like cell carcinoid, NOS" .
+icdo3m:8242\/3 a curie:Morphology ;
+  rdfs:label "Enterochromaffin-like cell tumor, malignant" .
+icdo3m:8243\/3 a curie:Morphology ;
+  rdfs:label "Goblet cell carcinoid" .
+icdo3m:8244\/3 a curie:Morphology ;
+  rdfs:label "Composite carcinoid" .
+icdo3m:8245\/1 a curie:Morphology ;
+  rdfs:label "Tubular carcinoid" .
+icdo3m:8245\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoid tumor" .
+icdo3m:8246\/3 a curie:Morphology ;
+  rdfs:label "Neuroendocrine carcinoma, NOS" .
+icdo3m:8247\/3 a curie:Morphology ;
+  rdfs:label "Merkel cell carcinoma" .
+icdo3m:8248\/1 a curie:Morphology ;
+  rdfs:label "Apudoma" .
+icdo3m:8249\/3 a curie:Morphology ;
+  rdfs:label "Atypical carcinoid tumor" .
+icdo3m:8250\/1 a curie:Morphology ;
+  rdfs:label "Pulmonary adenomatosis" .
+icdo3m:8250\/3 a curie:Morphology ;
+  rdfs:label "Bronchiolo-alveolar adenocarcinoma, NOS" .
+icdo3m:8251\/0 a curie:Morphology ;
+  rdfs:label "Alveolar adenoma" .
+icdo3m:8251\/3 a curie:Morphology ;
+  rdfs:label "Alveolar adenocarcinoma" .
+icdo3m:8252\/3 a curie:Morphology ;
+  rdfs:label "Bronchiolo-alveolar carcinoma, non- mucinous" .
+icdo3m:8253\/3 a curie:Morphology ;
+  rdfs:label "Bronchiolo-alveolar carcinoma, mucinous" .
+icdo3m:8254\/3 a curie:Morphology ;
+  rdfs:label "Bronchiolo-alveolar carcinoma, mixed mucinous and non-mucinous" .
+icdo3m:8255\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma with mixed subtypes" .
+icdo3m:8260\/0 a curie:Morphology ;
+  rdfs:label "Papillary adenoma, NOS" .
+icdo3m:8260\/3 a curie:Morphology ;
+  rdfs:label "Papillary adenocarcinoma, NOS" .
+icdo3m:8261\/0 a curie:Morphology ;
+  rdfs:label "Villous adenoma, NOS" .
+icdo3m:8261\/2 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in situ in villous adenoma" .
+icdo3m:8261\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in villous adenoma" .
+icdo3m:8262\/3 a curie:Morphology ;
+  rdfs:label "Villous adenocarcinoma" .
+icdo3m:8263\/0 a curie:Morphology ;
+  rdfs:label "Tubulovillous adenoma, NOS" .
+icdo3m:8263\/2 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in situ in tubulovillous adenoma" .
+icdo3m:8263\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma in tubulovillous adenoma" .
+icdo3m:8264\/0 a curie:Morphology ;
+  rdfs:label "Papillomatosis, glandular" .
+icdo3m:8270\/0 a curie:Morphology ;
+  rdfs:label "Chromophobe adenoma" .
+icdo3m:8270\/3 a curie:Morphology ;
+  rdfs:label "Chromophobe carcinoma" .
+icdo3m:8271\/0 a curie:Morphology ;
+  rdfs:label "Prolactinoma" .
+icdo3m:8272\/0 a curie:Morphology ;
+  rdfs:label "Pituitary adenoma, NOS" .
+icdo3m:8272\/3 a curie:Morphology ;
+  rdfs:label "Pituitary carcinoma, NOS" .
+icdo3m:8280\/0 a curie:Morphology ;
+  rdfs:label "Acidophil adenoma" .
+icdo3m:8280\/3 a curie:Morphology ;
+  rdfs:label "Acidophil carcinoma" .
+icdo3m:8281\/0 a curie:Morphology ;
+  rdfs:label "Mixed acidophil-basophil adenoma" .
+icdo3m:8281\/3 a curie:Morphology ;
+  rdfs:label "Mixed acidophil-basophil carcinoma" .
+icdo3m:8290\/0 a curie:Morphology ;
+  rdfs:label "Oxyphilic adenoma" .
+icdo3m:8290\/3 a curie:Morphology ;
+  rdfs:label "Oxyphilic adenocarcinoma" .
+icdo3m:8300\/0 a curie:Morphology ;
+  rdfs:label "Basophil adenoma" .
+icdo3m:8300\/3 a curie:Morphology ;
+  rdfs:label "Basophil carcinoma" .
+icdo3m:8310\/0 a curie:Morphology ;
+  rdfs:label "Clear cell adenoma" .
+icdo3m:8310\/3 a curie:Morphology ;
+  rdfs:label "Clear cell adenocarcinoma, NOS" .
+icdo3m:8311\/1 a curie:Morphology ;
+  rdfs:label "Hypernephroid tumor" .
+icdo3m:8312\/3 a curie:Morphology ;
+  rdfs:label "Renal cell carcinoma, NOS" .
+icdo3m:8313\/0 a curie:Morphology ;
+  rdfs:label "Clear cell adenofibroma" .
+icdo3m:8313\/1 a curie:Morphology ;
+  rdfs:label "Clear cell adenofibroma of borderline malignancy" .
+icdo3m:8313\/3 a curie:Morphology ;
+  rdfs:label "Clear cell adenocarcinofibroma" .
+icdo3m:8314\/3 a curie:Morphology ;
+  rdfs:label "Lipid-rich carcinoma" .
+icdo3m:8315\/3 a curie:Morphology ;
+  rdfs:label "Glycogen-rich carcinoma" .
+icdo3m:8316\/3 a curie:Morphology ;
+  rdfs:label "Cyst-associated renal cell carcinoma" .
+icdo3m:8317\/3 a curie:Morphology ;
+  rdfs:label "Renal cell carcinoma, chromophobe type" .
+icdo3m:8318\/3 a curie:Morphology ;
+  rdfs:label "Renal cell carcinoma, sarcomatoid" .
+icdo3m:8319\/3 a curie:Morphology ;
+  rdfs:label "Collecting duct carcinoma" .
+icdo3m:8320\/3 a curie:Morphology ;
+  rdfs:label "Granular cell carcinoma" .
+icdo3m:8321\/0 a curie:Morphology ;
+  rdfs:label "Chief cell adenoma" .
+icdo3m:8322\/0 a curie:Morphology ;
+  rdfs:label "Water-clear cell adenoma" .
+icdo3m:8322\/3 a curie:Morphology ;
+  rdfs:label "Water-clear cell adenocarcinoma" .
+icdo3m:8323\/0 a curie:Morphology ;
+  rdfs:label "Mixed cell adenoma" .
+icdo3m:8323\/3 a curie:Morphology ;
+  rdfs:label "Mixed cell adenocarcinoma" .
+icdo3m:8324\/0 a curie:Morphology ;
+  rdfs:label "Lipoadenoma" .
+icdo3m:8325\/0 a curie:Morphology ;
+  rdfs:label "Metanephric adenoma" .
+icdo3m:8330\/0 a curie:Morphology ;
+  rdfs:label "Follicular adenoma" .
+icdo3m:8330\/1 a curie:Morphology ;
+  rdfs:label "Atypical follicular adenoma" .
+icdo3m:8330\/3 a curie:Morphology ;
+  rdfs:label "Follicular adenocarcinoma, NOS" .
+icdo3m:8331\/3 a curie:Morphology ;
+  rdfs:label "Follicular adenocarcinoma, well differentiated" .
+icdo3m:8332\/3 a curie:Morphology ;
+  rdfs:label "Follicular adenocarcinoma, trabecular" .
+icdo3m:8333\/0 a curie:Morphology ;
+  rdfs:label "Microfollicular adenoma, NOS" .
+icdo3m:8333\/3 a curie:Morphology ;
+  rdfs:label "Fetal adenocarcinoma" .
+icdo3m:8334\/0 a curie:Morphology ;
+  rdfs:label "Macrofollicular adenoma" .
+icdo3m:8335\/3 a curie:Morphology ;
+  rdfs:label "Follicular carcinoma, minimally invasive" .
+icdo3m:8336\/0 a curie:Morphology ;
+  rdfs:label "Hyalinizing trabecular adenoma" .
+icdo3m:8337\/3 a curie:Morphology ;
+  rdfs:label "Insular carcinoma" .
+icdo3m:8340\/3 a curie:Morphology ;
+  rdfs:label "Papillary carcinoma, follicular variant" .
+icdo3m:8341\/3 a curie:Morphology ;
+  rdfs:label "Papillary microcarcinoma" .
+icdo3m:8342\/3 a curie:Morphology ;
+  rdfs:label "Papillary carcinoma, oxyphilic cell" .
+icdo3m:8343\/3 a curie:Morphology ;
+  rdfs:label "Papillary carcinoma, encapsulated" .
+icdo3m:8344\/3 a curie:Morphology ;
+  rdfs:label "Papillary carcinoma, columnar cell" .
+icdo3m:8345\/3 a curie:Morphology ;
+  rdfs:label "Medullary carcinoma with amyloid stroma" .
+icdo3m:8346\/3 a curie:Morphology ;
+  rdfs:label "Mixed medullary-follicular carcinoma" .
+icdo3m:8347\/3 a curie:Morphology ;
+  rdfs:label "Mixed medullary-papillary carcinoma" .
+icdo3m:8350\/3 a curie:Morphology ;
+  rdfs:label "Nonencapsulated sclerosing carcinoma" .
+icdo3m:8360\/1 a curie:Morphology ;
+  rdfs:label "Multiple endocrine adenomas" .
+icdo3m:8361\/0 a curie:Morphology ;
+  rdfs:label "Juxtaglomerular tumor" .
+icdo3m:8370\/0 a curie:Morphology ;
+  rdfs:label "Adrenal cortical adenoma, NOS" .
+icdo3m:8370\/3 a curie:Morphology ;
+  rdfs:label "Adrenal cortical carcinoma" .
+icdo3m:8371\/0 a curie:Morphology ;
+  rdfs:label "Adrenal cortical adenoma, compact cell" .
+icdo3m:8372\/0 a curie:Morphology ;
+  rdfs:label "Adrenal cortical adenoma, pigmented" .
+icdo3m:8373\/0 a curie:Morphology ;
+  rdfs:label "Adrenal cortical adenoma, clear cell" .
+icdo3m:8374\/0 a curie:Morphology ;
+  rdfs:label "Adrenal cortical adenoma, glomerulosa cell" .
+icdo3m:8375\/0 a curie:Morphology ;
+  rdfs:label "Adrenal cortical adenoma, mixed cell" .
+icdo3m:8380\/0 a curie:Morphology ;
+  rdfs:label "Endometrioid adenoma, NOS" .
+icdo3m:8380\/1 a curie:Morphology ;
+  rdfs:label "Endometrioid adenoma, borderline malignancy" .
+icdo3m:8380\/3 a curie:Morphology ;
+  rdfs:label "Endometrioid adenocarcinoma, NOS" .
+icdo3m:8381\/0 a curie:Morphology ;
+  rdfs:label "Endometrioid adenofibroma, NOS" .
+icdo3m:8381\/1 a curie:Morphology ;
+  rdfs:label "Endometrioid adenofibroma, borderline malignancy" .
+icdo3m:8381\/3 a curie:Morphology ;
+  rdfs:label "Endometrioid adenofibroma, malignant" .
+icdo3m:8382\/3 a curie:Morphology ;
+  rdfs:label "Endometrioid adenocarcinoma, secretory variant" .
+icdo3m:8383\/3 a curie:Morphology ;
+  rdfs:label "Endometrioid adenocarcinoma, ciliated cell variant" .
+icdo3m:8384\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma, endocervical type" .
+icdo3m:8390\/0 a curie:Morphology ;
+  rdfs:label "Skin appendage adenoma" .
+icdo3m:8390\/3 a curie:Morphology ;
+  rdfs:label "Skin appendage carcinoma" .
+icdo3m:8391\/0 a curie:Morphology ;
+  rdfs:label "Follicular fibroma" .
+icdo3m:8392\/0 a curie:Morphology ;
+  rdfs:label "Syringofibroadenoma" .
+icdo3m:8400\/0 a curie:Morphology ;
+  rdfs:label "Sweat gland adenoma" .
+icdo3m:8400\/1 a curie:Morphology ;
+  rdfs:label "Sweat gland tumor, NOS" .
+icdo3m:8400\/3 a curie:Morphology ;
+  rdfs:label "Sweat gland adenocarcinoma" .
+icdo3m:8401\/0 a curie:Morphology ;
+  rdfs:label "Apocrine adenoma" .
+icdo3m:8401\/3 a curie:Morphology ;
+  rdfs:label "Apocrine adenocarcinoma" .
+icdo3m:8402\/0 a curie:Morphology ;
+  rdfs:label "Nodular hidradenoma" .
+icdo3m:8402\/3 a curie:Morphology ;
+  rdfs:label "Nodular hidradenoma, malignant" .
+icdo3m:8403\/0 a curie:Morphology ;
+  rdfs:label "Eccrine spiradenoma" .
+icdo3m:8403\/3 a curie:Morphology ;
+  rdfs:label "Malignant eccrine spiradenoma" .
+icdo3m:8404\/0 a curie:Morphology ;
+  rdfs:label "Hidrocystoma" .
+icdo3m:8405\/0 a curie:Morphology ;
+  rdfs:label "Papillary hidradenoma" .
+icdo3m:8406\/0 a curie:Morphology ;
+  rdfs:label "Papillary syringadenoma" .
+icdo3m:8407\/0 a curie:Morphology ;
+  rdfs:label "Syringoma, NOS" .
+icdo3m:8407\/3 a curie:Morphology ;
+  rdfs:label "Sclerosing sweat duct carcinoma" .
+icdo3m:8408\/0 a curie:Morphology ;
+  rdfs:label "Eccrine papillary adenoma" .
+icdo3m:8408\/1 a curie:Morphology ;
+  rdfs:label "Aggressive digital papillary adenoma" .
+icdo3m:8408\/3 a curie:Morphology ;
+  rdfs:label "Eccrine papillary adenocarcinoma" .
+icdo3m:8409\/0 a curie:Morphology ;
+  rdfs:label "Eccrine poroma" .
+icdo3m:8409\/3 a curie:Morphology ;
+  rdfs:label "Eccrine poroma, malignant" .
+icdo3m:8410\/0 a curie:Morphology ;
+  rdfs:label "Sebaceous adenoma" .
+icdo3m:8410\/3 a curie:Morphology ;
+  rdfs:label "Sebaceous adenocarcinoma" .
+icdo3m:8413\/3 a curie:Morphology ;
+  rdfs:label "Eccrine adenocarcinoma" .
+icdo3m:8420\/0 a curie:Morphology ;
+  rdfs:label "Ceruminous adenoma" .
+icdo3m:8420\/3 a curie:Morphology ;
+  rdfs:label "Ceruminous adenocarcinoma" .
+icdo3m:8430\/1 a curie:Morphology ;
+  rdfs:label "Mucoepidermoid tumor" .
+icdo3m:8430\/3 a curie:Morphology ;
+  rdfs:label "Mucoepidermoid carcinoma" .
+icdo3m:8440\/0 a curie:Morphology ;
+  rdfs:label "Cystadenoma, NOS" .
+icdo3m:8440\/3 a curie:Morphology ;
+  rdfs:label "Cystadenocarcinoma, NOS" .
+icdo3m:8441\/0 a curie:Morphology ;
+  rdfs:label "Serous cystadenoma, NOS" .
+icdo3m:8441\/3 a curie:Morphology ;
+  rdfs:label "Serous cystadenocarcinoma, NOS" .
+icdo3m:8442\/1 a curie:Morphology ;
+  rdfs:label "Serous cystadenoma, borderline malignancy" .
+icdo3m:8443\/0 a curie:Morphology ;
+  rdfs:label "Clear cell cystadenoma" .
+icdo3m:8444\/1 a curie:Morphology ;
+  rdfs:label "Clear cell cystic tumor of borderline malignancy" .
+icdo3m:8450\/0 a curie:Morphology ;
+  rdfs:label "Papillary cystadenoma, NOS" .
+icdo3m:8450\/3 a curie:Morphology ;
+  rdfs:label "Papillary cystadenocarcinoma, NOS" .
+icdo3m:8451\/1 a curie:Morphology ;
+  rdfs:label "Papillary cystadenoma, borderline malignancy" .
+icdo3m:8452\/1 a curie:Morphology ;
+  rdfs:label "Solid pseudopapillary tumor" .
+icdo3m:8452\/3 a curie:Morphology ;
+  rdfs:label "Solid pseudopapillary carcinoma" .
+icdo3m:8453\/0 a curie:Morphology ;
+  rdfs:label "Intraductal papillary-mucinous adenoma" .
+icdo3m:8453\/1 a curie:Morphology ;
+  rdfs:label "Intraductal papillary-mucinous tumor with moderate dysplasia" .
+icdo3m:8453\/2 a curie:Morphology ;
+  rdfs:label "Intraductal papillary-mucinous carcinoma, non-invasive" .
+icdo3m:8453\/3 a curie:Morphology ;
+  rdfs:label "Intraductal papillary-mucinous carcinoma, invasive" .
+icdo3m:8454\/0 a curie:Morphology ;
+  rdfs:label "Cystic tumor of atrio-ventricular node" .
+icdo3m:8460\/0 a curie:Morphology ;
+  rdfs:label "Papillary serous cystadenoma, NOS" .
+icdo3m:8460\/3 a curie:Morphology ;
+  rdfs:label "Papillary serous cystadenocarcinoma" .
+icdo3m:8461\/0 a curie:Morphology ;
+  rdfs:label "Serous surface papilloma" .
+icdo3m:8461\/3 a curie:Morphology ;
+  rdfs:label "Serous surface papillary carcinoma" .
+icdo3m:8462\/1 a curie:Morphology ;
+  rdfs:label "Serous papillary cystic tumor of borderline malignancy" .
+icdo3m:8463\/1 a curie:Morphology ;
+  rdfs:label "Serous surface papillary tumor of borderline malignancy" .
+icdo3m:8470\/0 a curie:Morphology ;
+  rdfs:label "Mucinous cystadenoma, NOS" .
+icdo3m:8470\/1 a curie:Morphology ;
+  rdfs:label "Mucinous cystic tumor with moderate dysplasia" .
+icdo3m:8470\/2 a curie:Morphology ;
+  rdfs:label "Mucinous cystadenocarcinoma, non-invasive" .
+icdo3m:8470\/3 a curie:Morphology ;
+  rdfs:label "Mucinous cystadenocarcinoma, NOS" .
+icdo3m:8471\/0 a curie:Morphology ;
+  rdfs:label "Papillary mucinous cystadenoma, NOS" .
+icdo3m:8471\/3 a curie:Morphology ;
+  rdfs:label "Papillary mucinous cystadenocarcinoma" .
+icdo3m:8472\/1 a curie:Morphology ;
+  rdfs:label "Mucinous cystic tumor of borderline malignancy" .
+icdo3m:8473\/1 a curie:Morphology ;
+  rdfs:label "Papillary mucinous cystadenoma, borderline malignancy" .
+icdo3m:8480\/0 a curie:Morphology ;
+  rdfs:label "Mucinous adenoma" .
+icdo3m:8480\/3 a curie:Morphology ;
+  rdfs:label "Mucinous adenocarcinoma" .
+icdo3m:8480\/6 a curie:Morphology ;
+  rdfs:label "Pseudomyxoma peritonei" .
+icdo3m:8481\/3 a curie:Morphology ;
+  rdfs:label "Mucin-producing adenocarcinoma" .
+icdo3m:8482\/3 a curie:Morphology ;
+  rdfs:label "Mucinous adenocarcinoma, endocervical type" .
+icdo3m:8490\/3 a curie:Morphology ;
+  rdfs:label "Signet ring cell carcinoma" .
+icdo3m:8490\/6 a curie:Morphology ;
+  rdfs:label "Metastatic signet ring cell carcinoma" .
+icdo3m:8500\/2 a curie:Morphology ;
+  rdfs:label "Intraductal carcinoma, noninfiltrating, NOS" .
+icdo3m:8500\/3 a curie:Morphology ;
+  rdfs:label "Infiltrating duct carcinoma, NOS" .
+icdo3m:8501\/2 a curie:Morphology ;
+  rdfs:label "Comedocarcinoma, noninfiltrating" .
+icdo3m:8501\/3 a curie:Morphology ;
+  rdfs:label "Comedocarcinoma, NOS" .
+icdo3m:8502\/3 a curie:Morphology ;
+  rdfs:label "Secretory carcinoma of breast" .
+icdo3m:8503\/0 a curie:Morphology ;
+  rdfs:label "Intraductal papilloma" .
+icdo3m:8503\/2 a curie:Morphology ;
+  rdfs:label "Noninfiltrating intraductal papillary adenocarcinoma" .
+icdo3m:8503\/3 a curie:Morphology ;
+  rdfs:label "Intraductal papillary adenocarcinoma with invasion" .
+icdo3m:8504\/0 a curie:Morphology ;
+  rdfs:label "Intracystic papillary adenoma" .
+icdo3m:8504\/2 a curie:Morphology ;
+  rdfs:label "Noninfiltrating intracystic carcinoma" .
+icdo3m:8504\/3 a curie:Morphology ;
+  rdfs:label "Intracystic carcinoma, NOS" .
+icdo3m:8505\/0 a curie:Morphology ;
+  rdfs:label "Intraductal papillomatosis, NOS" .
+icdo3m:8506\/0 a curie:Morphology ;
+  rdfs:label "Adenoma of nipple" .
+icdo3m:8507\/2 a curie:Morphology ;
+  rdfs:label "Intraductal micropapillary carcinoma" .
+icdo3m:8508\/3 a curie:Morphology ;
+  rdfs:label "Cystic hypersecretory carcinoma" .
+icdo3m:8510\/3 a curie:Morphology ;
+  rdfs:label "Medullary carcinoma, NOS" .
+icdo3m:8512\/3 a curie:Morphology ;
+  rdfs:label "Medullary carcinoma with lymphoid stroma" .
+icdo3m:8513\/3 a curie:Morphology ;
+  rdfs:label "Atypical medullary carcinoma" .
+icdo3m:8514\/3 a curie:Morphology ;
+  rdfs:label "Duct carcinoma, desmoplastic type" .
+icdo3m:8520\/2 a curie:Morphology ;
+  rdfs:label "Lobular carcinoma in situ, NOS" .
+icdo3m:8520\/3 a curie:Morphology ;
+  rdfs:label "Lobular carcinoma, NOS" .
+icdo3m:8851\/0 a curie:Morphology ;
+  rdfs:label "Fibrolipoma" .
+icdo3m:8851\/3 a curie:Morphology ;
+  rdfs:label "Liposarcoma, well differentiated" .
+icdo3m:8852\/0 a curie:Morphology ;
+  rdfs:label "Fibromyxolipoma" .
+icdo3m:8852\/3 a curie:Morphology ;
+  rdfs:label "Myxoid liposarcoma" .
+icdo3m:8853\/3 a curie:Morphology ;
+  rdfs:label "Round cell liposarcoma" .
+icdo3m:8854\/0 a curie:Morphology ;
+  rdfs:label "Pleomorphic lipoma" .
+icdo3m:8854\/3 a curie:Morphology ;
+  rdfs:label "Pleomorphic liposarcoma" .
+icdo3m:8855\/3 a curie:Morphology ;
+  rdfs:label "Mixed liposarcoma" .
+icdo3m:8856\/0 a curie:Morphology ;
+  rdfs:label "Intramuscular lipoma" .
+icdo3m:8857\/0 a curie:Morphology ;
+  rdfs:label "Spindle cell lipoma" .
+icdo3m:8857\/3 a curie:Morphology ;
+  rdfs:label "Fibroblastic liposarcoma" .
+icdo3m:8858\/3 a curie:Morphology ;
+  rdfs:label "Dedifferentiated liposarcoma" .
+icdo3m:8860\/0 a curie:Morphology ;
+  rdfs:label "Angiomyolipoma" .
+icdo3m:8861\/0 a curie:Morphology ;
+  rdfs:label "Angiolipoma, NOS" .
+icdo3m:8862\/0 a curie:Morphology ;
+  rdfs:label "Chondroid lipoma" .
+icdo3m:8870\/0 a curie:Morphology ;
+  rdfs:label "Myelolipoma" .
+icdo3m:8880\/0 a curie:Morphology ;
+  rdfs:label "Hibernoma" .
+icdo3m:8881\/0 a curie:Morphology ;
+  rdfs:label "Lipoblastomatosis" .
+icdo3m:8890\/0 a curie:Morphology ;
+  rdfs:label "Leiomyoma, NOS" .
+icdo3m:8890\/1 a curie:Morphology ;
+  rdfs:label "Leiomyomatosis, NOS" .
+icdo3m:8890\/3 a curie:Morphology ;
+  rdfs:label "Leiomyosarcoma, NOS" .
+icdo3m:8891\/0 a curie:Morphology ;
+  rdfs:label "Epithelioid leiomyoma" .
+icdo3m:8891\/3 a curie:Morphology ;
+  rdfs:label "Epithelioid leiomyosarcoma" .
+icdo3m:8892\/0 a curie:Morphology ;
+  rdfs:label "Cellular leiomyoma" .
+icdo3m:8893\/0 a curie:Morphology ;
+  rdfs:label "Bizarre leiomyoma" .
+icdo3m:8894\/0 a curie:Morphology ;
+  rdfs:label "Angiomyoma" .
+icdo3m:8894\/3 a curie:Morphology ;
+  rdfs:label "Angiomyosarcoma" .
+icdo3m:8895\/0 a curie:Morphology ;
+  rdfs:label "Myoma" .
+icdo3m:8895\/3 a curie:Morphology ;
+  rdfs:label "Myosarcoma" .
+icdo3m:8896\/3 a curie:Morphology ;
+  rdfs:label "Myxoid leiomyosarcoma" .
+icdo3m:8897\/1 a curie:Morphology ;
+  rdfs:label "Smooth muscle tumor of uncertain malignant potential" .
+icdo3m:8898\/1 a curie:Morphology ;
+  rdfs:label "Metastasizing leiomyoma" .
+icdo3m:8900\/0 a curie:Morphology ;
+  rdfs:label "Rhabdomyoma, NOS" .
+icdo3m:8900\/3 a curie:Morphology ;
+  rdfs:label "Rhabdomyosarcoma, NOS" .
+icdo3m:8901\/3 a curie:Morphology ;
+  rdfs:label "Pleomorphic rhabdomyosarcoma, adult type" .
+icdo3m:8902\/3 a curie:Morphology ;
+  rdfs:label "Mixed type rhabdomyosarcoma" .
+icdo3m:8903\/0 a curie:Morphology ;
+  rdfs:label "Fetal rhabdomyoma" .
+icdo3m:8904\/0 a curie:Morphology ;
+  rdfs:label "Adult rhabdomyoma" .
+icdo3m:8905\/0 a curie:Morphology ;
+  rdfs:label "Genital rhabdomyoma" .
+icdo3m:8910\/3 a curie:Morphology ;
+  rdfs:label "Embryonal rhabdomyosarcoma, NOS" .
+icdo3m:8912\/3 a curie:Morphology ;
+  rdfs:label "Spindle cell rhabdomyosarcoma" .
+icdo3m:8920\/3 a curie:Morphology ;
+  rdfs:label "Alveolar rhabdomyosarcoma" .
+icdo3m:8921\/3 a curie:Morphology ;
+  rdfs:label "Rhabdomyosarcoma with ganglionic differentiation" .
+icdo3m:8930\/0 a curie:Morphology ;
+  rdfs:label "Endometrial stromal nodule" .
+icdo3m:8930\/3 a curie:Morphology ;
+  rdfs:label "Endometrial stromal sarcoma, NOS" .
+icdo3m:8931\/3 a curie:Morphology ;
+  rdfs:label "Endometrial stromal sarcoma, low grade" .
+icdo3m:8932\/0 a curie:Morphology ;
+  rdfs:label "Adenomyoma" .
+icdo3m:8933\/3 a curie:Morphology ;
+  rdfs:label "Adenosarcoma" .
+icdo3m:8934\/3 a curie:Morphology ;
+  rdfs:label "Carcinofibroma" .
+icdo3m:8935\/0 a curie:Morphology ;
+  rdfs:label "Stromal tumor, benign" .
+icdo3m:8935\/1 a curie:Morphology ;
+  rdfs:label "Stromal tumor, NOS" .
+icdo3m:8935\/3 a curie:Morphology ;
+  rdfs:label "Stromal sarcoma, NOS" .
+icdo3m:9300\/0 a curie:Morphology ;
+  rdfs:label "Adenomatoid odontogenic tumor" .
+icdo3m:9301\/0 a curie:Morphology ;
+  rdfs:label "Calcifying odontogenic cyst" .
+icdo3m:9302\/0 a curie:Morphology ;
+  rdfs:label "Odontogenic ghost cell tumor" .
+icdo3m:9310\/0 a curie:Morphology ;
+  rdfs:label "Ameloblastoma, NOS" .
+icdo3m:9310\/3 a curie:Morphology ;
+  rdfs:label "Ameloblastoma, malignant" .
+icdo3m:9311\/0 a curie:Morphology ;
+  rdfs:label "Odontoameloblastoma" .
+icdo3m:9312\/0 a curie:Morphology ;
+  rdfs:label "Squamous odontogenic tumor" .
+icdo3m:9320\/0 a curie:Morphology ;
+  rdfs:label "Odontogenic myxoma" .
+icdo3m:9321\/0 a curie:Morphology ;
+  rdfs:label "Central odontogenic fibroma" .
+icdo3m:9322\/0 a curie:Morphology ;
+  rdfs:label "Peripheral odontogenic fibroma" .
+icdo3m:9330\/0 a curie:Morphology ;
+  rdfs:label "Ameloblastic fibroma" .
+icdo3m:9330\/3 a curie:Morphology ;
+  rdfs:label "Ameloblastic fibrosarcoma" .
+icdo3m:9340\/0 a curie:Morphology ;
+  rdfs:label "Calcifying epithelial odontogenic tumor" .
+icdo3m:9341\/1 a curie:Morphology ;
+  rdfs:label "Clear cell odontogenic tumor" .
+icdo3m:9342\/3 a curie:Morphology ;
+  rdfs:label "Odontogenic carcinosarcoma" .
+icdo3m:9350\/1 a curie:Morphology ;
+  rdfs:label "Craniopharyngioma" .
+icdo3m:9351\/1 a curie:Morphology ;
+  rdfs:label "Craniopharyngioma, adamantinomatous" .
+icdo3m:9352\/1 a curie:Morphology ;
+  rdfs:label "Craniopharyngioma, papillary" .
+icdo3m:9360\/1 a curie:Morphology ;
+  rdfs:label "Pinealoma" .
+icdo3m:9361\/1 a curie:Morphology ;
+  rdfs:label "Pineocytoma" .
+icdo3m:9362\/3 a curie:Morphology ;
+  rdfs:label "Pineoblastoma" .
+icdo3m:9363\/0 a curie:Morphology ;
+  rdfs:label "Melanotic neuroectodermal tumor" .
+icdo3m:9364\/3 a curie:Morphology ;
+  rdfs:label "Peripheral neuroectodermal tumor" .
+icdo3m:9365\/3 a curie:Morphology ;
+  rdfs:label "Askin tumor" .
+icdo3m:9370\/3 a curie:Morphology ;
+  rdfs:label "Chordoma, NOS" .
+icdo3m:9371\/3 a curie:Morphology ;
+  rdfs:label "Chondroid chordoma" .
+icdo3m:9372\/3 a curie:Morphology ;
+  rdfs:label "Dedifferentiated chordoma" .
+icdo3m:9373\/0 a curie:Morphology ;
+  rdfs:label "Parachordoma" .
+icdo3m:9380\/3 a curie:Morphology ;
+  rdfs:label "Glioma, malignant" .
+icdo3m:9381\/3 a curie:Morphology ;
+  rdfs:label "Gliomatosis cerebri" .
+icdo3m:9382\/3 a curie:Morphology ;
+  rdfs:label "Mixed glioma" .
+icdo3m:9383\/1 a curie:Morphology ;
+  rdfs:label "Subependymoma" .
+icdo3m:9384\/1 a curie:Morphology ;
+  rdfs:label "Subependymal giant cell astrocytoma" .
+icdo3m:9390\/0 a curie:Morphology ;
+  rdfs:label "Choroid plexus papilloma, NOS" .
+icdo3m:9390\/1 a curie:Morphology ;
+  rdfs:label "Atypical choroid plexus papilloma" .
+icdo3m:9390\/3 a curie:Morphology ;
+  rdfs:label "Choroid plexus carcinoma" .
+icdo3m:9391\/3 a curie:Morphology ;
+  rdfs:label "Ependymoma, NOS" .
+icdo3m:8521\/3 a curie:Morphology ;
+  rdfs:label "Infiltrating ductular carcinoma" .
+icdo3m:8522\/2 a curie:Morphology ;
+  rdfs:label "Intraductal carcinoma and lobular carcinoma in situ" .
+icdo3m:8522\/3 a curie:Morphology ;
+  rdfs:label "Infiltrating duct and lobular carcinoma" .
+icdo3m:8523\/3 a curie:Morphology ;
+  rdfs:label "Infiltrating duct mixed with other types of carcinoma" .
+icdo3m:8524\/3 a curie:Morphology ;
+  rdfs:label "Infiltrating lobular mixed with other types of carcinoma" .
+icdo3m:8525\/3 a curie:Morphology ;
+  rdfs:label "Polymorphous low grade adenocarcinoma" .
+icdo3m:8530\/3 a curie:Morphology ;
+  rdfs:label "Inflammatory carcinoma" .
+icdo3m:8540\/3 a curie:Morphology ;
+  rdfs:label "Paget disease, mammary" .
+icdo3m:8541\/3 a curie:Morphology ;
+  rdfs:label "Paget disease and infiltrating duct carcinoma of breast" .
+icdo3m:8542\/3 a curie:Morphology ;
+  rdfs:label "Paget disease, extramammary" .
+icdo3m:8543\/3 a curie:Morphology ;
+  rdfs:label "Paget disease and intraductal carcinoma of breast" .
+icdo3m:8550\/0 a curie:Morphology ;
+  rdfs:label "Acinar cell adenoma" .
+icdo3m:8550\/1 a curie:Morphology ;
+  rdfs:label "Acinar cell tumor" .
+icdo3m:8550\/3 a curie:Morphology ;
+  rdfs:label "Acinar cell carcinoma" .
+icdo3m:8551\/3 a curie:Morphology ;
+  rdfs:label "Acinar cell cystadenocarcinoma" .
+icdo3m:8560\/0 a curie:Morphology ;
+  rdfs:label "Mixed squamous cell and glandular papilloma" .
+icdo3m:8560\/3 a curie:Morphology ;
+  rdfs:label "Adenosquamous carcinoma" .
+icdo3m:8561\/0 a curie:Morphology ;
+  rdfs:label "Adenolymphoma" .
+icdo3m:8562\/3 a curie:Morphology ;
+  rdfs:label "Epithelial-myoepithelial carcinoma" .
+icdo3m:8570\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma with squamous metaplasia" .
+icdo3m:8571\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma with cartilaginous and osseous metaplasia" .
+icdo3m:8572\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma with spindle cell metaplasia" .
+icdo3m:8573\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma with apocrine metaplasia" .
+icdo3m:8574\/3 a curie:Morphology ;
+  rdfs:label "Adenocarcinoma with neuroendocrine differentiation" .
+icdo3m:8575\/3 a curie:Morphology ;
+  rdfs:label "Metaplastic carcinoma, NOS" .
+icdo3m:8576\/3 a curie:Morphology ;
+  rdfs:label "Hepatoid adenocarcinoma" .
+icdo3m:8580\/0 a curie:Morphology ;
+  rdfs:label "Thymoma, benign" .
+icdo3m:8580\/1 a curie:Morphology ;
+  rdfs:label "Thymoma, NOS" .
+icdo3m:8580\/3 a curie:Morphology ;
+  rdfs:label "Thymoma, malignant, NOS" .
+icdo3m:8581\/1 a curie:Morphology ;
+  rdfs:label "Thymoma, type A, NOS" .
+icdo3m:8581\/3 a curie:Morphology ;
+  rdfs:label "Thymoma, type A, malignant" .
+icdo3m:8582\/1 a curie:Morphology ;
+  rdfs:label "Thymoma, type AB, NOS" .
+icdo3m:8582\/3 a curie:Morphology ;
+  rdfs:label "Thymoma, type AB, malignant" .
+icdo3m:8583\/1 a curie:Morphology ;
+  rdfs:label "Thymoma, type B1, NOS" .
+icdo3m:8583\/3 a curie:Morphology ;
+  rdfs:label "Thymoma, type B1, malignant" .
+icdo3m:8584\/1 a curie:Morphology ;
+  rdfs:label "Thymoma, type B2, NOS" .
+icdo3m:8584\/3 a curie:Morphology ;
+  rdfs:label "Thymoma, type B2, malignant" .
+icdo3m:8585\/1 a curie:Morphology ;
+  rdfs:label "Thymoma, type B3, NOS" .
+icdo3m:8585\/3 a curie:Morphology ;
+  rdfs:label "Thymoma, type B3, malignant" .
+icdo3m:8586\/3 a curie:Morphology ;
+  rdfs:label "Thymic carcinoma, NOS" .
+icdo3m:8587\/0 a curie:Morphology ;
+  rdfs:label "Ectopic hamartomatous thymoma" .
+icdo3m:8588\/3 a curie:Morphology ;
+  rdfs:label "Spindle epithelial tumor with thymus-like element" .
+icdo3m:8589\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma showing thymus-like element" .
+icdo3m:8590\/1 a curie:Morphology ;
+  rdfs:label "Sex cord-gonadal stromal tumor, NOS" .
+icdo3m:8591\/1 a curie:Morphology ;
+  rdfs:label "Sex cord-gonadal stromal tumor, incompletely differentiated" .
+icdo3m:8592\/1 a curie:Morphology ;
+  rdfs:label "Sex cord-gonadal stromal tumor, mixed forms" .
+icdo3m:8593\/1 a curie:Morphology ;
+  rdfs:label "Stromal tumor with minor sex cord elements" .
+icdo3m:8600\/0 a curie:Morphology ;
+  rdfs:label "Thecoma, NOS" .
+icdo3m:8600\/3 a curie:Morphology ;
+  rdfs:label "Thecoma, malignant" .
+icdo3m:8601\/0 a curie:Morphology ;
+  rdfs:label "Thecoma, luteinized" .
+icdo3m:8602\/0 a curie:Morphology ;
+  rdfs:label "Sclerosing stromal tumor" .
+icdo3m:8610\/0 a curie:Morphology ;
+  rdfs:label "Luteoma, NOS" .
+icdo3m:8620\/1 a curie:Morphology ;
+  rdfs:label "Granulosa cell tumor, adult type" .
+icdo3m:8620\/3 a curie:Morphology ;
+  rdfs:label "Granulosa cell tumor, malignant" .
+icdo3m:8621\/1 a curie:Morphology ;
+  rdfs:label "Granulosa cell-theca cell tumor" .
+icdo3m:8622\/1 a curie:Morphology ;
+  rdfs:label "Granulosa cell tumor, juvenile" .
+icdo3m:8623\/1 a curie:Morphology ;
+  rdfs:label "Sex cord tumor with annular tubules" .
+icdo3m:8630\/0 a curie:Morphology ;
+  rdfs:label "Androblastoma, benign" .
+icdo3m:8630\/1 a curie:Morphology ;
+  rdfs:label "Androblastoma, NOS" .
+icdo3m:8630\/3 a curie:Morphology ;
+  rdfs:label "Androblastoma, malignant" .
+icdo3m:8631\/0 a curie:Morphology ;
+  rdfs:label "Sertoli-Leydig cell tumor, well differentiated" .
+icdo3m:8631\/1 a curie:Morphology ;
+  rdfs:label "Sertoli-Leydig cell tumor of intermediate differentiation" .
+icdo3m:8631\/3 a curie:Morphology ;
+  rdfs:label "Sertoli-Leydig cell tumor, poorly differentiated" .
+icdo3m:8632\/1 a curie:Morphology ;
+  rdfs:label "Gynandroblastoma" .
+icdo3m:8633\/1 a curie:Morphology ;
+  rdfs:label "Sertoli-Leydig cell tumor, retiform" .
+icdo3m:8634\/1 a curie:Morphology ;
+  rdfs:label "Sertoli-Leydig cell tumor, intermediate differentiation, with heterologous elements" .
+icdo3m:8634\/3 a curie:Morphology ;
+  rdfs:label "Sertoli-Leydig cell tumor, poorly differentiated, with heterologous elements" .
+icdo3m:8640\/1 a curie:Morphology ;
+  rdfs:label "Sertoli cell tumor, NOS" .
+icdo3m:8640\/3 a curie:Morphology ;
+  rdfs:label "Sertoli cell carcinoma" .
+icdo3m:8641\/0 a curie:Morphology ;
+  rdfs:label "Sertoli cell tumor with lipid storage" .
+icdo3m:8642\/1 a curie:Morphology ;
+  rdfs:label "Large cell calcifying Sertoli cell tumor" .
+icdo3m:8650\/0 a curie:Morphology ;
+  rdfs:label "Leydig cell tumor, benign" .
+icdo3m:8650\/1 a curie:Morphology ;
+  rdfs:label "Leydig cell tumor, NOS" .
+icdo3m:8650\/3 a curie:Morphology ;
+  rdfs:label "Leydig cell tumor, malignant" .
+icdo3m:8660\/0 a curie:Morphology ;
+  rdfs:label "Hilus cell tumor" .
+icdo3m:8670\/0 a curie:Morphology ;
+  rdfs:label "Lipid cell tumor of ovary" .
+icdo3m:8670\/3 a curie:Morphology ;
+  rdfs:label "Steroid cell tumor, malignant" .
+icdo3m:8671\/0 a curie:Morphology ;
+  rdfs:label "Adrenal rest tumor" .
+icdo3m:8680\/0 a curie:Morphology ;
+  rdfs:label "Paraganglioma, benign" .
+icdo3m:8680\/1 a curie:Morphology ;
+  rdfs:label "Paraganglioma, NOS" .
+icdo3m:8680\/3 a curie:Morphology ;
+  rdfs:label "Paraganglioma, malignant" .
+icdo3m:8681\/1 a curie:Morphology ;
+  rdfs:label "Sympathetic paraganglioma" .
+icdo3m:8682\/1 a curie:Morphology ;
+  rdfs:label "Parasympathetic paraganglioma" .
+icdo3m:8683\/0 a curie:Morphology ;
+  rdfs:label "Gangliocytic paraganglioma" .
+icdo3m:8690\/1 a curie:Morphology ;
+  rdfs:label "Glomus jugulare tumor, NOS" .
+icdo3m:8691\/1 a curie:Morphology ;
+  rdfs:label "Aortic body tumor" .
+icdo3m:8692\/1 a curie:Morphology ;
+  rdfs:label "Carotid body tumor" .
+icdo3m:8693\/1 a curie:Morphology ;
+  rdfs:label "Extra-adrenal paraganglioma, NOS" .
+icdo3m:8693\/3 a curie:Morphology ;
+  rdfs:label "Extra-adrenal paraganglioma, malignant" .
+icdo3m:8700\/0 a curie:Morphology ;
+  rdfs:label "Pheochromocytoma, NOS" .
+icdo3m:8700\/3 a curie:Morphology ;
+  rdfs:label "Pheochromocytoma, malignant" .
+icdo3m:8710\/3 a curie:Morphology ;
+  rdfs:label "Glomangiosarcoma" .
+icdo3m:8711\/0 a curie:Morphology ;
+  rdfs:label "Glomus tumor, NOS" .
+icdo3m:8711\/3 a curie:Morphology ;
+  rdfs:label "Glomus tumor, malignant" .
+icdo3m:8712\/0 a curie:Morphology ;
+  rdfs:label "Glomangioma" .
+icdo3m:8713\/0 a curie:Morphology ;
+  rdfs:label "Glomangiomyoma" .
+icdo3m:8720\/0 a curie:Morphology ;
+  rdfs:label "Pigmented nevus, NOS" .
+icdo3m:8720\/2 a curie:Morphology ;
+  rdfs:label "Melanoma in situ" .
+icdo3m:8720\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma, NOS" .
+icdo3m:8721\/3 a curie:Morphology ;
+  rdfs:label "Nodular melanoma" .
+icdo3m:8722\/0 a curie:Morphology ;
+  rdfs:label "Balloon cell nevus" .
+icdo3m:8722\/3 a curie:Morphology ;
+  rdfs:label "Balloon cell melanoma" .
+icdo3m:8723\/0 a curie:Morphology ;
+  rdfs:label "Halo nevus" .
+icdo3m:8723\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma, regressing" .
+icdo3m:8725\/0 a curie:Morphology ;
+  rdfs:label "Neuronevus" .
+icdo3m:8726\/0 a curie:Morphology ;
+  rdfs:label "Magnocellular nevus" .
+icdo3m:8727\/0 a curie:Morphology ;
+  rdfs:label "Dysplastic nevus" .
+icdo3m:8728\/0 a curie:Morphology ;
+  rdfs:label "Diffuse melanocytosis" .
+icdo3m:8728\/1 a curie:Morphology ;
+  rdfs:label "Meningeal melanocytoma" .
+icdo3m:8728\/3 a curie:Morphology ;
+  rdfs:label "Meningeal melanomatosis" .
+icdo3m:8730\/0 a curie:Morphology ;
+  rdfs:label "Nonpigmented nevus" .
+icdo3m:8730\/3 a curie:Morphology ;
+  rdfs:label "Amelanotic melanoma" .
+icdo3m:8740\/0 a curie:Morphology ;
+  rdfs:label "Junctional nevus, NOS" .
+icdo3m:8740\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma in junctional nevus" .
+icdo3m:8741\/2 a curie:Morphology ;
+  rdfs:label "Precancerous melanosis, NOS" .
+icdo3m:8741\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma in precancerous melanosis" .
+icdo3m:8742\/2 a curie:Morphology ;
+  rdfs:label "Lentigo maligna" .
+icdo3m:8742\/3 a curie:Morphology ;
+  rdfs:label "Lentigo maligna melanoma" .
+icdo3m:8743\/3 a curie:Morphology ;
+  rdfs:label "Superficial spreading melanoma" .
+icdo3m:8744\/3 a curie:Morphology ;
+  rdfs:label "Acral lentiginous melanoma, malignant" .
+icdo3m:8745\/3 a curie:Morphology ;
+  rdfs:label "Desmoplastic melanoma, malignant" .
+icdo3m:8746\/3 a curie:Morphology ;
+  rdfs:label "Mucosal lentiginous melanoma" .
+icdo3m:8750\/0 a curie:Morphology ;
+  rdfs:label "Intradermal nevus" .
+icdo3m:8760\/0 a curie:Morphology ;
+  rdfs:label "Compound nevus" .
+icdo3m:8761\/0 a curie:Morphology ;
+  rdfs:label "Small congenital nevus" .
+icdo3m:8761\/1 a curie:Morphology ;
+  rdfs:label "Giant pigmented nevus, NOS" .
+icdo3m:8761\/3 a curie:Morphology ;
+  rdfs:label "Malignant melanoma in giant pigmented nevus" .
+icdo3m:8762\/1 a curie:Morphology ;
+  rdfs:label "Proliferative dermal lesion in congenital nevus" .
+icdo3m:8770\/0 a curie:Morphology ;
+  rdfs:label "Epithelioid and spindle cell nevus" .
+icdo3m:8770\/3 a curie:Morphology ;
+  rdfs:label "Mixed epithelioid and spindle cell melanoma" .
+icdo3m:8771\/0 a curie:Morphology ;
+  rdfs:label "Epithelioid cell nevus" .
+icdo3m:8771\/3 a curie:Morphology ;
+  rdfs:label "Epithelioid cell melanoma" .
+icdo3m:8772\/0 a curie:Morphology ;
+  rdfs:label "Spindle cell nevus, NOS" .
+icdo3m:8772\/3 a curie:Morphology ;
+  rdfs:label "Spindle cell melanoma, NOS" .
+icdo3m:8773\/3 a curie:Morphology ;
+  rdfs:label "Spindle cell melanoma, type A" .
+icdo3m:8774\/3 a curie:Morphology ;
+  rdfs:label "Spindle cell melanoma, type B" .
+icdo3m:8780\/0 a curie:Morphology ;
+  rdfs:label "Blue nevus, NOS" .
+icdo3m:8780\/3 a curie:Morphology ;
+  rdfs:label "Blue nevus, malignant" .
+icdo3m:8790\/0 a curie:Morphology ;
+  rdfs:label "Cellular blue nevus" .
+icdo3m:8800\/0 a curie:Morphology ;
+  rdfs:label "Soft tissue tumor, benign" .
+icdo3m:8800\/3 a curie:Morphology ;
+  rdfs:label "Sarcoma, NOS" .
+icdo3m:8800\/9 a curie:Morphology ;
+  rdfs:label "Sarcomatosis, NOS" .
+icdo3m:8801\/3 a curie:Morphology ;
+  rdfs:label "Spindle cell sarcoma" .
+icdo3m:8802\/3 a curie:Morphology ;
+  rdfs:label "Giant cell sarcoma" .
+icdo3m:8803\/3 a curie:Morphology ;
+  rdfs:label "Small cell sarcoma" .
+icdo3m:8804\/3 a curie:Morphology ;
+  rdfs:label "Epithelioid sarcoma" .
+icdo3m:8805\/3 a curie:Morphology ;
+  rdfs:label "Undifferentiated sarcoma" .
+icdo3m:8806\/3 a curie:Morphology ;
+  rdfs:label "Desmoplastic small round cell tumor" .
+icdo3m:8810\/0 a curie:Morphology ;
+  rdfs:label "Fibroma, NOS" .
+icdo3m:8810\/1 a curie:Morphology ;
+  rdfs:label "Cellular fibroma" .
+icdo3m:8810\/3 a curie:Morphology ;
+  rdfs:label "Fibrosarcoma, NOS" .
+icdo3m:8811\/0 a curie:Morphology ;
+  rdfs:label "Fibromyxoma" .
+icdo3m:8811\/3 a curie:Morphology ;
+  rdfs:label "Fibromyxosarcoma" .
+icdo3m:8812\/0 a curie:Morphology ;
+  rdfs:label "Periosteal fibroma" .
+icdo3m:8812\/3 a curie:Morphology ;
+  rdfs:label "Periosteal fibrosarcoma" .
+icdo3m:8813\/0 a curie:Morphology ;
+  rdfs:label "Fascial fibroma" .
+icdo3m:8813\/3 a curie:Morphology ;
+  rdfs:label "Fascial fibrosarcoma" .
+icdo3m:8814\/3 a curie:Morphology ;
+  rdfs:label "Infantile fibrosarcoma" .
+icdo3m:8815\/0 a curie:Morphology ;
+  rdfs:label "Solitary fibrous tumor" .
+icdo3m:8815\/3 a curie:Morphology ;
+  rdfs:label "Solitary fibrous tumor, malignant" .
+icdo3m:8820\/0 a curie:Morphology ;
+  rdfs:label "Elastofibroma" .
+icdo3m:8821\/1 a curie:Morphology ;
+  rdfs:label "Aggressive fibromatosis" .
+icdo3m:8822\/1 a curie:Morphology ;
+  rdfs:label "Abdominal fibromatosis" .
+icdo3m:8823\/0 a curie:Morphology ;
+  rdfs:label "Desmoplastic fibroma" .
+icdo3m:8824\/0 a curie:Morphology ;
+  rdfs:label "Myofibroma" .
+icdo3m:8824\/1 a curie:Morphology ;
+  rdfs:label "Myofibromatosis" .
+icdo3m:8825\/0 a curie:Morphology ;
+  rdfs:label "Myofibroblastoma" .
+icdo3m:8825\/1 a curie:Morphology ;
+  rdfs:label "Myofibroblastic tumor, NOS" .
+icdo3m:8826\/0 a curie:Morphology ;
+  rdfs:label "Angiomyofibroblastoma" .
+icdo3m:8827\/1 a curie:Morphology ;
+  rdfs:label "Myofibroblastic tumor, peribronchial" .
+icdo3m:8830\/0 a curie:Morphology ;
+  rdfs:label "Benign fibrous histiocytoma" .
+icdo3m:8830\/1 a curie:Morphology ;
+  rdfs:label "Atypical fibrous histiocytoma" .
+icdo3m:8830\/3 a curie:Morphology ;
+  rdfs:label "Malignant fibrous histiocytoma" .
+icdo3m:8831\/0 a curie:Morphology ;
+  rdfs:label "Histiocytoma, NOS" .
+icdo3m:8832\/0 a curie:Morphology ;
+  rdfs:label "Dermatofibroma, NOS" .
+icdo3m:8832\/3 a curie:Morphology ;
+  rdfs:label "Dermatofibrosarcoma, NOS" .
+icdo3m:8833\/3 a curie:Morphology ;
+  rdfs:label "Pigmented dermatofibrosarcoma protuberans" .
+icdo3m:8834\/1 a curie:Morphology ;
+  rdfs:label "Giant cell fibroblastoma" .
+icdo3m:8835\/1 a curie:Morphology ;
+  rdfs:label "Plexiform fibrohistiocytic tumor" .
+icdo3m:8836\/1 a curie:Morphology ;
+  rdfs:label "Angiomatoid fibrous histiocytoma" .
+icdo3m:8840\/0 a curie:Morphology ;
+  rdfs:label "Myxoma, NOS" .
+icdo3m:8840\/3 a curie:Morphology ;
+  rdfs:label "Myxosarcoma" .
+icdo3m:8841\/1 a curie:Morphology ;
+  rdfs:label "Angiomyxoma" .
+icdo3m:8842\/0 a curie:Morphology ;
+  rdfs:label "Ossifying fibromyxoid tumor" .
+icdo3m:8850\/0 a curie:Morphology ;
+  rdfs:label "Lipoma, NOS" .
+icdo3m:8850\/1 a curie:Morphology ;
+  rdfs:label "Atypical lipoma/j" .
+icdo3m:8850\/3 a curie:Morphology ;
+  rdfs:label "Liposarcoma, NOS" .
+icdo3m:8936\/0 a curie:Morphology ;
+  rdfs:label "Gastrointestinal stromal tumor, benign" .
+icdo3m:8936\/1 a curie:Morphology ;
+  rdfs:label "Gastrointestinal stromal tumor, NOS" .
+icdo3m:8936\/3 a curie:Morphology ;
+  rdfs:label "Gastrointestinal stromal sarcoma" .
+icdo3m:8940\/0 a curie:Morphology ;
+  rdfs:label "Pleomorphic adenoma" .
+icdo3m:8940\/3 a curie:Morphology ;
+  rdfs:label "Mixed tumor, malignant, NOS" .
+icdo3m:8941\/3 a curie:Morphology ;
+  rdfs:label "Carcinoma in pleomorphic adenoma" .
+icdo3m:8950\/3 a curie:Morphology ;
+  rdfs:label "Mullerian mixed tumor" .
+icdo3m:8951\/3 a curie:Morphology ;
+  rdfs:label "Mesodermal mixed tumor" .
+icdo3m:8959\/0 a curie:Morphology ;
+  rdfs:label "Benign cystic nephroma" .
+icdo3m:8959\/1 a curie:Morphology ;
+  rdfs:label "Cystic partially differentiated nephroblastoma" .
+icdo3m:8959\/3 a curie:Morphology ;
+  rdfs:label "Malignant cystic nephroma" .
+icdo3m:8960\/1 a curie:Morphology ;
+  rdfs:label "Mesoblastic nephroma" .
+icdo3m:8960\/3 a curie:Morphology ;
+  rdfs:label "Nephroblastoma, NOS" .
+icdo3m:8963\/3 a curie:Morphology ;
+  rdfs:label "Malignant rhabdoid tumor" .
+icdo3m:8964\/3 a curie:Morphology ;
+  rdfs:label "Clear cell sarcoma of kidney" .
+icdo3m:8965\/0 a curie:Morphology ;
+  rdfs:label "Nephrogenic adenofibroma" .
+icdo3m:8966\/0 a curie:Morphology ;
+  rdfs:label "Renomedullary interstitial cell tumor" .
+icdo3m:8967\/0 a curie:Morphology ;
+  rdfs:label "Ossifying renal tumor" .
+icdo3m:8970\/3 a curie:Morphology ;
+  rdfs:label "Hepatoblastoma" .
+icdo3m:8971\/3 a curie:Morphology ;
+  rdfs:label "Pancreatoblastoma" .
+icdo3m:8972\/3 a curie:Morphology ;
+  rdfs:label "Pulmonary blastoma" .
+icdo3m:8973\/3 a curie:Morphology ;
+  rdfs:label "Pleuropulmonary blastoma" .
+icdo3m:8974\/1 a curie:Morphology ;
+  rdfs:label "Sialoblastoma" .
+icdo3m:8980\/3 a curie:Morphology ;
+  rdfs:label "Carcinosarcoma, NOS" .
+icdo3m:8981\/3 a curie:Morphology ;
+  rdfs:label "Carcinosarcoma, embryonal" .
+icdo3m:8982\/0 a curie:Morphology ;
+  rdfs:label "Myoepithelioma" .
+icdo3m:8982\/3 a curie:Morphology ;
+  rdfs:label "Malignant myoepithelioma" .
+icdo3m:8983\/0 a curie:Morphology ;
+  rdfs:label "Adenomyoepithelioma" .
+icdo3m:8990\/0 a curie:Morphology ;
+  rdfs:label "Mesenchymoma, benign" .
+icdo3m:8990\/1 a curie:Morphology ;
+  rdfs:label "Mesenchymoma, NOS" .
+icdo3m:8990\/3 a curie:Morphology ;
+  rdfs:label "Mesenchymoma, malignant" .
+icdo3m:8991\/3 a curie:Morphology ;
+  rdfs:label "Embryonal sarcoma" .
+icdo3m:9000\/0 a curie:Morphology ;
+  rdfs:label "Brenner tumor, NOS" .
+icdo3m:9000\/1 a curie:Morphology ;
+  rdfs:label "Brenner tumor, borderline malignancy" .
+icdo3m:9000\/3 a curie:Morphology ;
+  rdfs:label "Brenner tumor, malignant" .
+icdo3m:9010\/0 a curie:Morphology ;
+  rdfs:label "Fibroadenoma, NOS" .
+icdo3m:9011\/0 a curie:Morphology ;
+  rdfs:label "Intracanalicular fibroadenoma" .
+icdo3m:9012\/0 a curie:Morphology ;
+  rdfs:label "Pericanalicular fibroadenoma" .
+icdo3m:9013\/0 a curie:Morphology ;
+  rdfs:label "Adenofibroma, NOS" .
+icdo3m:9014\/0 a curie:Morphology ;
+  rdfs:label "Serous adenofibroma, NOS" .
+icdo3m:9014\/1 a curie:Morphology ;
+  rdfs:label "Serous adenofibroma of borderline malignancy" .
+icdo3m:9014\/3 a curie:Morphology ;
+  rdfs:label "Serous adenocarcinofibroma" .
+icdo3m:9015\/0 a curie:Morphology ;
+  rdfs:label "Mucinous adenofibroma, NOS" .
+icdo3m:9015\/1 a curie:Morphology ;
+  rdfs:label "Mucinous adenofibroma of borderline malignancy" .
+icdo3m:9015\/3 a curie:Morphology ;
+  rdfs:label "Mucinous adenocarcinofibroma" .
+icdo3m:9016\/0 a curie:Morphology ;
+  rdfs:label "Giant fibroadenoma" .
+icdo3m:9020\/0 a curie:Morphology ;
+  rdfs:label "Phyllodes tumor, benign" .
+icdo3m:9020\/1 a curie:Morphology ;
+  rdfs:label "Phyllodes tumor, borderline" .
+icdo3m:9020\/3 a curie:Morphology ;
+  rdfs:label "Phyllodes tumor, malignant" .
+icdo3m:9030\/0 a curie:Morphology ;
+  rdfs:label "Juvenile fibroadenoma" .
+icdo3m:9040\/0 a curie:Morphology ;
+  rdfs:label "Synovioma, benign" .
+icdo3m:9040\/3 a curie:Morphology ;
+  rdfs:label "Synovial sarcoma, NOS" .
+icdo3m:9041\/3 a curie:Morphology ;
+  rdfs:label "Synovial sarcoma, spindle cell" .
+icdo3m:9042\/3 a curie:Morphology ;
+  rdfs:label "Synovial sarcoma, epithelioid cell" .
+icdo3m:9043\/3 a curie:Morphology ;
+  rdfs:label "Synovial sarcoma, biphasic" .
+icdo3m:9044\/3 a curie:Morphology ;
+  rdfs:label "Clear cell sarcoma, NOS" .
+icdo3m:9050\/0 a curie:Morphology ;
+  rdfs:label "Mesothelioma, benign" .
+icdo3m:9050\/3 a curie:Morphology ;
+  rdfs:label "Mesothelioma, malignant" .
+icdo3m:9051\/0 a curie:Morphology ;
+  rdfs:label "Fibrous mesothelioma, benign" .
+icdo3m:9051\/3 a curie:Morphology ;
+  rdfs:label "Fibrous mesothelioma, malignant" .
+icdo3m:9052\/0 a curie:Morphology ;
+  rdfs:label "Epithelioid mesothelioma, benign" .
+icdo3m:9052\/3 a curie:Morphology ;
+  rdfs:label "Epithelioid mesothelioma, malignant" .
+icdo3m:9053\/3 a curie:Morphology ;
+  rdfs:label "Mesothelioma, biphasic, malignant" .
+icdo3m:9054\/0 a curie:Morphology ;
+  rdfs:label "Adenomatoid tumor, NOS" .
+icdo3m:9055\/0 a curie:Morphology ;
+  rdfs:label "Multicystic mesothelioma, benign" .
+icdo3m:9055\/1 a curie:Morphology ;
+  rdfs:label "Cystic mesothelioma, NOS" .
+icdo3m:9060\/3 a curie:Morphology ;
+  rdfs:label "Dysgerminoma" .
+icdo3m:9061\/3 a curie:Morphology ;
+  rdfs:label "Seminoma, NOS" .
+icdo3m:9062\/3 a curie:Morphology ;
+  rdfs:label "Seminoma, anaplastic" .
+icdo3m:9063\/3 a curie:Morphology ;
+  rdfs:label "Spermatocytic seminoma" .
+icdo3m:9064\/2 a curie:Morphology ;
+  rdfs:label "Intratubular malignant germ cells" .
+icdo3m:9064\/3 a curie:Morphology ;
+  rdfs:label "Germinoma" .
+icdo3m:9065\/3 a curie:Morphology ;
+  rdfs:label "Germ cell tumor, nonseminomatous" .
+icdo3m:9070\/3 a curie:Morphology ;
+  rdfs:label "Embryonal carcinoma, NOS" .
+icdo3m:9071\/3 a curie:Morphology ;
+  rdfs:label "Yolk sac tumor" .
+icdo3m:9072\/3 a curie:Morphology ;
+  rdfs:label "Polyembryoma" .
+icdo3m:9073\/1 a curie:Morphology ;
+  rdfs:label "Gonadoblastoma" .
+icdo3m:9080\/0 a curie:Morphology ;
+  rdfs:label "Teratoma, benign" .
+icdo3m:9080\/1 a curie:Morphology ;
+  rdfs:label "Teratoma, NOS" .
+icdo3m:9080\/3 a curie:Morphology ;
+  rdfs:label "Teratoma, malignant, NOS" .
+icdo3m:9081\/3 a curie:Morphology ;
+  rdfs:label "Teratocarcinoma" .
+icdo3m:9082\/3 a curie:Morphology ;
+  rdfs:label "Malignant teratoma, undifferentiated" .
+icdo3m:9083\/3 a curie:Morphology ;
+  rdfs:label "Malignant teratoma, intermediate" .
+icdo3m:9084\/0 a curie:Morphology ;
+  rdfs:label "Dermoid cyst, NOS" .
+icdo3m:9084\/3 a curie:Morphology ;
+  rdfs:label "Teratoma with malignant transformation" .
+icdo3m:9085\/3 a curie:Morphology ;
+  rdfs:label "Mixed germ cell tumor" .
+icdo3m:9090\/0 a curie:Morphology ;
+  rdfs:label "Struma ovarii, NOS" .
+icdo3m:9090\/3 a curie:Morphology ;
+  rdfs:label "Struma ovarii, malignant" .
+icdo3m:9091\/1 a curie:Morphology ;
+  rdfs:label "Strumal carcinoid" .
+icdo3m:9100\/0 a curie:Morphology ;
+  rdfs:label "Hydatidiform mole, NOS" .
+icdo3m:9100\/1 a curie:Morphology ;
+  rdfs:label "Invasive hydatidiform mole" .
+icdo3m:9100\/3 a curie:Morphology ;
+  rdfs:label "Choriocarcinoma, NOS" .
+icdo3m:9101\/3 a curie:Morphology ;
+  rdfs:label "Choriocarcinoma combined with other germ cell elements" .
+icdo3m:9102\/3 a curie:Morphology ;
+  rdfs:label "Malignant teratoma, trophoblastic" .
+icdo3m:9103\/0 a curie:Morphology ;
+  rdfs:label "Partial hydatidiform mole" .
+icdo3m:9104\/1 a curie:Morphology ;
+  rdfs:label "Placental site trophoblastic tumor" .
+icdo3m:9105\/3 a curie:Morphology ;
+  rdfs:label "Trophoblastic tumor, epithelioid" .
+icdo3m:9110\/0 a curie:Morphology ;
+  rdfs:label "Mesonephroma, benign" .
+icdo3m:9110\/1 a curie:Morphology ;
+  rdfs:label "Mesonephric tumor, NOS" .
+icdo3m:9110\/3 a curie:Morphology ;
+  rdfs:label "Mesonephroma, malignant" .
+icdo3m:9120\/0 a curie:Morphology ;
+  rdfs:label "Hemangioma, NOS" .
+icdo3m:9120\/3 a curie:Morphology ;
+  rdfs:label "Hemangiosarcoma" .
+icdo3m:9121\/0 a curie:Morphology ;
+  rdfs:label "Cavernous hemangioma" .
+icdo3m:9122\/0 a curie:Morphology ;
+  rdfs:label "Venous hemangioma" .
+icdo3m:9123\/0 a curie:Morphology ;
+  rdfs:label "Racemose hemangioma" .
+icdo3m:9124\/3 a curie:Morphology ;
+  rdfs:label "Kupffer cell sarcoma" .
+icdo3m:9125\/0 a curie:Morphology ;
+  rdfs:label "Epithelioid hemangioma" .
+icdo3m:9130\/0 a curie:Morphology ;
+  rdfs:label "Hemangioendothelioma, benign" .
+icdo3m:9130\/1 a curie:Morphology ;
+  rdfs:label "Hemangioendothelioma, NOS" .
+icdo3m:9130\/3 a curie:Morphology ;
+  rdfs:label "Hemangioendothelioma, malignant" .
+icdo3m:9131\/0 a curie:Morphology ;
+  rdfs:label "Capillary hemangioma" .
+icdo3m:9132\/0 a curie:Morphology ;
+  rdfs:label "Intramuscular hemangioma" .
+icdo3m:9133\/1 a curie:Morphology ;
+  rdfs:label "Epithelioid hemangioendothelioma, NOS" .
+icdo3m:9133\/3 a curie:Morphology ;
+  rdfs:label "Epithelioid hemangioendothelioma, malignant" .
+icdo3m:9135\/1 a curie:Morphology ;
+  rdfs:label "Endovascular papillary angioendothelioma" .
+icdo3m:9136\/1 a curie:Morphology ;
+  rdfs:label "Spindle cell hemangioendothelioma" .
+icdo3m:9140\/3 a curie:Morphology ;
+  rdfs:label "Kaposi sarcoma" .
+icdo3m:9141\/0 a curie:Morphology ;
+  rdfs:label "Angiokeratoma" .
+icdo3m:9142\/0 a curie:Morphology ;
+  rdfs:label "Verrucous keratotic hemangioma" .
+icdo3m:9150\/0 a curie:Morphology ;
+  rdfs:label "Hemangiopericytoma, benign" .
+icdo3m:9150\/1 a curie:Morphology ;
+  rdfs:label "Hemangiopericytoma, NOS" .
+icdo3m:9150\/3 a curie:Morphology ;
+  rdfs:label "Hemangiopericytoma, malignant" .
+icdo3m:9160\/0 a curie:Morphology ;
+  rdfs:label "Angiofibroma, NOS" .
+icdo3m:9161\/0 a curie:Morphology ;
+  rdfs:label "Acquired tufted hemangioma" .
+icdo3m:9161\/1 a curie:Morphology ;
+  rdfs:label "Hemangioblastoma" .
+icdo3m:9170\/0 a curie:Morphology ;
+  rdfs:label "Lymphangioma, NOS" .
+icdo3m:9170\/3 a curie:Morphology ;
+  rdfs:label "Lymphangiosarcoma" .
+icdo3m:9171\/0 a curie:Morphology ;
+  rdfs:label "Capillary lymphangioma" .
+icdo3m:9172\/0 a curie:Morphology ;
+  rdfs:label "Cavernous lymphangioma" .
+icdo3m:9173\/0 a curie:Morphology ;
+  rdfs:label "Cystic lymphangioma" .
+icdo3m:9174\/0 a curie:Morphology ;
+  rdfs:label "Lymphangiomyoma" .
+icdo3m:9174\/1 a curie:Morphology ;
+  rdfs:label "Lymphangiomyomatosis" .
+icdo3m:9175\/0 a curie:Morphology ;
+  rdfs:label "Hemolymphangioma" .
+icdo3m:9180\/0 a curie:Morphology ;
+  rdfs:label "Osteoma, NOS" .
+icdo3m:9180\/3 a curie:Morphology ;
+  rdfs:label "Osteosarcoma, NOS" .
+icdo3m:9181\/3 a curie:Morphology ;
+  rdfs:label "Chondroblastic osteosarcoma" .
+icdo3m:9182\/3 a curie:Morphology ;
+  rdfs:label "Fibroblastic osteosarcoma" .
+icdo3m:9183\/3 a curie:Morphology ;
+  rdfs:label "Telangiectatic osteosarcoma" .
+icdo3m:9184\/3 a curie:Morphology ;
+  rdfs:label "Osteosarcoma in Paget disease of bone" .
+icdo3m:9185\/3 a curie:Morphology ;
+  rdfs:label "Small cell osteosarcoma" .
+icdo3m:9186\/3 a curie:Morphology ;
+  rdfs:label "Central osteosarcoma" .
+icdo3m:9187\/3 a curie:Morphology ;
+  rdfs:label "Intraosseous well differentiated osteosarcoma" .
+icdo3m:9191\/0 a curie:Morphology ;
+  rdfs:label "Osteoid osteoma, NOS" .
+icdo3m:9192\/3 a curie:Morphology ;
+  rdfs:label "Parosteal osteosarcoma" .
+icdo3m:9193\/3 a curie:Morphology ;
+  rdfs:label "Periosteal osteosarcoma" .
+icdo3m:9194\/3 a curie:Morphology ;
+  rdfs:label "High grade surface osteosarcoma" .
+icdo3m:9195\/3 a curie:Morphology ;
+  rdfs:label "Intracortical osteosarcoma" .
+icdo3m:9200\/0 a curie:Morphology ;
+  rdfs:label "Osteoblastoma, NOS" .
+icdo3m:9200\/1 a curie:Morphology ;
+  rdfs:label "Aggressive osteoblastoma" .
+icdo3m:9210\/0 a curie:Morphology ;
+  rdfs:label "Osteochondroma" .
+icdo3m:9210\/1 a curie:Morphology ;
+  rdfs:label "Osteochondromatosis, NOS" .
+icdo3m:9220\/0 a curie:Morphology ;
+  rdfs:label "Chondroma, NOS" .
+icdo3m:9220\/1 a curie:Morphology ;
+  rdfs:label "Chondromatosis, NOS" .
+icdo3m:9220\/3 a curie:Morphology ;
+  rdfs:label "Chondrosarcoma, NOS" .
+icdo3m:9221\/0 a curie:Morphology ;
+  rdfs:label "Juxtacortical chondroma" .
+icdo3m:9221\/3 a curie:Morphology ;
+  rdfs:label "Juxtacortical chondrosarcoma" .
+icdo3m:9230\/0 a curie:Morphology ;
+  rdfs:label "Chondroblastoma, NOS" .
+icdo3m:9230\/3 a curie:Morphology ;
+  rdfs:label "Chondroblastoma, malignant" .
+icdo3m:9231\/3 a curie:Morphology ;
+  rdfs:label "Myxoid chondrosarcoma" .
+icdo3m:9240\/3 a curie:Morphology ;
+  rdfs:label "Mesenchymal chondrosarcoma" .
+icdo3m:9241\/0 a curie:Morphology ;
+  rdfs:label "Chondromyxoid fibroma" .
+icdo3m:9242\/3 a curie:Morphology ;
+  rdfs:label "Clear cell chondrosarcoma" .
+icdo3m:9243\/3 a curie:Morphology ;
+  rdfs:label "Dedifferentiated chondrosarcoma" .
+icdo3m:9250\/1 a curie:Morphology ;
+  rdfs:label "Giant cell tumor of bone, NOS" .
+icdo3m:9250\/3 a curie:Morphology ;
+  rdfs:label "Giant cell tumor of bone, malignant" .
+icdo3m:9251\/1 a curie:Morphology ;
+  rdfs:label "Giant cell tumor of soft parts, NOS" .
+icdo3m:9251\/3 a curie:Morphology ;
+  rdfs:label "Malignant giant cell tumor of soft parts" .
+icdo3m:9252\/0 a curie:Morphology ;
+  rdfs:label "Tenosynovial giant cell tumor" .
+icdo3m:9252\/3 a curie:Morphology ;
+  rdfs:label "Malignant tenosynovial giant cell tumor" .
+icdo3m:9260\/3 a curie:Morphology ;
+  rdfs:label "Ewing sarcoma" .
+icdo3m:9261\/3 a curie:Morphology ;
+  rdfs:label "Adamantinoma of long bones" .
+icdo3m:9262\/0 a curie:Morphology ;
+  rdfs:label "Ossifying fibroma" .
+icdo3m:9270\/0 a curie:Morphology ;
+  rdfs:label "Odontogenic tumor, benign" .
+icdo3m:9270\/1 a curie:Morphology ;
+  rdfs:label "Odontogenic tumor, NOS" .
+icdo3m:9270\/3 a curie:Morphology ;
+  rdfs:label "Odontogenic tumor, malignant" .
+icdo3m:9271\/0 a curie:Morphology ;
+  rdfs:label "Ameloblastic fibrodentinoma" .
+icdo3m:9272\/0 a curie:Morphology ;
+  rdfs:label "Cementoma, NOS" .
+icdo3m:9273\/0 a curie:Morphology ;
+  rdfs:label "Cementoblastoma, benign" .
+icdo3m:9274\/0 a curie:Morphology ;
+  rdfs:label "Cementifying fibroma" .
+icdo3m:9275\/0 a curie:Morphology ;
+  rdfs:label "Gigantiform cementoma" .
+icdo3m:9280\/0 a curie:Morphology ;
+  rdfs:label "Odontoma, NOS" .
+icdo3m:9281\/0 a curie:Morphology ;
+  rdfs:label "Compound odontoma" .
+icdo3m:9282\/0 a curie:Morphology ;
+  rdfs:label "Complex odontoma" .
+icdo3m:9290\/0 a curie:Morphology ;
+  rdfs:label "Ameloblastic fibro-odontoma" .
+icdo3m:9290\/3 a curie:Morphology ;
+  rdfs:label "Ameloblastic odontosarcoma" .
+icdo3m:9392\/3 a curie:Morphology ;
+  rdfs:label "Ependymoma, anaplastic" .
+icdo3m:9393\/3 a curie:Morphology ;
+  rdfs:label "Papillary ependymoma" .
+icdo3m:9394\/1 a curie:Morphology ;
+  rdfs:label "Myxopapillary ependymoma" .
+icdo3m:9400\/3 a curie:Morphology ;
+  rdfs:label "Astrocytoma, NOS" .
+icdo3m:9401\/3 a curie:Morphology ;
+  rdfs:label "Astrocytoma, anaplastic" .
+icdo3m:9410\/3 a curie:Morphology ;
+  rdfs:label "Protoplasmic astrocytoma" .
+icdo3m:9411\/3 a curie:Morphology ;
+  rdfs:label "Gemistocytic astrocytoma" .
+icdo3m:9412\/1 a curie:Morphology ;
+  rdfs:label "Desmoplastic infantile astrocytoma" .
+icdo3m:9413\/0 a curie:Morphology ;
+  rdfs:label "Dysembryoplastic neuroepithelial tumor" .
+icdo3m:9420\/3 a curie:Morphology ;
+  rdfs:label "Fibrillary astrocytoma" .
+icdo3m:9421\/1 a curie:Morphology ;
+  rdfs:label "Pilocytic astrocytoma" .
+icdo3m:9423\/3 a curie:Morphology ;
+  rdfs:label "Polar spongioblastoma" .
+icdo3m:9424\/3 a curie:Morphology ;
+  rdfs:label "Pleomorphic xanthoastrocytoma" .
+icdo3m:9430\/3 a curie:Morphology ;
+  rdfs:label "Astroblastoma" .
+icdo3m:9440\/3 a curie:Morphology ;
+  rdfs:label "Glioblastoma, NOS" .
+icdo3m:9441\/3 a curie:Morphology ;
+  rdfs:label "Giant cell glioblastoma" .
+icdo3m:9442\/1 a curie:Morphology ;
+  rdfs:label "Gliofibroma" .
+icdo3m:9442\/3 a curie:Morphology ;
+  rdfs:label "Gliosarcoma" .
+icdo3m:9444\/1 a curie:Morphology ;
+  rdfs:label "Chordoid glioma" .
+icdo3m:9450\/3 a curie:Morphology ;
+  rdfs:label "Oligodendroglioma, NOS" .
+icdo3m:9451\/3 a curie:Morphology ;
+  rdfs:label "Oligodendroglioma, anaplastic" .
+icdo3m:9460\/3 a curie:Morphology ;
+  rdfs:label "Oligodendroblastoma" .
+icdo3m:9470\/3 a curie:Morphology ;
+  rdfs:label "Medulloblastoma, NOS" .
+icdo3m:9471\/3 a curie:Morphology ;
+  rdfs:label "Desmoplastic nodular medulloblastoma" .
+icdo3m:9472\/3 a curie:Morphology ;
+  rdfs:label "Medullomyoblastoma" .
+icdo3m:9473\/3 a curie:Morphology ;
+  rdfs:label "Primitive neuroectodermal tumor, NOS" .
+icdo3m:9474\/3 a curie:Morphology ;
+  rdfs:label "Large cell medulloblastoma" .
+icdo3m:9480\/3 a curie:Morphology ;
+  rdfs:label "Cerebellar sarcoma, NOS" .
+icdo3m:9490\/0 a curie:Morphology ;
+  rdfs:label "Ganglioneuroma" .
+icdo3m:9490\/3 a curie:Morphology ;
+  rdfs:label "Ganglioneuroblastoma" .
+icdo3m:9491\/0 a curie:Morphology ;
+  rdfs:label "Ganglioneuromatosis" .
+icdo3m:9492\/0 a curie:Morphology ;
+  rdfs:label "Gangliocytoma" .
+icdo3m:9493\/0 a curie:Morphology ;
+  rdfs:label "Dysplastic gangliocytoma of cerebellum (Lhermitte-Duclos)" .
+icdo3m:9500\/3 a curie:Morphology ;
+  rdfs:label "Neuroblastoma, NOS" .
+icdo3m:9501\/0 a curie:Morphology ;
+  rdfs:label "Medulloepithelioma, benign" .
+icdo3m:9501\/3 a curie:Morphology ;
+  rdfs:label "Medulloepithelioma, NOS" .
+icdo3m:9502\/0 a curie:Morphology ;
+  rdfs:label "Teratoid medulloepithelioma, benign" .
+icdo3m:9502\/3 a curie:Morphology ;
+  rdfs:label "Teratoid medulloepithelioma" .
+icdo3m:9503\/3 a curie:Morphology ;
+  rdfs:label "Neuroepithelioma, NOS" .
+icdo3m:9504\/3 a curie:Morphology ;
+  rdfs:label "Spongioneuroblastoma" .
+icdo3m:9505\/1 a curie:Morphology ;
+  rdfs:label "Ganglioglioma, NOS" .
+icdo3m:9505\/3 a curie:Morphology ;
+  rdfs:label "Ganglioglioma, anaplastic" .
+icdo3m:9506\/1 a curie:Morphology ;
+  rdfs:label "Central neurocytoma" .
+icdo3m:9507\/0 a curie:Morphology ;
+  rdfs:label "Pacinian tumor" .
+icdo3m:9508\/3 a curie:Morphology ;
+  rdfs:label "Atypical teratoid/rhabdoid tumor" .
+icdo3m:9510\/0 a curie:Morphology ;
+  rdfs:label "Retinocytoma" .
+icdo3m:9510\/3 a curie:Morphology ;
+  rdfs:label "Retinoblastoma, NOS" .
+icdo3m:9511\/3 a curie:Morphology ;
+  rdfs:label "Retinoblastoma, differentiated" .
+icdo3m:9512\/3 a curie:Morphology ;
+  rdfs:label "Retinoblastoma, undifferentiated" .
+icdo3m:9513\/3 a curie:Morphology ;
+  rdfs:label "Retinoblastoma, diffuse" .
+icdo3m:9514\/1 a curie:Morphology ;
+  rdfs:label "Retinoblastoma, spontaneously regressed" .
+icdo3m:9520\/3 a curie:Morphology ;
+  rdfs:label "Olfactory neurogenic tumor" .
+icdo3m:9521\/3 a curie:Morphology ;
+  rdfs:label "Olfactory neurocytoma" .
+icdo3m:9522\/3 a curie:Morphology ;
+  rdfs:label "Olfactory neuroblastoma" .
+icdo3m:9523\/3 a curie:Morphology ;
+  rdfs:label "Olfactory neuroepithelioma" .
+icdo3m:9530\/0 a curie:Morphology ;
+  rdfs:label "Meningioma, NOS" .
+icdo3m:9530\/1 a curie:Morphology ;
+  rdfs:label "Meningiomatosis, NOS" .
+icdo3m:9530\/3 a curie:Morphology ;
+  rdfs:label "Meningioma, malignant" .
+icdo3m:9531\/0 a curie:Morphology ;
+  rdfs:label "Meningothelial meningioma" .
+icdo3m:9532\/0 a curie:Morphology ;
+  rdfs:label "Fibrous meningioma" .
+icdo3m:9533\/0 a curie:Morphology ;
+  rdfs:label "Psammomatous meningioma" .
+icdo3m:9534\/0 a curie:Morphology ;
+  rdfs:label "Angiomatous meningioma" .
+icdo3m:9535\/0 a curie:Morphology ;
+  rdfs:label "Hemangioblastic meningioma" .
+icdo3m:9537\/0 a curie:Morphology ;
+  rdfs:label "Transitional meningioma" .
+icdo3m:9538\/1 a curie:Morphology ;
+  rdfs:label "Clear cell meningioma" .
+icdo3m:9538\/3 a curie:Morphology ;
+  rdfs:label "Papillary meningioma" .
+icdo3m:9539\/1 a curie:Morphology ;
+  rdfs:label "Atypical meningioma" .
+icdo3m:9539\/3 a curie:Morphology ;
+  rdfs:label "Meningeal sarcomatosis" .
+icdo3m:9540\/0 a curie:Morphology ;
+  rdfs:label "Neurofibroma, NOS" .
+icdo3m:9540\/1 a curie:Morphology ;
+  rdfs:label "Neurofibromatosis, NOS" .
+icdo3m:9540\/3 a curie:Morphology ;
+  rdfs:label "Malignant peripheral nerve sheath tumor" .
+icdo3m:9541\/0 a curie:Morphology ;
+  rdfs:label "Melanotic neurofibroma" .
+icdo3m:9550\/0 a curie:Morphology ;
+  rdfs:label "Plexiform neurofibroma" .
+icdo3m:9560\/0 a curie:Morphology ;
+  rdfs:label "Neurilemoma, NOS" .
+icdo3m:9560\/1 a curie:Morphology ;
+  rdfs:label "Neurinomatosis" .
+icdo3m:9560\/3 a curie:Morphology ;
+  rdfs:label "Neurilemoma, malignant" .
+icdo3m:9561\/3 a curie:Morphology ;
+  rdfs:label "Malignant peripheral nerve sheath tumor with rhabdomyoblastic differentiation" .
+icdo3m:9562\/0 a curie:Morphology ;
+  rdfs:label "Neurothekeoma" .
+icdo3m:9570\/0 a curie:Morphology ;
+  rdfs:label "Neuroma, NOS" .
+icdo3m:9571\/0 a curie:Morphology ;
+  rdfs:label "Perineurioma, NOS" .
+icdo3m:9571\/3 a curie:Morphology ;
+  rdfs:label "Perineurioma, malignant" .
+icdo3m:9580\/0 a curie:Morphology ;
+  rdfs:label "Granular cell tumor, NOS" .
+icdo3m:9580\/3 a curie:Morphology ;
+  rdfs:label "Granular cell tumor, malignant" .
+icdo3m:9581\/3 a curie:Morphology ;
+  rdfs:label "Alveolar soft part sarcoma" .
+icdo3m:9582\/0 a curie:Morphology ;
+  rdfs:label "Granular cell tumor of the sellar region" .
+icdo3m:9590\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, NOS" .
+icdo3m:9591\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, non-Hodgkin, NOS" .
+icdo3m:9596\/3 a curie:Morphology ;
+  rdfs:label "Composite Hodgkin and non-Hodgkin lymphoma" .
+icdo3m:9650\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, NOS" .
+icdo3m:9651\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, lymphocyte-rich" .
+icdo3m:9652\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, mixed cellularity, NOS" .
+icdo3m:9653\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, lymphocyte depletion, NOS" .
+icdo3m:9654\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, lymphocyte depletion, diffuse fibrosis" .
+icdo3m:9655\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, lymphocyte depletion, reticular" .
+icdo3m:9659\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, nodular lymphocyte predominance" .
+icdo3m:9661\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin granuloma" .
+icdo3m:9662\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin sarcoma" .
+icdo3m:9663\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, nodular sclerosis, NOS" .
+icdo3m:9664\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, nodular sclerosis, cellular phase" .
+icdo3m:9665\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, nodular sclerosis, grade 1" .
+icdo3m:9667\/3 a curie:Morphology ;
+  rdfs:label "Hodgkin lymphoma, nodular sclerosis, grade 2" .
+icdo3m:9670\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, small B lymphocytic, NOS" .
+icdo3m:9671\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, lymphoplasmacytic" .
+icdo3m:9673\/3 a curie:Morphology ;
+  rdfs:label "Mantle cell lymphoma" .
+icdo3m:9675\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, mixed small and large cell, diffuse" .
+icdo3m:9678\/3 a curie:Morphology ;
+  rdfs:label "Primary effusion lymphoma" .
+icdo3m:9679\/3 a curie:Morphology ;
+  rdfs:label "Mediastinal large B-cell lymphoma" .
+icdo3m:9680\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, large B-cell, diffuse, NOS" .
+icdo3m:9684\/3 a curie:Morphology ;
+  rdfs:label "Malignant lymphoma, large B-cell, diffuse, immunoblastic, NOS" .
+icdo3m:9687\/3 a curie:Morphology ;
+  rdfs:label "Burkitt lymphoma, NOS" .
+icdo3m:9689\/3 a curie:Morphology ;
+  rdfs:label "Splenic marginal zone B-cell lymphoma" .
+icdo3m:9690\/3 a curie:Morphology ;
+  rdfs:label "Follicular lymphoma, NOS" .
+icdo3m:9691\/3 a curie:Morphology ;
+  rdfs:label "Follicular lymphoma, grade 2" .
+icdo3m:9695\/3 a curie:Morphology ;
+  rdfs:label "Follicular lymphoma, grade 1" .
+icdo3m:9698\/3 a curie:Morphology ;
+  rdfs:label "Follicular lymphoma, grade 3" .
+icdo3m:9699\/3 a curie:Morphology ;
+  rdfs:label "Marginal zone B-cell lymphoma, NOS" .
+icdo3m:9700\/3 a curie:Morphology ;
+  rdfs:label "Mycosis fungoides" .
+icdo3m:9701\/3 a curie:Morphology ;
+  rdfs:label "Sezary syndrome" .
+icdo3m:9702\/3 a curie:Morphology ;
+  rdfs:label "Mature T-cell lymphoma, NOS" .
+icdo3m:9705\/3 a curie:Morphology ;
+  rdfs:label "Angioimmunoblastic T-cell lymphoma" .
+icdo3m:9708\/3 a curie:Morphology ;
+  rdfs:label "Subcutaneous panniculitis-like T-cell lymphoma" .
+icdo3m:9709\/3 a curie:Morphology ;
+  rdfs:label "Cutaneous T-cell lymphoma, NOS" .
+icdo3m:9714\/3 a curie:Morphology ;
+  rdfs:label "Anaplastic large cell lymphoma, T cell and Null cell type" .
+icdo3m:9716\/3 a curie:Morphology ;
+  rdfs:label "Hepatosplenic (gamma-delta) cell lymphoma" .
+icdo3m:9717\/3 a curie:Morphology ;
+  rdfs:label "Intestinal T-cell lymphoma" .
+icdo3m:9718\/3 a curie:Morphology ;
+  rdfs:label "Primary cutaneous CD30+ T-cell lymphoproliferative disorder" .
+icdo3m:9719\/3 a curie:Morphology ;
+  rdfs:label "NK/T-cell lymphoma, nasal and nasal-type" .
+icdo3m:9727\/3 a curie:Morphology ;
+  rdfs:label "Precursor cell lymphoblastic lymphoma, NOS" .
+icdo3m:9728\/3 a curie:Morphology ;
+  rdfs:label "Precursor B-cell lymphoblastic lymphoma" .
+icdo3m:9729\/3 a curie:Morphology ;
+  rdfs:label "Precursor T-cell lymphoblastic lymphoma" .
+icdo3m:9731\/3 a curie:Morphology ;
+  rdfs:label "Plasmacytoma, NOS" .
+icdo3m:9732\/3 a curie:Morphology ;
+  rdfs:label "Multiple myeloma" .
+icdo3m:9733\/3 a curie:Morphology ;
+  rdfs:label "Plasma cell leukemia" .
+icdo3m:9734\/3 a curie:Morphology ;
+  rdfs:label "Plasmacytoma, extramedullary (not occurring in bone)" .
+icdo3m:9740\/1 a curie:Morphology ;
+  rdfs:label "Mastocytoma, NOS" .
+icdo3m:9740\/3 a curie:Morphology ;
+  rdfs:label "Mast cell sarcoma" .
+icdo3m:9741\/3 a curie:Morphology ;
+  rdfs:label "Malignant mastocytosis" .
+icdo3m:9742\/3 a curie:Morphology ;
+  rdfs:label "Mast cell leukemia" .
+icdo3m:9750\/3 a curie:Morphology ;
+  rdfs:label "Malignant histiocytosis" .
+icdo3m:9751\/1 a curie:Morphology ;
+  rdfs:label "Langerhans cell histiocytosis, NOS" .
+icdo3m:9752\/1 a curie:Morphology ;
+  rdfs:label "Langerhans cell histiocytosis, unifocal" .
+icdo3m:9753\/1 a curie:Morphology ;
+  rdfs:label "Langerhans cell histiocytosis, multifocal" .
+icdo3m:9754\/3 a curie:Morphology ;
+  rdfs:label "Langerhans cell histiocytosis, disseminated" .
+icdo3m:9755\/3 a curie:Morphology ;
+  rdfs:label "Histiocytic sarcoma" .
+icdo3m:9756\/3 a curie:Morphology ;
+  rdfs:label "Langerhans cell sarcoma" .
+icdo3m:9757\/3 a curie:Morphology ;
+  rdfs:label "Interdigitating dendritic cell sarcoma" .
+icdo3m:9758\/3 a curie:Morphology ;
+  rdfs:label "Follicular dendritic cell sarcoma" .
+icdo3m:9760\/3 a curie:Morphology ;
+  rdfs:label "Immunoproliferative disease, NOS" .
+icdo3m:9761\/3 a curie:Morphology ;
+  rdfs:label "Waldenstrom macroglobulinemia" .
+icdo3m:9762\/3 a curie:Morphology ;
+  rdfs:label "Heavy chain disease, NOS" .
+icdo3m:9764\/3 a curie:Morphology ;
+  rdfs:label "Immunoproliferative small intestinal disease" .
+icdo3m:9765\/1 a curie:Morphology ;
+  rdfs:label "Monoclonal gammopathy of undetermined significance" .
+icdo3m:9766\/1 a curie:Morphology ;
+  rdfs:label "Angiocentric immunoproliferative lesion" .
+icdo3m:9767\/1 a curie:Morphology ;
+  rdfs:label "Angioimmunoblastic lymphadenopathy (AIC)" .
+icdo3m:9768\/1 a curie:Morphology ;
+  rdfs:label "T-gamma lymphoproliferative disease" .
+icdo3m:9769\/1 a curie:Morphology ;
+  rdfs:label "Immunoglobulin deposition disease" .
+icdo3m:9800\/3 a curie:Morphology ;
+  rdfs:label "Leukemia, NOS" .
+icdo3m:9801\/3 a curie:Morphology ;
+  rdfs:label "Acute leukemia, NOS" .
+icdo3m:9805\/3 a curie:Morphology ;
+  rdfs:label "Acute biphenotypic leukemia" .
+icdo3m:9820\/3 a curie:Morphology ;
+  rdfs:label "Lymphoid leukemia, NOS" .
+icdo3m:9823\/3 a curie:Morphology ;
+  rdfs:label "B-cell chronic lymphocytic leukemia/small lymphocytic lymphoma" .
+icdo3m:9826\/3 a curie:Morphology ;
+  rdfs:label "Burkitt cell leukemia" .
+icdo3m:9827\/3 a curie:Morphology ;
+  rdfs:label "Adult T-cell leukemia/lymphoma (HTLV-1 positive)" .
+icdo3m:9831\/3 a curie:Morphology ;
+  rdfs:label "T-cell large granular lymphocytic leukemia" .
+icdo3m:9832\/3 a curie:Morphology ;
+  rdfs:label "Prolymphocytic leukemia, NOS" .
+icdo3m:9833\/3 a curie:Morphology ;
+  rdfs:label "Prolymphocytic leukemia, B-cell type" .
+icdo3m:9834\/3 a curie:Morphology ;
+  rdfs:label "Prolymphocytic leukemia, T-cell type" .
+icdo3m:9835\/3 a curie:Morphology ;
+  rdfs:label "Precursor cell lymphoblastic leukemia, NOS" .
+icdo3m:9836\/3 a curie:Morphology ;
+  rdfs:label "Precursor B-cell lymphoblastic leukemia" .
+icdo3m:9837\/3 a curie:Morphology ;
+  rdfs:label "Precursor T-cell lymphoblastic leukemia" .
+icdo3m:9840\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia, M6 type" .
+icdo3m:9860\/3 a curie:Morphology ;
+  rdfs:label "Myeloid leukemia, NOS" .
+icdo3m:9861\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia, NOS" .
+icdo3m:9863\/3 a curie:Morphology ;
+  rdfs:label "Chronic myeloid leukemia, NOS" .
+icdo3m:9866\/3 a curie:Morphology ;
+  rdfs:label "Acute promyelocytic leukemia" .
+icdo3m:9867\/3 a curie:Morphology ;
+  rdfs:label "Acute myelomonocytic leukemia" .
+icdo3m:9870\/3 a curie:Morphology ;
+  rdfs:label "Acute basophilic leukemia" .
+icdo3m:9871\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia with abnormal marrow eosinophils" .
+icdo3m:9872\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia, minimal differentiation" .
+icdo3m:9873\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia without maturation" .
+icdo3m:9874\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia with maturation" .
+icdo3m:9875\/3 a curie:Morphology ;
+  rdfs:label "Chronic myelogenous leukemia, BCR/ABL positive" .
+icdo3m:9876\/3 a curie:Morphology ;
+  rdfs:label "Atypical chronic myeloid leukemia, BCR/ABL negative" .
+icdo3m:9891\/3 a curie:Morphology ;
+  rdfs:label "Acute monocytic leukemia" .
+icdo3m:9895\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia with multilineage dysplasia" .
+icdo3m:9896\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia, t(8" .
+icdo3m:9897\/3 a curie:Morphology ;
+  rdfs:label "Acute myeloid leukemia, 11q23 abnormalities" .
+icdo3m:9910\/3 a curie:Morphology ;
+  rdfs:label "Acute megakaryoblastic leukemia" .
+icdo3m:9920\/3 a curie:Morphology ;
+  rdfs:label "Therapy-related acute myeloid leukemia, NOS" .
+icdo3m:9930\/3 a curie:Morphology ;
+  rdfs:label "Myeloid sarcoma" .
+icdo3m:9931\/3 a curie:Morphology ;
+  rdfs:label "Acute panmyelosis with myelofibrosis" .
+icdo3m:9940\/3 a curie:Morphology ;
+  rdfs:label "Hairy cell leukemia" .
+icdo3m:9945\/3 a curie:Morphology ;
+  rdfs:label "Chronic myelomonocytic leukemia, NOS" .
+icdo3m:9946\/3 a curie:Morphology ;
+  rdfs:label "Juvenile myelomonocytic leukemia" .
+icdo3m:9948\/3 a curie:Morphology ;
+  rdfs:label "Aggressive NK-cell leukemia" .
+icdo3m:9950\/3 a curie:Morphology ;
+  rdfs:label "Polycythemia vera" .
+icdo3m:9960\/3 a curie:Morphology ;
+  rdfs:label "Chronic myeloproliferative disease, NOS" .
+icdo3m:9961\/3 a curie:Morphology ;
+  rdfs:label "Myelosclerosis with myeloid metaplasia" .
+icdo3m:9962\/3 a curie:Morphology ;
+  rdfs:label "Essential thrombocythemia" .
+icdo3m:9963\/3 a curie:Morphology ;
+  rdfs:label "Chronic neutrophilic leukemia" .
+icdo3m:9964\/3 a curie:Morphology ;
+  rdfs:label "Hypereosinophilic syndrome" .
+icdo3m:9970\/1 a curie:Morphology ;
+  rdfs:label "Lymphoproliferative disorder, NOS" .
+icdo3m:9975\/1 a curie:Morphology ;
+  rdfs:label "Myeloproliferative disease, NOS" .
+icdo3m:9980\/3 a curie:Morphology ;
+  rdfs:label "Refractory anemia" .
+icdo3m:9982\/3 a curie:Morphology ;
+  rdfs:label "Refractory anemia with sideroblasts" .
+icdo3m:9983\/3 a curie:Morphology ;
+  rdfs:label "Refractory anemia with excess blasts" .
+icdo3m:9984\/3 a curie:Morphology ;
+  rdfs:label "Refractory anemia with excess blasts in transformation" .
+icdo3m:9985\/3 a curie:Morphology ;
+  rdfs:label "Refractory cytopenia with multilineage dysplasia" .
+icdo3m:9986\/3 a curie:Morphology ;
+  rdfs:label "Myelodysplastic syndrome with 5q deletion (5q-) syndrome" .
+icdo3m:9987\/3 a curie:Morphology ;
+  rdfs:label "Therapy-related myelodysplastic syndrome, NOS" .
+icdo3m:9989\/3 a curie:Morphology ;
+  rdfs:label "Myelodysplastic syndrome, NOS" .
+ncbitaxon:562 a curie:Species ;
+  rdfs:label "Escherichia coli" .
+ncbitaxon:1423 a curie:Species ;
+  rdfs:label "Bacillus subtilis" .
+ncbitaxon:4896 a curie:Species ;
+  rdfs:label "Schizosaccharomyces pombe" .
+ncbitaxon:4932 a curie:Species ;
+  rdfs:label "Saccharomyces cerevisiae" .
+ncbitaxon:6239 a curie:Species ;
+  rdfs:label "Caenorhabditis elegans" .
+ncbitaxon:7227 a curie:Species ;
+  rdfs:label "Drosophila melanogaster" .
+ncbitaxon:7955 a curie:Species ;
+  rdfs:label "Zebrafish" .
+ncbitaxon:8355 a curie:Species ;
+  rdfs:label "Xenopus laevis" .
+ncbitaxon:9606 a curie:Species ;
+  rdfs:label "Homo sapiens" .
+ncbitaxon:10090 a curie:Species ;
+  rdfs:label "Mus musculus" .
+ncbitaxon:10116 a curie:Species ;
+  rdfs:label "Rattus norvegicus" .
+ncbitaxon:10678 a curie:Species ;
+  rdfs:label "Enterobacteria phage P1" .
+ncbitaxon:12480 a curie:Species ;
+  rdfs:label "African green monkey polyomavirus" .
+ncbitaxon:27778 a curie:Species ;
+  rdfs:label "Ameiurus nebulosus" .
+ncbitaxon:8839 a curie:Species ;
+  rdfs:label "Anas platyrhynchos" .
+ncbitaxon:8842 a curie:Species ;
+  rdfs:label "Anser" .
+ncbitaxon:9504 a curie:Species ;
+  rdfs:label "Aotus" .
+ncbitaxon:6724 a curie:Species ;
+  rdfs:label "Astacoidea" .
+ncbitaxon:9913 a curie:Species ;
+  rdfs:label "Bos taurus" .
+ncbitaxon:8383 a curie:Species ;
+  rdfs:label "Bufo" .
+ncbitaxon:9482 a curie:Species ;
+  rdfs:label "Callithrix argentata" .
+ncbitaxon:64678 a curie:Species ;
+  rdfs:label "Callosciurus notatus" .
+ncbitaxon:9837 a curie:Species ;
+  rdfs:label "Camelus bactrianus" .
+ncbitaxon:9615 a curie:Species ;
+  rdfs:label "Canis lupus familiaris" .
+ncbitaxon:9925 a curie:Species ;
+  rdfs:label "Capra hircus" .
+ncbitaxon:10141 a curie:Species ;
+  rdfs:label "Cavia porcellus" .
+ncbitaxon:9534 a curie:Species ;
+  rdfs:label "Chlorocebus aethiops" .
+ncbitaxon:59899 a curie:Species ;
+  rdfs:label "Clarias batrachus" .
+ncbitaxon:30724 a curie:Species ;
+  rdfs:label "Clupea pallasii" .
+ncbitaxon:93934 a curie:Species ;
+  rdfs:label "Coturnix japonica" .
+ncbitaxon:10026 a curie:Species ;
+  rdfs:label "Cricetinae" .
+ncbitaxon:10029 a curie:Species ;
+  rdfs:label "Cricetulus griseus" .
+ncbitaxon:71110 a curie:Species ;
+  rdfs:label "Crossarchus" .
+ncbitaxon:7157 a curie:Species ;
+  rdfs:label "Culicidae" .
+ncbitaxon:8707 a curie:Species ;
+  rdfs:label "Daboia russelii" .
+ncbitaxon:9361 a curie:Species ;
+  rdfs:label "Dasypus novemcinctus" .
+ncbitaxon:9265 a curie:Species ;
+  rdfs:label "Didelphidae" .
+ncbitaxon:7215 a curie:Species ;
+  rdfs:label "Drosophila" .
+ncbitaxon:10847 a curie:Species ;
+  rdfs:label "Enterobacteria phage phiX174" .
+ncbitaxon:9790 a curie:Species ;
+  rdfs:label "Equus burchellii" .
+ncbitaxon:9796 a curie:Species ;
+  rdfs:label "Equus caballus" .
+ncbitaxon:9685 a curie:Species ;
+  rdfs:label "Felis catus" .
+ncbitaxon:28756 a curie:Species ;
+  rdfs:label "Fundulidae" .
+ncbitaxon:9031 a curie:Species ;
+  rdfs:label "Gallus gallus" .
+ncbitaxon:6448 a curie:Species ;
+  rdfs:label "Gastropoda" .
+ncbitaxon:8561 a curie:Species ;
+  rdfs:label "Gekkonidae" .
+ncbitaxon:37178 a curie:Species ;
+  rdfs:label "Hemitragus" .
+ncbitaxon:10566 a curie:Species ;
+  rdfs:label "Human papillomavirus" .
+ncbitaxon:7998 a curie:Species ;
+  rdfs:label "Ictalurus punctatus" .
+ncbitaxon:8516 a curie:Species ;
+  rdfs:label "Iguana" .
+ncbitaxon:7088 a curie:Species ;
+  rdfs:label "Lepidoptera" .
+ncbitaxon:13106 a curie:Species ;
+  rdfs:label "Lepomis macrochirus" .
+ncbitaxon:9544 a curie:Species ;
+  rdfs:label "Macaca mulatta" .
+ncbitaxon:55057 a curie:Species ;
+  rdfs:label "Mamestra brassicae" .
+ncbitaxon:9995 a curie:Species ;
+  rdfs:label "Marmota monax" .
+ncbitaxon:13146 a curie:Species ;
+  rdfs:label "Melopsittacus undulatus" .
+ncbitaxon:10047 a curie:Species ;
+  rdfs:label "Meriones unguiculatus" .
+ncbitaxon:10036 a curie:Species ;
+  rdfs:label "Mesocricetus auratus" .
+ncbitaxon:36231 a curie:Species ;
+  rdfs:label "Miopithecus talapoin" .
+ncbitaxon:9436 a curie:Species ;
+  rdfs:label "Molossidae" .
+ncbitaxon:46259 a curie:Species ;
+  rdfs:label "Morone chrysops" .
+ncbitaxon:9885 a curie:Species ;
+  rdfs:label "Muntiacus" .
+ncbitaxon:36237 a curie:Species ;
+  rdfs:label "Mus musculus x Rattus norvegicus" .
+ncbitaxon:9669 a curie:Species ;
+  rdfs:label "Mustela putorius furo" .
+ncbitaxon:169418 a curie:Species ;
+  rdfs:label "Mustelinae" .
+ncbitaxon:9349 a curie:Species ;
+  rdfs:label "Myrmecophagidae" .
+ncbitaxon:8416 a curie:Species ;
+  rdfs:label "Neobatrachia" .
+ncbitaxon:9873 a curie:Species ;
+  rdfs:label "Odocoileus hemionus columbianus" .
+ncbitaxon:8018 a curie:Species ;
+  rdfs:label "Oncorhynchus keta" .
+ncbitaxon:8022 a curie:Species ;
+  rdfs:label "Oncorhynchus mykiss" .
+ncbitaxon:74940 a curie:Species ;
+  rdfs:label "Oncorhynchus tshawytscha" .
+ncbitaxon:9986 a curie:Species ;
+  rdfs:label "Oryctolagus cuniculus" .
+ncbitaxon:9957 a curie:Species ;
+  rdfs:label "Oryx" .
+ncbitaxon:9940 a curie:Species ;
+  rdfs:label "Ovis aries" .
+ncbitaxon:90988 a curie:Species ;
+  rdfs:label "Pimephales promelas" .
+ncbitaxon:9309 a curie:Species ;
+  rdfs:label "Potorous" .
+ncbitaxon:9654 a curie:Species ;
+  rdfs:label "Procyon lotor" .
+ncbitaxon:8400 a curie:Species ;
+  rdfs:label "Rana catesbeiana" .
+ncbitaxon:39432 a curie:Species ;
+  rdfs:label "Saimiri boliviensis boliviensis" .
+ncbitaxon:8030 a curie:Species ;
+  rdfs:label "Salmo salar" .
+ncbitaxon:5147 a curie:Species ;
+  rdfs:label "Sordaria macrospora" .
+ncbitaxon:7108 a curie:Species ;
+  rdfs:label "Spodoptera frugiperda" .
+ncbitaxon:9823 a curie:Species ;
+  rdfs:label "Sus scrofa" .
+ncbitaxon:9987 a curie:Species ;
+  rdfs:label "Sylvilagus" .
+ncbitaxon:31033 a curie:Species ;
+  rdfs:label "Takifugu rubripes" .
+ncbitaxon:9827 a curie:Species ;
+  rdfs:label "Tayassuidae" .
+ncbitaxon:85610 a curie:Species ;
+  rdfs:label "Terrapene" .
+ncbitaxon:55040 a curie:Species ;
+  rdfs:label "Urocyon cinereoargenteus" .
+ncbitaxon:32630 a curie:Species ;
+  rdfs:label "Synthetic" .
+ncbitaxon:7091 a curie:Species ;
+  rdfs:label "Bombyx mori" .
+ncbitaxon:11103 a curie:Species ;
+  rdfs:label "Hepatitis C virus" .
+ncbitaxon:5888 a curie:Species ;
+  rdfs:label "Paramecium tetraurelia" .
+ncbitaxon:5691 a curie:Species ;
+  rdfs:label "Trypanosoma brucei" .
+ncbitaxon:27288 a curie:Species ;
+  rdfs:label "Naumovozyma castellii" .
+ncbitaxon:4934 a curie:Species ;
+  rdfs:label "Lachancea kluyveri" .
+ncbitaxon:3702 a curie:Species ;
+  rdfs:label "Arabidopsis thaliana" .
+ncbitaxon:4530 a curie:Species ;
+  rdfs:label "Oryza sativa" .
+ncbitaxon:12721 a curie:Species ;
+  rdfs:label "Human immunodeficiency virus" .
+ncbitaxon:28901 a curie:Species ;
+  rdfs:label "Salmonella enterica" .
+ncbitaxon:1773 a curie:Species ;
+  rdfs:label "Mycobacterium tuberculosis" .
+ncbitaxon:7029 a curie:Species ;
+  rdfs:label "Acyrthosiphon pisum" .
+ncbitaxon:12461 a curie:Species ;
+  rdfs:label "Hepatitis E virus" .
+ncbitaxon:256318 a curie:Species ;
+  rdfs:label "Metagenome" .
+ncbitaxon:5833 a curie:Species ;
+  rdfs:label "Plasmodium falciparum" .
+evs:C12434 a curie:SampleNature ;
+  rdfs:label "Blood" .
+evs:C13356 a curie:SampleNature ;
+  rdfs:label "Plasma" .
+evs:C17021 a curie:SampleNature ;
+  rdfs:label "Protein" .
+evs:C812 a curie:SampleNature ;
+  rdfs:label "RNA" .
+evs:C449 a curie:SampleNature ;
+  rdfs:label "DNA" .
+evs:C12954 a curie:SampleNature ;
+  rdfs:label "Peripheral Blood Mononuclear Cell" .
+evs:C20313 a curie:SampleNature ;
+  rdfs:label "Tumor Cell Line" .
+evs:C70717 a curie:SampleNature ;
+  rdfs:label "Frozen Specimen" .
+evs:C19597 a curie:SampleNature ;
+  rdfs:label "Paraffin Embedded Tissue (FFPE)" .
+evs:C13283 a curie:SampleNature ;
+  rdfs:label "Urine" .
+curie:normal a curie:SampleOrigin ;
+  rdfs:label "Normal" .
+curie:tumoral a curie:SampleOrigin ;
+  rdfs:label "Tumoral" .
+evs:C3262 a curie:EventType ;
+  rdfs:label "Neoplasm" .
+evs:C36263 a curie:EventType ;
+  rdfs:label "Metastatic Malignant Neoplasm" .
+evs:C4798 a curie:EventType ;
+  rdfs:label "Recurrent tumor" .
+evs:C8509 a curie:EventType ;
+  rdfs:label "Primary tumor" .
+evs:C13332 a curie:Laterality ;
+  rdfs:label "Bilateral" .
+evs:C25229 a curie:Laterality ;
+  rdfs:label "Left" .
+evs:C25228 a curie:Laterality ;
+  rdfs:label "Right" .
+tumorGradeValue:gradeValue0 a curie:TumorGradeValue ;
+  rdfs:label "0" .
+tumorGradeValue:gradeValueI a curie:TumorGradeValue ;
+  rdfs:label "I" .
+tumorGradeValue:gradeValueII a curie:TumorGradeValue ;
+  rdfs:label "II" .
+tumorGradeValue:gradeValueIII a curie:TumorGradeValue ;
+  rdfs:label "III" .
+tumorGradeValue:gradeValueIV a curie:TumorGradeValue ;
+  rdfs:label "IV" .
+tnmT:tx a curie:TnmT ;
+  rdfs:label "Tx" .
+tnmT:t0 a curie:TnmT ;
+  rdfs:label "T0" .
+tnmT:t1 a curie:TnmT ;
+  rdfs:label "T1" .
+tnmT:t1a a curie:TnmT ;
+  rdfs:label "T1a" .
+tnmT:t1b a curie:TnmT ;
+  rdfs:label "T1b" .
+tnmT:t1c a curie:TnmT ;
+  rdfs:label "T1c" .
+tnmT:t2 a curie:TnmT ;
+  rdfs:label "T2" .
+tnmT:t3 a curie:TnmT ;
+  rdfs:label "T3" .
+tnmT:t4 a curie:TnmT ;
+  rdfs:label "T4" .
+tnmT:t4a a curie:TnmT ;
+  rdfs:label "T4a" .
+tnmT:t4b a curie:TnmT ;
+  rdfs:label "T4b" .
+tnmT:t4c a curie:TnmT ;
+  rdfs:label "T4c" .
+tnmT:t4d a curie:TnmT ;
+  rdfs:label "T4d" .
+tnmN:nx a curie:TnmN ;
+  rdfs:label "Nx" .
+tnmN:n0 a curie:TnmN ;
+  rdfs:label "N0" .
+tnmN:n1mi a curie:TnmN ;
+  rdfs:label "N1mi" .
+tnmN:n1 a curie:TnmN ;
+  rdfs:label "N1" .
+tnmN:n2 a curie:TnmN ;
+  rdfs:label "N2" .
+tnmN:n3 a curie:TnmN ;
+  rdfs:label "N3" .
+tnmM:mx a curie:TnmM ;
+  rdfs:label "Mx" .
+tnmM:m0 a curie:TnmM ;
+  rdfs:label "M0" .
+tnmM:m1 a curie:TnmM ;
+  rdfs:label "M1" .
+osiris:C37-1 a curie:AnalysisType ;
+  rdfs:label "Biology" .
+osiris:C37-2 a curie:AnalysisType ;
+  rdfs:label "Imaging" .
+osiris:C37-3 a curie:AnalysisType ;
+  rdfs:label "Omic" .
+osiris:C37-4 a curie:AnalysisType ;
+  rdfs:label "Pathology" .
+osiris:O6-1 a curie:AnalysisType ;
+  rdfs:label "ChIP-on-Chip" .
+osiris:O6-2 a curie:AnalysisType ;
+  rdfs:label "ChIP-seq" .
+osiris:O6-3 a curie:AnalysisType ;
+  rdfs:label "DNA microarray" .
+osiris:O6-4 a curie:AnalysisType ;
+  rdfs:label "DNA targeted panel sequencing" .
+osiris:O6-5 a curie:AnalysisType ;
+  rdfs:label "Exome sequencing" .
+osiris:O6-6 a curie:AnalysisType ;
+  rdfs:label "Mass spectrometry" .
+osiris:O6-7 a curie:AnalysisType ;
+  rdfs:label "MeDIP-Chip" .
+osiris:O6-8 a curie:AnalysisType ;
+  rdfs:label "MeDIP-seq" .
+osiris:O6-9 a curie:AnalysisType ;
+  rdfs:label "Methylation microarray" .
+osiris:O6-10 a curie:AnalysisType ;
+  rdfs:label "RNA microarray" .
+osiris:O6-11 a curie:AnalysisType ;
+  rdfs:label "RNA targeted panel sequencing" .
+osiris:O6-12 a curie:AnalysisType ;
+  rdfs:label "RNA-seq" .
+osiris:O6-13 a curie:AnalysisType ;
+  rdfs:label "RPPA" .
+osiris:O6-14 a curie:AnalysisType ;
+  rdfs:label "Whole genome bisulfite sequencing" .
+osiris:O6-15 a curie:AnalysisType ;
+  rdfs:label "Whole genome sequencing" .
+osiris:O6-16 a curie:AnalysisType ;
+  rdfs:label "miRNA microarray" .
+osiris:O6-OTH a curie:AnalysisType ;
+  rdfs:label "Other" .
+
+osiris:O7-1 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Cytoscan HD" .
+osiris:O7-2 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix EMET Plus Premier Pack" .
+osiris:O7-3 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Genome-Wide Human SNP Array 5.0" .
+osiris:O7-4 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Genome-Wide Human SNP Array 6.0" .
+osiris:O7-5 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix HT Human Genome U133A Array Plate Set" .
+osiris:O7-6 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human Exon 1.0 ST" .
+osiris:O7-7 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human Gene 1.0 ST" .
+osiris:O7-8 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human Genome U219 Array Plate" .
+osiris:O7-9 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human MIP 330K" .
+osiris:O7-10 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human U133 Plus 2.0" .
+osiris:O7-11 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Human U133 Plus PM" .
+osiris:O7-12 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Mapping 100K Array Set" .
+osiris:O7-13 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Mapping 10K 2.0 Array Set" .
+osiris:O7-14 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix Mapping 500K Array Set" .
+osiris:O7-15 a curie:TechnologyPlatformName ;
+  rdfs:label "Affymetrix OncoScan FFPE Express 2.0" .
+osiris:O7-16 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07" .
+osiris:O7-17 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07-1" .
+osiris:O7-18 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07-2" .
+osiris:O7-19 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 244K Custom Gene Expression G4502A-07-3" .
+osiris:O7-20 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent 8 x 15K Human miRNA-specific microarray" .
+osiris:O7-21 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 1x1M" .
+osiris:O7-22 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 2x400K" .
+osiris:O7-23 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 4x180K" .
+osiris:O7-24 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CGH 8x60K" .
+osiris:O7-25 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CNV 2x400K" .
+osiris:O7-26 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CNV Association 2x105K" .
+osiris:O7-27 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human CpG Island Microarray Kit" .
+osiris:O7-28 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome 105A" .
+osiris:O7-29 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome 244A" .
+osiris:O7-30 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome 44K" .
+osiris:O7-31 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Genome CGH Custom Microaary 2x415K" .
+osiris:O7-32 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human miRNA Microarray Kit (v2)" .
+osiris:O7-33 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human Promoter ChIP-on-chip Microarray Set" .
+osiris:O7-34 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Human SpliceArray" .
+osiris:O7-35 a curie:TechnologyPlatformName ;
+  rdfs:label "Agilent Whole Human Genome Oligo Microarray Kit" .
+osiris:O7-36 a curie:TechnologyPlatformName ;
+  rdfs:label "Almac Human CRC" .
+osiris:O7-37 a curie:TechnologyPlatformName ;
+  rdfs:label "capillary sequencing" .
+osiris:O7-38 a curie:TechnologyPlatformName ;
+  rdfs:label "Complete Genomics" .
+osiris:O7-39 a curie:TechnologyPlatformName ;
+  rdfs:label "Custom-designed cDNA array" .
+osiris:O7-40 a curie:TechnologyPlatformName ;
+  rdfs:label "Custom-designed gene expression array" .
+osiris:O7-41 a curie:TechnologyPlatformName ;
+  rdfs:label "Helicos sequencing" .
+osiris:O7-42 a curie:TechnologyPlatformName ;
+  rdfs:label "HumanOmni2.5-8 BeadChip Kit" .
+osiris:O7-43 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina GA sequencing" .
+osiris:O7-44 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina goldengate methylation" .
+osiris:O7-45 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina GoldenGate Methylation Cancer Panel I" .
+osiris:O7-46 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HiSeq" .
+osiris:O7-47 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HiSeq X Ten" .
+osiris:O7-48 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina Human Omni1-Quad beadchip" .
+osiris:O7-49 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina Human1M OmniQuad chip" .
+osiris:O7-50 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina human1m-duo" .
+osiris:O7-51 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina human510s-duo" .
+osiris:O7-52 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina human660w-quad" .
+osiris:O7-53 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanCNV370-Duo v1.0 BeadChip" .
+osiris:O7-54 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humancytosnp-12" .
+osiris:O7-55 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanHap550" .
+osiris:O7-56 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanHT-12 v4.0 beadchip" .
+osiris:O7-57 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humanht-16" .
+osiris:O7-58 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humanht-17" .
+osiris:O7-59 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina humanmethylation27" .
+osiris:O7-60 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanOmniExpress BeadChip" .
+osiris:O7-61 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanRef-8 v3.0 beadchip" .
+osiris:O7-62 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina HumanWG-6 v3.0 beadchip" .
+osiris:O7-63 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina Infinium HumanMethylation450" .
+osiris:O7-64 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina microRNA Expression Profiling Panel" .
+osiris:O7-65 a curie:TechnologyPlatformName ;
+  rdfs:label "Illumina MiSeq Personal Sequencer" .
+osiris:O7-66 a curie:TechnologyPlatformName ;
+  rdfs:label "Ion Torrent PGM" .
+osiris:O7-67 a curie:TechnologyPlatformName ;
+  rdfs:label "Ion Torrent Proton" .
+osiris:O7-68 a curie:TechnologyPlatformName ;
+  rdfs:label "M.D. Anderson Reverse Phase Protein Array Core" .
+osiris:O7-69 a curie:TechnologyPlatformName ;
+  rdfs:label "Microsatellite Instability Analysis" .
+osiris:O7-70 a curie:TechnologyPlatformName ;
+  rdfs:label "nanoString" .
+osiris:O7-71 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen CGS" .
+osiris:O7-72 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Gene Expression 12x135K" .
+osiris:O7-73 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Gene Expression 385K" .
+osiris:O7-74 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Gene Expression 4x72K" .
+osiris:O7-75 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human CGH 2.1M Whole-Genome v2.0D Array" .
+osiris:O7-76 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human CGH 3x720 Whole-Genome v3.0 Array" .
+osiris:O7-77 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human Methylation 2.1M Whole-Genome sets" .
+osiris:O7-78 a curie:TechnologyPlatformName ;
+  rdfs:label "Nimblegen Human Methylation 385K Whole-Genome sets" .
+osiris:O7-79 a curie:TechnologyPlatformName ;
+  rdfs:label "PacBio RS sequencing" .
+osiris:O7-80 a curie:TechnologyPlatformName ;
+  rdfs:label "PCR" .
+osiris:O7-81 a curie:TechnologyPlatformName ;
+  rdfs:label "PCR and capillary sequencing" .
+osiris:O7-82 a curie:TechnologyPlatformName ;
+  rdfs:label "qPCR" .
+osiris:O7-83 a curie:TechnologyPlatformName ;
+  rdfs:label "Roche 454 sequencing" .
+osiris:O7-84 a curie:TechnologyPlatformName ;
+  rdfs:label "Sequenom MassARRAY" .
+osiris:O7-85 a curie:TechnologyPlatformName ;
+  rdfs:label "SOLiD sequencing" .
+osiris:O7-86 a curie:TechnologyPlatformName ;
+  rdfs:label "Digital PCR" .
+osiris:O7-87 a curie:TechnologyPlatformName ;
+  rdfs:label "NextSeq 500" .
+osiris:O7-88 a curie:TechnologyPlatformName ;
+  rdfs:label "NovaSeq" .
+osiris:O7-OTH a curie:TechnologyPlatformName ;
+  rdfs:label "Other" .

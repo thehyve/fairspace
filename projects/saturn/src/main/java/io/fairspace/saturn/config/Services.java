@@ -1,16 +1,17 @@
 package io.fairspace.saturn.config;
 
 import java.io.File;
-import javax.servlet.http.HttpServlet;
 
 import io.milton.resource.Resource;
+import jakarta.servlet.http.HttpServlet;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.log4j.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
+import org.keycloak.admin.client.resource.UsersResource;
 
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
@@ -20,12 +21,23 @@ import io.fairspace.saturn.services.health.HealthService;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.DeletionValidator;
+import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
+import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
+import io.fairspace.saturn.services.metadata.validation.URIPrefixValidator;
+import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.views.*;
+import io.fairspace.saturn.services.views.JdbcQueryService;
+import io.fairspace.saturn.services.views.QueryService;
+import io.fairspace.saturn.services.views.SparqlQueryService;
+import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
@@ -50,7 +62,7 @@ public class Services {
     private final SearchService searchService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
-    private final HttpServlet davServlet;
+    private final WebDAVServlet davServlet;
 
     private final BlobStore extraBlobStore;
     private final DavFactory extraDavFactory;
@@ -63,12 +75,13 @@ public class Services {
             @NonNull Config config,
             @NonNull ViewsConfig viewsConfig,
             @NonNull Dataset dataset,
-            ViewStoreClientFactory viewStoreClientFactory) {
+            ViewStoreClientFactory viewStoreClientFactory,
+            UsersResource usersResource) {
         this.config = config;
         this.transactions =
                 config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
-        userService = new UserService(config.auth, transactions);
+        userService = new UserService(config.auth, transactions, usersResource);
 
         blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
         davFactory = new DavFactory(
