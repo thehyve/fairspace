@@ -70,6 +70,20 @@ export default createTheme({
         fontSize: 13,
         button: {
             textTransform: 'none'
+        },
+        h3: {
+            fontSize: '1.4rem',
+            fontWeight: 600
+        },
+        h4: {
+            fontSize: '1.3rem',
+            fontWeight: 600
+        },
+        h5: {
+            fontSize: '1rem'
+        },
+        body2: {
+            fontSize: '0.8rem'
         }
     },
     components: {

@@ -1,22 +1,41 @@
-import * as consts from '../constants';
+// import * as consts from '../constants';
 
 const styles = theme => ({
     mainPage: {
-        width: consts.MAIN_CONTENT_WIDTH,
-        maxWidth: '700px',
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
+        // maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
         padding: 20,
-        marginTop: 20
+        marginTop: 20,
+        marginLeft: 20,
+        width: '80%'
+    },
+    paperContent: {
+        borderRadius: 30,
+        border: 'none',
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        padding: 20
+    },
+    paperContentLight: {
+        backgroundColor: theme.palette.primary.light
+    },
+    paperContentDark: {
+        background: `linear-gradient(45deg, ${theme.palette.primary.light} 8%, ${theme.palette.primary.main} 40%, ${theme.palette.primary.dark} 76%)`
+    },
+    link: {
+        color: theme.palette.primary.contrastText,
+        textDecoration: 'underline'
     },
     header: {
-        borderBottom: '2px solid ' + theme.palette.primary.main,
-        marginBottom: 50
+        margin: 20
     },
-    textRow: {
-        minHeight: '250px'
+    footer: {
+        marginBottom: 0,
+        paddingTop: 20
     },
-    customFont: {
-        fontFamily: 'sans-serif'
+    divider: {
+        marginBottom: 30,
+        background: theme.palette.primary.dark,
+        borderBottomWidth: 5
     }
 });
 

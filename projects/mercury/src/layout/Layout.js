@@ -9,6 +9,7 @@ import UserContext from '../users/UserContext';
 import StatusContext, {VALID_USER_SESSION} from '../status/StatusContext';
 import {SERVER_STATUS_UP} from '../status/StatusAPI';
 import StatusAlert from '../status/StatusAlert';
+import {LEFT_PANEL_MAX_WIDTH} from '../constants';
 
 const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
 const LEFT_MENU_EXPANSION_DELAY = 500;
@@ -89,7 +90,7 @@ const Layout = ({classes, renderMenu, renderMain = () => {}}) => {
                     onMouseEnter={handleMouseEnter}
                 />
             )}
-            <main style={{marginLeft: menuExpanded ? 220 : 0}} className={classes.main}>
+            <main style={{marginLeft: menuExpanded ? LEFT_PANEL_MAX_WIDTH : 0}} className={classes.main}>
                 {renderMain()}
             </main>
         </>

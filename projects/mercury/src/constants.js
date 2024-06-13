@@ -1,5 +1,7 @@
 export const APPLICATION_NAME = 'Fairspace';
 export const DEFAULT_METADATA_VIEW_MENU_LABEL = 'Metadata';
+export const THE_HYVE_URL = 'https://thehyve.nl';
+export const APPLICATION_DOCS_URL = 'https://docs.fairway.app/';
 export const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
 export const CUT = 'CUT';
 export const COPY = 'COPY';
@@ -10,6 +12,7 @@ export const LEFT_MENU_EXPANSION_DELAY = 500;
 export const MAIN_CONTENT_WIDTH = '65%';
 export const SIDE_PANEL_WIDTH = '35%';
 export const MAIN_CONTENT_MAX_HEIGHT = 'calc(100vh - 156px)';
+export const LEFT_PANEL_MAX_WIDTH = 280;
 export const COLLECTIONS_PATH = 'collections';
 export const METADATA_PATH = '/metadata';
 export const CROSS_WORKSPACES_SEARCH_PATH = '/workspaces/_all';

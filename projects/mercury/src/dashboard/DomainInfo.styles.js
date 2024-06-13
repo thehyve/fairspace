@@ -1,11 +1,14 @@
+import {alpha} from '@mui/material/styles';
+
 const styles = theme => ({
     paper: {
-        width: '200px',
+        width: '160px',
         height: '100px',
-        borderStyle: 'solid',
-        borderColor: theme.palette.primary.light,
+        border: 'none',
         background: theme.palette.primary.dark,
-        borderWidth: 2,
+        '&:hover': {
+            backgroundColor: alpha(theme.palette.primary.dark, 0.5)
+        },
         textAlign: 'center'
     },
     outerMargin: {
@@ -26,7 +29,8 @@ const styles = theme => ({
         width: 'inherit'
     },
     domainText: {
-        color: theme.palette.primary.contrastText
+        color: theme.palette.primary.contrastText,
+        paddingTop: 10
     },
     link: {
         textDecoration: 'none'
