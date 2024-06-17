@@ -22,6 +22,7 @@ import java.io.FileWriter;
 
 @Log4j2
 public class AiSearchApp extends BaseApp {
+    final String CACHE_DIR = "./data/conversations/";
 
     public AiSearchApp(String basePath) {
         super(basePath);
@@ -39,7 +40,11 @@ public class AiSearchApp extends BaseApp {
         });
 
         get("/allconversations", "application/json", (req, res) -> {
-            try (var conversations = Files.list(Paths.get("./data/conversations/" + getUserKey()))) {
+            if (!Files.exists(Paths.get(CACHE_DIR + getUserKey()))) {
+                return new ArrayList<JSONObject>();
+            }
+
+            try (var conversations = Files.list(Paths.get(CACHE_DIR + getUserKey()))) {
                 var content = conversations.map(path -> {
                     try {
                         return new String(Files.readAllBytes(path));
@@ -47,7 +52,7 @@ public class AiSearchApp extends BaseApp {
                         return "{}";
                     }
                 }).collect(Collectors.toList());
-                
+
                 var result = new ArrayList<JSONObject>();
                 for (var c : content) {
                     try {
@@ -56,7 +61,7 @@ public class AiSearchApp extends BaseApp {
                         conversation.put("id", obj.getJSONObject("conversation").getString("conversationId"));
                         conversation.put("topic", obj.getJSONObject("conversation").getJSONArray("messages").getJSONObject(0).getJSONObject("userInput").getString("input"));
                         conversation.put("start", new LlmConversation().getStartTime(obj.getJSONObject("conversation").getString("startTime")));
-                        
+
                         result.add(conversation);
                     } catch (Exception e) {
                         System.out.println("Error extracting conversation id, input message, and start time: " + e.getMessage());
@@ -96,10 +101,10 @@ public class AiSearchApp extends BaseApp {
                 }
 
                 var conversationId = req.params(":id");
-                var filename = "./data/conversations/" + getUserKey() + "/" + conversationId + ".json";
-                
+                var filename = CACHE_DIR + getUserKey() + "/" + conversationId + ".json";
+
                 res.type(APPLICATION_JSON.asString());
-                
+
                 if (Files.exists(Paths.get(filename))) {
                     try {
                         var content = new String(Files.readAllBytes(Paths.get(filename)));
@@ -113,7 +118,7 @@ public class AiSearchApp extends BaseApp {
                     System.out.println("Conversation history file " + filename + " does not exist.");
                     return "{}";
                 }
-                
+
             } catch (Exception e) {
                 return handleError(req, e);
             }
@@ -133,11 +138,11 @@ public class AiSearchApp extends BaseApp {
                 var conversationId = body.getString("conversationId");
 
                 var result = new LlmConversation().continueChat(conversationId, query);
-                var filepath = "./data/conversations/" + getUserKey();
+                var filepath = CACHE_DIR + getUserKey();
                 var file = new java.io.File(filepath + "/" + conversationId + ".json");
 
                 Files.createDirectories(Paths.get(filepath));
-                
+
                 try (FileWriter writer = new FileWriter(file)) {
                     writer.write(result.toString());
                 } catch (Exception e) {
@@ -160,14 +165,14 @@ public class AiSearchApp extends BaseApp {
                 }
 
                 var conversationId = req.params(":id");
-                var filename = "./data/conversations/" + getUserKey() + "/" + conversationId + ".json";
+                var filename = CACHE_DIR + getUserKey() + "/" + conversationId + ".json";
 
                 try {
                     Files.deleteIfExists(Paths.get(filename));
                 } catch (Exception e) {
                     System.out.println("Error deleting conversation history file: " + e.getMessage());
                 }
-                
+
                 var result = new LlmConversation().deleteChat(conversationId);
 
                 res.type(APPLICATION_JSON.asString());
