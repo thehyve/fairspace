@@ -115,6 +115,23 @@ const MainMenu = ({open, classes}) => {
                 >
                     {open && 'Collections'}
                 </Button>
+                {useLlmSearch && (
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        className={classNames(
+                            classes.mainMenuButton,
+                            !open && classes.mainMenuButtonSmall,
+                            pathname.startsWith('/search') && classes.mainMenuButtonSelected
+                        )}
+                        key="search"
+                        component={NavLink}
+                        to="/ask"
+                        startIcon={<ChatIcon />}
+                    >
+                        {open && 'Chat'}
+                    </Button>
+                )}
                 {externalStorages &&
                     externalStorages.map(storage => (
                         <Button
