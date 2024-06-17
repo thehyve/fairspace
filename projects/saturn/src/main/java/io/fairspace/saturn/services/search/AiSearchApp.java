@@ -1,24 +1,23 @@
 package io.fairspace.saturn.services.search;
 
-import lombok.extern.log4j.*;
-import nl.hyve.llm.LlmConversation;
-
-import org.json.JSONObject;
-
-import spark.Request;
+import java.io.FileWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+import lombok.extern.log4j.*;
+import nl.hyve.llm.LlmConversation;
+import org.json.JSONObject;
+import spark.Request;
+
 import io.fairspace.saturn.services.BaseApp;
 
 import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
+
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
 import static spark.Spark.post;
-
-import java.io.FileWriter;
 
 @Log4j2
 public class AiSearchApp extends BaseApp {
@@ -45,13 +44,15 @@ public class AiSearchApp extends BaseApp {
             }
 
             try (var conversations = Files.list(Paths.get(CACHE_DIR + getUserKey()))) {
-                var content = conversations.map(path -> {
-                    try {
-                        return new String(Files.readAllBytes(path));
-                    } catch (Exception e) {
-                        return "{}";
-                    }
-                }).collect(Collectors.toList());
+                var content = conversations
+                        .map(path -> {
+                            try {
+                                return new String(Files.readAllBytes(path));
+                            } catch (Exception e) {
+                                return "{}";
+                            }
+                        })
+                        .collect(Collectors.toList());
 
                 var result = new ArrayList<JSONObject>();
                 for (var c : content) {
@@ -59,12 +60,23 @@ public class AiSearchApp extends BaseApp {
                         var obj = new JSONObject(c);
                         var conversation = new JSONObject();
                         conversation.put("id", obj.getJSONObject("conversation").getString("conversationId"));
-                        conversation.put("topic", obj.getJSONObject("conversation").getJSONArray("messages").getJSONObject(0).getJSONObject("userInput").getString("input"));
-                        conversation.put("start", new LlmConversation().getStartTime(obj.getJSONObject("conversation").getString("startTime")));
+                        conversation.put(
+                                "topic",
+                                obj.getJSONObject("conversation")
+                                        .getJSONArray("messages")
+                                        .getJSONObject(0)
+                                        .getJSONObject("userInput")
+                                        .getString("input"));
+                        conversation.put(
+                                "start",
+                                new LlmConversation()
+                                        .getStartTime(obj.getJSONObject("conversation")
+                                                .getString("startTime")));
 
                         result.add(conversation);
                     } catch (Exception e) {
-                        System.out.println("Error extracting conversation id, input message, and start time: " + e.getMessage());
+                        System.out.println(
+                                "Error extracting conversation id, input message, and start time: " + e.getMessage());
                     }
                 }
 
@@ -156,7 +168,7 @@ public class AiSearchApp extends BaseApp {
             }
         });
 
-        post("/deletechat/:id",  "application/json", (req, res) -> {
+        post("/deletechat/:id", "application/json", (req, res) -> {
             try {
                 boolean keyExists = req.params() != null && req.params().containsKey(":id");
 
