@@ -1,6 +1,7 @@
 import React from 'react';
 import {render} from '@testing-library/react';
 import {BrowserRouter as Router} from 'react-router-dom';
+import {ThemeProvider} from '@mui/material/styles';
 import ServicesContext from '../../common/contexts/ServicesContext';
 import UserContext from '../../users/UserContext';
 import ExternalStoragesContext from '../../external-storage/ExternalStoragesContext';
@@ -9,31 +10,34 @@ import InternalMetadataSourceContext from '../../metadata/metadata-sources/Inter
 import MetadataViewContext from '../../metadata/views/MetadataViewContext';
 import MainMenu from '../MainMenu';
 import {DEFAULT_METADATA_VIEW_MENU_LABEL} from '../../constants';
+import theme from '../../App.theme';
 
 describe('MainMenu', () => {
     const setup = (user, services, externalStorages, externalMetadataSources, internalMetadata, views) => {
         return render(
-            <Router>
-                <ServicesContext.Provider value={{services}}>
-                    <UserContext.Provider value={{currentUser: user}}>
-                        <ExternalStoragesContext.Provider value={{externalStorages}}>
-                            <ExternalMetadataSourceContext.Provider value={{externalMetadataSources}}>
-                                <InternalMetadataSourceContext.Provider
-                                    value={{
-                                        internalMetadataIcon: internalMetadata.icon,
-                                        internalMetadataLabel:
-                                            internalMetadata.label || DEFAULT_METADATA_VIEW_MENU_LABEL
-                                    }}
-                                >
-                                    <MetadataViewContext.Provider value={{views}}>
-                                        <MainMenu />
-                                    </MetadataViewContext.Provider>
-                                </InternalMetadataSourceContext.Provider>
-                            </ExternalMetadataSourceContext.Provider>
-                        </ExternalStoragesContext.Provider>
-                    </UserContext.Provider>
-                </ServicesContext.Provider>
-            </Router>
+            <ThemeProvider theme={theme}>
+                <Router>
+                    <ServicesContext.Provider value={{services}}>
+                        <UserContext.Provider value={{currentUser: user}}>
+                            <ExternalStoragesContext.Provider value={{externalStorages}}>
+                                <ExternalMetadataSourceContext.Provider value={{externalMetadataSources}}>
+                                    <InternalMetadataSourceContext.Provider
+                                        value={{
+                                            internalMetadataIcon: internalMetadata.icon,
+                                            internalMetadataLabel:
+                                                internalMetadata.label || DEFAULT_METADATA_VIEW_MENU_LABEL
+                                        }}
+                                    >
+                                        <MetadataViewContext.Provider value={{views}}>
+                                            <MainMenu open />
+                                        </MetadataViewContext.Provider>
+                                    </InternalMetadataSourceContext.Provider>
+                                </ExternalMetadataSourceContext.Provider>
+                            </ExternalStoragesContext.Provider>
+                        </UserContext.Provider>
+                    </ServicesContext.Provider>
+                </Router>
+            </ThemeProvider>
         );
     };
 
