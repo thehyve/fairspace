@@ -29,7 +29,6 @@ const Conversation = props => {
     const {classes} = props;
 
     const [query, setQuery] = useState('');
-    const [finalQuery, setFinalQuery] = useState('');
 
     const [messages, setMessages] = useState([]);
     const [responseMessage, setResponseMessage] = useState('');
@@ -39,7 +38,7 @@ const Conversation = props => {
     const [conversationHistory, setConversationHistory] = useState([]);
     const [restoreChatStatus, setRestoreChatStatus] = useState(false);
 
-    const [openModal, setOpenModal] = React.useState(false);
+    const [openModal, setOpenModal] = useState(false);
 
     const handleOpenModal = () => setOpenModal(true);
     const handleCloseModal = () => setOpenModal(false);
@@ -189,7 +188,19 @@ const Conversation = props => {
 
     const prepareFetchSearch = () => {
         setLoading(true);
-        setFinalQuery(query);
+        setResponseMessage('');
+
+        if (query === '') {
+            return;
+        }
+
+        performSearch()
+            .then(processResponseMessages)
+            .then(() => setLoading(false))
+            .catch(() => {
+                handleHttpError('Connection error.');
+                handleSearchError('Fairspace article search is not available at the moment');
+            });
     };
 
     const extractArticleIri = webResult => {
@@ -320,22 +331,6 @@ const Conversation = props => {
             </List>
         );
     };
-
-    useEffect(() => {
-        setResponseMessage('');
-        if (finalQuery === '') {
-            return;
-        }
-
-        performSearch()
-            .then(processResponseMessages)
-            .then(() => setLoading(false))
-            .catch(() => {
-                handleHttpError('Connection error.');
-                handleSearchError('Fairspace article search is not available at the moment');
-            });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [finalQuery]);
 
     useEffect(() => {
         getAllConversationHistory();
