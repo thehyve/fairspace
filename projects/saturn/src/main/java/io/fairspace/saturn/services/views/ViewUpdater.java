@@ -176,10 +176,7 @@ public class ViewUpdater implements AutoCloseable {
                         try {
                             for (var column : view.columns) {
                                 var objects = retrieveValues(graph, subject, column.source);
-                                if (objects.isEmpty()) {
-                                    continue;
-                                }
-                                row.put(column.name, getValue(column, objects.get(0)));
+                                row.put(column.name, objects.isEmpty() ? null : getValue(column, objects.getFirst()));
                             }
                             viewStoreClient.updateRows(view.name, List.of(row), false);
                         } catch (SQLException e) {
