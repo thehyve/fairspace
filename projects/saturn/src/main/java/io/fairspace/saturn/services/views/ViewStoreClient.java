@@ -203,17 +203,13 @@ public class ViewStoreClient implements AutoCloseable {
     public int updateRows(String view, List<Map<String, Object>> rows, boolean bulkInsert) throws SQLException {
         var viewTable = configuration.viewTables.get(view);
         var config = configuration.viewConfig.get(view);
-        // Find the columns for which there are values in the rows
+        // Find the columns in the rows of type different from Set
         var columnNames = rows.stream()
-                .flatMap(row -> row.entrySet().stream()
-                        .filter(entry -> entry.getValue() != null)
-                        .map(Map.Entry::getKey))
+                .flatMap(row -> row.keySet().stream())
                 .distinct()
                 .filter(columnName -> config.columns.stream()
-                        .noneMatch(column ->
-                                // Skip value set columns
-                                column.name.equalsIgnoreCase(columnName) && column.type.isSet()))
-                .collect(Collectors.toList());
+                        .noneMatch(column -> column.name.equalsIgnoreCase(columnName) && column.type.isSet()))
+                .toList();
         if (columnNames.isEmpty()) {
             return 0;
         }
@@ -228,7 +224,7 @@ public class ViewStoreClient implements AutoCloseable {
             for (var row : rows) {
                 var values = columnNames.stream()
                         .map(columnName -> row.getOrDefault(columnName, null))
-                        .collect(Collectors.toList());
+                        .toList();
                 var id = (String) row.get("id");
                 var exists = (!bulkInsert) && rowExists(viewTable.name, id);
                 if (exists) {
