@@ -2499,18 +2499,20 @@ DOCKER_LOGGING_DRIVER=json-file
 ----
 
 To run the development version, checkout this repository,
-navigate to ``projects/mercury`` and run
+navigate to ``projects/mercury`` and run the following commands (``yarn install`` only has to be ran the first time running fairspace).
 
 [source, shell]
 ----
+yarn install
 yarn dev
 ----
+
 
 This will start a Keycloak instance for authentication at port ``5100``,
 the backend application named Saturn at port ``8080`` and the
 user interface at port ``3000``.
 
-At first run, you need to configure the service account in Keycloak.
+At first run, you need to configure the service account in Keycloak. If you cannot log in, you might need to restart fairspace by closing it and running ``yarn dev`` again.
 
 * Navigate to link:http://localhost:5100[http://localhost:5100]
 * Login with credentials ``keycloak``, ``keycloak``
@@ -2519,7 +2521,7 @@ At first run, you need to configure the service account in Keycloak.
 ** Click `Clients` in the left menu -> Select 'workspace-client'
 ** Choose tab `Service Account Roles`
 ** Click `Assign Role`
-** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Asign role`.
+** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Assign`.
 
 Now everything should be ready to start using Fairspace:
 
