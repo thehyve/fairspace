@@ -91,7 +91,8 @@ public class AuthEndpoints {
             // Retrieve the token from the auth provider
             OAuthAuthenticationToken token = null;
             try {
-                token = oAuthFlow.retrieveToken(code, exchange.getRequest());
+                String redirectUri = (String) session.getAttributes().get(PREVIOUS_REQUEST_SESSION_ATTRIBUTE);
+                token = oAuthFlow.retrieveToken(code, exchange.getRequest(), redirectUri);
             } catch (Exception e) {
                 log.error("Error retrieving token from the auth provider: " + e.getMessage());
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)

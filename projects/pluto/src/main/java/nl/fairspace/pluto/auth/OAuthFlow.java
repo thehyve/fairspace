@@ -51,10 +51,10 @@ public class OAuthFlow {
                 .toURI();
     }
 
-    public OAuthAuthenticationToken retrieveToken(String code, ServerHttpRequest request)
+    public OAuthAuthenticationToken retrieveToken(String code, ServerHttpRequest request, String redirectUri)
             throws IOException, ParseException, URISyntaxException {
         return retrieveToken(
-                new AuthorizationCodeGrant(new AuthorizationCode(code), getAuthorizeUri(request)),
+                new AuthorizationCodeGrant(new AuthorizationCode(code), new URI(redirectUri)),
                 getClientAuthentication());
     }
 
