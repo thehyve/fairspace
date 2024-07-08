@@ -11,6 +11,7 @@ import org.apache.jena.query.DatasetFactory;
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.views.*;
+import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
 
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
@@ -30,8 +31,12 @@ public class SaturnDatasetFactory {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams, null)
+        Location location = Location.create(config.datasetPath.getAbsolutePath());
+        var dsg = connectCreate(location, config.storeParams, null)
                 .getDatasetGraph();
+
+        // wrap it with DatasetGraphSwitchable to allow  compacting Jena
+        dsg = new DatasetGraphSwitchable(null, location, dsg); // todo: test the parameters
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 

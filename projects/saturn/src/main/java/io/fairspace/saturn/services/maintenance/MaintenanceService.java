@@ -1,15 +1,5 @@
 package io.fairspace.saturn.services.maintenance;
 
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
-import org.apache.jena.query.Dataset;
-
 import io.fairspace.saturn.config.ConfigLoader;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.ConflictException;
@@ -18,6 +8,19 @@ import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.views.ViewUpdater;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphWrapper;
+import org.apache.jena.tdb2.DatabaseMgr;
+import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
+
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class MaintenanceService {
@@ -70,9 +73,25 @@ public class MaintenanceService {
         });
     }
 
+    public void compactRdfStorage() {
+        log.info("Compacting RDF storage started");
+        try {
+            var ds = unwrap(dataset.asDatasetGraph());
+            if (ds != null) {
+                log.info("Compacting RDF storage is not supported for this storage type");
+                return;
+            }
+            DatabaseMgr.compact(ds, true);
+        } catch (Exception e) {
+            log.error("Error compacting RDF storage", e);
+            return;
+        }
+        log.info("Compacting RDF storage finished");
+    }
+
     public void recreateIndex() {
         try (var viewStoreClient = viewStoreClientFactory.build();
-                var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph())) {
+             var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph())) {
             var start = new Date().getTime();
             // Index entities
             for (var view : ConfigLoader.VIEWS_CONFIG.views) {
@@ -82,6 +101,22 @@ public class MaintenanceService {
             log.info("View index recreated in {}ms.", new Date().getTime() - start);
         } catch (SQLException e) {
             throw new RuntimeException("Failed to recreate index", e);
+        }
+    }
+
+    /**
+     * Unwrap the dataset graph to the underlying dataset graph that supports compacting.
+     * @param dsg the dataset graph
+     * @return the underlying dataset graph that supports compacting
+     */
+    private static DatasetGraph unwrap(DatasetGraph dsg) {
+        while (true) {
+            if (dsg instanceof DatasetGraphSwitchable) {
+                return dsg;
+            }
+            if (!(dsg instanceof DatasetGraphWrapper))
+                return null;
+            dsg = ((DatasetGraphWrapper) dsg).getWrapped();
         }
     }
 }
