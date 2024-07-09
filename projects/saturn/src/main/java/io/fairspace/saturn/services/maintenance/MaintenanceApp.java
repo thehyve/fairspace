@@ -22,7 +22,7 @@ public class MaintenanceApp extends BaseApp {
             return "";
         });
         post("/compact", (req, res) -> {
-            maintenanceService.compactRdfStorage();
+            maintenanceService.compactRdfStorageTask();
             res.status(SC_NO_CONTENT);
             return "";
         });

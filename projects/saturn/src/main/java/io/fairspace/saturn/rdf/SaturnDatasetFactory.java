@@ -4,39 +4,34 @@ import java.io.File;
 
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.TypeMapper;
-import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.tdb2.TDB2Factory;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
 import io.fairspace.saturn.services.views.*;
-import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
 
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
-
-import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
 @Log4j2
 public class SaturnDatasetFactory {
     /**
      * Returns a dataset to work with.
      * We're playing Russian dolls here.
-     * The original TDB2 dataset graph, which in fact consists of a number of wrappers itself (Jena uses wrappers everywhere),
+     * The original TDB2 dataset graph, which in fact consists of a number of
+     * wrappers itself (Jena uses wrappers everywhere),
      * is wrapped with a number of wrapper classes, each adding a new feature.
-     * Currently it adds transaction logging and applies default vocabulary if needed.
+     * Currently it adds transaction logging and applies default vocabulary if
+     * needed.
      */
     public static Dataset connect(Config.Jena config, ViewStoreClientFactory viewStoreClientFactory) {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
-        Location location = Location.create(config.datasetPath.getAbsolutePath());
-        var dsg = connectCreate(location, config.storeParams, null)
-                .getDatasetGraph();
-
-        // wrap it with DatasetGraphSwitchable to allow  compacting Jena
-        dsg = new DatasetGraphSwitchable(null, location, dsg); // todo: test the parameters
+        Dataset ds = TDB2Factory.connectDataset(config.datasetPath.getAbsolutePath());
+        var dsg = ds.asDatasetGraph();
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 
