@@ -4,9 +4,9 @@ import java.io.File;
 
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.dboe.base.file.Location;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
-import org.apache.jena.tdb2.TDB2Factory;
 
 import io.fairspace.saturn.config.*;
 import io.fairspace.saturn.rdf.transactions.*;
@@ -14,6 +14,8 @@ import io.fairspace.saturn.services.views.*;
 
 import static io.fairspace.saturn.rdf.MarkdownDataType.MARKDOWN_DATA_TYPE;
 import static io.fairspace.saturn.rdf.transactions.Restore.restore;
+
+import static org.apache.jena.tdb2.sys.DatabaseConnection.connectCreate;
 
 @Log4j2
 public class SaturnDatasetFactory {
@@ -30,8 +32,8 @@ public class SaturnDatasetFactory {
         var restoreNeeded = isRestoreNeeded(config.datasetPath);
 
         // Create a TDB2 dataset graph
-        Dataset ds = TDB2Factory.connectDataset(config.datasetPath.getAbsolutePath());
-        var dsg = ds.asDatasetGraph();
+        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams, null)
+                .getDatasetGraph();
 
         var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
 

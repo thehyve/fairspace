@@ -1,5 +1,18 @@
 package io.fairspace.saturn.services.maintenance;
 
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.tdb2.DatabaseMgr;
+import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
+
 import io.fairspace.saturn.config.ConfigLoader;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.TxnLogDatasetGraph;
@@ -10,26 +23,14 @@ import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.views.ViewUpdater;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.tdb2.DatabaseMgr;
-import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
-
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 @Log4j2
 public class MaintenanceService {
     public static final String SERVICE_NOT_AVAILABLE = "Service not available";
     public static final String REINDEXING_IS_ALREADY_IN_PROGRESS = "Reindexing is already in progress.";
 
-    private final ThreadPoolExecutor threadpool = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
+    private final ThreadPoolExecutor threadpool =
+            new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
 
     private final UserService userService;
     private final Dataset dataset;
