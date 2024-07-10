@@ -27,7 +27,7 @@ import io.fairspace.saturn.services.views.ViewUpdater;
 @Log4j2
 public class MaintenanceService {
     public static final String SERVICE_NOT_AVAILABLE = "Service not available";
-    public static final String REINDEXING_IS_ALREADY_IN_PROGRESS = "Reindexing is already in progress.";
+    public static final String REINDEXING_IS_ALREADY_IN_PROGRESS = "Maintenance is already in progress.";
 
     private final ThreadPoolExecutor threadpool =
             new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -64,7 +64,7 @@ public class MaintenanceService {
             throw new NotAvailableException(SERVICE_NOT_AVAILABLE);
         }
         if (active()) {
-            log.info("Maintenance is already in progress.");
+            log.info(REINDEXING_IS_ALREADY_IN_PROGRESS);
             throw new ConflictException(REINDEXING_IS_ALREADY_IN_PROGRESS);
         }
 
@@ -80,11 +80,8 @@ public class MaintenanceService {
         if (!userService.currentUser().isAdmin()) {
             throw new AccessDeniedException();
         }
-        if (disabled()) {
-            throw new NotAvailableException(SERVICE_NOT_AVAILABLE);
-        }
         if (active()) {
-            log.info("Reindexing is already in progress.");
+            log.info(REINDEXING_IS_ALREADY_IN_PROGRESS);
             throw new ConflictException(REINDEXING_IS_ALREADY_IN_PROGRESS);
         }
 
@@ -93,7 +90,7 @@ public class MaintenanceService {
             try {
                 var ds = unwrap(dataset.asDatasetGraph());
                 if (ds == null) {
-                    log.info("Compacting RDF storage is not supported for this storage type");
+                    log.warn("Compacting RDF storage is not supported for this storage type");
                     return;
                 }
                 DatabaseMgr.compact(ds, true);

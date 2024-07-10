@@ -42,6 +42,7 @@ public class SaturnDatasetFactory {
         }
 
         if (restoreNeeded) {
+            log.warn("Jena restore is needed, starting automatic restore.");
             restore(dsg, txnLog);
         }
 
