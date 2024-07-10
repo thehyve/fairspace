@@ -27,7 +27,7 @@ import io.fairspace.saturn.services.views.ViewUpdater;
 @Log4j2
 public class MaintenanceService {
     public static final String SERVICE_NOT_AVAILABLE = "Service not available";
-    public static final String REINDEXING_IS_ALREADY_IN_PROGRESS = "Maintenance is already in progress.";
+    public static final String MAINTENANCE_IS_IN_PROGRESS = "Maintenance is in progress.";
 
     private final ThreadPoolExecutor threadpool =
             new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -64,8 +64,8 @@ public class MaintenanceService {
             throw new NotAvailableException(SERVICE_NOT_AVAILABLE);
         }
         if (active()) {
-            log.info(REINDEXING_IS_ALREADY_IN_PROGRESS);
-            throw new ConflictException(REINDEXING_IS_ALREADY_IN_PROGRESS);
+            log.info(MAINTENANCE_IS_IN_PROGRESS);
+            throw new ConflictException(MAINTENANCE_IS_IN_PROGRESS);
         }
 
         threadpool.submit(() -> {
@@ -81,8 +81,8 @@ public class MaintenanceService {
             throw new AccessDeniedException();
         }
         if (active()) {
-            log.info(REINDEXING_IS_ALREADY_IN_PROGRESS);
-            throw new ConflictException(REINDEXING_IS_ALREADY_IN_PROGRESS);
+            log.info(MAINTENANCE_IS_IN_PROGRESS);
+            throw new ConflictException(MAINTENANCE_IS_IN_PROGRESS);
         }
 
         threadpool.submit(() -> {
@@ -100,6 +100,10 @@ public class MaintenanceService {
             }
             log.info("Compacting RDF storage finished");
         });
+    }
+
+    public boolean isMaintenanceInProgress() {
+        return active();
     }
 
     /**
