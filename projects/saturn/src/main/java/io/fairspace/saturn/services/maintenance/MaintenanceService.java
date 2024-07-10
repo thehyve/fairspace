@@ -127,7 +127,7 @@ public class MaintenanceService {
      * @param dsg the dataset graph
      * @return the underlying dataset graph that supports compacting
      */
-    private static DatasetGraph unwrap(DatasetGraph dsg) {
+    public static DatasetGraph unwrap(DatasetGraph dsg) {
         if (dsg == null || dsg instanceof DatasetGraphSwitchable) {
             return dsg;
         }
