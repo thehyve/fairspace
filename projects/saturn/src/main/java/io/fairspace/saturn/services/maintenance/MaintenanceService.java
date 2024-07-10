@@ -102,10 +102,6 @@ public class MaintenanceService {
         });
     }
 
-    public boolean isMaintenanceInProgress() {
-        return active();
-    }
-
     /**
      * Only use this method in a secure and synchonisized way, see 'recreateIndex()'
      */
