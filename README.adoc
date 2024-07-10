@@ -1748,13 +1748,62 @@ Only allowed for administrators.
 | Service not available. This means that the application is configured not to use a view database.
 |===
 
+|===
+2+| ``POST /api/maintenance/compact``
+
+2+| Compact the Jena TDB database files.
+
+Jena database files grow fast when using transactions. This operation will compact the database files to reduce their size. If data is inserted using many small transactions the files will be reduced to 10-20% of their original size.
+
+Only allowed for administrators.
+2+| _Response:_
+| ``204``
+| Asynchronous task to compact Jena files has started.
+| ``403``
+| Operation not allowed. The current user is not an administrator.
+| ``409``
+| Reindexing is already in progress.
+| ``503``
+| Service not available. This means that the application is configured not to use a view database.
+|===
+
 
 .Example recreate index using curl
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -X POST 'http://localhost:8080/api/maintenance/reindex'
+curl -X GET 'http://localhost:8080/api/maintenance/compact'
+----
+====
+
+|===
+2+| ``GET /api/maintenance/status``
+
+2+| Get the status of maintenance tasks.
+
+It is not possible to run more than one maintenance task at the same time. If you start a task while another task is running, the new task will be rejected. If you want to know in advance whether a task is running, you can use this endpoint.
+
+A text is return
+
+2+| _Response:_
+| ``200``
+| Returns "active" or "inactive"
+| ``403``
+| Operation not allowed. The current user is not an administrator.
+| ``409``
+| Reindexing is already in progress.
+| ``503``
+| Service not available. This means that the application is configured not to use a view database.
+|===
+
+
+.Example recreate index using curl
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/api/maintenance/status'
 ----
 ====
 
