@@ -237,6 +237,9 @@ public class ViewUpdater implements AutoCloseable {
         log.debug("Updating subject of type {} took {}ms", type.getLocalName(), new Date().getTime() - start);
     }
 
+    /**
+     * Only use this method in a secure and synchonisized way, see 'MaintenanceService.recreateIndex()'
+     */
     public void recreateIndexForView(ViewStoreClient viewStoreClient, ViewsConfig.View view) throws SQLException {
         // Clear database tables for view
         log.info("Recreating index for view {} started", view.name);
