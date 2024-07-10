@@ -1768,7 +1768,7 @@ Only allowed for administrators.
 |===
 
 
-.Example recreate index using curl
+.Example of compacting Jena using curl
 [%collapsible]
 ====
 [source, bash]
@@ -1798,7 +1798,7 @@ A text is return
 |===
 
 
-.Example recreate index using curl
+.Example of getting the maintenance status using curl
 [%collapsible]
 ====
 [source, bash]
