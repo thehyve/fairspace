@@ -17,9 +17,11 @@ import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 @Slf4j
 public class MaterializedViewService {
 
-    public static final String INDEX_POSTFIX = "_idx";
-    private final DataSource dataSource;
+    private static final String INDEX_POSTFIX = "_idx";
+    private static final String UNIQUE_INDEX_POSTFIX = "_unique_idx";
+    private static final int FIRST_ROW_IDX = 1;
 
+    private final DataSource dataSource;
     private final ViewStoreClient.ViewStoreConfiguration configuration;
     private final int maxJoinItems;
 
@@ -37,47 +39,115 @@ public class MaterializedViewService {
                 createOrUpdateJoinMaterializedView(view, connection);
             }
         } catch (SQLException e) {
-            log.error("Materialized view update failed", e);
+            log.error("Materialized view create/update failed", e);
             throw new RuntimeException(e);
         }
     }
 
-    public void createOrUpdateViewMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
+    private void createOrUpdateViewMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
         var setColumns =
                 view.columns.stream().filter(column -> column.type.isSet()).toList();
         if (!setColumns.isEmpty()) {
             String viewName = view.name.toLowerCase();
             var mvName = "mv_%s".formatted(viewName);
-            log.info("{} refresh has started", mvName);
-            dropMaterializedViewIfExists(mvName, connection);
-            createViewMaterializedView(mvName, view, setColumns, connection);
-            createMaterializedViewIndex(viewName + INDEX_POSTFIX, mvName, viewName + "id", connection);
-            log.info("{} refresh has finished successfully", mvName);
+
+            log.info("View materialized view {} create/update has started", mvName);
+            // all checks and changes to be done in one transaction
+            connection.setAutoCommit(false);
+            try {
+                List<String> columns = collectViewColumns(view);
+                if (doesMaterializedViewExist(mvName, connection)) {
+                    // 'refresh' requires unique index based on all columns, so we have to check if it exists
+                    createMaterializedViewUniqueIndexIfNotExist(
+                            viewName + UNIQUE_INDEX_POSTFIX, mvName, columns, connection);
+                    refreshMaterializedView(mvName, connection);
+                } else {
+                    createViewMaterializedView(mvName, view, setColumns, connection);
+                    createMaterializedViewIndex(viewName + INDEX_POSTFIX, mvName, viewName + "id", connection);
+                    createMaterializedViewUniqueIndexIfNotExist(
+                            viewName + UNIQUE_INDEX_POSTFIX, mvName, columns, connection);
+                }
+                connection.commit();
+                log.info("View materialized view {} create/update has finished successfully", mvName);
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
         }
     }
 
-    public void createOrUpdateJoinMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
+    private void createOrUpdateJoinMaterializedView(ViewsConfig.View view, Connection connection) throws SQLException {
         for (ViewsConfig.View.JoinView joinView : view.join) {
             String viewName = view.name.toLowerCase();
             String joinViewName = joinView.view.toLowerCase();
             var mvName = "mv_%s_join_%s".formatted(viewName, joinViewName);
-            log.info("{} refresh has started", mvName);
-            dropMaterializedViewIfExists(mvName, connection);
-            createJoinMaterializedViews(view, joinView, connection);
-            createMaterializedViewIndex(mvName + "_" + viewName + INDEX_POSTFIX, mvName, viewName + "_id", connection);
-            createMaterializedViewIndex(
-                    mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id", connection);
-            log.info("{} refresh has finished successfully", mvName);
+
+            log.info("Join materialized view {} create/update has started", mvName);
+            // all checks and changes to be done in one transaction
+            connection.setAutoCommit(false);
+            try {
+                List<String> columns = collectJoinColumns(view, joinView);
+                if (doesMaterializedViewExist(mvName, connection)) {
+                    // 'refresh' requires unique index based on all columns, so we have to check if it exists
+                    createMaterializedViewUniqueIndexIfNotExist(
+                            mvName + UNIQUE_INDEX_POSTFIX, mvName, columns, connection);
+                    refreshMaterializedView(mvName, connection);
+                } else {
+                    createJoinMaterializedViews(view, joinView, connection);
+                    createMaterializedViewIndex(
+                            mvName + "_" + viewName + INDEX_POSTFIX, mvName, viewName + "_id", connection);
+                    createMaterializedViewIndex(
+                            mvName + "_" + joinViewName + INDEX_POSTFIX, mvName, joinViewName + "_id", connection);
+                    createMaterializedViewUniqueIndexIfNotExist(
+                            mvName + UNIQUE_INDEX_POSTFIX, mvName, columns, connection);
+                }
+                connection.commit();
+                log.info("Join  materialized view {} create/update has finished successfully", mvName);
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
         }
     }
 
-    private void createMaterializedViewIndex(
-            String indexName, String materializedViewName, String columnName, Connection connection)
-            throws SQLException {
-        var query = "CREATE INDEX %s on %s (%s)".formatted(indexName, materializedViewName, columnName);
+    private void refreshMaterializedView(String mvName, Connection connection) throws SQLException {
+        var query = "REFRESH MATERIALIZED VIEW CONCURRENTLY %s".formatted(mvName);
         try (var ps = connection.prepareStatement(query)) {
             ps.execute();
-            connection.commit();
+        }
+    }
+
+    private void createMaterializedViewUniqueIndexIfNotExist(
+            String idxName, String mvName, List<String> columns, Connection connection) throws SQLException {
+        if (!doesIndexExist(mvName, idxName, connection)) {
+            var joinedColumns = String.join(", ", columns);
+            var query = "CREATE UNIQUE INDEX %s ON %s (%s)".formatted(idxName, mvName, joinedColumns);
+            try (var ps = connection.prepareStatement(query)) {
+                ps.execute();
+            }
+        }
+    }
+
+    private boolean doesMaterializedViewExist(String viewName, Connection connection) throws SQLException {
+        var query = "SELECT EXISTS (SELECT 1 FROM pg_matviews WHERE matviewname = '%s')".formatted(viewName);
+        try (var ps = connection.prepareStatement(query)) {
+            var rs = ps.executeQuery();
+            rs.next();
+            return rs.getBoolean(FIRST_ROW_IDX);
+        }
+    }
+
+    private boolean doesIndexExist(String mvName, String idxName, Connection connection) throws SQLException {
+        var query = "SELECT EXISTS (SELECT * FROM pg_indexes WHERE tablename = '%s' AND indexname = '%s')"
+                .formatted(mvName, idxName);
+        try (var ps = connection.prepareStatement(query)) {
+            var rs = ps.executeQuery();
+            rs.next();
+            return rs.getBoolean(FIRST_ROW_IDX);
         }
     }
 
@@ -125,6 +195,15 @@ public class MaterializedViewService {
         }
 
         try (var ps = connection.prepareStatement(queryBuilder.toString())) {
+            ps.execute();
+        }
+    }
+
+    private void createMaterializedViewIndex(
+            String indexName, String materializedViewName, String columnName, Connection connection)
+            throws SQLException {
+        var query = "CREATE INDEX %s on %s (%s)".formatted(indexName, materializedViewName, columnName);
+        try (var ps = connection.prepareStatement(query)) {
             ps.execute();
             connection.commit();
         }
@@ -241,11 +320,29 @@ public class MaterializedViewService {
         }
     }
 
-    private void dropMaterializedViewIfExists(String viewName, Connection connection) throws SQLException {
-        var query = "DROP MATERIALIZED VIEW IF EXISTS %s CASCADE".formatted(viewName);
-        try (var ps = connection.prepareStatement(query)) {
-            ps.execute();
-            connection.commit();
+    private List<String> collectViewColumns(ViewsConfig.View view) {
+        List<String> columns = view.columns.stream()
+                .filter(column -> column.type.isSet())
+                .map(column -> column.name.toLowerCase())
+                .toList();
+        columns = new ArrayList<>(columns);
+        columns.add(view.name.toLowerCase() + "id");
+        return columns;
+    }
+
+    private List<String> collectJoinColumns(ViewsConfig.View view, ViewsConfig.View.JoinView joinView) {
+        var viewTableName = view.name.toLowerCase();
+        var joinedTable = configuration.viewTables.get(joinView.view).name.toLowerCase();
+        var viewIdColumn = viewTableName + "_id";
+        var joinIdColumn = joinedTable + "_id";
+        var joinLabelColumn = joinedTable + "_label";
+        var columns = new ArrayList<>(List.of(viewIdColumn, joinIdColumn, joinLabelColumn));
+        for (int i = 0; i < joinView.include.size(); i++) {
+            var attr = joinView.include.get(i).toLowerCase();
+            if (!"id".equalsIgnoreCase(attr)) {
+                columns.add(joinedTable + "_" + attr);
+            }
         }
+        return columns;
     }
 }
