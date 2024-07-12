@@ -1773,7 +1773,7 @@ Only allowed for administrators.
 ====
 [source, bash]
 ----
-curl -X GET 'http://localhost:8080/api/maintenance/compact'
+curl -X POST 'http://localhost:8080/api/maintenance/compact'
 ----
 ====
 
