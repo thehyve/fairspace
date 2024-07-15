@@ -115,6 +115,7 @@ public class Config {
         public int maxPoolSize = 50;
         public long connectionTimeout = 1000;
         public boolean autoCommit = false;
+        public boolean mvRefreshOnStartRequired = true;
     }
 
     public static class ExtraStorage {
