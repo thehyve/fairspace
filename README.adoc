@@ -3320,7 +3320,7 @@ To address this issue, materialized views are used for enhanced performance.
 There are two types of materialized views: one for denormalized data, which includes the view ID and attribute data of Set/TermSet types, and another for joined views.
 For each joined view, there is one corresponding join materialized view (as specified in the views.yaml config).
 
-Materialized views are refreshed during database reindexing, on Saturn initialization stage and metadata updates, provided that the doViewsUpdate flag is set to true in the metadata endpoints. The refresh is performed concurrently what allows for the system to be available during the update providing the old version of data until the new one is ready.
+Materialized views are refreshed during database reindexing, on Saturn initialization stage and metadata updates, provided that the doViewsUpdate flag is set to true in the metadata endpoints. The refresh is performed concurrently what allows for the system to be available during the update providing the old version of data until the new one is ready. To skip materialized views refresh on Saturn initialization stage, update the Saturn ConfigMap setting false value to `viewDatabase.mvRefreshOnStartRequired`.
 
 ==== Extra file storage
 

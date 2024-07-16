@@ -55,6 +55,7 @@ viewDatabase:
   autoCommit: false
   maxPoolSize: 50
   connectionTimeout: 1000
+  mvRefreshOnStartRequired: true
 search:
   pageRequestTimeout: 10000
   countRequestTimeout: 60000
