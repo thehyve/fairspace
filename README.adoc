@@ -1743,7 +1743,7 @@ Only allowed for administrators.
 | ``403``
 | Operation not allowed. The current user is not an administrator.
 | ``409``
-| Reindexing is already in progress.
+| Maintenance (reindexing or compacting) is already in progress.
 | ``503``
 | Service not available. This means that the application is configured not to use a view database.
 |===
@@ -1762,7 +1762,7 @@ Only allowed for administrators.
 | ``403``
 | Operation not allowed. The current user is not an administrator.
 | ``409``
-| Reindexing is already in progress.
+| Maintenance (reindexing or compacting) is already in progress.
 | ``503``
 | Service not available. This means that the application is configured not to use a view database.
 |===
