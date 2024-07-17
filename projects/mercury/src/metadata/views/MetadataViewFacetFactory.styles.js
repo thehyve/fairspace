@@ -17,7 +17,7 @@ const styles = theme => ({
     },
     content: {
         '&:last-child': {
-            paddingTop: 0,
+            paddingTop: 8,
             paddingBottom: 8
         },
         padding: 8

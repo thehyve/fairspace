@@ -7,6 +7,9 @@ const styles = theme => ({
         paddingBottom: 10,
         minWidth: 282
     },
+    overallPanelContainer: {
+        height: 'calc(100vh - 64px)'
+    },
     overallPanel: {
         width: CENTRAL_PANEL_WIDTH,
         overflowX: 'auto'
@@ -15,7 +18,8 @@ const styles = theme => ({
         width: '100%'
     },
     rightPanel: {
-        width: RIGHT_PANEL_WIDTH
+        width: RIGHT_PANEL_WIDTH,
+        height: '100%'
     },
     centralPanel: {
         overflowX: 'auto',

@@ -156,7 +156,7 @@ const CollectionsPage = (props: CollectionsPageProperties) => {
                         ' Your pending changes will be lost.'
                     }
                     agreeButtonText="Navigate"
-                    disagreeButtonText="back to form"
+                    disagreeButtonText="Back to form"
                     onAgree={handleConfirmSwitchCollection}
                     onDisagree={handleCancelSwitchCollection}
                 />

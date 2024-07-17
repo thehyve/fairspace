@@ -25,9 +25,7 @@ type MetadataViewTabsProperties = {
 const styles = theme => ({
     tabsPanel: {
         paddingRight: 70,
-        '& .MuiButtonBase-root': {
-            borderRadius: 30
-        }
+        paddingLeft: 10
     },
     tab: {
         '& .MuiBox-root': {

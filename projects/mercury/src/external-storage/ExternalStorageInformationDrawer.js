@@ -36,11 +36,19 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
+        overflowY: 'auto',
         outline: 'none',
         transitionBorder: '.24s',
         easeInOut: true,
         '& .MuiCardHeader-root .MuiSvgIcon-root': {
             color: theme.palette.primary.contrastText
+        },
+        cardHeader: {
+            wordBreak: 'break-word',
+            top: 0,
+            zIndex: 2,
+            position: 'sticky'
         }
     }
 }));
@@ -131,7 +139,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                 titleTypographyProps={{variant: 'h6'}}
                 title={title}
                 avatar={avatar}
-                style={{wordBreak: 'break-word'}}
+                className={classes.cardHeader}
                 action={
                     <IconButton
                         onClick={toggleExpand}

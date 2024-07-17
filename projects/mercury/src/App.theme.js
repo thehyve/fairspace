@@ -17,7 +17,8 @@ const globalTheme = createTheme({
             contrastText: 'white'
         },
         secondary: {
-            main: '#758bfd'
+            main: '#fd759e',
+            contrastText: 'white'
         },
         error: pink,
         success: {
@@ -29,6 +30,12 @@ const globalTheme = createTheme({
         text: {
             primary: COLORS.fsBlueDark,
             secondary: COLORS.fsBlueMedium
+        },
+        mellow: {
+            light: '#cfd8dc',
+            main: '#b0bec5',
+            dark: '#37474f',
+            contrastText: '#47008F'
         }
     },
     shape: {
@@ -38,17 +45,21 @@ const globalTheme = createTheme({
 
 export const scrollbarStyles = {
     '&::-webkit-scrollbar': {
-        width: '0.3em',
-        height: '0.3em'
+        width: '0.5em',
+        height: '0.5em'
     },
     '&::-webkit-scrollbar-track': {
         boxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
-        webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)'
+        webkitBoxShadow: 'inset 0 0 6px rgba(0,0,0,0.00)',
+        margin: 2
     },
     '&::-webkit-scrollbar-thumb': {
-        backgroundColor: globalTheme.palette.primary.light,
-        outline: `1px solid ${globalTheme.palette.primary.light}`,
-        borderRadius: 5
+        backgroundColor: globalTheme.palette.mellow.light,
+        borderRadius: 5,
+        margin: 1
+    },
+    '&::-webkit-scrollbar-thumb:hover': {
+        backgroundColor: globalTheme.palette.mellow.main
     }
 };
 
@@ -149,6 +160,11 @@ export default createTheme({
                     background: globalTheme.palette.primary.dark,
                     '&:hover': {
                         background: globalTheme.palette.primary.light
+                    },
+                    '&:disabled': {
+                        opacity: 0.4,
+                        color: globalTheme.palette.primary.contrastText,
+                        background: globalTheme.palette.mellow.main
                     },
                     borderRadius: globalTheme.shape.borderRadius,
                     borderColor: globalTheme.palette.primary.light,

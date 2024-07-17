@@ -359,14 +359,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         : 0;
 
     return (
-        <Box
-            border="1px solid"
-            borderColor={theme.palette.primary.dark}
-            borderRadius={5}
-            sx={{
-                boxShadow: 5
-            }}
-        >
+        <Box border="1px solid" borderColor={theme.palette.primary.dark} borderRadius={5}>
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
                 <MetadataViewActiveTextFilters

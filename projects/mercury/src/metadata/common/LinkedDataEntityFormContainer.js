@@ -102,6 +102,7 @@ const LinkedDataEntityFormContainer = ({
                         clearForm();
                         setEditingEnabled(!showEditButtons);
                     }}
+                    style={{marginLeft: 8}}
                 >
                     Cancel
                 </Button>
@@ -141,7 +142,7 @@ const LinkedDataEntityFormContainer = ({
                             ' Your pending changes will be lost.'
                         }
                         agreeButtonText="Navigate"
-                        disagreeButtonText="back to form"
+                        disagreeButtonText="Back to form"
                         onAgree={() => executeNavigation()}
                         onDisagree={hideConfirmation}
                     />

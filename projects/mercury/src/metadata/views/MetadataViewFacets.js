@@ -145,6 +145,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                 <Button
                     onClick={clearFilterCandidates}
                     variant="contained"
+                    color="primary"
                     className={classes.confirmFiltersButton}
                     disabled={filterCandidates.length === 0}
                 >
@@ -155,7 +156,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                 <Button
                     onClick={applyFilters}
                     variant="contained"
-                    color="secondary"
+                    color="primary"
                     className={classes.confirmFiltersButton}
                     disabled={filterCandidates.length === 0}
                 >
