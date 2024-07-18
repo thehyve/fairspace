@@ -22,7 +22,8 @@ const styles = () => ({
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT
     },
     sidePanel: {
-        width: consts.SIDE_PANEL_WIDTH
+        width: consts.SIDE_PANEL_WIDTH,
+        height: '100%'
     }
 });
 

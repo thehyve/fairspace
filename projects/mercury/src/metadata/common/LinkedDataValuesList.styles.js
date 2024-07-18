@@ -1,3 +1,5 @@
+import {alpha} from '@mui/material/styles';
+
 const styles = theme => ({
     values: {
         cursor: 'default',
@@ -19,14 +21,24 @@ const styles = theme => ({
     addValue: {
         marginTop: 10,
         padding: 3,
-        borderColor: theme.palette.grey['400'],
+        borderColor: theme.palette.primary.main,
         borderStyle: 'solid',
         borderWidth: 1.5,
-        borderRadius: 6,
-        backgroundColor: theme.palette.grey['50']
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: theme.palette.background.default,
+        '& .MuiGrid-item': {
+            paddingTop: 4,
+            paddingBottom: 4
+        }
     },
     addValueInput: {
-        backgroundColor: theme.palette.background.paper
+        borderRadius: theme.shape.borderRadius,
+        backgroundColor: alpha(theme.palette.primary.main, 0.15),
+        opacity: 0.8,
+        '&:hover': {
+            backgroundColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: theme.palette.primary.main
+        }
     }
 });
 

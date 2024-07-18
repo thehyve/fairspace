@@ -4,6 +4,7 @@ import {
     Card,
     CardContent,
     CardHeader,
+    Divider,
     FormControl,
     FormGroup,
     FormLabel,
@@ -274,6 +275,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     renderDeleted = (dateDeleted: string, deletedBy: User) =>
         dateDeleted && [
+            <Divider component="li" />,
             <ListItem key="dateDeleted" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted</FormLabel>
@@ -282,6 +284,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </FormGroup>
                 </FormControl>
             </ListItem>,
+            <Divider component="li" />,
             <ListItem key="deletedBy" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted by</FormLabel>
@@ -398,7 +401,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                             {collection.description}
                         </Typography>
                         <List>
-                            <ListItem disableGutters>{this.renderCollectionOwner(ownerWorkspace)}</ListItem>
+                            <ListItem disableGutters divider>
+                                {this.renderCollectionOwner(ownerWorkspace)}
+                            </ListItem>
+                            <Divider component="li" />
                             <ListItem disableGutters>{this.renderCollectionStatus()}</ListItem>
                             {this.renderDeleted(collection.dateDeleted, deletedBy)}
                         </List>

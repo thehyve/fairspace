@@ -7,6 +7,7 @@ const styles = theme => ({
     title: {
         padding: 8,
         fontWidth: 'bold',
+        backgroundColor: theme.palette.primary.dark,
         '& .MuiCardHeader-action': {
             alignSelf: 'auto',
             margin: 0

@@ -7,6 +7,7 @@ import {
     CardContent,
     CardHeader,
     Collapse,
+    Divider,
     FormControl,
     FormGroup,
     FormHelperText,
@@ -374,8 +375,10 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     <div style={{overflowX: 'auto'}}>
                         <List>
                             <ListItem disableGutters>{renderAccessMode()}</ListItem>
+                            <Divider component="li" />
                             <ListItem disableGutters>{renderOwnerWorkspaceAccess()}</ListItem>
                         </List>
+                        <Divider />
                         <PermissionViewer
                             collection={collection}
                             collaboratingUsers={collaboratingUsers}

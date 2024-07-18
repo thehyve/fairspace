@@ -42,7 +42,7 @@ const styles = theme => ({
         marginBottom: 1,
         marginTop: 0,
         fontSize: 13,
-        color: theme.palette.primary.light,
+        color: theme.palette.primary.main,
         textTransform: 'uppercase'
     },
     facet: {

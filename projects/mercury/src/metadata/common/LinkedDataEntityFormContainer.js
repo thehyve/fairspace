@@ -112,7 +112,7 @@ const LinkedDataEntityFormContainer = ({
 
     return (
         <Grid container direction="row">
-            <Grid item xs={11}>
+            <Grid item xs={showEditButtons && hasEditRight && !editingEnabled ? 11 : 12}>
                 <Grid container>
                     <Grid item xs={12}>
                         <LinkedDataEntityForm

@@ -55,7 +55,7 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
     }
 
     return (
-        <Card className={classes.card}>
+        <Card className={classes.card} sx={{boxShadow: 3}}>
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
                 title={

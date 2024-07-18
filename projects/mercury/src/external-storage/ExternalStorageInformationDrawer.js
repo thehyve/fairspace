@@ -48,7 +48,8 @@ const useStyles = makeStyles(theme => ({
             wordBreak: 'break-word',
             top: 0,
             zIndex: 2,
-            position: 'sticky'
+            position: 'sticky',
+            backgroundColor: theme.palette.primary.main
         }
     }
 }));

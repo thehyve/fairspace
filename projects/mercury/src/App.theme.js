@@ -92,7 +92,8 @@ export default createTheme({
         MuiDivider: {
             styleOverrides: {
                 root: {
-                    margin: 0
+                    margin: 0,
+                    borderColor: globalTheme.palette.mellow.main
                 },
                 margin: 0
             }
@@ -180,7 +181,7 @@ export default createTheme({
         MuiCardHeader: {
             styleOverrides: {
                 root: {
-                    backgroundColor: globalTheme.palette.primary.dark,
+                    backgroundColor: globalTheme.palette.primary.main,
                     marginBottom: 0,
                     padding: 5
                 },
@@ -251,6 +252,14 @@ export default createTheme({
             styleOverrides: {
                 root: {
                     ...scrollbarStyles
+                }
+            }
+        },
+        MuiTableCell: {
+            styleOverrides: {
+                root: {
+                    borderBottom: '1px solid',
+                    borderColor: globalTheme.palette.mellow.main
                 }
             }
         }

@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import PropTypes from 'prop-types';
-import {Box, FormHelperText, FormLabel, FormControl, FormGroup} from '@mui/material';
+import {Box, FormHelperText, FormLabel, FormControl, FormGroup, Divider} from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import MessageDisplay from '../common/components/MessageDisplay';
 import LoadingInlay from '../common/components/LoadingInlay';
@@ -72,6 +72,7 @@ export const PermissionViewer = ({
                     </FormHelperText>
                 </Box>
             </FormControl>
+            <Divider />
             <FormControl className={classes.property}>
                 <FormLabel>Share with workspaces</FormLabel>
                 <Box className={classes.root}>{renderWorkspacePermissionComponent()}</Box>
