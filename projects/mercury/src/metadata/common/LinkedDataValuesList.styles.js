@@ -7,15 +7,27 @@ const styles = theme => ({
         fontSize: '0.875rem',
         lineHeight: 1.43,
         letterSpacing: '0.01071em',
+        '& .MuiInputBase-root': {
+            backgroundColor: alpha(theme.palette.primary.main, 0.15),
+            '&:hover': {
+                backgroundColor: alpha(theme.palette.primary.main, 0.25),
+                borderColor: theme.palette.primary.main
+            }
+        },
         '& input': {
             fontSize: '0.875rem',
             lineHeight: 1.43,
-            letterSpacing: '0.01071em'
+            letterSpacing: '0.01071em',
+            overflow: 'hidden'
+        },
+        '& .MuiOutlinedInput-input': {
+            borderRadius: theme.shape.borderRadius
         },
         '& textarea': {
             fontSize: '0.875rem',
             lineHeight: 1.43,
-            letterSpacing: '0.01071em'
+            letterSpacing: '0.01071em',
+            borderRadius: theme.shape.borderRadius
         }
     },
     addValue: {
@@ -32,13 +44,7 @@ const styles = theme => ({
         }
     },
     addValueInput: {
-        borderRadius: theme.shape.borderRadius,
-        backgroundColor: alpha(theme.palette.primary.main, 0.15),
-        opacity: 0.8,
-        '&:hover': {
-            backgroundColor: alpha(theme.palette.primary.main, 0.25),
-            borderColor: theme.palette.primary.main
-        }
+        borderRadius: theme.shape.borderRadius
     }
 });
 

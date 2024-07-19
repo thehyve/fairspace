@@ -43,7 +43,10 @@ const styles = {
     },
     accessCell: {
         padding: 0,
-        minWidth: 100
+        minWidth: 100,
+        '& .MuiOutlinedInput-input': {
+            padding: 5
+        }
     }
 };
 
