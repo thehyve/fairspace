@@ -1,13 +1,11 @@
-import {alpha} from '@mui/material/styles';
-
 const styles = theme => ({
     paper: {
         width: '160px',
         height: '100px',
         border: 'none',
-        background: theme.palette.primary.dark,
+        background: theme.palette.primary.main,
         '&:hover': {
-            backgroundColor: alpha(theme.palette.primary.dark, 0.5)
+            backgroundColor: theme.palette.primary.light
         },
         textAlign: 'center'
     },
@@ -33,7 +31,8 @@ const styles = theme => ({
         paddingTop: 10
     },
     link: {
-        textDecoration: 'none'
+        textDecoration: 'none',
+        alignItems: 'center'
     }
 });
 
