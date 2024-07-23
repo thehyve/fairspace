@@ -31,7 +31,8 @@ const styles = theme => ({
         paddingBottom: 15,
         textAlign: 'center',
         color: theme.palette.primary.contrastText,
-        height: 40
+        height: 40,
+        fontSize: 14
     },
     mainMenuButtonSmall: {
         minWidth: 40,

@@ -5,7 +5,7 @@ const styles = theme => ({
     leftPanel: {
         marginTop: 8,
         paddingBottom: 10,
-        minWidth: 282
+        minWidth: 275
     },
     overallPanelContainer: {
         height: 'calc(100vh - 64px)'

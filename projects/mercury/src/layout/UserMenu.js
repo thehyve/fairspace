@@ -124,7 +124,7 @@ const UserMenu = ({menuOpen, classes}) => {
                             <ClickAwayListener onClickAway={handleClose}>
                                 <MenuList className={classes.menu}>
                                     <MenuItem className={classes.userMenu} disablefocusonhover="true">
-                                        <Card sx={{minWidth: 275}}>
+                                        <Card sx={{minWidth: 250}}>
                                             <CardContent>
                                                 <Typography sx={{fontSize: 12}} color="text.secondary" gutterBottom>
                                                     Welcome

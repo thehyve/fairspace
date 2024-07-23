@@ -35,7 +35,7 @@ const styles = {
         fontStyle: 'italic'
     },
     accessDropdown: {
-        fontSize: 14
+        fontSize: 13
     },
     accessIcon: {
         verticalAlign: 'middle',

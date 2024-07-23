@@ -1,10 +1,11 @@
 import {scrollbarStyles} from '../App.theme';
+import {LEFT_PANEL_MAX_WIDTH} from '../constants';
 
 const styles = theme => ({
     drawerPaper: {
         position: 'fixed',
         whiteSpace: 'nowrap',
-        width: 280,
+        width: LEFT_PANEL_MAX_WIDTH,
         marginTop: '0',
         border: 'none',
         overflow: 'hidden',

@@ -90,7 +90,7 @@ const DashboardPage = props => {
                             </Typography>
                             <Typography variant="body2" paragraph className={classes.footer} align="center">
                                 {/* eslint-disable-next-line prettier/prettier */}
-                                {"Created by "}
+                                {'Created by '}
                                 <Link className={classes.link} href={THE_HYVE_URL}>
                                     The Hyve
                                 </Link>

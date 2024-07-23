@@ -90,7 +90,10 @@ const Layout = ({classes, renderMenu, renderMain = () => {}}) => {
                     onMouseEnter={handleMouseEnter}
                 />
             )}
-            <main style={{marginLeft: menuExpanded ? LEFT_PANEL_MAX_WIDTH : 0}} className={classes.main}>
+            <main
+                style={{marginLeft: menuExpanded ? LEFT_PANEL_MAX_WIDTH : 0, paddingLeft: menuExpanded ? 20 : 80}}
+                className={classes.main}
+            >
                 {renderMain()}
             </main>
         </>

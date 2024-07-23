@@ -17,15 +17,15 @@ const globalTheme = createTheme({
             contrastText: 'white'
         },
         secondary: {
-            main: '#fd759e',
-            contrastText: 'white'
+            main: '#ffdb56',
+            contrastText: 'black'
         },
         error: pink,
         success: {
             main: '#08a045'
         },
         background: {
-            default: '#eef0eb'
+            default: '#ECEDF0'
         },
         text: {
             primary: COLORS.fsBlueDark,
@@ -66,7 +66,7 @@ export const scrollbarStyles = {
 export default createTheme({
     ...globalTheme,
     typography: {
-        fontFamily: ['Sora', 'Palanquin'].join(','),
+        fontFamily: 'Poppins',
         fontSize: 13,
         button: {
             textTransform: 'none'

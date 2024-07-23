@@ -1,6 +1,6 @@
 const styles = theme => ({
     paper: {
-        width: '160px',
+        width: '180px',
         height: '100px',
         border: 'none',
         background: theme.palette.primary.main,

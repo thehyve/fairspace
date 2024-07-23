@@ -225,6 +225,7 @@ const MetadataCard = props => {
                                                 {'Download '}
                                                 <Link
                                                     download="metadata.csv"
+                                                    color="secondary"
                                                     href={
                                                         'data:text/csv;charset=utf-8,' +
                                                         encodeURIComponent(fileTemplate)
