@@ -18,7 +18,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import io.fairspace.saturn.config.Config;
@@ -33,7 +32,6 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 @Slf4j
 public class ViewStoreClientFactory {
 
-    @Getter
     private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
@@ -82,7 +80,11 @@ public class ViewStoreClientFactory {
             createOrUpdateView(view);
         }
         materializedViewService = new MaterializedViewService(dataSource, configuration, search.maxJoinItems);
-        materializedViewService.createOrUpdateAllMaterializedViews();
+        if (viewDatabase.mvRefreshOnStartRequired) {
+            materializedViewService.createOrUpdateAllMaterializedViews();
+        } else {
+            log.warn("Skipping materialized view refresh on start");
+        }
     }
 
     public Connection getConnection() throws SQLException {

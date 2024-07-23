@@ -176,10 +176,7 @@ public class ViewUpdater implements AutoCloseable {
                         try {
                             for (var column : view.columns) {
                                 var objects = retrieveValues(graph, subject, column.source);
-                                if (objects.isEmpty()) {
-                                    continue;
-                                }
-                                row.put(column.name, getValue(column, objects.get(0)));
+                                row.put(column.name, objects.isEmpty() ? null : getValue(column, objects.getFirst()));
                             }
                             viewStoreClient.updateRows(view.name, List.of(row), false);
                         } catch (SQLException e) {
@@ -240,6 +237,9 @@ public class ViewUpdater implements AutoCloseable {
         log.debug("Updating subject of type {} took {}ms", type.getLocalName(), new Date().getTime() - start);
     }
 
+    /**
+     * Only use this method in a secure and synchonisized way, see 'MaintenanceService.recreateIndex()'
+     */
     public void recreateIndexForView(ViewStoreClient viewStoreClient, ViewsConfig.View view) throws SQLException {
         // Clear database tables for view
         log.info("Recreating index for view {} started", view.name);

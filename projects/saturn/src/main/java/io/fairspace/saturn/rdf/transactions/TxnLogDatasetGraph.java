@@ -22,10 +22,12 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
 
     private final TransactionLog transactionLog;
     private volatile AccessToken user;
+    private DatasetGraph dsg;
 
     public TxnLogDatasetGraph(DatasetGraph dsg, TransactionLog transactionLog) {
         super(dsg);
         this.transactionLog = transactionLog;
+        this.dsg = dsg;
     }
 
     /**
@@ -44,6 +46,10 @@ public class TxnLogDatasetGraph extends AbstractChangesAwareDatasetGraph {
                 case DELETE -> transactionLog.onDelete(graph, subject, predicate, object);
             }
         });
+    }
+
+    public DatasetGraph getDatasetGraph() {
+        return dsg;
     }
 
     @Override

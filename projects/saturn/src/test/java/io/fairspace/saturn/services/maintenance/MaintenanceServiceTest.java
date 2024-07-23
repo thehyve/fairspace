@@ -13,7 +13,7 @@ import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.ViewService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 
-import static io.fairspace.saturn.services.maintenance.MaintenanceService.REINDEXING_IS_ALREADY_IN_PROGRESS;
+import static io.fairspace.saturn.services.maintenance.MaintenanceService.MAINTENANCE_IS_IN_PROGRESS;
 import static io.fairspace.saturn.services.maintenance.MaintenanceService.SERVICE_NOT_AVAILABLE;
 
 import static org.junit.Assert.assertThrows;
@@ -68,7 +68,7 @@ public class MaintenanceServiceTest {
         doReturn(true).when(sut).active();
 
         // when/then
-        assertThrows(REINDEXING_IS_ALREADY_IN_PROGRESS, ConflictException.class, sut::startRecreateIndexTask);
+        assertThrows(MAINTENANCE_IS_IN_PROGRESS, ConflictException.class, sut::startRecreateIndexTask);
     }
 
     @Test
