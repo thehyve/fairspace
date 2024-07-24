@@ -7,6 +7,7 @@ import {
     CardContent,
     CardHeader,
     Collapse,
+    Divider,
     FormControl,
     FormGroup,
     FormHelperText,
@@ -50,7 +51,10 @@ const styles = theme => ({
         transform: 'rotate(180deg)'
     },
     permissionsCard: {
-        marginTop: 10
+        marginTop: 10,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
     },
     avatar: {
         width: 20,
@@ -371,8 +375,10 @@ export const PermissionCard = (props: PermissionCardProperties) => {
                     <div style={{overflowX: 'auto'}}>
                         <List>
                             <ListItem disableGutters>{renderAccessMode()}</ListItem>
+                            <Divider component="li" />
                             <ListItem disableGutters>{renderOwnerWorkspaceAccess()}</ListItem>
                         </List>
+                        <Divider />
                         <PermissionViewer
                             collection={collection}
                             collaboratingUsers={collaboratingUsers}

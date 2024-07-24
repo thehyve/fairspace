@@ -25,10 +25,11 @@ const styles = theme => ({
         width: 265
     },
     confirmFiltersButton: {
-        width: '100%'
+        width: '100%',
+        background: theme.palette.primary.main
     },
     facetsContainer: {
-        maxHeight: 'calc(100vh - 212px)',
+        maxHeight: 'calc(100vh - 100px)',
         overflowY: 'auto',
         paddingTop: 8
     },
@@ -41,13 +42,13 @@ const styles = theme => ({
         marginBottom: 1,
         marginTop: 0,
         fontSize: 13,
-        color: theme.palette.primary.light,
+        color: theme.palette.primary.main,
         textTransform: 'uppercase'
     },
     facet: {
         borderColor: theme.palette.primary.light,
         borderWidth: 1.8,
-        borderRadius: 6,
+        borderRadius: theme.shape.borderRadius,
         marginLeft: 8,
         marginTop: 6
     }
@@ -144,6 +145,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                 <Button
                     onClick={clearFilterCandidates}
                     variant="contained"
+                    color="primary"
                     className={classes.confirmFiltersButton}
                     disabled={filterCandidates.length === 0}
                 >
@@ -154,7 +156,7 @@ export const MetadataViewFacets = (props: MetadataViewFacetsProperties) => {
                 <Button
                     onClick={applyFilters}
                     variant="contained"
-                    color="secondary"
+                    color="primary"
                     className={classes.confirmFiltersButton}
                     disabled={filterCandidates.length === 0}
                 >

@@ -3,25 +3,18 @@ import PropTypes from 'prop-types';
 import withStyles from '@mui/styles/withStyles';
 import Link from '@mui/material/Link';
 import styles from './Layout.styles';
-import Footer from './Footer';
-import TopBar from './TopBar';
 import MenuDrawer from './MenuDrawer';
 import LoadingInlay from '../common/components/LoadingInlay';
-import versionInfo from '../common/VersionInfo';
 import UserContext from '../users/UserContext';
 import StatusContext, {VALID_USER_SESSION} from '../status/StatusContext';
 import {SERVER_STATUS_UP} from '../status/StatusAPI';
 import StatusAlert from '../status/StatusAlert';
+import {LEFT_PANEL_MAX_WIDTH} from '../constants';
 
 const LOCAL_STORAGE_MENU_KEY = 'FAIRSPACE_MENU_EXPANDED';
 const LEFT_MENU_EXPANSION_DELAY = 500;
 
-const Layout = ({
-    classes,
-    renderMenu,
-    renderMain = () => {},
-    renderTopbar = () => <TopBar title={versionInfo.name} />
-}) => {
+const Layout = ({classes, renderMenu, renderMain = () => {}}) => {
     const [menuExpanded, setMenuExpanded] = useState(window.localStorage.getItem(LOCAL_STORAGE_MENU_KEY) !== 'false');
     const [menuOpenDueToHover, setMenuOpenDueToHover] = useState(false);
     const [timeoutId, setTimeoutId] = useState();
@@ -84,11 +77,9 @@ const Layout = ({
         return <></>;
     };
 
-    // The topbar is shown even if the user has no proper authorization
     return (
-        // The app itself consists of a topbar, a drawer and the actual page
+        // The app itself consists of a drawer and the actual page
         <>
-            {renderTopbar()}
             {renderAlert()}
             {renderMenu && (
                 <MenuDrawer
@@ -99,18 +90,19 @@ const Layout = ({
                     onMouseEnter={handleMouseEnter}
                 />
             )}
-            <main style={{marginLeft: menuExpanded ? 175 : 0}} className={classes.main}>
+            <main
+                style={{marginLeft: menuExpanded ? LEFT_PANEL_MAX_WIDTH : 0, paddingLeft: menuExpanded ? 20 : 80}}
+                className={classes.main}
+            >
                 {renderMain()}
             </main>
-            <Footer />
         </>
     );
 };
 
 Layout.propTypes = {
     renderMenu: PropTypes.func,
-    renderMain: PropTypes.func,
-    renderTopbar: PropTypes.func
+    renderMain: PropTypes.func
 };
 
 export default withStyles(styles)(Layout);

@@ -1,10 +1,12 @@
 const styles = theme => ({
     paper: {
-        width: '200px',
+        width: '180px',
         height: '100px',
-        borderStyle: 'solid',
-        borderColor: theme.palette.primary.light,
-        borderWidth: 2,
+        border: 'none',
+        background: theme.palette.primary.main,
+        '&:hover': {
+            backgroundColor: theme.palette.primary.light
+        },
         textAlign: 'center'
     },
     outerMargin: {
@@ -25,10 +27,12 @@ const styles = theme => ({
         width: 'inherit'
     },
     domainText: {
-        color: theme.palette.grey[700]
+        color: theme.palette.primary.contrastText,
+        paddingTop: 10
     },
     link: {
-        textDecoration: 'none'
+        textDecoration: 'none',
+        alignItems: 'center'
     }
 });
 

@@ -27,7 +27,7 @@ import LinkedDataLink from '../metadata/common/LinkedDataLink';
 import type {DisplayProperty} from './UseExternalStorageMetadata';
 import useExternalStorageMetadata from './UseExternalStorageMetadata';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
     expandOpen: {
         transform: 'rotate(180deg)'
     },
@@ -36,9 +36,21 @@ const useStyles = makeStyles(() => ({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
+        overflowY: 'auto',
         outline: 'none',
         transitionBorder: '.24s',
-        easeInOut: true
+        easeInOut: true,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        },
+        cardHeader: {
+            wordBreak: 'break-word',
+            top: 0,
+            zIndex: 2,
+            position: 'sticky',
+            backgroundColor: theme.palette.primary.main
+        }
     }
 }));
 
@@ -128,7 +140,7 @@ const ExternalMetadataCard = (props: ExternalMetadataCardProperties) => {
                 titleTypographyProps={{variant: 'h6'}}
                 title={title}
                 avatar={avatar}
-                style={{wordBreak: 'break-word'}}
+                className={classes.cardHeader}
                 action={
                     <IconButton
                         onClick={toggleExpand}

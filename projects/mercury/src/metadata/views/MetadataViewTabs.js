@@ -22,13 +22,15 @@ type MetadataViewTabsProperties = {
     classes: any
 };
 
-const styles = () => ({
+const styles = theme => ({
     tabsPanel: {
-        paddingRight: 70
+        paddingRight: 70,
+        paddingLeft: 10
     },
     tab: {
         '& .MuiBox-root': {
-            padding: 0
+            padding: 0,
+            borderRadius: theme.shape.borderRadius
         }
     }
 });

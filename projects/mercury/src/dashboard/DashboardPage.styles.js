@@ -1,22 +1,54 @@
-import * as consts from '../constants';
+import {alpha} from '@mui/material/styles';
 
 const styles = theme => ({
     mainPage: {
-        width: consts.MAIN_CONTENT_WIDTH,
-        maxWidth: '700px',
-        maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT,
-        padding: 20,
-        marginTop: 20
+        marginTop: 10,
+        width: '80%'
+    },
+    paperContent: {
+        borderRadius: theme.shape.borderRadius,
+        borderColor: theme.palette.primary.main,
+        padding: '10px 20px 10px 20px',
+        height: '100%'
+    },
+    link: {
+        color: theme.palette.primary.light,
+        textDecoration: 'underline'
     },
     header: {
-        borderBottom: '2px solid ' + theme.palette.primary.main,
-        marginBottom: 50
+        margin: 10
     },
-    textRow: {
-        minHeight: '250px'
+    mainHeader: {
+        paddingBottom: 40,
+        paddingTop: 20
     },
-    customFont: {
-        fontFamily: 'sans-serif'
+    footer: {
+        marginBottom: 0,
+        paddingTop: 10
+    },
+    paragraph: {
+        border: 2,
+        borderRadius: theme.shape.borderRadius,
+        borderColor: theme.palette.primary.main,
+        backgroundColor: theme.palette.primary.dark,
+        color: theme.palette.primary.contrastText,
+        padding: 10
+    },
+    textFieldWrapper: {
+        padding: 20,
+        alignItems: 'center'
+    },
+    textField: {
+        border: 2,
+        borderRadius: theme.shape.borderRadius,
+        borderColor: theme.palette.primary.main,
+        backgroundColor: alpha(theme.palette.primary.main, 0.15),
+        '&:hover': {
+            backgroundColor: alpha(theme.palette.primary.main, 0.25),
+            borderColor: theme.palette.primary.dark
+        },
+        color: theme.palette.primary.contrastText,
+        width: '100%'
     }
 });
 

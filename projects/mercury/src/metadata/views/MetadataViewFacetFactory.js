@@ -71,7 +71,7 @@ const Facet = (props: MetadataViewFacetProperties) => {
 
     const clearFiltersAction = activeFilterValues.length > 0 && (
         <IconButton onClick={clearFilter} aria-label="Clear" className={classes.headerIcon} size="medium">
-            <Clear fontSize="small" color="primary" />
+            <Clear fontSize="small" color="primary.contrastText" />
         </IconButton>
     );
 

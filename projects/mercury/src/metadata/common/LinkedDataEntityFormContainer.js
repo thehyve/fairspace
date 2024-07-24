@@ -102,6 +102,7 @@ const LinkedDataEntityFormContainer = ({
                         clearForm();
                         setEditingEnabled(!showEditButtons);
                     }}
+                    style={{marginLeft: 8}}
                 >
                     Cancel
                 </Button>
@@ -111,7 +112,7 @@ const LinkedDataEntityFormContainer = ({
 
     return (
         <Grid container direction="row">
-            <Grid item xs={11}>
+            <Grid item xs={showEditButtons && hasEditRight && !editingEnabled ? 11 : 12}>
                 <Grid container>
                     <Grid item xs={12}>
                         <LinkedDataEntityForm
@@ -141,7 +142,7 @@ const LinkedDataEntityFormContainer = ({
                             ' Your pending changes will be lost.'
                         }
                         agreeButtonText="Navigate"
-                        disagreeButtonText="back to form"
+                        disagreeButtonText="Back to form"
                         onAgree={() => executeNavigation()}
                         onDisagree={hideConfirmation}
                     />

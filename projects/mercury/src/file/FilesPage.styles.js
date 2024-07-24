@@ -10,15 +10,20 @@ const styles = () => ({
         width: consts.MAIN_CONTENT_WIDTH
     },
     topBarSwitch: {
+        paddingLeft: 8,
         textAlign: 'right',
         whiteSpace: 'nowrap'
+    },
+    metadataButton: {
+        paddingRight: 8
     },
     centralPanel: {
         width: consts.MAIN_CONTENT_WIDTH,
         maxHeight: consts.MAIN_CONTENT_MAX_HEIGHT
     },
     sidePanel: {
-        width: consts.SIDE_PANEL_WIDTH
+        width: consts.SIDE_PANEL_WIDTH,
+        height: '100%'
     }
 });
 

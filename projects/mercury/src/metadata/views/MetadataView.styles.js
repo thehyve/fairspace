@@ -5,7 +5,10 @@ const styles = theme => ({
     leftPanel: {
         marginTop: 8,
         paddingBottom: 10,
-        minWidth: 282
+        minWidth: 275
+    },
+    overallPanelContainer: {
+        height: 'calc(100vh - 64px)'
     },
     overallPanel: {
         width: CENTRAL_PANEL_WIDTH,
@@ -15,19 +18,20 @@ const styles = theme => ({
         width: '100%'
     },
     rightPanel: {
-        width: RIGHT_PANEL_WIDTH
+        width: RIGHT_PANEL_WIDTH,
+        height: '100%'
     },
     centralPanel: {
         overflowX: 'auto',
         width: '100%',
-        overflowY: 'hidden',
-        maxHeight: 'calc(100vh - 150px)'
+        overflowY: 'hidden'
     },
     clearAllButtonContainer: {
         textAlign: 'end'
     },
     clearAllButton: {
-        color: theme.palette.error.main
+        color: theme.palette.primary.contrastText,
+        background: theme.palette.primary.main
     },
     activeFilters: {
         marginBottom: 10

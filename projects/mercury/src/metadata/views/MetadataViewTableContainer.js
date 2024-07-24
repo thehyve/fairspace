@@ -3,7 +3,7 @@ import {
     CircularProgress,
     FormControlLabel,
     IconButton,
-    Paper,
+    Box,
     TableContainer,
     TablePagination,
     Tooltip,
@@ -20,6 +20,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import FormGroup from '@mui/material/FormGroup';
 import useDeepCompareEffect from 'use-deep-compare-effect';
+import {useTheme} from '@mui/material/styles';
 
 import type {MetadataViewColumn, MetadataViewFilter} from './MetadataViewAPI';
 import MessageDisplay from '../../common/components/MessageDisplay';
@@ -52,7 +53,7 @@ type MetadataViewTableContainerProperties = {
     classes: any
 };
 
-const styles = () => ({
+const styles = theme => ({
     footerButtonDiv: {
         display: 'flex',
         padding: 0,
@@ -69,11 +70,11 @@ const styles = () => ({
     },
     tableContents: {
         minHeight: '200px',
-        maxHeight: 'calc(100vh - 310px)',
+        maxHeight: 'calc(100vh - 250px)',
         overflowY: 'auto',
         overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {
-            backgroundColor: 'white'
+            backgroundColor: theme.palette.background.default
         }
     },
     tableFooter: {
@@ -105,6 +106,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
     const [exportToAnalysisLoading, setExportToAnalysisLoading] = useState(false);
     const [currentSelectionExported, setCurrentSelectionExported] = useState(false);
+    const theme = useTheme();
 
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
@@ -357,7 +359,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         : 0;
 
     return (
-        <Paper>
+        <Box border="1px solid" borderColor={theme.palette.primary.dark} borderRadius={5} sx={{boxShadow: 3}}>
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
                 <MetadataViewActiveTextFilters
@@ -425,7 +427,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                     />
                 </div>
             </LoadingOverlayWrapper>
-        </Paper>
+        </Box>
     );
 };
 

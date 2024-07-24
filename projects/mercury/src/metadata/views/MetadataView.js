@@ -259,7 +259,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
                     )}
                 </Grid>
             )}
-            <Grid container direction="row" spacing={1} wrap="nowrap">
+            <Grid container direction="row" spacing={1} wrap="nowrap" className={classes.overallPanelContainer}>
                 <Grid item className={`${classes.overallPanel} ${isClosedPanel && classes.overallPanelFullWidth}`}>
                     <Grid container direction="row" spacing={1} wrap="nowrap">
                         <Grid item className={classes.leftPanel}>

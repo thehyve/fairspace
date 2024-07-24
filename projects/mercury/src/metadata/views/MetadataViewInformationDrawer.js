@@ -10,7 +10,7 @@ import {LinkedDataEntityFormWithLinkedData} from '../common/LinkedDataEntityForm
 import type {MetadataViewEntityWithLinkedFiles} from './metadataViewUtils';
 import CopyButton from '../../common/components/CopyButton';
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
     expandOpen: {
         transform: 'rotate(180deg)'
     },
@@ -19,9 +19,20 @@ const useStyles = makeStyles(() => ({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
+        overflowY: 'auto',
         outline: 'none',
         transitionBorder: '.24s',
-        easeInOut: true
+        easeInOut: true,
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
+    },
+    cardHeader: {
+        wordBreak: 'break-word',
+        top: 0,
+        zIndex: 2,
+        position: 'sticky'
     },
     emptyLinkedFiles: {
         fontStyle: 'italic'
@@ -44,7 +55,7 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
     }
 
     return (
-        <Card className={classes.card}>
+        <Card className={classes.card} sx={{boxShadow: 3}}>
             <CardHeader
                 titleTypographyProps={{variant: 'h6'}}
                 title={
@@ -54,7 +65,7 @@ const MetadataViewInformationDrawer = (props: MetadataViewInformationDrawerProps
                     </div>
                 }
                 avatar={viewIcon}
-                style={{wordBreak: 'break-word'}}
+                className={classes.cardHeader}
                 action={
                     <IconButton title="Close" onClick={handleCloseCard} size="medium">
                         <Close />

@@ -10,7 +10,7 @@ const styles = theme => ({
         border: `1px solid ${theme.palette.error.main}`
     },
     snackbarRoot: {
-        paddingTop: 50
+        paddingTop: 0
     }
 });
 

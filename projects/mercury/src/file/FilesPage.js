@@ -150,7 +150,7 @@ export const FilesPage = (props: FilesPageProperties) => {
                         </Grid>
                         {showMetadataSearchButton && (
                             <Grid item container xs={4} justifyContent="flex-end">
-                                <Grid item>
+                                <Grid item className={classes.metadataButton}>
                                     <Button
                                         variant="text"
                                         color="primary"
