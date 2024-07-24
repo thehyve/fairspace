@@ -31,7 +31,7 @@ data:
       blobStorePath: "/data/saturn/files/blobs"
     viewDatabase:
       enabled: true
-      mvRefreshOnStartRequired: true
+      mvRefreshOnStartRequired: {{ default true .Values.saturn.mvRefreshOnStartRequired }}
     features:
 {{ toYaml .Values.fairspace.features | indent 6 }}
 {{ if has "ExtraStorage" .Values.fairspace.features }}
