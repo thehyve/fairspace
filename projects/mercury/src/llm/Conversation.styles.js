@@ -1,3 +1,4 @@
+import {alpha} from '@mui/material/styles';
 import * as consts from '../constants';
 
 const styles = theme => ({
@@ -45,8 +46,8 @@ const styles = theme => ({
         marginRight: '25px'
     },
     historyListContainer: {
-        borderTop: '1.5px solid ' + theme.palette.primary.light,
-        backgroundColor: '#F1F1F1'
+        borderTop: '1.5px solid ' + theme.palette.primary.light
+        // backgroundColor: theme.palette.mellow.light
     },
     historyListItem: {
         borderColor: theme.palette.primary.dark,
@@ -72,7 +73,8 @@ const styles = theme => ({
         padding: 10,
         marginBottom: 20,
         borderRadius: 15,
-        maxWidth: 500
+        maxWidth: 500,
+        backgroundColor: alpha(theme.palette.primary.main, 0.15)
     },
     allResults: {
         marginTop: 20,
@@ -83,7 +85,7 @@ const styles = theme => ({
         overflow: 'auto'
     },
     chatArticle: {
-        backgroundColor: '#F1F1F1',
+        backgroundColor: theme.palette.mellow.light,
         margin: 0,
         marginBottom: 10,
         paddingLeft: 10,
@@ -117,11 +119,11 @@ const styles = theme => ({
         marginBottom: 10
     },
     modalDialog: {
-        background: theme.palette.grey['200'],
+        background: theme.palette.primary.main,
         position: 'relative',
         top: 0,
         width: 800,
-        bgcolor: 'background.paper',
+        bgcolor: 'primary',
         border: '0px solid #000',
         boxShadow: 0,
         outline: 'none',
