@@ -26,9 +26,9 @@ import LinkedDataEntityPage from '../metadata/common/LinkedDataEntityPage';
 import {LocalSearchAPI} from '../search/SearchAPI';
 
 const Conversation = props => {
-    const {classes} = props;
+    const {initialQuery = '', classes} = props;
 
-    const [query, setQuery] = useState('');
+    const [query, setQuery] = useState(initialQuery);
 
     const [messages, setMessages] = useState([]);
     const [responseMessage, setResponseMessage] = useState('');

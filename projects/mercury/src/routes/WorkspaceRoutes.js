@@ -48,10 +48,9 @@ const WorkspaceRoutes = () => {
 
             <Route
                 path="/ask"
-                exact
-                render={() => (
+                render={props => (
                     <LinkedDataMetadataProvider>
-                        <LlmSearchPage />
+                        <LlmSearchPage {...props} />
                     </LinkedDataMetadataProvider>
                 )}
             />

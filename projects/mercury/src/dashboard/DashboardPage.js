@@ -2,6 +2,8 @@ import React, {useContext} from 'react';
 
 import withStyles from '@mui/styles/withStyles';
 import {Grid, Link, Paper, Typography, TextField} from '@mui/material';
+import {useHistory} from 'react-router-dom';
+import queryString from 'query-string';
 import styles from './DashboardPage.styles';
 import MetadataViewContext from '../metadata/views/MetadataViewContext';
 import ExternalMetadataSourceContext from '../metadata/metadata-sources/ExternalMetadataSourceContext';
@@ -9,14 +11,23 @@ import UserContext from '../users/UserContext';
 import DomainInfo from './DomainInfo';
 import {APPLICATION_DOCS_URL, APPLICATION_NAME, THE_HYVE_URL} from '../constants';
 import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
+import FeaturesContext from '../common/contexts/FeaturesContext';
 
 const DashboardPage = props => {
     const {currentUser, classes} = props;
+    const history = useHistory();
     const {views} = useContext(MetadataViewContext);
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
     const {internalMetadataIcon, internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
-    const askAIConfigured = false;
+    const {isFeatureEnabled} = useContext(FeaturesContext);
+    const isLlsSearchEnabled = isFeatureEnabled('LlmSearch');
+
+    const handleLlmInputChange = event => {
+        if (event.keyCode === 13) {
+            history.push('/ask/?' + queryString.stringify({q: event.target.value}));
+        }
+    };
 
     return (
         <Grid container spacing={5} className={classes.mainPage} direction="column" justifyContent="flex-start">
@@ -100,7 +111,7 @@ const DashboardPage = props => {
                 </Grid>
             </Grid>
             <Grid item xs={12}>
-                {askAIConfigured && (
+                {isLlsSearchEnabled && (
                     <Paper elevation={3} className={classes.paperContent}>
                         <Typography className={classes.header} variant="h4" paragraph align="center">
                             Ask AI
@@ -114,6 +125,7 @@ const DashboardPage = props => {
                                 placeholder="Type your quetion here..."
                                 variant="outlined"
                                 className={classes.textField}
+                                onKeyDown={event => handleLlmInputChange(event)}
                             />
                         </div>
                     </Paper>
