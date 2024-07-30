@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
+        maxHeight: '100%',
         overflowY: 'auto',
         outline: 'none',
         transitionBorder: '.24s',
