@@ -6,6 +6,7 @@ import {Table, TableBody, TableCell, TableHead, TablePagination, TableRow, Table
 import Checkbox from '@mui/material/Checkbox';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
+import withStyles from '@mui/styles/withStyles';
 import UsersContext from './UsersContext';
 import useSorting from '../common/hooks/UseSorting';
 import usePagination from '../common/hooks/UsePagination';
@@ -66,7 +67,15 @@ const roleSelectionColumns = [
     columns.canAddSharedMetadata
 ];
 
-const UserRolesPage = () => {
+const styles = () => ({
+    userDataCell: {
+        whiteSpace: 'normal',
+        wordWrap: 'break-word',
+        maxWidth: 260
+    }
+});
+
+const UserRolesPage = ({classes = {}}) => {
     usePageTitleUpdater('Users');
 
     const {currentUser} = useContext(UserContext);
@@ -174,19 +183,33 @@ const UserRolesPage = () => {
                                     </TableCell>
                                 ))
                             }
-                            <TableCell />
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {pagedItems.map(u => (
                             <TableRow key={u.iri} hover>
-                                <TableCell style={{minWidth: 220}} component="th" scope="row">
+                                <TableCell
+                                    style={{minWidth: 220}}
+                                    className={classes.userDataCell}
+                                    component="th"
+                                    scope="row"
+                                >
                                     {u.name}
                                 </TableCell>
-                                <TableCell style={{minWidth: 160}} component="th" scope="row">
+                                <TableCell
+                                    style={{minWidth: 160}}
+                                    className={classes.userDataCell}
+                                    component="th"
+                                    scope="row"
+                                >
                                     {u.username}
                                 </TableCell>
-                                <TableCell style={{maxWidth: 180}} component="th" scope="row">
+                                <TableCell
+                                    style={{maxWidth: 180}}
+                                    className={classes.userDataCell}
+                                    component="th"
+                                    scope="row"
+                                >
                                     {u.email}
                                 </TableCell>
                                 <TableCell style={{width: 80}}>
@@ -245,4 +268,4 @@ const UserRolesPage = () => {
     );
 };
 
-export default UserRolesPage;
+export default withStyles(styles)(UserRolesPage);
