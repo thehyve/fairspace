@@ -52,15 +52,18 @@ type MetadataViewProperties = ContextualMetadataViewProperties & {
 
 export const MetadataView = (props: MetadataViewProperties) => {
     const {
-        views,
-        facets,
-        filters,
+        views = [],
+        facets = [],
+        filters = [],
         currentViewName,
         metadataLabel,
         locationContext,
         classes,
         handleViewChangeRedirect,
-        pathPrefix
+        pathPrefix = '/metadata-views',
+        updateFilters,
+        clearFilter,
+        clearAllFilters
     } = props;
 
     usePageTitleUpdater(metadataLabel);
@@ -68,7 +71,6 @@ export const MetadataView = (props: MetadataViewProperties) => {
     const {collections} = useContext(CollectionsContext);
     const {toggle, selected} = useSingleSelection();
 
-    const {updateFilters, clearFilter, clearAllFilters} = useContext(MetadataViewContext);
     const [filterCandidates, setFilterCandidates] = useState([]);
     const [textFiltersObject, setTextFiltersObject] = useState({});
     const [isClosedPanel, setIsClosedPanel] = useState(true);
@@ -81,7 +83,7 @@ export const MetadataView = (props: MetadataViewProperties) => {
 
     const currentViewIndex = Math.max(0, views.map(v => v.name).indexOf(currentViewName));
     const currentView = views[currentViewIndex];
-    const currentViewIdColumn = currentView.columns.find(c => c.type === 'Identifier' && c.name === currentView.name);
+    const currentViewIdColumn = currentView?.columns.find(c => c.type === 'Identifier' && c.name === currentView.name);
 
     const changeTab = useCallback(
         (event, tabIndex) => {
@@ -209,12 +211,11 @@ export const MetadataView = (props: MetadataViewProperties) => {
         if (!selected) {
             return '';
         }
-        const metadataURL = window.location.host + getMetadataViewsPath(currentView.name, pathPrefix);
         const prefilteringQueryString = queryString.stringify({
             view: currentView.name,
             [currentViewIdColumn.name.toLowerCase()]: selected.label
         });
-        return metadataURL + '?' + prefilteringQueryString;
+        return `${window.location.host}${pathPrefix}?${prefilteringQueryString}`;
     };
 
     return (
@@ -306,7 +307,15 @@ export const MetadataView = (props: MetadataViewProperties) => {
 };
 
 export const ContextualMetadataView = (props: ContextualMetadataViewProperties) => {
-    const {views = [], filters, loading, error} = useContext(MetadataViewContext);
+    const {
+        views = [],
+        filters,
+        loading,
+        error,
+        updateFilters,
+        clearFilter,
+        clearAllFilters
+    } = useContext(MetadataViewContext);
     const {facets = [], facetsLoading, facetsError, initialLoad} = useContext(MetadataViewFacetsContext);
     const {internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const currentViewName = getMetadataViewNameFromString(window.location.search);
@@ -348,6 +357,9 @@ export const ContextualMetadataView = (props: ContextualMetadataViewProperties) 
             locationContext={currentViewName === RESOURCES_VIEW && locationContext}
             currentViewName={currentViewName}
             handleViewChangeRedirect={handleViewChangeRedirect}
+            updateFilters={updateFilters}
+            clearFilter={clearFilter}
+            clearAllFilters={clearAllFilters}
         />
     );
 };
