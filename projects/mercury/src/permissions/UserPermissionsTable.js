@@ -26,7 +26,7 @@ const styles = {
         width: '100%'
     },
     iconCell: {
-        padding: '0 0 0 8px',
+        padding: 0,
         textAlign: 'right'
     },
     emptyPermissions: {
