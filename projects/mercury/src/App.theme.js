@@ -276,6 +276,13 @@ export default createTheme({
                     borderColor: globalTheme.palette.mellow.main
                 }
             }
+        },
+        MuiTab: {
+            styleOverrides: {
+                root: {
+                    fontSize: 15
+                }
+            }
         }
     }
 });
