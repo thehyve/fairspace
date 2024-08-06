@@ -9,4 +9,5 @@ public class ViewDTO {
     String name;
     String title;
     List<ColumnDTO> columns;
+    ViewConfigDto config;
 }

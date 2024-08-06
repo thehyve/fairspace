@@ -189,7 +189,7 @@ public class ViewService {
                             columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
                         }
                     }
-                    return new ViewDTO(v.name, v.title, columns);
+                    return new ViewDTO(v.name, v.title, columns, new ViewConfigDto(1000000L));
                 })
                 .collect(toList());
     }
