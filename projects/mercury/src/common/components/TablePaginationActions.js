@@ -2,7 +2,7 @@ import React from 'react';
 import IconButton from '@mui/material/IconButton';
 import {KeyboardArrowLeft, KeyboardArrowRight, LastPage, FirstPage} from '@mui/icons-material';
 import makeStyles from '@mui/styles/makeStyles';
-import {Typography} from '@mui/material';
+import {Tooltip, Typography} from '@mui/material';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -20,7 +20,9 @@ export type TablePaginationActionsProperties = {
 
 const TablePaginationActions = (props: TablePaginationActionsProperties) => {
     const classes = useStyles();
-    const {count, page, rowsPerPage, onPageChange} = props;
+    const {count, page, rowsPerPage, onPageChange, countDisplayLimit} = props;
+
+    const countDisplayLimitReached = countDisplayLimit !== undefined && countDisplayLimit === count;
 
     const handleFirstPageButtonClick = event => {
         onPageChange(event, 0);
@@ -62,14 +64,18 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
             >
                 <KeyboardArrowRight />
             </IconButton>
-            <IconButton
-                onClick={handleLastPageButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                aria-label="last page"
-                size="medium"
-            >
-                <LastPage />
-            </IconButton>
+            <Tooltip title={countDisplayLimitReached ? 'Total page count not available' : ''}>
+                <span>
+                    <IconButton
+                        onClick={handleLastPageButtonClick}
+                        disabled={countDisplayLimitReached || page >= Math.ceil(count / rowsPerPage) - 1}
+                        aria-label="last page"
+                        size="medium"
+                    >
+                        <LastPage />
+                    </IconButton>
+                </span>
+            </Tooltip>
         </div>
     );
 };
