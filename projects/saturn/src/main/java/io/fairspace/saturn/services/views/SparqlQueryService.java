@@ -1,18 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import java.time.*;
-import java.util.*;
-
-import lombok.extern.log4j.*;
-import org.apache.jena.datatypes.xsd.XSDDateTime;
-import org.apache.jena.query.*;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.sparql.expr.*;
-import org.apache.jena.sparql.syntax.ElementFilter;
-import org.apache.jena.vocabulary.RDFS;
-
 import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
@@ -21,17 +8,55 @@ import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.search.SearchResultDTO;
 import io.fairspace.saturn.vocabulary.FS;
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.datatypes.xsd.XSDDateTime;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryCancelledException;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.sparql.expr.E_Equals;
+import org.apache.jena.sparql.expr.E_GreaterThanOrEqual;
+import org.apache.jena.sparql.expr.E_LessThanOrEqual;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.E_OneOf;
+import org.apache.jena.sparql.expr.E_StrLowerCase;
+import org.apache.jena.sparql.expr.E_StrStartsWith;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.expr.ExprList;
+import org.apache.jena.sparql.expr.ExprVar;
+import org.apache.jena.sparql.expr.NodeValue;
+import org.apache.jena.sparql.syntax.ElementFilter;
+import org.apache.jena.vocabulary.RDFS;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
-import static org.apache.jena.sparql.expr.NodeValue.*;
+import static org.apache.jena.sparql.expr.NodeValue.makeBoolean;
+import static org.apache.jena.sparql.expr.NodeValue.makeDate;
+import static org.apache.jena.sparql.expr.NodeValue.makeDecimal;
+import static org.apache.jena.sparql.expr.NodeValue.makeNode;
 import static org.apache.jena.sparql.expr.NodeValue.makeString;
 import static org.apache.jena.system.Txn.calculateRead;
 
@@ -39,17 +64,17 @@ import static org.apache.jena.system.Txn.calculateRead;
 public class SparqlQueryService implements QueryService {
     private static final String RESOURCES_VIEW = "Resource";
     private final Config.Search config;
-    private final ViewsConfig searchConfig;
+    private final ViewsConfig viewsConfig;
     private final Dataset ds;
 
     public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds) {
         this.config = config;
-        this.searchConfig = viewsConfig;
+        this.viewsConfig = viewsConfig;
         this.ds = ds;
     }
 
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
-        var query = getQuery(request);
+        var query = getQuery(request, false);
 
         log.debug("Executing query:\n{}", query);
 
@@ -105,8 +130,8 @@ public class SparqlQueryService implements QueryService {
             var prop = createProperty(j.on);
             var refs = j.reverse
                     ? resource.getModel()
-                            .listResourcesWithProperty(prop, resource)
-                            .toList()
+                    .listResourcesWithProperty(prop, resource)
+                    .toList()
                     : getResourceProperties(resource, prop);
 
             for (var colName : j.include) {
@@ -146,9 +171,7 @@ public class SparqlQueryService implements QueryService {
     }
 
     private View getView(String viewName) {
-        return searchConfig.views.stream()
-                .filter(v -> v.name.equals(viewName))
-                .findFirst()
+        return viewsConfig.getViewConfig(viewName)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }
 
@@ -169,13 +192,12 @@ public class SparqlQueryService implements QueryService {
         return new ValueDTO(label, resource.getURI());
     }
 
-    private Query getQuery(CountRequest request) {
+    private Query getQuery(CountRequest request, boolean isCount) {
         var view = getView(request.getView());
 
-        var builder = new StringBuilder("PREFIX fs: <")
-                .append(FS.NS)
-                .append(">\n\nSELECT ?")
-                .append(view.name)
+        var builder = new StringBuilder()
+                .append("SELECT ")
+                .append("%s")
                 .append("\nWHERE {\n");
 
         if (request.getFilters() != null) {
@@ -278,7 +300,28 @@ public class SparqlQueryService implements QueryService {
                 .append(view.name)
                 .append(" fs:dateDeleted ?any }\n}");
 
-        return QueryFactory.create(builder.toString());
+        var query = isCount
+                ? transformToCountQuery(builder.toString(), view)
+                : builder.toString().formatted("?" + view.name);
+
+        query = "PREFIX fs: <%s>\n\n" .formatted(FS.NS) + query; // adding prefix to the query
+
+        return QueryFactory.create(query);
+    }
+
+    private String transformToCountQuery(String queryTemplate, View view) {
+        String query;
+        if (view.maxDisplayCount == null) {
+            query = queryTemplate.formatted("(COUNT(?%s) AS ?count)" .formatted(view.name));
+        } else {
+            query = new StringBuilder()
+                    .append("SELECT (COUNT(?%s) AS ?count)" .formatted(view.name))
+                    .append("\nWHERE {\n{\n")
+                    .append(queryTemplate.formatted("?" + view.name))
+                    .append("\nLIMIT %d\n}\n}" .formatted(view.maxDisplayCount))
+                    .toString();
+        }
+        return query;
     }
 
     private String toFilterString(ViewFilter filter, ColumnType type, String field) {
@@ -364,8 +407,8 @@ public class SparqlQueryService implements QueryService {
             case Identifier, Term, TermSet -> makeNode(createURI(o.toString()));
             case Text, Set -> makeString(o.toString());
             case Number -> makeDecimal(o.toString());
-                // Extract date only as it comes in format "yyyy-MM-ddTHH:mm:ss.SSSX"
-                // Leave it as is in case of adding new DateTime filter format
+            // Extract date only as it comes in format "yyyy-MM-ddTHH:mm:ss.SSSX"
+            // Leave it as is in case of adding new DateTime filter format
             case Date -> makeDate(o.toString().split("T")[0]);
             case Boolean -> makeBoolean(convertBooleanValue(o.toString()));
         };
@@ -376,23 +419,25 @@ public class SparqlQueryService implements QueryService {
     }
 
     public CountDTO count(CountRequest request) {
-        var query = getQuery(request);
+        var query = getQuery(request, true);
 
         log.debug("Querying the total number of matches: \n{}", query);
 
-        var execution = QueryExecutionFactory.create(query, ds);
-        execution.setTimeout(config.countRequestTimeout);
+        try (var execution = QueryExecutionFactory.create(query, ds)) {
+            execution.setTimeout(config.countRequestTimeout);
 
-        return calculateRead(ds, () -> {
-            long count = 0;
-            try (execution) {
-                for (var it = execution.execSelect(); it.hasNext(); it.next()) {
-                    count++;
+            return calculateRead(ds, () -> {
+                var queryResult = execution.execSelect();
+                if (queryResult.hasNext()) {
+                    var row = queryResult.next();
+                    var count = row.getLiteral("count").getLong();
+                    return new CountDTO(count, false);
+                } else {
+                    return new CountDTO(-1, false);
                 }
-                return new CountDTO(count, false);
-            } catch (QueryCancelledException e) {
-                return new CountDTO(count, true);
-            }
-        });
+            });
+        } catch (QueryCancelledException e) {
+            return new CountDTO(-1, true);
+        }
     }
 }

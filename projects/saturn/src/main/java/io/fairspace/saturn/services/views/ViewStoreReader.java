@@ -351,7 +351,7 @@ public class ViewStoreReader implements AutoCloseable {
 
     private String transformToCountQuery(String viewName, String query) {
         boolean isCountLimitDefined = viewsConfig.getViewConfig(viewName)
-                .map(c -> c.maxDisplayCount > 0)
+                .map(c -> c.maxDisplayCount != null)
                 .orElse(false);
         if (isCountLimitDefined) { // limit defined
             query = query.formatted("*"); // set projection to *
