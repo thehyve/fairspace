@@ -3,7 +3,7 @@ const styles = theme => ({
         backgroundColor: theme.palette.background.default,
         paddingTop: 14,
         paddingBottom: 14,
-        paddingRight: 0,
+        paddingRight: 8,
         minWidth: 0, // So the Typography noWrap works
         overflowY: 'scroll',
         overflowX: 'hidden',

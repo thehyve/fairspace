@@ -85,7 +85,7 @@ const DashboardPage = props => {
                             <Typography className={classes.header} variant="h4" paragraph align="center">
                                 About
                             </Typography>
-                            <Typography variant="body1" paragraph>
+                            <Typography variant="body1" paragraph align="center">
                                 {APPLICATION_NAME} version: {process.env.REACT_APP_VERSION}
                             </Typography>
                             <Typography variant="body2" paragraph className={classes.footer} align="center">
