@@ -40,15 +40,11 @@ export type MetadataViewColumn = {
     type: ValueType
 };
 
-export type MetadataViewsConfig = {
-    maxDisplayCount: number
-};
-
 export type MetadataViewOptions = {
     name: string,
     title: string,
     columns: MetadataViewColumn[],
-    config: MetadataViewsConfig
+    maxDisplayCount: number
 };
 
 export type MetadataViews = {

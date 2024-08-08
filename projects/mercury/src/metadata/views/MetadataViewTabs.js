@@ -92,7 +92,7 @@ export const MetadataViewTabs = (props: MetadataViewTabsProperties) => {
                         columns={appendCustomColumns(view)}
                         idColumn={idColumn}
                         view={view.name}
-                        viewCountDisplayLimit={view.config?.maxDisplayCount}
+                        viewCountDisplayLimit={view.maxDisplayCount}
                         filters={filters}
                         locationContext={locationContext}
                         selected={selected}
