@@ -187,7 +187,10 @@ public class ViewService {
                             columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
                         }
                     }
-                    return new ViewDTO(v.name, v.title, columns, ViewConfigDto.from(viewsConfig.getViewConfig(v.name)));
+                    Long maxDisplayCount = viewsConfig.getViewConfig(v.name)
+                            .map(t -> t.maxDisplayCount)
+                            .orElse(null);
+                    return new ViewDTO(v.name, v.title, columns, maxDisplayCount);
                 })
                 .collect(toList());
     }

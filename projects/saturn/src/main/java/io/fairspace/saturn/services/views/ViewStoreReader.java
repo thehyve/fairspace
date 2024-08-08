@@ -350,16 +350,16 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     private String transformToCountQuery(String viewName, String query) {
-        boolean isCountLimitDefeined = Optional.ofNullable(viewsConfig.getViewConfig(viewName))
+        boolean isCountLimitDefined = viewsConfig.getViewConfig(viewName)
                 .map(c -> c.maxDisplayCount > 0)
                 .orElse(false);
-        if (isCountLimitDefeined) { // limit defined
+        if (isCountLimitDefined) { // limit defined
             query = query.formatted("*"); // set projection to *
             // limitation is applied to improve performance
             // we just set limit for the query and then wrap with count query
             // on UI user either exact number if less the limit or "more than 'limit'" if more
             query = "select count(*) as rowCount from ( " + query + " limit %s) as count";
-            query = query.formatted(viewsConfig.getViewConfig(viewName).maxDisplayCount);
+            query = query.formatted(viewsConfig.getViewConfig(viewName).map(c -> c.maxDisplayCount).orElseThrow());
         } else {
             query = query.formatted("count(*) as rowCount");
         }

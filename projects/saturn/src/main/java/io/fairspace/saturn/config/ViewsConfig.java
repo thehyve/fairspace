@@ -18,12 +18,12 @@ public class ViewsConfig {
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public List<View> views = new ArrayList<>();
 
-    public View getViewConfig(String viewName) {
+    public Optional<View> getViewConfig(String viewName) {
         if (viewConfig == null) {
             viewConfig = views.stream()
                     .collect(Collectors.toMap(view -> view.name, Function.identity()));
         }
-        return viewConfig.get(viewName);
+        return Optional.ofNullable(viewConfig.get(viewName));
     }
 
     public enum ColumnType {
@@ -86,7 +86,7 @@ public class ViewsConfig {
          * If total count is greater than this max value, the total count value will look like 'more than 1000' on FE.
          * This is to prevent performance issues when the total count is too large.
          */
-        public long maxDisplayCount;
+        public Long maxDisplayCount;
         /**
          * The URLs of the types of entities that should be indexed in this view.
          */
