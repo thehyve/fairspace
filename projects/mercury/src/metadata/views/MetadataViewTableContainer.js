@@ -136,6 +136,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         locationContext,
         rowsPerPage
     );
+    const viewCountDisplayLimitReached = viewCountDisplayLimit !== undefined && count.count === viewCountDisplayLimit;
     const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
     const resetRowCheckboxes = () => {
@@ -322,8 +323,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const getTotalCountString = (totalCount: number, to: number) => {
         if (totalCount === undefined) return '...';
         if (totalCount === -1) return `more than ${to}`;
-        if (viewCountDisplayLimit !== undefined && totalCount === viewCountDisplayLimit)
-            return `more than ${viewCountDisplayLimit - 1}`;
+        if (viewCountDisplayLimitReached) return `more than ${viewCountDisplayLimit - 1}`;
         return totalCount;
     };
 
@@ -375,7 +375,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         setPage(0);
     }, [filters]);
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         resetRowCheckboxes();
     }, [data]);
 
@@ -456,7 +456,13 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         labelDisplayedRows={d =>
                             renderTablePaginationLabel({...d, countIsLoading: loadingCount, countHasError: countError})
                         }
-                        ActionsComponent={p => TablePaginationActions({...p, countDisplayLimit: viewCountDisplayLimit})}
+                        ActionsComponent={p =>
+                            TablePaginationActions({
+                                ...p,
+                                countDisplayLimitReached: viewCountDisplayLimitReached,
+                                hasNextFlag: data?.hasNext
+                            })
+                        }
                     />
                 </div>
             </LoadingOverlayWrapper>

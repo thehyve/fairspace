@@ -15,14 +15,14 @@ export type TablePaginationActionsProperties = {
     count: number,
     onPageChange: () => {},
     page: number,
-    rowsPerPage: number
+    rowsPerPage: number,
+    countDisplayLimitReached?: boolean,
+    currentPageCount?: number
 };
 
 const TablePaginationActions = (props: TablePaginationActionsProperties) => {
     const classes = useStyles();
-    const {count, page, rowsPerPage, onPageChange, countDisplayLimit} = props;
-
-    const countDisplayLimitReached = countDisplayLimit !== undefined && countDisplayLimit === count;
+    const {count, page, rowsPerPage, onPageChange, countDisplayLimitReached = false, hasNextFlag = false} = props;
 
     const handleFirstPageButtonClick = event => {
         onPageChange(event, 0);
@@ -58,7 +58,7 @@ const TablePaginationActions = (props: TablePaginationActionsProperties) => {
             </Typography>
             <IconButton
                 onClick={handleNextButtonClick}
-                disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                disabled={page >= Math.ceil(count / rowsPerPage) - 1 && !(countDisplayLimitReached && hasNextFlag)}
                 aria-label="next page"
                 size="medium"
             >
