@@ -1,7 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.ViewsConfig;
 import lombok.Value;
+
+import io.fairspace.saturn.config.ViewsConfig;
 
 @Value
 public class ViewConfigDto {
@@ -11,6 +12,4 @@ public class ViewConfigDto {
     public static ViewConfigDto from(ViewsConfig.View config) {
         return new ViewConfigDto(config.maxDisplayCount);
     }
-
 }
-

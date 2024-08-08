@@ -1,17 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import com.google.common.collect.Sets;
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +21,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Sets;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
@@ -53,7 +54,8 @@ public class ViewStoreReader implements AutoCloseable {
     final Connection connection;
 
     // TODO: in whole class, use StringBuilder instead of String concats
-    public ViewStoreReader(Config.Search searchConfig, ViewsConfig viewsConfig, ViewStoreClientFactory viewStoreClientFactory)
+    public ViewStoreReader(
+            Config.Search searchConfig, ViewsConfig viewsConfig, ViewStoreClientFactory viewStoreClientFactory)
             throws SQLException {
         this.searchConfig = searchConfig;
         this.viewsConfig = viewsConfig;
@@ -290,8 +292,7 @@ public class ViewStoreReader implements AutoCloseable {
                 .collect(Collectors.joining(" and "));
     }
 
-    PreparedStatement query(String view, List<ViewFilter> filters, String scope, boolean isCount)
-            throws SQLException {
+    PreparedStatement query(String view, List<ViewFilter> filters, String scope, boolean isCount) throws SQLException {
         if (filters == null) {
             filters = Collections.emptyList();
         }
@@ -350,7 +351,8 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     private String transformToCountQuery(String viewName, String query) {
-        boolean isCountLimitDefined = viewsConfig.getViewConfig(viewName)
+        boolean isCountLimitDefined = viewsConfig
+                .getViewConfig(viewName)
                 .map(c -> c.maxDisplayCount != null)
                 .orElse(false);
         if (isCountLimitDefined) { // limit defined
@@ -359,7 +361,10 @@ public class ViewStoreReader implements AutoCloseable {
             // we just set limit for the query and then wrap with count query
             // on UI user either exact number if less the limit or "more than 'limit'" if more
             query = "select count(*) as rowCount from ( " + query + " limit %s) as count";
-            query = query.formatted(viewsConfig.getViewConfig(viewName).map(c -> c.maxDisplayCount).orElseThrow());
+            query = query.formatted(viewsConfig
+                    .getViewConfig(viewName)
+                    .map(c -> c.maxDisplayCount)
+                    .orElseThrow());
         } else {
             query = query.formatted("count(*) as rowCount");
         }
@@ -400,8 +405,7 @@ public class ViewStoreReader implements AutoCloseable {
         try (var query = query(
                 view.name,
                 filters,
-                String.format(
-                        "order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit),
+                String.format("order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit),
                 false)) {
             query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
             var result = query.executeQuery();

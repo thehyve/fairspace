@@ -20,8 +20,7 @@ public class ViewsConfig {
 
     public Optional<View> getViewConfig(String viewName) {
         if (viewConfig == null) {
-            viewConfig = views.stream()
-                    .collect(Collectors.toMap(view -> view.name, Function.identity()));
+            viewConfig = views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
         }
         return Optional.ofNullable(viewConfig.get(viewName));
     }

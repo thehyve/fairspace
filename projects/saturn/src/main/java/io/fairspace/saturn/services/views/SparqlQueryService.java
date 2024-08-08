@@ -1,13 +1,14 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.Dataset;
@@ -33,17 +34,18 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -130,8 +132,8 @@ public class SparqlQueryService implements QueryService {
             var prop = createProperty(j.on);
             var refs = j.reverse
                     ? resource.getModel()
-                    .listResourcesWithProperty(prop, resource)
-                    .toList()
+                            .listResourcesWithProperty(prop, resource)
+                            .toList()
                     : getResourceProperties(resource, prop);
 
             for (var colName : j.include) {
@@ -171,7 +173,8 @@ public class SparqlQueryService implements QueryService {
     }
 
     private View getView(String viewName) {
-        return viewsConfig.getViewConfig(viewName)
+        return viewsConfig
+                .getViewConfig(viewName)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }
 
@@ -195,10 +198,7 @@ public class SparqlQueryService implements QueryService {
     private Query getQuery(CountRequest request, boolean isCount) {
         var view = getView(request.getView());
 
-        var builder = new StringBuilder()
-                .append("SELECT ")
-                .append("%s")
-                .append("\nWHERE {\n");
+        var builder = new StringBuilder().append("SELECT ").append("%s").append("\nWHERE {\n");
 
         if (request.getFilters() != null) {
             var filters = new ArrayList<>(request.getFilters());
@@ -304,7 +304,7 @@ public class SparqlQueryService implements QueryService {
                 ? transformToCountQuery(builder.toString(), view)
                 : builder.toString().formatted("?" + view.name);
 
-        query = "PREFIX fs: <%s>\n\n" .formatted(FS.NS) + query; // adding prefix to the query
+        query = "PREFIX fs: <%s>\n\n".formatted(FS.NS) + query; // adding prefix to the query
 
         return QueryFactory.create(query);
     }
@@ -312,13 +312,13 @@ public class SparqlQueryService implements QueryService {
     private String transformToCountQuery(String queryTemplate, View view) {
         String query;
         if (view.maxDisplayCount == null) {
-            query = queryTemplate.formatted("(COUNT(?%s) AS ?count)" .formatted(view.name));
+            query = queryTemplate.formatted("(COUNT(?%s) AS ?count)".formatted(view.name));
         } else {
             query = new StringBuilder()
-                    .append("SELECT (COUNT(?%s) AS ?count)" .formatted(view.name))
+                    .append("SELECT (COUNT(?%s) AS ?count)".formatted(view.name))
                     .append("\nWHERE {\n{\n")
                     .append(queryTemplate.formatted("?" + view.name))
-                    .append("\nLIMIT %d\n}\n}" .formatted(view.maxDisplayCount))
+                    .append("\nLIMIT %d\n}\n}".formatted(view.maxDisplayCount))
                     .toString();
         }
         return query;
@@ -407,8 +407,8 @@ public class SparqlQueryService implements QueryService {
             case Identifier, Term, TermSet -> makeNode(createURI(o.toString()));
             case Text, Set -> makeString(o.toString());
             case Number -> makeDecimal(o.toString());
-            // Extract date only as it comes in format "yyyy-MM-ddTHH:mm:ss.SSSX"
-            // Leave it as is in case of adding new DateTime filter format
+                // Extract date only as it comes in format "yyyy-MM-ddTHH:mm:ss.SSSX"
+                // Leave it as is in case of adding new DateTime filter format
             case Date -> makeDate(o.toString().split("T")[0]);
             case Boolean -> makeBoolean(convertBooleanValue(o.toString()));
         };

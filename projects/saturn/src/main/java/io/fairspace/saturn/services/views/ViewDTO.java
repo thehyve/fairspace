@@ -10,6 +10,7 @@ public class ViewDTO {
     String name;
     String title;
     List<ColumnDTO> columns;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Long maxDisplayCount;
 }

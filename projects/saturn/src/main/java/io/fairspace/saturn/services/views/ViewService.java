@@ -1,14 +1,15 @@
 package io.fairspace.saturn.services.views;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
-import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -20,15 +21,16 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
+
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -187,7 +189,8 @@ public class ViewService {
                             columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
                         }
                     }
-                    Long maxDisplayCount = viewsConfig.getViewConfig(v.name)
+                    Long maxDisplayCount = viewsConfig
+                            .getViewConfig(v.name)
                             .map(t -> t.maxDisplayCount)
                             .orElse(null);
                     return new ViewDTO(v.name, v.title, columns, maxDisplayCount);
