@@ -75,7 +75,8 @@ const styles = theme => ({
         overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {
             backgroundColor: theme.palette.background.default
-        }
+        },
+        borderRadius: theme.shape.borderRadius
     },
     tableFooter: {
         flex: 1

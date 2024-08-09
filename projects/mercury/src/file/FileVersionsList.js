@@ -176,12 +176,7 @@ const FileVersionsList = ({selectedFile, onRevertVersion, isWritingEnabled, clas
     );
 
     const renderHeader = ({label}) => (
-        <TableCell
-            component="div"
-            className={`${classes.tableCell} ${classes.tableHeaderRow}`}
-            variant="head"
-            align="left"
-        >
+        <TableCell component="div" className={classes.tableCell} variant="head" align="left">
             {label}
         </TableCell>
     );
