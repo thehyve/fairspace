@@ -198,100 +198,13 @@ public class SparqlQueryService implements QueryService {
     private Query getQuery(CountRequest request, boolean isCount) {
         var view = getView(request.getView());
 
-        var builder = new StringBuilder().append("SELECT ").append("%s").append("\nWHERE {\n");
+        var builder = new StringBuilder().append("SELECT %s \nWHERE {\n"); // prefix to be added later
 
         if (request.getFilters() != null) {
-            var filters = new ArrayList<>(request.getFilters());
-
-            filters.stream().filter(f -> f.field.equals("location")).findFirst().ifPresent(locationFilter -> {
-                filters.remove(locationFilter);
-
-                if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
-                    locationFilter.values.forEach(v -> validateIRI(v.toString()));
-                    var fileLink = view.join.stream()
-                            .filter(v -> v.view.equals(RESOURCES_VIEW))
-                            .findFirst()
-                            .orElse(null);
-                    if (fileLink != null) {
-                        builder.append("FILTER EXISTS {\n")
-                                .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
-                                .append(locationFilter.values.stream()
-                                        .map(v -> "<" + v + ">")
-                                        .collect(joining(", ")))
-                                .append("))\n ?file <")
-                                .append(fileLink.on)
-                                .append("> ?")
-                                .append(view.name)
-                                .append(" . \n")
-                                .append("}\n");
-                    } else {
-                        builder.append("?")
-                                .append(view.name)
-                                .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
-                                .append(locationFilter.values.stream()
-                                        .map(v -> "<" + v + ">")
-                                        .collect(joining(", ")))
-                                .append("))\n");
-                    }
-                }
-            });
-
-            filters.stream()
-                    .map(f -> f.field)
-                    .sorted(comparing(field -> field.contains("_") ? getColumn(field).priority : 0))
-                    .map(field -> field.split("_")[0])
-                    .distinct()
-                    .forEach(entity -> {
-                        if (!entity.equals(view.name)) {
-                            builder.append("FILTER EXISTS {\n");
-
-                            var join = view.join.stream()
-                                    .filter(j -> j.view.equals(entity))
-                                    .findFirst()
-                                    .orElseThrow(() -> new RuntimeException("Unknown view: " + entity));
-
-                            builder.append("?")
-                                    .append(view.name)
-                                    .append(join.reverse ? " ^<" : " <")
-                                    .append(join.on)
-                                    .append("> ?")
-                                    .append(join.view)
-                                    .append(" .\n");
-                        }
-
-                        request.getFilters().stream()
-                                .filter(f -> f.getField().startsWith(entity))
-                                .sorted(comparing(f -> f.field.contains("_") ? getColumn(f.field).priority : 0))
-                                .forEach(f -> {
-                                    String condition, property, field;
-                                    if (f.getField().equals(entity)) {
-                                        field = f.field + "_id";
-                                        property = RDFS.label.toString();
-                                        condition = toFilterString(f, ColumnType.Identifier, field);
-                                    } else {
-                                        field = f.field;
-                                        property = getColumn(f.field).source;
-                                        condition = toFilterString(f, getColumn(f.field).type, f.field);
-                                    }
-                                    if (condition != null) {
-                                        builder.append("?")
-                                                .append(entity)
-                                                .append(" <")
-                                                .append(property)
-                                                .append("> ?")
-                                                .append(field)
-                                                .append(" .\n")
-                                                .append(condition)
-                                                .append(" \n");
-                                    }
-                                });
-                        if (!entity.equals(view.name)) {
-                            builder.append("}");
-                        }
-                        builder.append("\n");
-                    });
+            buildAndAddFilterToQuery(request, view, builder);
         }
 
+        // add type condition and check if the entity is not deleted
         builder.append("?")
                 .append(view.name)
                 .append(" a ?type .\nFILTER (?type IN (")
@@ -304,11 +217,108 @@ public class SparqlQueryService implements QueryService {
                 ? transformToCountQuery(builder.toString(), view)
                 : builder.toString().formatted("?" + view.name);
 
-        query = "PREFIX fs: <%s>\n\n".formatted(FS.NS) + query; // adding prefix to the query
+        // adding prefix at the top of the query
+        // prefix cannot be added earlier due to transformation for the count query
+        query = "PREFIX fs: <%s>\n\n".formatted(FS.NS) + query;
 
         return QueryFactory.create(query);
     }
 
+    private void buildAndAddFilterToQuery(CountRequest request, View view, StringBuilder builder) {
+        var filters = new ArrayList<>(request.getFilters());
+        filters.stream().filter(f -> f.field.equals("location")).findFirst().ifPresent(locationFilter -> {
+            filters.remove(locationFilter);
+
+            if (locationFilter.values != null && !locationFilter.values.isEmpty()) {
+                locationFilter.values.forEach(v -> validateIRI(v.toString()));
+                var fileLink = view.join.stream()
+                        .filter(v -> v.view.equals(RESOURCES_VIEW))
+                        .findFirst()
+                        .orElse(null);
+                if (fileLink != null) {
+                    builder.append("FILTER EXISTS {\n")
+                            .append("?file fs:belongsTo* ?location .\n FILTER (?location IN (")
+                            .append(locationFilter.values.stream()
+                                    .map(v -> "<" + v + ">")
+                                    .collect(joining(", ")))
+                            .append("))\n ?file <")
+                            .append(fileLink.on)
+                            .append("> ?")
+                            .append(view.name)
+                            .append(" . \n")
+                            .append("}\n");
+                } else {
+                    builder.append("?")
+                            .append(view.name)
+                            .append(" fs:belongsTo* ?location .\n FILTER (?location IN (")
+                            .append(locationFilter.values.stream()
+                                    .map(v -> "<" + v + ">")
+                                    .collect(joining(", ")))
+                            .append("))\n");
+                }
+            }
+        });
+
+        filters.stream()
+                .map(f -> f.field)
+                .sorted(comparing(field -> field.contains("_") ? getColumn(field).priority : 0))
+                .map(field -> field.split("_")[0])
+                .distinct()
+                .forEach(entity -> {
+                    if (!entity.equals(view.name)) {
+                        builder.append("FILTER EXISTS {\n");
+
+                        var join = view.join.stream()
+                                .filter(j -> j.view.equals(entity))
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("Unknown view: " + entity));
+
+                        builder.append("?")
+                                .append(view.name)
+                                .append(join.reverse ? " ^<" : " <")
+                                .append(join.on)
+                                .append("> ?")
+                                .append(join.view)
+                                .append(" .\n");
+                    }
+
+                    request.getFilters().stream()
+                            .filter(f -> f.getField().startsWith(entity))
+                            .sorted(comparing(f -> f.field.contains("_") ? getColumn(f.field).priority : 0))
+                            .forEach(f -> {
+                                String condition, property, field;
+                                if (f.getField().equals(entity)) {
+                                    field = f.field + "_id";
+                                    property = RDFS.label.toString();
+                                    condition = toFilterString(f, ColumnType.Identifier, field);
+                                } else {
+                                    field = f.field;
+                                    property = getColumn(f.field).source;
+                                    condition = toFilterString(f, getColumn(f.field).type, f.field);
+                                }
+                                if (condition != null) {
+                                    builder.append("?")
+                                            .append(entity)
+                                            .append(" <")
+                                            .append(property)
+                                            .append("> ?")
+                                            .append(field)
+                                            .append(" .\n")
+                                            .append(condition)
+                                            .append(" \n");
+                                }
+                            });
+                    if (!entity.equals(view.name)) {
+                        builder.append("}");
+                    }
+                    builder.append("\n");
+                });
+    }
+
+    /**
+     * The way count is calculated depends on the view configuration. If the view has a maxDisplayCount set,
+     * the count query will be limited to that number of results. Otherwise, the count query will return the total
+     */
     private String transformToCountQuery(String queryTemplate, View view) {
         String query;
         if (view.maxDisplayCount == null) {
