@@ -1,0 +1,95 @@
+# imports: http://www.w3.org/ns/shacl#
+
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix fnscloud: <https://fns-cloud.eu/ontology/dbnp-data-model#> .
+@prefix fnsharmony: <https://www.fns-cloud.eu/> .
+@prefix fnsomics: <https://www.fns-demo.com/ontology/omics-data-model#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
+@prefix fs: <https://fairspace.nl/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://www.schema.org/> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Properties
+fnsomics:submittedByCenter a rdf:Property .
+fnsomics:usedProtocol a rdf:Property .
+
+fnsomics:runRelatedToExperiment a rdf:Property .
+fnsomics:hasTaxId a rdf:Property .
+
+# Property shapes
+fnsomics:LabelPropertyShape
+    a sh:PropertyShape ;
+    sh:path rdfs:label ;
+    dash:singleLine true ;
+    sh:datatype xsd:string ;
+    sh:order 0 ;
+    sh:description "The unique label of this item." ;
+    sh:maxCount 1 ;
+    sh:name "Label" ;
+    fs:importantProperty true ;
+.
+fnsomics:IdentifierPropertyShape
+    a sh:PropertyShape ;
+    sh:path dcterms:identifier ;
+    sh:datatype xsd:string ;
+    sh:description "The identifier of this item." ;
+    sh:maxCount 1 ;
+    sh:order 0 ;
+    sh:name "Identifier" ;
+.
+fnsomics:submittedByCenterPropertyShape
+    a sh:PropertyShape ;
+    sh:path fnsomics:submittedByCenter ;
+    sh:datatype xsd:string ;
+    sh:description "The name of the center that submitted this item." ;
+    sh:order 2 ;
+    sh:name "Submitted by" ;
+.
+fnsomics:protocolLabelPropertyShape
+    a sh:PropertyShape ;
+    sh:path fnsomics:usedProtocol ;
+    sh:datatype xsd:string ;
+    sh:description "The protocol used to produce samples." ;
+    sh:order 3 ;
+    sh:name "Protocol label" ;
+.
+fnsomics:runRelatedToExperimentPropertyShape
+    a sh:PropertyShape ;
+    sh:path fnsomics:runRelatedToExperiment ;
+    sh:class fnsomics:Experiment ;
+    sh:description "The experiment that this run is related to." ;
+    sh:order 1 ;
+    sh:name "Related to experiment" ;
+.
+fnsomics:taxIdPropertyShape
+    a sh:PropertyShape ;
+    sh:path fnsomics:hasTaxId ;
+    sh:datatype xsd:string ;
+    sh:description "The taxonomic identifier of the organism." ;
+    sh:order 1 ;
+    sh:name "Taxonomic identifier" ;
+.
+
+# Classes
+fnsomics:Experiment a rdfs:Class, sh:NodeShape ;
+    sh:description "An experiment is a scientific procedure undertaken to make a discovery, test a hypothesis, or demonstrate a known fact." ;
+    sh:name "Experiment" ;
+    sh:property fnsomics:LabelPropertyShape ;
+    sh:property fnsomics:IdentifierPropertyShape ;
+    sh:property fnsomics:submittedByCenterPropertyShape ;
+    sh:property fnsomics:protocolLabelPropertyShape ;
+.
+fnsomics:Run a rdfs:Class, sh:NodeShape ;
+    sh:description "A run is a single execution of an experiment." ;
+    sh:name "Run" ;
+    sh:property fnsomics:LabelPropertyShape ;
+    sh:property fnsomics:IdentifierPropertyShape ;
+    sh:property fnsomics:taxIdPropertyShape ;
+    sh:property fnsomics:runRelatedToExperimentPropertyShape ;
+.

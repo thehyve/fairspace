@@ -1,0 +1,45 @@
+views:
+  - name: Experiment
+    title: Experiments
+    itemName: Experiment
+    types:
+      - https://www.fns-demo.com/ontology/omics-data-model#Experiment
+    columns:
+      - name: identifier
+        title: Identifier
+        source: http://purl.org/dc/terms/identifier
+        type: text
+        displayIndex: 1
+      - name: submittedByCenter
+        title: Submitted by center
+        source: https://www.fns-demo.com/ontology/omics-data-model#submittedByCenter
+        type: text
+        displayIndex: 2
+      - name: protocol
+        title: Protocol
+        source: https://www.fns-demo.com/ontology/omics-data-model#usedProtocol
+        type: text
+        displayIndex: 3
+    join:
+  - name: Run
+    title: Runs
+    itemName: Run
+    types:
+      - https://www.fns-demo.com/ontology/omics-data-model#Run
+    columns:
+      - name: identifier
+        title: Identifier
+        source: http://purl.org/dc/terms/identifier
+        type: text
+        displayIndex: 1
+      - name: taxId
+        title: Taxonomic identifier
+        source: https://www.fns-demo.com/ontology/omics-data-model#hasTaxId
+        type: text
+        displayIndex: 2
+    join:
+      - view: Experiment
+        on: https://www.fns-demo.com/ontology/omics-data-model#runRelatedToExperiment
+        displayIndex: 3
+        include:
+          - id
