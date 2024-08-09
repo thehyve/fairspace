@@ -433,11 +433,11 @@ public class SparqlQueryService implements QueryService {
                     var count = row.getLiteral("count").getLong();
                     return new CountDTO(count, false);
                 } else {
-                    return new CountDTO(-1, false);
+                    return new CountDTO(0, false);
                 }
             });
         } catch (QueryCancelledException e) {
-            return new CountDTO(-1, true);
+            return new CountDTO(0, true);
         }
     }
 }

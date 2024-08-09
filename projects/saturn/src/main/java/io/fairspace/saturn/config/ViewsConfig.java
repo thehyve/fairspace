@@ -11,7 +11,7 @@ import jakarta.validation.constraints.*;
 
 public class ViewsConfig {
 
-    private Map<String, View> viewConfig;
+    private Map<String, View> nameToViewConfigMap;
 
     public static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
 
@@ -19,10 +19,10 @@ public class ViewsConfig {
     public List<View> views = new ArrayList<>();
 
     public Optional<View> getViewConfig(String viewName) {
-        if (viewConfig == null) {
-            viewConfig = views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
+        if (nameToViewConfigMap == null) {
+            nameToViewConfigMap = views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
         }
-        return Optional.ofNullable(viewConfig.get(viewName));
+        return Optional.ofNullable(nameToViewConfigMap.get(viewName));
     }
 
     public enum ColumnType {
