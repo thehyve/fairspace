@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import lombok.extern.log4j.*;
-import nl.hyve.llm.LlmConversation;
+import io.fairspace.saturn.services.llm.LlmConversation;
 import org.json.JSONObject;
 import spark.Request;
 

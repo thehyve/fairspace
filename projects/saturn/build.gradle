@@ -71,9 +71,6 @@ dependencies {
 
     implementation("org.json:json:20240303")
 
-    // LLM is customer specific. By default the jar will be a demo implementation, overwrite it with customer specific implementation
-    implementation files("libs/nl-hyve-fairspace-demo-v2.4.jar")
-
     runtimeOnly 'org.apache.logging.log4j:log4j-api:2.23.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-core:2.23.0'
     runtimeOnly 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.0'
@@ -83,6 +80,10 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:1.19.6"
     testImplementation('com.github.stefanbirkner:system-rules:1.19.0') {
         exclude group: 'junit', module:'junit-dep'
+
+    // dependencies for google llm api
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.23.0'
+    implementation("org.json:json:20240303")
     }
 
     constraints {
