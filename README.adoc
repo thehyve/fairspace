@@ -1239,7 +1239,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 |===
 3+| ``POST /api/views/count``
 
-3+| Count rows of a view matching request filters.
+3+| Count rows of a view matching request filters. If `maxDisplayCount` configured in the `views.yaml` for a view, then the count for the view is limited by this value if total count exceeds it. Otherwise, the total count is returned.
 3+| _Parameters:_
 | ``view``
 | string
