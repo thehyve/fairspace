@@ -1,4 +1,4 @@
-package io.fairspace.saturn.services.search;
+package io.fairspace.saturn.services.llm;
 
 import java.io.FileWriter;
 import java.nio.file.Files;
