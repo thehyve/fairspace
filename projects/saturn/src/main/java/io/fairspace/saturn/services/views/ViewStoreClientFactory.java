@@ -76,6 +76,7 @@ public class ViewStoreClientFactory {
                 List.of(idColumn(), valueColumn("type", ColumnType.Text), valueColumn("label", ColumnType.Text))));
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
+        // todo: configuration is initialized within the loop below, do the initialization in constructor
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }

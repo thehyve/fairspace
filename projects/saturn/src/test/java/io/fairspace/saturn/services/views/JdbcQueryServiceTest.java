@@ -54,6 +54,7 @@ import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 
 import static org.apache.jena.query.DatasetFactory.wrap;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
@@ -125,7 +126,12 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
 
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
-        sut = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClientFactory, tx, davFactory.root);
+        sut = new JdbcQueryService(
+                ConfigLoader.CONFIG.search,
+                loadViewsConfig("src/test/resources/test-views.yaml"),
+                viewStoreClientFactory,
+                tx,
+                davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
 
@@ -343,11 +349,28 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
     }
 
     @Test
-    public void testCountSamples() {
+    public void testCountSamplesWithoutMaxDisplayCount() {
+        selectRegularUser();
+        var requestParams = new CountRequest();
+        requestParams.setView("Sample");
+        var result = sut.count(requestParams);
+        assertEquals(2, result.getCount());
+    }
+
+    @Test
+    public void testCountSubjectWithMaxDisplayCountLimitLessThanTotalCount() {
         var request = new CountRequest();
-        request.setView("Sample");
+        request.setView("Subject");
         var result = sut.count(request);
-        Assert.assertEquals(2, result.getCount());
+        Assert.assertEquals(1, result.getCount());
+    }
+
+    @Test
+    public void testCountResourceWithMaxDisplayCountLimitMoreThanTotalCount() {
+        var request = new CountRequest();
+        request.setView("Resource");
+        var result = sut.count(request);
+        Assert.assertEquals(4, result.getCount());
     }
 
     @Test

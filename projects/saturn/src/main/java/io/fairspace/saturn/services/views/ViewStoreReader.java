@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.services.search.FileSearchRequest;
@@ -46,14 +47,18 @@ import static io.fairspace.saturn.services.views.Table.idColumn;
  */
 @Slf4j
 public class ViewStoreReader implements AutoCloseable {
+
     final Config.Search searchConfig;
+    final ViewsConfig viewsConfig;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
 
     // TODO: in whole class, use StringBuilder instead of String concats
-    public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory)
+    public ViewStoreReader(
+            Config.Search searchConfig, ViewsConfig viewsConfig, ViewStoreClientFactory viewStoreClientFactory)
             throws SQLException {
         this.searchConfig = searchConfig;
+        this.viewsConfig = viewsConfig;
         this.configuration = viewStoreClientFactory.configuration;
         this.connection = viewStoreClientFactory.getConnection();
     }
@@ -287,8 +292,7 @@ public class ViewStoreReader implements AutoCloseable {
                 .collect(Collectors.joining(" and "));
     }
 
-    PreparedStatement query(String view, String projection, List<ViewFilter> filters, String scope)
-            throws SQLException {
+    PreparedStatement query(String view, List<ViewFilter> filters, String scope, boolean isCount) throws SQLException {
         if (filters == null) {
             filters = Collections.emptyList();
         }
@@ -326,20 +330,44 @@ public class ViewStoreReader implements AutoCloseable {
                 .collect(Collectors.joining(" and "));
 
         var viewTable = configuration.viewTables.get(view);
-        var query = connection.prepareStatement("select " + projection + " from "
+        String query = "select %s from "
                 + viewTable.name + " v " + (constraints.isBlank() ? "" : " where " + constraints)
-                + (scope == null ? "" : (" " + scope)));
+                + (scope == null ? "" : (" " + scope));
+
+        query = isCount ? transformToCountQuery(view, query) : query.formatted("*");
+        var preparedStatement = connection.prepareStatement(query);
         for (var i = 0; i < values.size(); i++) {
             var value = values.get(i);
             if (value instanceof Number) {
-                query.setFloat(i + 1, ((Number) value).floatValue());
+                preparedStatement.setFloat(i + 1, ((Number) value).floatValue());
             } else if (value instanceof Instant) {
-                query.setTimestamp(i + 1, Timestamp.from((Instant) value));
+                preparedStatement.setTimestamp(i + 1, Timestamp.from((Instant) value));
             } else {
-                query.setString(i + 1, value.toString());
+                preparedStatement.setString(i + 1, value.toString());
             }
         }
-        log.debug("Query: {}", query.toString());
+        log.debug("Query: {}", preparedStatement.toString());
+        return preparedStatement;
+    }
+
+    private String transformToCountQuery(String viewName, String query) {
+        boolean isCountLimitDefined = viewsConfig
+                .getViewConfig(viewName)
+                .map(c -> c.maxDisplayCount != null)
+                .orElse(false);
+        if (isCountLimitDefined) { // limit defined
+            query = query.formatted("*"); // set projection to *
+            // limitation is applied to improve performance
+            // we just set limit for the query and then wrap with count query
+            // on UI user either exact number if less the limit or "more than 'limit'" if more
+            query = "select count(*) as rowCount from ( " + query + " limit %s) as count";
+            query = query.formatted(viewsConfig
+                    .getViewConfig(viewName)
+                    .map(c -> c.maxDisplayCount)
+                    .orElseThrow());
+        } else {
+            query = query.formatted("count(*) as rowCount");
+        }
         return query;
     }
 
@@ -376,10 +404,9 @@ public class ViewStoreReader implements AutoCloseable {
             throws SQLException {
         try (var query = query(
                 view.name,
-                "*",
                 filters,
-                String.format(
-                        "order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit))) {
+                String.format("order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit),
+                false)) {
             query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
             var result = query.executeQuery();
             Map<String, ViewRow> rowsById = new HashMap<>();
@@ -572,7 +599,7 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     public long countRows(String view, List<ViewFilter> filters) throws SQLTimeoutException {
-        try (var q = query(view, "count(*) as rowCount", filters, null)) {
+        try (var q = query(view, filters, null, true)) {
             q.setQueryTimeout((int) searchConfig.countRequestTimeout);
             var result = q.executeQuery();
             result.next();

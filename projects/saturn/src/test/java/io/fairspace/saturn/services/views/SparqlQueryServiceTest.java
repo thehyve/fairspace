@@ -184,12 +184,28 @@ public class SparqlQueryServiceTest {
     }
 
     @Test
-    public void testCountSamples() {
+    public void testCountSamplesWithoutMaxDisplayCount() {
         selectRegularUser();
         var requestParams = new CountRequest();
         requestParams.setView("Sample");
         var result = queryService.count(requestParams);
         assertEquals(2, result.getCount());
+    }
+
+    @Test
+    public void testCountSubjectWithMaxDisplayCountLimitLessThanTotalCount() {
+        var request = new CountRequest();
+        request.setView("Subject");
+        var result = queryService.count(request);
+        Assert.assertEquals(1, result.getCount());
+    }
+
+    @Test
+    public void testCountResourceWithMaxDisplayCountLimitMoreThanTotalCount() {
+        var request = new CountRequest();
+        request.setView("Resource");
+        var result = queryService.count(request);
+        Assert.assertEquals(3, result.getCount());
     }
 
     @Test

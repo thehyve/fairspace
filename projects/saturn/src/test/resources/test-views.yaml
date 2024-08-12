@@ -2,6 +2,7 @@ views:
   - name: Subject
     title: Subjects
     itemName: Subject
+    maxDisplayCount: 1
     types:
       - https://institut-curie.org/ontology#Subject
     columns:
@@ -269,6 +270,7 @@ views:
   - name: Resource
     title: Collections and files
     itemName: Name
+    maxDisplayCount: 5
     types:
       - https://fairspace.nl/ontology#Collection
       - https://fairspace.nl/ontology#Directory
