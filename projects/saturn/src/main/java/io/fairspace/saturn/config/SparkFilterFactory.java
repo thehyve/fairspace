@@ -4,10 +4,10 @@ import javax.servlet.Filter;
 
 import io.fairspace.saturn.services.features.FeaturesApp;
 import io.fairspace.saturn.services.health.HealthApp;
+import io.fairspace.saturn.services.llm.AiSearchApp;
 import io.fairspace.saturn.services.maintenance.MaintenanceApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
-import io.fairspace.saturn.services.search.AiSearchApp;
 import io.fairspace.saturn.services.search.SearchApp;
 import io.fairspace.saturn.services.users.*;
 import io.fairspace.saturn.services.views.ViewApp;
