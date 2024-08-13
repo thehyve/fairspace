@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import lombok.extern.log4j.*;
-import io.fairspace.saturn.services.llm.LlmConversation;
 import org.json.JSONObject;
 import spark.Request;
 
 import io.fairspace.saturn.services.BaseApp;
 
 import static io.fairspace.saturn.auth.RequestContext.getAccessToken;
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.get;
@@ -21,7 +21,7 @@ import static spark.Spark.post;
 
 @Log4j2
 public class AiSearchApp extends BaseApp {
-    final String CACHE_DIR = "./data/conversations/";
+    final String CACHE_DIR = CONFIG.llmConversationCachePath;
 
     public AiSearchApp(String basePath) {
         super(basePath);

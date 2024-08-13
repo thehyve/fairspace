@@ -10,6 +10,7 @@ data:
     port: 8090
     livenessPort: 8091
     publicUrl: {{ template "fairspace.url" . }}
+    llmConversationCachePath: "/data/saturn/conversations"
     jena:
       metadataBaseIRI: http://{{ .Values.fairspace.ingress.domain }}/iri/
       datasetPath: "/data/saturn/db"

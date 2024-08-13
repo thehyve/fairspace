@@ -6,36 +6,43 @@ import ServicesContext from '../../common/contexts/ServicesContext';
 import UserContext from '../../users/UserContext';
 import ExternalStoragesContext from '../../external-storage/ExternalStoragesContext';
 import ExternalMetadataSourceContext from '../../metadata/metadata-sources/ExternalMetadataSourceContext';
+import FeaturesContext from '../../common/contexts/FeaturesContext';
 import InternalMetadataSourceContext from '../../metadata/metadata-sources/InternalMetadataSourceContext';
 import MetadataViewContext from '../../metadata/views/MetadataViewContext';
 import MainMenu from '../MainMenu';
 import {DEFAULT_METADATA_VIEW_MENU_LABEL} from '../../constants';
 import theme from '../../App.theme';
 
+const mockFeatureContext = {
+    isFeatureEnabled: jest.fn()
+};
+
 describe('MainMenu', () => {
     const setup = (user, services, externalStorages, externalMetadataSources, internalMetadata, views) => {
         return render(
             <ThemeProvider theme={theme}>
                 <Router>
-                    <ServicesContext.Provider value={{services}}>
-                        <UserContext.Provider value={{currentUser: user}}>
-                            <ExternalStoragesContext.Provider value={{externalStorages}}>
-                                <ExternalMetadataSourceContext.Provider value={{externalMetadataSources}}>
-                                    <InternalMetadataSourceContext.Provider
-                                        value={{
-                                            internalMetadataIcon: internalMetadata.icon,
-                                            internalMetadataLabel:
-                                                internalMetadata.label || DEFAULT_METADATA_VIEW_MENU_LABEL
-                                        }}
-                                    >
-                                        <MetadataViewContext.Provider value={{views}}>
-                                            <MainMenu open />
-                                        </MetadataViewContext.Provider>
-                                    </InternalMetadataSourceContext.Provider>
-                                </ExternalMetadataSourceContext.Provider>
-                            </ExternalStoragesContext.Provider>
-                        </UserContext.Provider>
-                    </ServicesContext.Provider>
+                    <FeaturesContext.Provider value={mockFeatureContext}>
+                        <ServicesContext.Provider value={{services}}>
+                            <UserContext.Provider value={{currentUser: user}}>
+                                <ExternalStoragesContext.Provider value={{externalStorages}}>
+                                    <ExternalMetadataSourceContext.Provider value={{externalMetadataSources}}>
+                                        <InternalMetadataSourceContext.Provider
+                                            value={{
+                                                internalMetadataIcon: internalMetadata.icon,
+                                                internalMetadataLabel:
+                                                    internalMetadata.label || DEFAULT_METADATA_VIEW_MENU_LABEL
+                                            }}
+                                        >
+                                            <MetadataViewContext.Provider value={{views}}>
+                                                <MainMenu open />
+                                            </MetadataViewContext.Provider>
+                                        </InternalMetadataSourceContext.Provider>
+                                    </ExternalMetadataSourceContext.Provider>
+                                </ExternalStoragesContext.Provider>
+                            </UserContext.Provider>
+                        </ServicesContext.Provider>
+                    </FeaturesContext.Provider>
                 </Router>
             </ThemeProvider>
         );
