@@ -1,4 +1,4 @@
-package io.fairspace.saturn.auth;
+package io.fairspace.saturn.auth.spring;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

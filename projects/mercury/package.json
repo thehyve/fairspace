@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "yarn build && concurrently \"yarn localdevelopment\" \"yarn saturn\" \"yarn pluto\" \"yarn start\"",
+    "dev-no-saturn": "yarn build && concurrently \"yarn localdevelopment\" \"yarn pluto\" \"yarn start\"",
     "dev-be": "concurrently \"yarn localdevelopment\" \"yarn saturn\" \"yarn pluto\"",
     "dev-fe": "yarn build && yarn start",
     "localdevelopment": "cd ../../local-development && docker compose up",

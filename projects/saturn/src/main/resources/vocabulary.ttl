@@ -1,842 +1,539 @@
+# imports: http://www.w3.org/ns/shacl#
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix obo: <http://purl.obolibrary.org/obo/> .
 @prefix fs: <https://fairspace.nl/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://www.schema.org/> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix schema: <http://www.schema.org/> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix dash: <http://datashapes.org/dash#> .
-@prefix curie: <https://institut-curie.org/ontology#> .
+@prefix pfizer: <https://fairspace.nl/pfizer#> . # TO DO: Change
 
-########################
-###   User shapes    ###
-########################
+######################
+###   Properties   ###
+######################
 
-curie:aboutSubject a rdf:Property .
-curie:aboutEvent a rdf:Property .
-curie:sample a rdf:Property .
-curie:analysisType a rdf:Property .
-curie:workspaceType a rdf:Property .
-curie:principalInvestigator a rdf:Property .
-curie:projectCode a rdf:Property .
-curie:analysisCode a rdf:Property .
-curie:analysisDate a rdf:Property .
-curie:platformName a rdf:Property .
-curie:analyticPipelineCode a rdf:Property .
+dcterms:identifier a rdf:Property .
+dcterms:title a rdf:Property .
+pfizer:hasPlannedNumberOfSubjects a rdf:Property .
+pfizer:hasActualNumberOfSubjects a rdf:Property .
+pfizer:hasTreatmentId a rdf:Property .
+pfizer:hasTreatmentName a rdf:Property .
+pfizer:hasFileType a rdf:Property .
+pfizer:hasImagingModality a rdf:Property .
+pfizer:locatedInCountry a rdf:Property .
+pfizer:relatedToStudy a rdf:Property .
+pfizer:relatedToSubject a rdf:Property .
+pfizer:siteForStudy a rdf:Property .
+pfizer:hasAcquisitionDate a rdf:Property .
+pfizer:acquiredAtVisit a rdf:Property .
+pfizer:hasVisitDescription a rdf:Property .
+pfizer:hasClinicalStudyPhase a rdf:Property .
+pfizer:hasPrimaryEndpoint a rdf:Property .
+pfizer:conductedInMultipleSites a rdf:Property .
+pfizer:hasSponsoringUnit a rdf:Property .
+pfizer:hasContractResearchOrganization a rdf:Property .
+pfizer:createdAtSite a rdf:Property .
+pfizer:hasClinicalStudyReportDate a rdf:Property .
+pfizer:hasClinicalStudyTeamLead a rdf:Property .
+pfizer:hasClinicalDataScientist a rdf:Property .
+pfizer:hasLeadClinician a rdf:Property .
+pfizer:hasCountryInvolved a rdf:Property .
+pfizer:hasStudyStartDate a rdf:Property .
+pfizer:hasDuration a rdf:Property .
+pfizer:hasTherapeuticArea a rdf:Property .
+pfizer:hasIndicationVerbatimTerm a rdf:Property .
+pfizer:hasIndicationPreferredTerm a rdf:Property .
+pfizer:hasDrugsMechanismOfAction a rdf:Property .
+pfizer:demographicInformationAvailable a rdf:Property .
+pfizer:medicalHistoryAvailable a rdf:Property .
+pfizer:hasStudyStatus a rdf:Property .
 
-curie:WorkspaceType a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The type of the workspace. " ;
-    sh:name "Workspace type" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique workspace type label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
+###########################
+###   Property shapes   ###
+###########################
 
-## Augmented system class shapes
-fs:Workspace sh:property
-    [
-        sh:name "Type" ;
-        sh:description "Workspace type." ;
-        sh:maxCount 1 ;
-        sh:class curie:WorkspaceType ;
-        sh:path curie:workspaceType
-    ],
-    [
-        sh:name "Project code" ;
-        sh:description "Project code related to the workspace." ;
-        sh:datatype xsd:string ;
-        dash:singleLine true ;
-        sh:maxCount 1 ;
-        sh:path curie:projectCode
-    ],
-    [
-        sh:name "Principal investigator" ;
-        sh:description "Name of the PI or team leader." ;
-        sh:datatype xsd:string ;
-        dash:singleLine true ;
-        sh:maxCount 1 ;
-        sh:path curie:principalInvestigator
-    ] .
+pfizer:LabelPropertyShape
+    a sh:PropertyShape ;
+    sh:path rdfs:label ;
+    dash:singleLine true ;
+    sh:datatype xsd:string ;
+    sh:order 0 ;
+    sh:description "The unique label of this item." ; # TO DO
+    sh:maxCount 1 ;
+    sh:name "Label" ;
+    fs:importantProperty true ;
+.
+pfizer:IdentifierPropertyShape
+    a sh:PropertyShape ;
+    sh:path dcterms:identifier ;
+    sh:datatype xsd:string ;
+    sh:description "The identifier of this item." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 1 ;
+    sh:name "Identifier" ;
+.
+pfizer:TitlePropertyShape
+    a sh:PropertyShape ;
+    sh:path dcterms:title ;
+    sh:datatype xsd:string ;
+    sh:order 3 ;
+    sh:description "The title of this item." ; # TO DO
+    sh:maxCount 1 ;
+    sh:name "Title" ;
+.
+pfizer:IsAvailableForSecondaryUsePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:isAvailableForSecondaryUse ;
+    sh:datatype xsd:boolean ;
+    sh:description "Indicates whether this item is available for secondary use." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 12 ;
+    sh:name "Available for secondary use"
+.
+pfizer:DemographicInformationAvailablePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:demographicInformationAvailable ;
+    sh:datatype xsd:boolean ;
+    sh:description "Indicates whether demographic information is available for subjects of this study." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 20 ;
+    sh:name "Demographic information available"
+.
+pfizer:MedicalHistoryAvailablePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:medicalHistoryAvailable ;
+    sh:datatype xsd:boolean ;
+    sh:description "Indicates whether medical history is available for subjects of this study." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 25 ;
+    sh:name "Medical history available"
+.
+pfizer:PlannedNumberOfSubjectsPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasPlannedNumberOfSubjects ;
+    sh:datatype xsd:integer ;
+    sh:description "The planned number of subjects for this item." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 9 ;
+    sh:name "Planned number of subjects" ;
+.
+pfizer:ActualNumberOfSubjectsPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasActualNumberOfSubjects ;
+    sh:datatype xsd:integer ;
+    sh:description "The actual number of subjects for this item." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 10 ;
+    sh:name "Actual number of subjects" ;
+.
+pfizer:TreatmentIdPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasTreatmentId ;
+    sh:class pfizer:TreatmentId ;
+    sh:description "The treatment identifier of study, e.g. ..." ; # TO DO
+    sh:order 4 ;
+    sh:name "Treatment identifier" ;
+.
+pfizer:TreatmentNamePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasTreatmentName ;
+    sh:datatype xsd:string ;
+    sh:description "The treatment name of study, e.g. ..." ; # TO DO
+    sh:order 4 ;
+    sh:name "Treatment name" ;
+.
+pfizer:RelatedToStudyPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:relatedToStudy ;
+    sh:class pfizer:Study ;
+    sh:description "Study to which this data file is related ..." ; # TO DO
+    sh:order 1 ;
+    sh:name "Related to study" ;
+.
+pfizer:StudyRelatedDataFilePropertyShape
+    a sh:PropertyShape ;
+    sh:description "Linked data files" ;
+    sh:path [sh:inversePath pfizer:relatedToStudy] ;
+    sh:name "Data files" ;
+.
+pfizer:StudyRelatedSitePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:studySite ;
+    sh:class pfizer:Site ;
+    sh:description "Linked sites." ;
+    sh:order 17 ;
+    sh:name "Linked sites" ;
+.
+pfizer:SiteForStudyPropertyShape
+    a sh:PropertyShape ;
+    sh:path [sh:inversePath pfizer:studySite] ;
+    sh:description "Study to which this site is related ..." ; # TO DO
+    sh:name "Site for study" ;
+.
+pfizer:RelatedToSubjectPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:relatedToSubject ;
+    sh:class pfizer:Subject ;
+    sh:description "Subject to which this data file is related ..." ; # TO DO
+    sh:order 1 ;
+    sh:name "Related to subject" ;
+.
+pfizer:FileTypePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasFileType ;
+    sh:class pfizer:FileType ;
+    sh:description "The type of the data file, e.g. ..." ; # TO DO
+    sh:maxCount 1 ; # TO DO
+    sh:order 3 ;
+    sh:name "File type" ;
+.
+pfizer:ImagingModalityPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasImagingModality ;
+    sh:class pfizer:ImagingModality ;
+    sh:description "The imaging modality of the data file, e.g. MR" ; # TO DO
+    sh:order 25 ;
+    sh:name "Imaging modality" ;
+.
+pfizer:LocatedInCountryPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:locatedInCountry ;
+    sh:class pfizer:Country ;
+    sh:description "Country where this item is located" ; # TO DO
+    sh:order 16 ;
+    sh:name "Located in country" ;
+.
+pfizer:ClinicalStudyPhasePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasClinicalStudyPhase ;
+    sh:class pfizer:ClinicalStudyPhase ;
+    sh:description "Clinical study phase of drug development, e.g. PHASE I, PHASE II, etc." ; # TO DO
+    sh:order 6 ;
+    sh:name "Clinical study phase" ;
+.
+pfizer:SponsoringUnitPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasSponsoringUnit ;
+    sh:class pfizer:SponsoringUnit ;
+    sh:description "The research or business unit that sponsored this study" ; # TO DO
+    sh:order 15 ;
+    sh:name "Sponsoring unit" ;
+.
+pfizer:ContractResearchOrganizationPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasContractResearchOrganization ;
+    sh:class pfizer:ContractResearchOrganization ;
+    sh:description "The contract research organization associated to this study" ; # TO DO
+    sh:order 16 ;
+    sh:name "Contract research organization" ;
+.
+pfizer:CreatedAtSitePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:createdAtSite ;
+    sh:class pfizer:Site ;
+    sh:description "The site where this data file was created" ; # TO DO
+    sh:order 3 ;
+    sh:name "Created at site" ;
+.
+pfizer:CountryInvolvedPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasCountryInvolved ;
+    sh:class pfizer:Country ;
+    sh:description "The country involved with a study" ; # TO DO
+    sh:order 3 ;
+    sh:name "Country involved" ;
+.
+pfizer:TherapeuticAreaPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasTherapeuticArea ;
+    sh:class pfizer:TherapeuticArea ;
+    sh:description "The therapeutic area of a study" ; # TO DO
+    sh:order 5 ;
+    sh:name "Therapeutic area" ;
+.
+pfizer:IndicationVerbatimTermPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasIndicationVerbatimTerm ;
+    sh:class pfizer:IndicationVerbatimTerm ;
+    sh:description "Indication verbatim term" ; # TO DO
+    sh:order 5 ;
+    sh:name "Indication verbatim term" ;
+.
+pfizer:IndicationPreferredTermPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasIndicationPreferredTerm ;
+    sh:class pfizer:IndicationPreferredTerm ;
+    sh:description "Indication preferred term" ; # TO DO
+    sh:order 5 ;
+    sh:name "Indication preferred term" ;
+.
+pfizer:DrugsMechanismOfActionPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasDrugsMechanismOfAction ;
+    sh:class pfizer:CompoundMechanismOfAction ;
+    sh:description "Drug's mechanism of action" ; # TO DO
+    sh:order 19 ;
+    sh:name "Drug's mechanism of action" ;
+.
+pfizer:StudyStatusPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasStudyStatus ;
+    sh:class pfizer:StudyStatus ;
+    sh:description "Status of a study, e.g. 'Terminated' or 'Ongoing'" ; # TO DO
+    sh:order 3 ;
+    sh:name "Study status" ;
+.
+pfizer:ClinicalStudyTeamLeadPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasClinicalStudyTeamLead ;
+    sh:datatype xsd:string ;
+    sh:description "The clinical study team lead of a study" ; # TO DO
+    sh:order 16 ;
+    sh:name "Clinical study team lead" ;
+.
+pfizer:ClinicalDataScientistPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasClinicalDataScientist ;
+    sh:datatype xsd:string ;
+    sh:description "The clinical data scientist of a study" ; # TO DO
+    sh:order 16 ;
+    sh:name "Clinical data scientist" ;
+.
+pfizer:LeadClinicianPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasLeadClinician ;
+    sh:datatype xsd:string ;
+    sh:description "The lead clinician of a study" ; # TO DO
+    sh:order 16 ;
+    sh:name "Lead clinician" ;
+.
+pfizer:PrimaryEndpointPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasPrimaryEndpoint ;
+    sh:datatype xsd:string ;
+    sh:description "Primary endpoint (or measurable outcome)" ; # TO DO
+    sh:order 11 ;
+    sh:name "Primary endpoint" ;
+.
+pfizer:AcquisitionDatePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasAcquisitionDate ;
+    sh:datatype xsd:date ;
+    sh:description "Acquisition data" ;
+    sh:order 3 ;
+    sh:name "Acquisition date" ;
+.
+pfizer:VisitPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:acquiredAtVisit ;
+    sh:datatype xsd:string ;
+    sh:description "The name or title of the timepoint when item was acquired" ; # TO DO
+    sh:order 3 ;
+    sh:name "Visit" ;
+.
+pfizer:VisitDescriptionPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasVisitDescription ;
+    sh:datatype xsd:string ;
+    sh:description "The description of the visit" ; # TO DO
+    sh:order 3 ;
+    sh:name "Visit description" ;
+.
+pfizer:ConductedInMultipleSitesPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:conductedInMultipleSites ;
+    sh:datatype xsd:boolean ;
+    sh:description "Indicates whether this study was conducted in multiple sites. This helps to identify studies with a multi-center design for research and analysis." ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 17 ;
+    sh:name "Conducted in multiple sites"
+.
+pfizer:ClinicalStudyReportDatePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasClinicalStudyReportDate ;
+    sh:datatype xsd:date ;
+    sh:description "The clinical study report date of this study" ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 9 ;
+    sh:name "Clinical study report date"
+.
+pfizer:StudyStartDatePropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasStudyStartDate ;
+    sh:datatype xsd:date ;
+    sh:description "The start date of this study" ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 8 ;
+    sh:name "Study start date"
+.
+pfizer:DurationPropertyShape
+    a sh:PropertyShape ;
+    sh:path pfizer:hasDuration ;
+    sh:datatype xsd:integer ;
+    sh:description "The duration of this item" ; # TO DO
+    sh:maxCount 1 ;
+    sh:order 9 ;
+    sh:name "Duration (months)"
+.
 
-fs:File sh:property
-    [
-        sh:name "Is about subject" ;
-        sh:description "Subjects that are featured in this file." ;
-        sh:class curie:Subject ;
-        sh:path curie:aboutSubject
-    ],
-    [
-        sh:name "Is about biological sample" ;
-        sh:description "Biological samples that are featured in this file." ;
-        sh:class curie:BiologicalSample ;
-        sh:path curie:sample
-    ],
-    [
-        sh:name "Is about tumor pathology event" ;
-        sh:description "Events that are featured in this file." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:path curie:aboutEvent
-    ],
-    [
-        sh:name "Type of analysis" ;
-        sh:description "Type of analysis associated to this file" ;
-        sh:maxCount 1 ;
-        sh:class curie:AnalysisType ;
-        sh:path curie:analysisType
-    ],
-    [
-        sh:name "Analysis code" ;
-        sh:description "The analysis code (could be the sequencing run identifier for instance, or the imaging identifier, etc.)" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path curie:analysisCode
-    ],
-    [
-        sh:name "Analysis date" ;
-        sh:description "" ;
-        sh:datatype xsd:date ;
-        sh:maxCount 1 ;
-        sh:path curie:analysisDate
-    ],
-    [
-        sh:name "Platform name" ;
-        sh:description "The name of the technology platform on which the analysis has been processed." ;
-        sh:class curie:TechnologyPlatformName ;
-        sh:maxCount 1 ;
-        sh:path curie:platformName
-    ],
-    [
-        sh:name "Analytic pipeline code" ;
-        sh:description "The analytic pipeline code (which is helpful for data traceability and comparison)." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path curie:analyticPipelineCode
-    ] .
+###################
+###   Classes   ###
+###################
 
-fs:Directory sh:property
-    [
-        sh:name "Is about subject" ;
-        sh:description "Subjects that are featured in this directory." ;
-        sh:class curie:Subject ;
-        sh:path curie:aboutSubject
-    ],
-    [
-        sh:name "Is about biological sample" ;
-        sh:description "Biological samples that are featured in this directory." ;
-        sh:class curie:BiologicalSample ;
-        sh:path curie:sample
-    ],
-    [
-        sh:name "Is about tumor pathology event" ;
-        sh:description "Events that are featured in this directory." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:path curie:aboutEvent
-    ],
-    [
-        sh:name "Type of analysis" ;
-        sh:description "Type of analysis associated to this directory" ;
-        sh:class curie:AnalysisType ;
-        sh:path curie:analysisType
-    ] .
-
-fs:Collection sh:property
-    [
-        sh:name "Is about subject" ;
-        sh:description "Subjects that are featured in this collection." ;
-        sh:class curie:Subject ;
-        sh:path curie:aboutSubject
-    ],
-    [
-        sh:name "Is about biological sample" ;
-        sh:description "Biological samples that are featured in this collection." ;
-        sh:class curie:BiologicalSample ;
-        sh:path curie:sample
-    ],
-    [
-        sh:name "Is about tumor pathology event" ;
-        sh:description "Events that are featured in this collection." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:path curie:aboutEvent
-    ],
-    [
-        sh:name "Type of analysis" ;
-        sh:description "Type of analysis associated to this collection" ;
-        sh:class curie:AnalysisType ;
-        sh:path curie:analysisType
-    ] .
-
-## User class Shapes
-
-curie:AnalysisType a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The type of analysis." ;
-    sh:name "Analysis type" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique analysis type label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:TechnologyPlatformName a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "" ;
-    sh:name "Technology platform name" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-           [
-         sh:name "Label" ;
-         sh:description "Unique technology platform name." ;
-         sh:datatype xsd:string ;
-         sh:maxCount 1 ;
-         dash:singleLine true ;
-         fs:importantProperty true ;
-         sh:path rdfs:label
-     ] .
-
-curie:Gender a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The gender of the subject." ;
-    sh:name "Gender" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique gender label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:Species a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The species of the subject." ;
-    sh:name "Species" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique species label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:AvailabilityForResearch a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "Indication whether the subject is available for research." ;
-    sh:name "Availability for research" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-          [
-        sh:name "Label" ;
-        sh:description "Unique availability label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:ConsentAnswer a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "Answer type for consent questions." ;
-    sh:name "Consent answer" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-          [
-        sh:name "Label" ;
-        sh:description "Unique answer label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:ageAtLastNews a rdf:Property .
-curie:ageAtDeath a rdf:Property .
-curie:isOfGender a rdf:Property .
-curie:isOfSpecies a rdf:Property .
-curie:availableForResearch a rdf:Property .
-curie:dateOfOpposition a rdf:Property .
-curie:reuseClinicalWithGeneticData a rdf:Property .
-curie:sampleStorageAndReuse a rdf:Property .
-curie:geneticsAnalysis a rdf:Property .
-
-curie:Subject a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "A subject of research." ;
-    sh:name "Subject" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Gender" ;
-        sh:description "The gender of the subject." ;
-        sh:maxCount 1 ;
-        sh:class curie:Gender ;
-        sh:path curie:isOfGender
-    ],
-    [
-        sh:name "Species" ;
-        sh:description "The species of the subject." ;
-        sh:maxCount 1 ;
-        sh:class curie:Species ;
-        sh:path curie:isOfSpecies
-    ],
-    [
-        sh:name "Age at last news" ;
-        sh:description "The age at last news." ;
-        sh:datatype xsd:integer ;
-        sh:maxCount 1 ;
-        sh:path curie:ageAtLastNews
-    ],
-    [
-        sh:name "Age at death" ;
-        sh:description "The age at death." ;
-        sh:datatype xsd:integer ;
-        sh:maxCount 1 ;
-        sh:path curie:ageAtDeath
-    ],
-    [
-        sh:name "Available for research" ;
-        sh:maxCount 1 ;
-        sh:class curie:AvailabilityForResearch ;
-        sh:path curie:availableForResearch
-    ],
-    [
-        sh:name "Date of opposition" ;
-        sh:datatype xsd:date ;
-        sh:maxCount 1 ;
-        sh:path curie:dateOfOpposition
-    ],
-    [
-        sh:name "Reuse clinical with genetic data" ;
-        sh:maxCount 1 ;
-        sh:class curie:ConsentAnswer ;
-        sh:path curie:reuseClinicalWithGeneticData
-    ],
-    [
-        sh:name "Sample storage and reuse" ;
-        sh:maxCount 1 ;
-        sh:class curie:ConsentAnswer ;
-        sh:path curie:sampleStorageAndReuse
-    ],
-    [
-        sh:name "Genetic analysis" ;
-        sh:maxCount 1 ;
-        sh:class curie:ConsentAnswer ;
-        sh:path curie:geneticAnalysis
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique person label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ],
-    [
-        sh:name "Tumor pathology events" ;
-        sh:description "Tumor pathology events" ;
-        sh:path [sh:inversePath curie:eventSubject];
-    ],
-    [
-        sh:name "Samples" ;
-        sh:description "Samples" ;
-        sh:path [sh:inversePath curie:subject];
-    ],
-    [
-        sh:name "Files" ;
-        sh:description "Linked files" ;
-        sh:path [sh:inversePath curie:aboutSubject];
-    ].
-
-
-curie:Topography a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The topography of the tumor coded in ICD-10 (subdivision ICD-O-3)." ;
-    sh:name "Topography" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique topography label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:Morphology a rdfs:Class, sh:NodeShape ;
-     sh:closed false ;
-     sh:description "The morphology of the tumor coded in ICD-10 (subdivision ICD-O-3)." ;
-     sh:name "Morphology" ;
-     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-     sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique morphology label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:Laterality a rdfs:Class, sh:NodeShape ;
-     sh:closed false ;
-     sh:description "The laterality of the tumor." ;
-     sh:name "Laterality" ;
-     sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-     sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique laterality label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:EventType a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The type of tumor pathology event." ;
-    sh:name "Event type" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique event type label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:TumorGradeType a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The type of grading classification." ;
-    sh:name "Tumor grade type" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique tumor grade type label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:TumorGradeValue a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The grading value." ;
-    sh:name "Tumor grade value" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique tumor grade value label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:TnmT a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The primary tumor size." ;
-    sh:name "TNM_T" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique TNM_T label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:TnmN a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description " The regional lymph nodes." ;
-    sh:name "TNM_N" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique TNM_N label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:TnmM a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description " Distant metastasis." ;
-    sh:name "TNM_M" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique TNM_M label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:eventType a rdf:Property .
-curie:topography a rdf:Property .
-curie:tumorMorphology a rdf:Property .
-curie:tumorLaterality a rdf:Property .
-curie:yearOfDiagnosis a rdf:Property .
-curie:ageAtDiagnosis a rdf:Property .
-curie:tumorGradeType a rdf:Property .
-curie:tumorGradeValue a rdf:Property .
-curie:cTnmT a rdf:Property .
-curie:cTnmN a rdf:Property .
-curie:cTnmM a rdf:Property .
-curie:pTnmT a rdf:Property .
-curie:pTnmN a rdf:Property .
-curie:pTnmM a rdf:Property .
-curie:yTnmT a rdf:Property .
-curie:yTnmN a rdf:Property .
-curie:yTnmM a rdf:Property .
-
-curie:isAnalysedBy a rdf:Property .
-curie:eventSubject a rdf:Property .
-curie:isLinkedTo a rdf:Property .
-
-curie:TumorPathologyEvent a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "" ;
-    sh:name "Tumor pathology event" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Topography" ;
-        sh:description "The topography of the tumor." ;
-        sh:class curie:Topography ;
-        sh:path curie:topography
-    ],
-    [
-        sh:name "Morphology" ;
-        sh:description "The morphology of the tumor." ;
-        sh:class curie:Morphology ;
-        sh:path curie:tumorMorphology
-    ],
-    [
-        sh:name "Laterality" ;
-        sh:description "The laterality of the tumor." ;
-        sh:maxCount 1 ;
-        sh:class curie:Laterality ;
-        sh:path curie:tumorLaterality
-    ],
-    [
-        sh:name "Event type" ;
-        sh:description "The type of tumor pathology event." ;
-        sh:maxCount 1 ;
-        sh:class curie:EventType ;
-        sh:path curie:eventType
-    ],
-    [
-        sh:name "Year of diagnosis" ;
-        sh:description "The diagnosis year of the primary tumor." ;
-        sh:datatype xsd:integer ;
-        sh:maxCount 1 ;
-        sh:path curie:yearOfDiagnosis
-    ],
-    [
-        sh:name "Age at diagnosis" ;
-        sh:description "The age at diagnosis." ;
-        sh:datatype xsd:integer ;
-        sh:maxCount 1 ;
-        sh:path curie:ageAtDiagnosis
-    ],
-    [
-        sh:name "Tumor grade type" ;
-        sh:description "The type of tumor grading classification." ;
-        sh:class curie:TumorGradeType ;
-        sh:maxCount 1 ;
-        sh:path curie:tumorGradeType
-    ],
-    [
-        sh:name "Tumor grade value" ;
-        sh:description "The tumor grading value." ;
-        sh:class curie:TumorGradeValue ;
-        sh:maxCount 1 ;
-        sh:path curie:tumorGradeValue
-    ],
-    [
-        sh:name "cTNM_T" ;
-        sh:description "The primary tumor size (clinical evaluation)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmT ;
-        sh:path curie:cTnmT
-    ],
-    [
-        sh:name "cTNM_N" ;
-        sh:description "The regional lymph nodes (clinical evaluation)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmN ;
-        sh:path curie:cTnmN
-    ],
-    [
-        sh:name "cTNM_M" ;
-        sh:description "Distant metastasis (clinical evaluation)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmM ;
-        sh:path curie:cTnmM
-    ],
-    [
-        sh:name "pTNM_T" ;
-        sh:description "The primary tumor size (pathological evaluation)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmT ;
-        sh:path curie:pTnmT
-    ],
-    [
-        sh:name "pTNM_N" ;
-        sh:description "The regional lymph nodes (pathological evaluation)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmN ;
-        sh:path curie:pTnmN
-    ],
-    [
-        sh:name "pTNM_M" ;
-        sh:description "Distant metastasis (pathological evaluation)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmM ;
-        sh:path curie:pTnmM
-    ],
-    [
-        sh:name "yTNM_T" ;
-        sh:description "The primary tumor size (after treatment)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmT ;
-        sh:path curie:yTnmT
-    ],
-    [
-        sh:name "yTNM_N" ;
-        sh:description "The regional lymph nodes (after treatment)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmN ;
-        sh:path curie:yTnmN
-    ],
-    [
-        sh:name "yTNM_M" ;
-        sh:description "Distant metastasis (after treatment)." ;
-        sh:maxCount 1 ;
-        sh:class curie:TnmM ;
-        sh:path curie:yTnmM
-    ],
-    [
-        sh:name "Event subject" ;
-        sh:description "The subject associated with this event." ;
-        sh:class curie:Subject ;
-        sh:maxCount 1 ;
-        sh:path curie:eventSubject
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique tumor pathology event label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ],
-    [
-        sh:name "Samples" ;
-        sh:description "Samples" ;
-        sh:path [sh:inversePath curie:diagnosis];
-    ],
-    [
-        sh:name "Files" ;
-        sh:description "Linked files" ;
-        sh:path [sh:inversePath curie:aboutEvent];
-    ].
-
-
-curie:SampleNature a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The sample nature." ;
-    sh:name "Sample nature" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique sample nature label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:SampleOrigin a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "The sample origin." ;
-    sh:name "Sample origin" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Label" ;
-        sh:description "Unique sample origin label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label
-    ] .
-
-curie:collectDate a rdf:Property .
-curie:tumorCellularity a rdf:Property .
-curie:isOfNature a rdf:Property .
-curie:parentIsOfNature a rdf:Property .
-curie:hasOrigin a rdf:Property .
-curie:subject a rdf:Property .
-curie:diagnosis a rdf:Property .
-curie:isChildOf a rdf:Property .
-
-curie:BiologicalSample a rdfs:Class, sh:NodeShape ;
-    sh:closed false ;
-    sh:description "" ;
-    sh:name "Biological sample" ;
-    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
-    sh:property
-    [
-        sh:name "Collect date" ;
-        sh:description "The collect date of the biological sample." ;
-        sh:datatype xsd:date ;
-        sh:maxCount 1 ;
-        sh:path curie:collectDate
-    ],
-    [
-        sh:name "Tumor cellularity" ;
-        sh:description "The percentage of tumor cells in the biological sample (pathological measure)." ;
-        sh:datatype xsd:integer ;
-        sh:maxCount 1 ;
-        sh:path curie:tumorCellularity
-    ],
-    [
-        sh:name "Topography" ;
-        sh:description "The topography of the sample." ;
-        sh:maxCount 1 ;
-        sh:class curie:Topography ;
-        sh:path curie:topography
-    ],
-    [
-        sh:name "Sample nature" ;
-        sh:description "The sample nature." ;
-        sh:maxCount 1 ;
-        sh:class curie:SampleNature ;
-        sh:path curie:isOfNature
-    ],
-    [
-        sh:name "Parent sample nature" ;
-        sh:description "Natures of parent samples." ;
-        sh:class curie:SampleNature ;
-        sh:path curie:parentIsOfNature
-    ],
-    [
-        sh:name "Sample origin" ;
-        sh:description "The sample origin." ;
-        sh:maxCount 1 ;
-        sh:class curie:SampleOrigin ;
-        sh:path curie:hasOrigin ;
-    ],
-    [
-        sh:name "Subject" ;
-        sh:description "The subject associated with this sample." ;
-        sh:class curie:Subject ;
-        sh:maxCount 1 ;
-        sh:path curie:subject
-    ],
-    [
-        sh:name "Diagnosis" ;
-        sh:description "The diagnosing tumor pathology event." ;
-        sh:class curie:TumorPathologyEvent ;
-        sh:maxCount 1 ;
-        sh:path curie:diagnosis
-    ],
-    [
-        sh:name "Sample is child sample of" ;
-        sh:description "The biological sample has been extracted from this parent sample." ;
-        sh:class curie:BiologicalSample ;
-        sh:path curie:isChildOf
-    ],
-    [
-        sh:name "Label" ;
-        sh:description "Unique biological sample label." ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        dash:singleLine true ;
-        fs:importantProperty true ;
-        sh:path rdfs:label;
-        sh:order 0
-    ],
-    [
-        sh:name "Description" ;
-        sh:description "" ;
-        sh:datatype xsd:string ;
-        sh:maxCount 1 ;
-        sh:path rdfs:comment
-    ],
-    [
-        sh:name "Child samples" ;
-        sh:description "Child samples" ;
-        sh:path [sh:inversePath curie:isChildOf];
-    ],
-    [
-        sh:name "Files" ;
-        sh:description "Linked files" ;
-        sh:path [sh:inversePath curie:sample];
-    ].
+pfizer:FileType a rdfs:Class, sh:NodeShape ;
+                sh:closed false ;
+                sh:description "The type of the data file, e.g. ..." ; # TO DO
+                sh:name "File type" ;
+                sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:ImagingModality a rdfs:Class, sh:NodeShape ;
+                       sh:closed false ;
+                       sh:description "The imaging modality the data file, e.g. ..." ; # TO DO
+                       sh:name "Imaging modality" ;
+                       sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                       sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:TreatmentId a rdfs:Class, sh:NodeShape ;
+                   sh:closed false ;
+                   sh:description "Treatment identifier ..." ; # TO DO
+                   sh:name "Treatment identifier" ;
+                   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                   sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:Country a rdfs:Class, sh:NodeShape ;
+               sh:closed false ;
+               sh:description "Country ..." ; # TO DO
+               sh:name "Country" ;
+               sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+               sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:ClinicalStudyPhase a rdfs:Class, sh:NodeShape ;
+                          sh:closed false ;
+                          sh:description "The clinical study phase of this study, e.g. PHASE I, PHASE II, etc." ; # TO DO
+                          sh:name "Clinical study phase" ;
+                          sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                          sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:SponsoringUnit a rdfs:Class, sh:NodeShape ;
+                      sh:closed false ;
+                      sh:description "The research or business unit that sponsored a study" ; # TO DO
+                      sh:name "Sponsoring unit" ;
+                      sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                      sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:ContractResearchOrganization a rdfs:Class, sh:NodeShape ;
+                                    sh:closed false ;
+                                    sh:description "The contract research organization associated to a study" ; # TO DO
+                                    sh:name "Contract research organization" ;
+                                    sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                                    sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:TherapeuticArea a rdfs:Class, sh:NodeShape ;
+                       sh:closed false ;
+                       sh:description "Therapeutic area" ; # TO DO
+                       sh:name "Therapeutic area" ;
+                       sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                       sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:IndicationVerbatimTerm a rdfs:Class, sh:NodeShape ;
+                              sh:closed false ;
+                              sh:description "Indication verbatim term" ; # TO DO
+                              sh:name "Indication verbatim term" ;
+                              sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                              sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:IndicationPreferredTerm a rdfs:Class, sh:NodeShape ;
+                               sh:closed false ;
+                               sh:description "Indication preferred term" ; # TO DO
+                               sh:name "Indication preferred term" ;
+                               sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                               sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:CompoundMechanismOfAction a rdfs:Class, sh:NodeShape ;
+                                 sh:closed false ;
+                                 sh:description "Drug's mechanism of action" ; # TO DO
+                                 sh:name "Drug's mechanism of action" ;
+                                 sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                                 sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:StudyStatus a rdfs:Class, sh:NodeShape ;
+                   sh:closed false ;
+                   sh:description "Status of a study, e.g. 'Terminated' or 'Ongoing'" ; # TO DO
+                   sh:name "Study status" ;
+                   sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                   sh:property pfizer:LabelPropertyShape ;
+.
+pfizer:Site a rdfs:Class, sh:NodeShape ;
+            sh:closed false ;
+            sh:description "Site ..." ; # TO DO
+            sh:name "Site" ;
+            sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+            sh:property pfizer:IdentifierPropertyShape ;
+            sh:property pfizer:LabelPropertyShape ;
+            sh:property pfizer:PlannedNumberOfSubjectsPropertyShape ;
+            sh:property pfizer:ActualNumberOfSubjectsPropertyShape ;
+            sh:property pfizer:LocatedInCountryPropertyShape ;
+            sh:property pfizer:SiteForStudyPropertyShape ;
+.
+pfizer:DataFile a rdfs:Class, sh:NodeShape ;
+                sh:closed "false"^^xsd:boolean ;
+                sh:description "A datafile ..." ; # TO DO
+                sh:name "Data file" ;
+                sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+                sh:property pfizer:LabelPropertyShape ;
+                sh:property pfizer:TitlePropertyShape ;
+                sh:property pfizer:FileTypePropertyShape ;
+                sh:property pfizer:ImagingModalityPropertyShape ;
+                sh:property pfizer:RelatedToStudyPropertyShape ;
+                sh:property pfizer:RelatedToSubjectPropertyShape ;
+                sh:property pfizer:AcquisitionDatePropertyShape ;
+                sh:property pfizer:VisitPropertyShape ;
+                sh:property pfizer:VisitDescriptionPropertyShape ;
+                sh:property pfizer:CreatedAtSitePropertyShape ;
+.
+pfizer:Subject a rdfs:Class, sh:NodeShape ;
+               sh:closed false ;
+               sh:description "Subject ..." ; # TO DO
+               sh:name "Subject" ;
+               sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+               sh:property pfizer:LabelPropertyShape ;
+               sh:property pfizer:IdentifierPropertyShape ;
+.
+pfizer:Study a rdfs:Class, sh:NodeShape ;
+             sh:closed "false"^^xsd:boolean ;
+             sh:description "A study comprises a series of subjects and assays (or measurements) of one or more types, undertaken to answer a particular biological question." ; # TO DO
+             sh:name "Study" ;
+             sh:ignoredProperties ( rdf:type owl:sameAs ) ;
+             sh:property pfizer:IdentifierPropertyShape ;
+             sh:property pfizer:LabelPropertyShape ;
+             sh:property pfizer:TitlePropertyShape ;
+             sh:property pfizer:StudyStatusPropertyShape ;
+             sh:property pfizer:StudyRelatedDataFilePropertyShape ;
+             sh:property pfizer:StudyRelatedSitePropertyShape ;
+             sh:property pfizer:TreatmentIdPropertyShape ;
+             sh:property pfizer:TreatmentNamePropertyShape ;
+             sh:property pfizer:PlannedNumberOfSubjectsPropertyShape ;
+             sh:property pfizer:ActualNumberOfSubjectsPropertyShape ;
+             sh:property pfizer:ClinicalStudyPhasePropertyShape ;
+             sh:property pfizer:PrimaryEndpointPropertyShape ;
+             sh:property pfizer:ConductedInMultipleSitesPropertyShape ;
+             sh:property pfizer:SponsoringUnitPropertyShape ;
+             sh:property pfizer:ContractResearchOrganizationPropertyShape ;
+             sh:property pfizer:ClinicalStudyReportDatePropertyShape ;
+             sh:property pfizer:StudyStartDatePropertyShape ;
+             sh:property pfizer:ClinicalStudyTeamLeadPropertyShape ;
+             sh:property pfizer:ClinicalDataScientistPropertyShape ;
+             sh:property pfizer:LeadClinicianPropertyShape ;
+             sh:property pfizer:CountryInvolvedPropertyShape ;
+             sh:property pfizer:TherapeuticAreaPropertyShape ;
+             sh:property pfizer:DurationPropertyShape ;
+             sh:property pfizer:IndicationVerbatimTermPropertyShape ;
+             sh:property pfizer:IndicationPreferredTermPropertyShape ;
+             sh:property pfizer:DrugsMechanismOfActionPropertyShape ;
+             sh:property pfizer:DemographicInformationAvailablePropertyShape ;
+             sh:property pfizer:MedicalHistoryAvailablePropertyShape ;

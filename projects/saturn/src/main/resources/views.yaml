@@ -1,343 +1,181 @@
 views:
-  - name: Subject
-    title: Subjects
-    itemName: Subject
+  - name: Study
+    title: Studies
+    itemName: Study
     types:
-      - https://institut-curie.org/ontology#Subject
+      - https://fairspace.nl/pfizer#Study
     columns:
-      - name: gender
-        title: Gender
-        source: https://institut-curie.org/ontology#isOfGender
-        rdfType: https://institut-curie.org/ontology#Gender
-        type: term
-        priority: 1000
-      - name: species
-        title: Species
-        source: https://institut-curie.org/ontology#isOfSpecies
-        rdfType: https://institut-curie.org/ontology#Species
-        type: term
-      - name: ageAtLastNews
-        title: Age at last news
-        source: https://institut-curie.org/ontology#ageAtLastNews
-        type: number
-        priority: 100
-      - name: ageAtDeath
-        title: Age at death
-        source: https://institut-curie.org/ontology#ageAtDeath
-        type: number
-      - name: availableForResearch
-        title: Available for research
-        source: https://institut-curie.org/ontology#availableForResearch
-        rdfType: https://institut-curie.org/ontology#AvailabilityForResearch
-        type: term
-      - name: dateOfOpposition
-        title: Date of opposition
-        source: https://institut-curie.org/ontology#dateOfOpposition
-        type: date
-      - name: reuseClinicalWithGeneticData
-        title: Reuse clinical with genetic data
-        source: https://institut-curie.org/ontology#reuseClinicalWithGeneticData
-        rdfType: https://institut-curie.org/ontology#ConsentAnswer
-        type: term
-      - name: sampleStorageAndReuse
-        title: Sample storage and reuse
-        source: https://institut-curie.org/ontology#sampleStorageAndReuse
-        rdfType: https://institut-curie.org/ontology#ConsentAnswer
-        type: term
-      - name: geneticAnalysis
-        title: Genetic analysis
-        source: https://institut-curie.org/ontology#geneticAnalysis
-        rdfType: https://institut-curie.org/ontology#ConsentAnswer
-        type: term
-    join:
-      - view: TumorPathologyEvent
-        on: https://institut-curie.org/ontology#eventSubject
-        reverse: true
-        include:
-          - id
-          - eventType
-          - topography
-          - morphology
-          - ageAtDiagnosis
-      - view: Sample
-        on: https://institut-curie.org/ontology#subject
-        reverse: true
-        include:
-          - id
-          - nature
-          - topography
-          - origin
-      - view: Resource
-        on: https://institut-curie.org/ontology#aboutSubject
-        reverse: true
-        include:
-          - analysisType
-
-  - name: TumorPathologyEvent
-    title: Tumor pathology events
-    itemName: Tumor pathology event
-    types:
-      - https://institut-curie.org/ontology#TumorPathologyEvent
-    columns:
-      - name: eventType
-        title: Event type
-        source: https://institut-curie.org/ontology#eventType
-        rdfType: https://institut-curie.org/ontology#EventType
-        type: term
-        priority: 100
-      - name: topography
-        title: Tumor topography
-        source: https://institut-curie.org/ontology#topography
-        rdfType: https://institut-curie.org/ontology#Topography
+      - name: title
+        title: Title
+        source: http://purl.org/dc/terms/title
+        type: text
+        displayIndex: 1
+      - name: treatmentId
+        title: Treatment identifier
+        source: https://fairspace.nl/pfizer#hasTreatmentId
+        rdfType: https://fairspace.nl/pfizer#TreatmentId
         type: termSet
-      - name: morphology
-        title: Morphology
-        source: https://institut-curie.org/ontology#tumorMorphology
-        rdfType: https://institut-curie.org/ontology#Morphology
+        displayIndex: 7
+      - name: treatmentName
+        title: Treatment name
+        source: https://fairspace.nl/pfizer#hasTreatmentName
+        type: Set
+        displayIndex: 8
+      - name: clinicalStudyPhase
+        title: Clinical study phase
+        source: https://fairspace.nl/pfizer#hasClinicalStudyPhase
+        rdfType: https://fairspace.nl/pfizer#ClinicalStudyPhase
+        type: term
+        displayIndex: 2
+      - name: primaryEndpoint
+        title: Primary endpoint
+        source: https://fairspace.nl/pfizer#hasPrimaryEndpoint
+        type: text
+        displayIndex: 14
+      - name: cunductedInMultipleSites
+        title: Conducted in multiple sites
+        source: https://fairspace.nl/pfizer#conductedInMultipleSites
+        type: boolean
+        displayIndex: 22
+      - name: plannedNumberOfSubjects
+        title: Planned number of subjects
+        source: https://fairspace.nl/pfizer#hasPlannedNumberOfSubjects
+        type: number
+        displayIndex: 9
+      - name: actualTotalNumberOfSubjects
+        title: Actual total number of subjects
+        source: https://fairspace.nl/pfizer#hasActualNumberOfSubjects
+        type: number
+        displayIndex: 10
+      - name: therapeuticArea
+        title: Therapeutic area
+        source: https://fairspace.nl/pfizer#hasTherapeuticArea
+        rdfType: https://fairspace.nl/pfizer#TherapeuticArea
         type: termSet
-      - name: laterality
-        title: Laterality
-        source: https://institut-curie.org/ontology#tumorLaterality
-        rdfType: https://institut-curie.org/ontology#Laterality
-        type: term
-        priority: 1000
-      - name: ageAtDiagnosis
-        title: Age at diagnosis
-        source: https://institut-curie.org/ontology#ageAtDiagnosis
-        type: number
-        priority: 100
-      - name: yearOfDiagnosis
-        title: Year of diagnosis
-        source: https://institut-curie.org/ontology#yearOfDiagnosis
-        type: number
-        priority: 200
-      - name: tumorGradeType
-        title: Tumor grade type
-        source: https://institut-curie.org/ontology#tumorGradeType
-        rdfType: https://institut-curie.org/ontology#TumorGradeType
-        type: term
-      - name: tumorGradeValue
-        title: Tumor grade value
-        source: https://institut-curie.org/ontology#tumorGradeValue
-        rdfType: https://institut-curie.org/ontology#TumorGradeValue
-        type: term
-      - name: cTnmT
-        title: cTNM_T
-        source: https://institut-curie.org/ontology#cTnmT
-        rdfType: https://institut-curie.org/ontology#TnmT
-        type: term
-      - name: cTnmN
-        title: cTNM_N
-        source: https://institut-curie.org/ontology#cTnmN
-        rdfType: https://institut-curie.org/ontology#TnmN
-        type: term
-      - name: cTnmM
-        title: cTNM_M
-        source: https://institut-curie.org/ontology#cTnmM
-        rdfType: https://institut-curie.org/ontology#TnmM
-        type: term
-      - name: pTnmT
-        title: pTNM_T
-        source: https://institut-curie.org/ontology#pTnmT
-        rdfType: https://institut-curie.org/ontology#TnmT
-        type: term
-      - name: pTnmN
-        title: pTNM_N
-        source: https://institut-curie.org/ontology#pTnmN
-        rdfType: https://institut-curie.org/ontology#TnmN
-        type: term
-      - name: pTnmM
-        title: pTNM_M
-        source: https://institut-curie.org/ontology#pTnmM
-        rdfType: https://institut-curie.org/ontology#TnmM
-        type: term
-      - name: yTnmT
-        title: yTNM_T
-        source: https://institut-curie.org/ontology#yTnmT
-        rdfType: https://institut-curie.org/ontology#TnmT
-        type: term
-      - name: yTnmN
-        title: yTNM_N
-        source: https://institut-curie.org/ontology#yTnmN
-        rdfType: https://institut-curie.org/ontology#TnmN
-        type: term
-      - name: yTnmM
-        title: yTNM_M
-        source: https://institut-curie.org/ontology#yTnmM
-        rdfType: https://institut-curie.org/ontology#TnmM
-        type: term
-    join:
-      - view: Subject
-        on: https://institut-curie.org/ontology#eventSubject
-        include:
-          - id
-          - gender
-          - ageAtDeath
-      - view: Sample
-        on: https://institut-curie.org/ontology#diagnosis
-        reverse: true
-        include:
-          - id
-          - nature
-          - origin
-          - topography
-      - view: Resource
-        on: https://institut-curie.org/ontology#aboutEvent
-        reverse: true
-        include:
-          - analysisType
-
-  - name: Sample
-    title: Samples
-    itemName: Sample
-    types:
-      - https://institut-curie.org/ontology#BiologicalSample
-    columns:
-      - name: collectDate
-        title: Collect date
-        source: https://institut-curie.org/ontology#collectDate
-        type: date
-      - name: nature
-        title: Sample nature
-        source: https://institut-curie.org/ontology#isOfNature
-        rdfType: https://institut-curie.org/ontology#SampleNature
-        type: term
-        priority: 100
-      - name: parentIsOfNature
-        title: Parent sample nature
-        source: https://institut-curie.org/ontology#parentIsOfNature
-        rdfType: https://institut-curie.org/ontology#SampleNature
+        displayIndex: 16
+      - name: indicationVerbatimTerm
+        title: Indication verbatim term
+        source: https://fairspace.nl/pfizer#hasIndicationVerbatimTerm
+        rdfType: https://fairspace.nl/pfizer#IndicationVerbatimTerm
         type: termSet
-        priority: 200
-      - name: origin
-        title: Sample origin
-        source: https://institut-curie.org/ontology#hasOrigin
-        rdfType: https://institut-curie.org/ontology#SampleOrigin
+        displayIndex: 11
+      - name: indicationPreferredTerm
+        title: Indication preferred term
+        source: https://fairspace.nl/pfizer#hasIndicationPreferredTerm
+        rdfType: https://fairspace.nl/pfizer#IndicationPreferredTerm
+        type: termSet
+        displayIndex: 12
+      - name: drugsMechanismOfAction
+        title: Drug's mechanism of action
+        source: https://fairspace.nl/pfizer#hasDrugsMechanismOfAction
+        rdfType: https://fairspace.nl/pfizer#CompoundMechanismOfAction
+        type: termSet
+        displayIndex: 13
+      - name: sponsoringUnit
+        title: Sponsoring unit
+        source: https://fairspace.nl/pfizer#hasSponsoringUnit
+        rdfType: https://fairspace.nl/pfizer#SponsoringUnit
+        type: termSet
+        displayIndex: 17
+      - name: contractResearchOrganization
+        title: Contract research organization
+        source: https://fairspace.nl/pfizer#hasContractResearchOrganization
+        rdfType: https://fairspace.nl/pfizer#ContractResearchOrganization
+        type: termSet
+      - name: countriesInvolved
+        title: Countries involved
+        source: https://fairspace.nl/pfizer#hasCountryInvolved
+        rdfType: https://fairspace.nl/pfizer#Country
+        type: termSet
+        displayIndex: 24
+      - name: studyStartDate
+        title: Study start date
+        source: https://fairspace.nl/pfizer#hasStudyStartDate
+        type: date
+        displayIndex: 3
+      - name: studyStatus
+        title: Study status
+        source: https://fairspace.nl/pfizer#hasStudyStatus
+        rdfType: https://fairspace.nl/pfizer#StudyStatus
         type: term
-        priority: 100
-      - name: tumorCellularity
-        title: Tumor cellularity
-        source: https://institut-curie.org/ontology#tumorCellularity
+        displayIndex: 4
+      - name: studyDuration
+        title: Study duration (months)
+        source: https://fairspace.nl/pfizer#hasDuration
         type: number
-        priority: 1000
-      - name: topography
-        title: Sample topography
-        source: https://institut-curie.org/ontology#topography
-        rdfType: https://institut-curie.org/ontology#Topography
-        type: term
+        displayIndex: 5
+      - name: clinicalStudyReportDate
+        title: Clinical study report date
+        source: https://fairspace.nl/pfizer#hasClinicalStudyReportDate
+        type: date
+        displayIndex: 6
+      - name: clinicalStudyTeamLead
+        title: Clinical study team lead
+        source: https://fairspace.nl/pfizer#hasClinicalStudyTeamLead
+        type: Set
+        displayIndex: 18
+      - name: clinicalDataScientist
+        title: Clinical data scientist
+        source: https://fairspace.nl/pfizer#hasClinicalDataScientist
+        type: Set
+        displayIndex: 19
+      - name: leadClinician
+        title: Lead clinician
+        source: https://fairspace.nl/pfizer#hasLeadClinician
+        type: Set
+        displayIndex: 20
+      - name: demographicInformationAvailable
+        title: Demographic information available
+        source: https://fairspace.nl/pfizer#demographicInformationAvailable
+        type: boolean
+        displayIndex: 21
+      - name: medicalHistoryAvailable
+        title: Medical history available
+        source: https://fairspace.nl/pfizer#medicalHistoryAvailable
+        type: boolean
     join:
-      - view: Subject
-        on: https://institut-curie.org/ontology#subject
-        include:
-          - id
-          - species
-          - gender
-          - ageAtDeath
-          - availableForResearch
-          - reuseClinicalWithGeneticData
-          - sampleStorageAndReuse
-          - geneticAnalysis
-      - view: TumorPathologyEvent
-        on: https://institut-curie.org/ontology#diagnosis
-        include:
-          - id
-          - eventType
-          - topography
-          - morphology
-          - laterality
-          - ageAtDiagnosis
-          - tumorGradeType
-          - tumorGradeValue
-          - cTnmT
-          - cTnmN
-          - cTnmM
-          - pTnmT
-          - pTnmN
-          - pTnmM
-      - view: Resource
-        on: https://institut-curie.org/ontology#sample
+      - view: DataFile
+        on: https://fairspace.nl/pfizer#relatedToStudy
         reverse: true
         include:
-          - analysisType
-
-  - name: Resource
-    title: Collections and files
-    itemName: Name
+          - imagingModality
+  - name: DataFile
+    title: Data files
+    itemName: Data File
     types:
-      - https://fairspace.nl/ontology#Collection
-      - https://fairspace.nl/ontology#Directory
-      - https://fairspace.nl/ontology#File
+      - https://fairspace.nl/pfizer#DataFile
     columns:
-      - name: description
-        title: Description
-        source: http://www.w3.org/2000/01/rdf-schema#comment
-        type: text
-      - name: type
-        title: Resource type
-        source: http://www.w3.org/1999/02/22-rdf-syntax-ns#type
+      - name: fileType
+        title: File type
+        source: https://fairspace.nl/pfizer#hasFileType
+        rdfType: https://fairspace.nl/pfizer#FileType
         type: term
-      - name: keywords
-        title: Key words
-        source: http://www.w3.org/ns/dcat#keyword
-        type: set
-      - name: status
-        title: Collection status
-        source: https://fairspace.nl/ontology#status
-        type: text
-      - name: createdBy
-        title: Created by
-        source: https://fairspace.nl/ontology#createdBy
-        type: text
-      - name: dateCreated
-        title: Date created
-        source: https://fairspace.nl/ontology#dateCreated
+        displayIndex: -6
+      - name: imagingModality
+        title: Imaging modality
+        source: https://fairspace.nl/pfizer#hasImagingModality
+        rdfType: https://fairspace.nl/pfizer#ImagingModality
+        type: termSet
+        displayIndex: -5
+      - name: acquisitionDate
+        title: Acquisition date
+        source: https://fairspace.nl/pfizer#hasAcquisitionDate
         type: date
-      - name: modifiedBy
-        title: Last modified by
-        source: https://fairspace.nl/ontology#modifiedBy
-        type: text
-      - name: dateModified
-        title: Last modified
-        source: https://fairspace.nl/ontology#dateModified
-        type: date
-      - name: deletedBy
-        title: Deleted by
-        source: https://fairspace.nl/ontology#deletedBy
-        type: text
-      - name: dateDeleted
-        title: Date deleted
-        source: https://fairspace.nl/ontology#dateDeleted
-        type: date
-      - name: contentType
-        title: Content type
-        source: https://fairspace.nl/ontology#contentType
-        type: text
-      - name: analysisType
-        title: Analysis type
-        source: https://institut-curie.org/ontology#analysisType
-        rdfType: https://institut-curie.org/ontology#AnalysisType
-        type: termset
-        priority: 100
-      - name: platformName
-        title: Platform name
-        source: https://institut-curie.org/ontology#platformName
-        rdfType: https://institut-curie.org/ontology#TechnologyPlatformName
-        type: termset
-        priority: 200
+        displayIndex: -4
+      - name: visit
+        title: Visit
+        source: https://fairspace.nl/pfizer#acquiredAtVisit
+        type: Set
+        displayIndex: -3
+      - name: visitDescription
+        title: Visit description
+        source: https://fairspace.nl/pfizer#hasVisitDescription
+        type: Set
+        displayIndex: -2
     join:
-      - view: Subject
-        on: https://institut-curie.org/ontology#aboutSubject
+      - view: Study
+        on: https://fairspace.nl/pfizer#relatedToStudy
+        reverse: false
+        displayIndex: -7
         include:
           - id
-          - gender
-      - view: TumorPathologyEvent
-        on: https://institut-curie.org/ontology#aboutEvent
-        include:
-          - id
-          - eventType
-      - view: Sample
-        on: https://institut-curie.org/ontology#sample
-        include:
-          - id
-          - nature
-          - topography

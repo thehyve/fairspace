@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import lombok.extern.log4j.*;
+import org.springframework.util.ResourceUtils;
 
 @Log4j2
 public class ConfigLoader {
@@ -12,27 +13,27 @@ public class ConfigLoader {
     public static final ViewsConfig VIEWS_CONFIG = loadViewsConfig();
 
     private static Config loadConfig() {
-        var settingsFile = new File("application.yaml");
-        if (settingsFile.exists()) {
-            try {
+        try {
+            var settingsFile = ResourceUtils.getFile("classpath:saturn-config.yaml");
+            if (settingsFile.exists()) {
                 return Config.MAPPER.readValue(settingsFile, Config.class);
-            } catch (IOException e) {
-                throw new RuntimeException("Error loading configuration", e);
             }
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading configuration", e);
         }
         return new Config();
-    }
+}
 
-    private static ViewsConfig loadViewsConfig() {
-        var settingsFile = new File("views.yaml");
+private static ViewsConfig loadViewsConfig() {
+    try {
+        var settingsFile = ResourceUtils.getFile("classpath:views.yaml");
         if (settingsFile.exists()) {
-            try {
-                return ViewsConfig.MAPPER.readValue(settingsFile, ViewsConfig.class);
-            } catch (IOException e) {
-                log.error("Error loading search configuration", e);
-                throw new RuntimeException("Error loading search configuration", e);
-            }
+            return ViewsConfig.MAPPER.readValue(settingsFile, ViewsConfig.class);
         }
-        return new ViewsConfig();
+    } catch (IOException e) {
+        log.error("Error loading search configuration", e);
+        throw new RuntimeException("Error loading search configuration", e);
     }
+    return new ViewsConfig();
+}
 }
