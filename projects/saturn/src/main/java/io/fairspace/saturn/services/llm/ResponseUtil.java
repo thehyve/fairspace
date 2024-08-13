@@ -5,7 +5,7 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class responseUtil {
+public class ResponseUtil {
     public static String cleanupJson(String input) {
         return cleanupJson(new JSONObject(input));
     }
