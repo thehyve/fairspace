@@ -103,6 +103,10 @@ spec:
             - name: extra-file-storage
               mountPath: /data/saturn/extra-files
 {{- end }}
+{{- if has "LlmSearch" .Values.fairspace.features }}
+            - name: llm
+              mountPath: /data/saturn/conversations
+{{- end }}
           livenessProbe:
             httpGet:
               path:  /liveness
@@ -203,6 +207,27 @@ spec:
       storageClassName: ""
   {{- else }}
       storageClassName: {{ .Values.saturn.persistence.files.storageClass | quote }}
+  {{- end }}
+{{- end }}
+  - metadata:
+      name: llm
+      labels:
+        app: saturn
+{{- include "fairspace.labels" . | nindent 8 }}
+{{- if .Values.saturn.persistence.llm.annotations }}
+      annotations:
+{{ toYaml .Values.saturn.persistence.llm.annotations | indent 8 }}
+{{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.saturn.persistence.llm.size | quote }}
+{{- if .Values.saturn.persistence.llm.storageClass }}
+  {{- if (eq "-" .Values.saturn.persistence.llm.storageClass) }}
+      storageClassName: ""
+  {{- else }}
+      storageClassName: {{ .Values.saturn.persistence.llm.storageClass | quote }}
   {{- end }}
 {{- end }}
 {{- if has "ExtraStorage" .Values.fairspace.features }}

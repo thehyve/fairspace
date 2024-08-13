@@ -59,6 +59,8 @@ public class Config {
 
     public Search search = new Search();
 
+    public String llmConversationCachePath = "data/conversations";
+
     public static class Jena {
         public String metadataBaseIRI = "http://localhost/iri/";
 
