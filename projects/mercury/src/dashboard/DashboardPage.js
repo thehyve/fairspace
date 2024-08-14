@@ -12,6 +12,7 @@ import DomainInfo from './DomainInfo';
 import {APPLICATION_DOCS_URL, APPLICATION_NAME, THE_HYVE_URL} from '../constants';
 import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
 import FeaturesContext from '../common/contexts/FeaturesContext';
+import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 
 const DashboardPage = props => {
     const {currentUser, classes} = props;
@@ -22,6 +23,8 @@ const DashboardPage = props => {
     const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
     const {isFeatureEnabled} = useContext(FeaturesContext);
     const isLlsSearchEnabled = isFeatureEnabled('LlmSearch');
+
+    usePageTitleUpdater('Home');
 
     const handleLlmInputChange = event => {
         if (event.keyCode === 13) {
