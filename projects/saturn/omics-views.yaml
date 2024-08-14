@@ -15,11 +15,126 @@ views:
         source: https://www.fns-demo.com/ontology/omics-data-model#submittedByCenter
         type: text
         displayIndex: 2
-      - name: protocol
-        title: Protocol
-        source: https://www.fns-demo.com/ontology/omics-data-model#usedProtocol
+      - name: host
+        title: Host
+        source: https://www.fns-demo.com/ontology/omics-data-model#host
         type: text
         displayIndex: 3
+      - name: studyTitle
+        title: Study Title
+        source: https://www.fns-demo.com/ontology/omics-data-model#studyTitle
+        type: text
+        displayIndex: 4
+      - name: centerName
+        title: Center Name
+        source: https://www.fns-demo.com/ontology/omics-data-model#centerName
+        type: text
+        displayIndex: 5
+      - name: protocolLabel
+        title: Protocol Label
+        source: https://www.fns-demo.com/ontology/omics-data-model#protocolLabel
+        type: text
+        displayIndex: 6
+      - name: binningSoftware
+        title: Binning Software
+        source: https://www.fns-demo.com/ontology/omics-data-model#binningSoftware
+        type: text
+        displayIndex: 7
+      - name: cellLine
+        title: Cell Line
+        source: https://www.fns-demo.com/ontology/omics-data-model#cellLine
+        type: text
+        displayIndex: 8    
+      - name: cellType
+        title: Cell Type
+        source: https://www.fns-demo.com/ontology/omics-data-model#cellType
+        type: text
+        displayIndex: 9  
+      - name: collectedBy
+        title: Collected By
+        source: https://www.fns-demo.com/ontology/omics-data-model#collectedBy
+        type: text
+        displayIndex: 10
+      - name: collectionDate
+        title: Collection Date
+        source: https://www.fns-demo.com/ontology/omics-data-model#collectionDate
+        type: text
+        displayIndex: 11   
+      - name: completenessScore
+        title: Completeness Score
+        source: https://www.fns-demo.com/ontology/omics-data-model#completenessScore
+        type: text
+        displayIndex: 12    
+      - name: cultureCollection
+        title: Culture Collection
+        source: https://www.fns-demo.com/ontology/omics-data-model#cultureCollection
+        type: text
+        displayIndex: 13    
+      - name: disease
+        title: Disease
+        source: https://www.fns-demo.com/ontology/omics-data-model#disease
+        type: text
+        displayIndex: 14  
+      - name: ecotype
+        title: Ecotype
+        source: https://www.fns-demo.com/ontology/omics-data-model#ecotype
+        type: text
+        displayIndex: 15
+      - name: environmentBiome
+        title: Environment Biome
+        source: https://www.fns-demo.com/ontology/omics-data-model#environmentBiome
+        type: text
+        displayIndex: 16
+      - name: environmentMaterial
+        title: Environment Material
+        source: https://www.fns-demo.com/ontology/omics-data-model#environmentMaterial
+        type: text
+        displayIndex: 17
+      - name: environmentalMedium
+        title: Environmental Medium
+        source: https://www.fns-demo.com/ontology/omics-data-model#environmentalMedium
+        type: text
+        displayIndex: 18
+      - name: instrumentPlatform
+        title: Instrument Platform
+        source: https://www.fns-demo.com/ontology/omics-data-model#instrumentPlatform
+        type: text
+        displayIndex: 19
+      - name: instrumentModel
+        title: Instrument Model
+        source: https://www.fns-demo.com/ontology/omics-data-model#instrumentModel
+        type: text
+        displayIndex: 20
+      - name: investigationType
+        title: Investigation Type
+        source: https://www.fns-demo.com/ontology/omics-data-model#investigationType
+        type: text
+        displayIndex: 21
+      - name: isolate
+        title: Isolate
+        source: https://www.fns-demo.com/ontology/omics-data-model#isolate
+        type: text
+        displayIndex: 22
+      - name: libraryConstructionProtocol
+        title: Library Construction Protocol
+        source: https://www.fns-demo.com/ontology/omics-data-model#libraryConstructionProtocol
+        type: text
+        displayIndex: 23
+      - name: libraryStrategy
+        title: Library Strategy
+        source: https://www.fns-demo.com/ontology/omics-data-model#libraryStrategy
+        type: text
+        displayIndex: 24
+      - name: location
+        title: Location
+        source: https://www.fns-demo.com/ontology/omics-data-model#location
+        type: text
+        displayIndex: 25
+      - name: samplingSite
+        title: Sampling Site
+        source: https://www.fns-demo.com/ontology/omics-data-model#samplingSite
+        type: text
+        displayIndex: 26
     join:
   - name: Run
     title: Runs
@@ -37,9 +152,29 @@ views:
         source: https://www.fns-demo.com/ontology/omics-data-model#hasTaxId
         type: text
         displayIndex: 2
+      - name: runAccession
+        title: Run Accession
+        source: https://www.fns-demo.com/ontology/omics-data-model#runAccession
+        type: text
+        displayIndex: 3
+      - name: fastqFtp
+        title: Fastq Ftp
+        source: https://www.fns-demo.com/ontology/omics-data-model#fastqFtp
+        type: text
+        displayIndex: 4
+      - name: fastqMd5
+        title: Fastq Md5
+        source: https://www.fns-demo.com/ontology/omics-data-model#fastqMd5
+        type: text
+        displayIndex: 5
+      - name: fastqBytes
+        title: Fastq Bytes
+        source: https://www.fns-demo.com/ontology/omics-data-model#fastqBytes
+        type: text
+        displayIndex: 6
     join:
       - view: Experiment
         on: https://www.fns-demo.com/ontology/omics-data-model#runRelatedToExperiment
-        displayIndex: 3
+        displayIndex: 7
         include:
           - id

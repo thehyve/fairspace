@@ -16,11 +16,41 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 # Properties
-fnsomics:submittedByCenter a rdf:Property .
-fnsomics:usedProtocol a rdf:Property .
 
-fnsomics:runRelatedToExperiment a rdf:Property .
-fnsomics:hasTaxId a rdf:Property .
+rdfs:label a rdf:Property .
+dcterms:identifier a rdf:Property .
+
+
+fnsomics:runAccession a rdf:Property .
+fnsomics:fastqFtp a rdf:Property .
+fnsomics:fastqMd5 a rdf:Property .
+fnsomics:fastqBytes a rdf:Property .
+
+fnsomics:host a rdf:Property .
+fnsomics:studyTitle a rdf:Property .
+fnsomics:centerName a rdf:Property .
+fnsomics:protocolLabel a rdf:Property .
+fnsomics:binningSoftware a rdf:Property .
+fnsomics:cellLine a rdf:Property .
+fnsomics:cellType a rdf:Property .
+fnsomics:collectedBy a rdf:Property .
+fnsomics:collectionDate a rdf:Property .
+fnsomics:completenessScore a rdf:Property .
+fnsomics:cultureCollection a rdf:Property .
+fnsomics:disease a rdf:Property .
+fnsomics:ecotype a rdf:Property .
+fnsomics:environmentBiome a rdf:Property .
+fnsomics:environmentMaterial a rdf:Property .
+fnsomics:environmentalMedium a rdf:Property .
+fnsomics:instrumentPlatform a rdf:Property .
+fnsomics:instrumentModel a rdf:Property .
+fnsomics:investigationType a rdf:Property .
+fnsomics:isolate a rdf:Property .
+fnsomics:libraryConstructionProtocol a rdf:Property .
+fnsomics:libraryStrategy a rdf:Property .
+fnsomics:location a rdf:Property .
+fnsomics:samplingSite a rdf:Property .
+
 
 # Property shapes
 fnsomics:LabelPropertyShape
@@ -43,37 +73,203 @@ fnsomics:IdentifierPropertyShape
     sh:order 0 ;
     sh:name "Identifier" ;
 .
-fnsomics:submittedByCenterPropertyShape
-    a sh:PropertyShape ;
-    sh:path fnsomics:submittedByCenter ;
-    sh:datatype xsd:string ;
-    sh:description "The name of the center that submitted this item." ;
-    sh:order 2 ;
-    sh:name "Submitted by" ;
+
+fnsomics:RunAccessionPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:runAccession ; 
+        sh:datatype xsd:string ; 
+        sh:description "accession number" ; 
+        sh:name "Run Accession" ; 
 .
-fnsomics:protocolLabelPropertyShape
-    a sh:PropertyShape ;
-    sh:path fnsomics:usedProtocol ;
-    sh:datatype xsd:string ;
-    sh:description "The protocol used to produce samples." ;
-    sh:order 3 ;
-    sh:name "Protocol label" ;
+fnsomics:FastqFtpPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:fastqFtp ; 
+        sh:datatype xsd:string ; 
+        sh:description "FTP links for fastq files" ; 
+        sh:name "Fastq Ftp" ; 
 .
-fnsomics:runRelatedToExperimentPropertyShape
-    a sh:PropertyShape ;
-    sh:path fnsomics:runRelatedToExperiment ;
-    sh:class fnsomics:Experiment ;
-    sh:description "The experiment that this run is related to." ;
-    sh:order 1 ;
-    sh:name "Related to experiment" ;
+fnsomics:FastqMd5PropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:fastqMd5 ; 
+        sh:datatype xsd:string ; 
+        sh:description "MD5 checksum of FASTQ files" ; 
+        sh:name "Fastq Md5" ; 
 .
-fnsomics:taxIdPropertyShape
-    a sh:PropertyShape ;
-    sh:path fnsomics:hasTaxId ;
-    sh:datatype xsd:string ;
-    sh:description "The taxonomic identifier of the organism." ;
-    sh:order 1 ;
-    sh:name "Taxonomic identifier" ;
+fnsomics:FastqBytesPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:fastqBytes ; 
+        sh:datatype xsd:string ; 
+        sh:description "size (in bytes) of FASTQ files" ; 
+        sh:name "Fastq Bytes" ; 
+.
+
+fnsomics:HostPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:host ; 
+        sh:datatype xsd:string ; 
+        sh:description "natural (as opposed to laboratory) host to the organism from which sample was obtained" ; 
+        sh:name "Host" ; 
+.
+fnsomics:StudyTitlePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:studyTitle ; 
+        sh:datatype xsd:string ; 
+        sh:description "brief sequencing study description" ; 
+        sh:name "Study Title" ; 
+.
+fnsomics:CenterNamePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:centerName ; 
+        sh:datatype xsd:string ; 
+        sh:description "Submitting center" ; 
+        sh:name "Center Name" ; 
+.
+fnsomics:ProtocolLabelPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:protocolLabel ; 
+        sh:datatype xsd:string ; 
+        sh:description "the protocol used to produce the sample" ; 
+        sh:name "Protocol Label" ; 
+.
+fnsomics:BinningSoftwarePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:binningSoftware ; 
+        sh:datatype xsd:string ; 
+        sh:description "Binning software" ; 
+        sh:name "Binning Software" ; 
+.
+fnsomics:CellLinePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:cellLine ; 
+        sh:datatype xsd:string ; 
+        sh:description "cell line from which the sample was obtained" ; 
+        sh:name "Cell Line" ; 
+.
+fnsomics:CellTypePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:cellType ; 
+        sh:datatype xsd:string ; 
+        sh:description "cell type from which the sample was obtained" ; 
+        sh:name "Cell Type" ; 
+.
+fnsomics:CollectedByPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:collectedBy ; 
+        sh:datatype xsd:string ; 
+        sh:description "name of the person who collected the specimen" ; 
+        sh:name "Collected By" ; 
+.
+fnsomics:CollectionDatePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:collectionDate ; 
+        sh:datatype xsd:datetime ; 
+        sh:description "Time when specimen was collected" ; 
+        sh:name "Collection Date" ; 
+.
+fnsomics:CompletenessScorePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:completenessScore ; 
+        sh:datatype xsd:decimal ; 
+        sh:description "Completeness score (%)" ; 
+        sh:name "Completeness Score" ; 
+.
+fnsomics:CultureCollectionPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:cultureCollection ; 
+        sh:datatype xsd:string ; 
+        sh:description "identifier for the sample culture including institute and collection code" ; 
+        sh:name "Culture Collection" ; 
+.
+fnsomics:DiseasePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:disease ; 
+        sh:datatype xsd:string ; 
+        sh:description "Disease associated with the sample" ; 
+        sh:name "Disease" ; 
+.
+fnsomics:EcotypePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:ecotype ; 
+        sh:datatype xsd:string ; 
+        sh:description "a population within a given species displaying traits that reflect adaptation to a local habitat" ; 
+        sh:name "Ecotype" ; 
+.
+fnsomics:EnvironmentBiomePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:environmentBiome ; 
+        sh:datatype xsd:string ; 
+        sh:description "Environment (Biome)" ; 
+        sh:name "Environment Biome" ; 
+.
+fnsomics:EnvironmentMaterialPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:environmentMaterial ; 
+        sh:datatype xsd:string ; 
+        sh:description "Environment (Material)" ; 
+        sh:name "Environment Material" ; 
+.
+fnsomics:EnvironmentalMediumPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:environmentalMedium ; 
+        sh:datatype xsd:string ; 
+        sh:description "Report the environmental material(s) immediately surrounding the sample or specimen at the time of sampling. We recommend using subclasses of 'environmental material' (http://purl.obolibrary.org/obo/ENVO_00010483). EnvO documentation about how to use the field: https://github.com/EnvironmentOntology/envo/wiki/Using-ENVO-with-MIxS . Terms from other OBO ontologies are permissible as long as they reference mass/volume nouns (e.g. air, water, blood) and not discrete, countable entities (e.g. a tree, a leaf, a table top)." ; 
+        sh:name "Environmental Medium" ; 
+.
+fnsomics:InstrumentPlatformPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:instrumentPlatform ; 
+        sh:class fnsomics:InstrumentPlatform ; 
+        sh:description "instrument platform used in sequencing experiment" ; 
+        sh:name "Instrument Platform" ; 
+.
+fnsomics:InstrumentModelPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:instrumentModel ; 
+        sh:datatype xsd:string ; 
+        sh:description "instrument model used in sequencing experiment" ; 
+        sh:name "Instrument Model" ; 
+.
+fnsomics:InvestigationTypePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:investigationType ; 
+        sh:datatype xsd:string ; 
+        sh:description "the study type targeted by the sequencing" ; 
+        sh:name "Investigation Type" ; 
+.
+fnsomics:IsolatePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:isolate ; 
+        sh:datatype xsd:string ; 
+        sh:description "individual isolate from which sample was obtained" ; 
+        sh:name "Isolate" ; 
+.
+fnsomics:LibraryConstructionProtocolPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:libraryConstructionProtocol ; 
+        sh:datatype xsd:string ; 
+        sh:description "Library construction protocol" ; 
+        sh:name "Library Construction Protocol" ; 
+.
+fnsomics:LibraryStrategyPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:libraryStrategy ; 
+        sh:datatype xsd:string ; 
+        sh:description "sequencing technique intended for the library" ; 
+        sh:name "Library Strategy" ; 
+.
+fnsomics:LocationPropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:location ; 
+        sh:datatype xsd:string ; 
+        sh:description "geographic location of isolation of the sample" ; 
+        sh:name "Location" ; 
+.
+fnsomics:SamplingSitePropertyShape 
+        a sh:PropertyShape ; 
+        sh:path fnsomics:samplingSite ; 
+        sh:datatype xsd:string ; 
+        sh:description "the site/station where this sample was collection" ; 
+        sh:name "Sampling Site" ; 
 .
 
 # Classes
@@ -82,14 +278,46 @@ fnsomics:Experiment a rdfs:Class, sh:NodeShape ;
     sh:name "Experiment" ;
     sh:property fnsomics:LabelPropertyShape ;
     sh:property fnsomics:IdentifierPropertyShape ;
-    sh:property fnsomics:submittedByCenterPropertyShape ;
-    sh:property fnsomics:protocolLabelPropertyShape ;
+    sh:property fnsomics:HostPropertyShape ;
+    sh:property fnsomics:StudyTitlePropertyShape ;
+    sh:property fnsomics:CenterNamePropertyShape ;
+    sh:property fnsomics:ProtocolLabelPropertyShape ;
+    sh:property fnsomics:BinningSoftwarePropertyShape ;
+    sh:property fnsomics:CellLinePropertyShape ;
+    sh:property fnsomics:CellTypePropertyShape ;
+    sh:property fnsomics:CollectedByPropertyShape ;
+    sh:property fnsomics:CollectionDatePropertyShape ;
+    sh:property fnsomics:CompletenessScorePropertyShape ;
+    sh:property fnsomics:CultureCollectionPropertyShape ;
+    sh:property fnsomics:DiseasePropertyShape ;
+    sh:property fnsomics:EcotypePropertyShape ;
+    sh:property fnsomics:EnvironmentBiomePropertyShape ;
+    sh:property fnsomics:EnvironmentMaterialPropertyShape ;
+    sh:property fnsomics:EnvironmentalMediumPropertyShape ;
+    sh:property fnsomics:InstrumentPlatformPropertyShape ;
+    sh:property fnsomics:InstrumentModelPropertyShape ;
+    sh:property fnsomics:InvestigationTypePropertyShape ;
+    sh:property fnsomics:IsolatePropertyShape ;
+    sh:property fnsomics:LibraryConstructionProtocolPropertyShape ;
+    sh:property fnsomics:LibraryStrategyPropertyShape ;
+    sh:property fnsomics:LocationPropertyShape ;
+    sh:property fnsomics:SamplingSitePropertyShape ;
 .
+
 fnsomics:Run a rdfs:Class, sh:NodeShape ;
     sh:description "A run is a single execution of an experiment." ;
     sh:name "Run" ;
     sh:property fnsomics:LabelPropertyShape ;
     sh:property fnsomics:IdentifierPropertyShape ;
-    sh:property fnsomics:taxIdPropertyShape ;
-    sh:property fnsomics:runRelatedToExperimentPropertyShape ;
+    sh:property fnsomics:RunAccessionPropertyShape ;
+    sh:property fnsomics:FastqFtpPropertyShape ;
+    sh:property fnsomics:FastqMd5PropertyShape ;
+    sh:property fnsomics:FastqBytesPropertyShape ;
+    .
+
+fnsomics:InstrumentPlatform a rdfs:Class, sh:NodeShape ;
+    sh:description "A structure or device designed to support and facilitate the use of scientific instruments" ;
+    sh:name "Instrument Platform" ;
+    sh:property fnsomics:LabelPropertyShape ;
+    sh:property fnsomics:IdentifierPropertyShape ;
 .
