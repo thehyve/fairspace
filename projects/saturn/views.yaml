@@ -97,8 +97,9 @@ views:
         displayIndex: 18
       - name: instrumentPlatform
         title: Instrument Platform
-        source: https://www.fns-demo.com/ontology/omics-data-model#instrumentPlatform
-        type: text
+        source: https://www.fns-demo.com/ontology/omics-data-model#hasInstrumentPlatform
+        rdfType: https://www.fns-demo.com/ontology/omics-data-model#InstrumentPlatform
+        type: term
         displayIndex: 19
       - name: instrumentModel
         title: Instrument Model

@@ -3,8 +3,10 @@
 @prefix curie: <https://institut-curie.org/ontology#> .
 @prefix fnsomics: <https://www.fns-demo.com/ontology/omics-data-model#> .
 
-fnsomics:NGSPlatform rdf:type fnsomics:InstrumentPlatform ;
+fnsomics:NGSPlatform a fnsomics:InstrumentPlatform ;
   rdfs:label "NGS Platform" .
 
-fnsomics:Galaxy rdf:type fnsomics:InstrumentPlatform ;
+fnsomics:Galaxy a fnsomics:InstrumentPlatform ;
   rdfs:label "Galaxy" .
+
+

@@ -42,7 +42,7 @@ fnsomics:ecotype a rdf:Property .
 fnsomics:environmentBiome a rdf:Property .
 fnsomics:environmentMaterial a rdf:Property .
 fnsomics:environmentalMedium a rdf:Property .
-fnsomics:instrumentPlatform a rdf:Property .
+fnsomics:hasInstrumentPlatform a rdf:Property .
 fnsomics:instrumentModel a rdf:Property .
 fnsomics:investigationType a rdf:Property .
 fnsomics:isolate a rdf:Property .
@@ -217,7 +217,7 @@ fnsomics:EnvironmentalMediumPropertyShape
 .
 fnsomics:InstrumentPlatformPropertyShape 
         a sh:PropertyShape ; 
-        sh:path fnsomics:instrumentPlatform ; 
+        sh:path fnsomics:hasInstrumentPlatform ; 
         sh:class fnsomics:InstrumentPlatform ; 
         sh:description "instrument platform used in sequencing experiment" ; 
         sh:name "Instrument Platform" ; 
@@ -317,8 +317,6 @@ fnsomics:Run a rdfs:Class, sh:NodeShape ;
 .
 
 fnsomics:InstrumentPlatform a rdfs:Class, sh:NodeShape ;
-    sh:description "A structure or device designed to support and facilitate the use of scientific instruments" ;
+    sh:description "An instrument platform is a structure or device designed to support and facilitate the use of scientific instruments." ;
     sh:name "Instrument Platform" ;
-    sh:property fnsomics:LabelPropertyShape ;
-    sh:property fnsomics:IdentifierPropertyShape ;
 .
