@@ -2,9 +2,10 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix curie: <https://institut-curie.org/ontology#> .
 @prefix fnsomics: <https://www.fns-demo.com/ontology/omics-data-model#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-fnsomics:NGSPlatform rdf:type fnsomics:InstrumentPlatform ;
-  rdfs:label "NGS Platform" .
+fnsomics:ION_TORRENT a fnsomics:InstrumentPlatform ;
+  rdfs:label "ION TORRENT" .
 
-fnsomics:Galaxy rdf:type fnsomics:InstrumentPlatform ;
+fnsomics:NGSPlatform a fnsomics:InstrumentPlatform ;
   rdfs:label "Galaxy" .

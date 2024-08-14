@@ -95,11 +95,11 @@ views:
         source: https://www.fns-demo.com/ontology/omics-data-model#environmentalMedium
         type: text
         displayIndex: 18
-      - name: instrumentPlatform
-        title: Instrument Platform
+      - name: hasInstrumentPlatform
+        title: Has Instrument Platform
         source: https://www.fns-demo.com/ontology/omics-data-model#hasInstrumentPlatform
         rdfType: https://www.fns-demo.com/ontology/omics-data-model#InstrumentPlatform
-        type: term
+        type: termSet
         displayIndex: 19
       - name: instrumentModel
         title: Instrument Model
@@ -137,6 +137,10 @@ views:
         type: text
         displayIndex: 26
     join:
+      - view: Run
+        on: https://www.fns-demo.com/ontology/omics-data-model#relatedToRun
+        include:
+          - id
   - name: Run
     title: Runs
     itemName: Run

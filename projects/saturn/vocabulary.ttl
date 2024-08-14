@@ -50,6 +50,7 @@ fnsomics:libraryConstructionProtocol a rdf:Property .
 fnsomics:libraryStrategy a rdf:Property .
 fnsomics:location a rdf:Property .
 fnsomics:samplingSite a rdf:Property .
+fnsomics:relatedToRun a rdf:Property .
 
 
 # Property shapes
@@ -72,6 +73,14 @@ fnsomics:IdentifierPropertyShape
     sh:maxCount 1 ;
     sh:order 0 ;
     sh:name "Identifier" ;
+.
+
+fnsomics:RelatedToRunPropertyShape
+    a sh:PropertyShape ;
+    sh:path fnsomics:relatedToRun ;
+    sh:Class fnsomics:run ;
+    sh:description "experiment related to a specific run" ;
+    sh:name "Related to run" ;
 .
 
 fnsomics:RunAccessionPropertyShape 
@@ -162,7 +171,7 @@ fnsomics:CollectedByPropertyShape
 fnsomics:CollectionDatePropertyShape 
         a sh:PropertyShape ; 
         sh:path fnsomics:collectionDate ; 
-        sh:datatype xsd:datetime ; 
+        sh:datatype xsd:date ; 
         sh:description "Time when specimen was collected" ; 
         sh:name "Collection Date" ; 
 .
@@ -215,7 +224,7 @@ fnsomics:EnvironmentalMediumPropertyShape
         sh:description "Report the environmental material(s) immediately surrounding the sample or specimen at the time of sampling. We recommend using subclasses of 'environmental material' (http://purl.obolibrary.org/obo/ENVO_00010483). EnvO documentation about how to use the field: https://github.com/EnvironmentOntology/envo/wiki/Using-ENVO-with-MIxS . Terms from other OBO ontologies are permissible as long as they reference mass/volume nouns (e.g. air, water, blood) and not discrete, countable entities (e.g. a tree, a leaf, a table top)." ; 
         sh:name "Environmental Medium" ; 
 .
-fnsomics:InstrumentPlatformPropertyShape 
+fnsomics:HasInstrumentPlatformPropertyShape 
         a sh:PropertyShape ; 
         sh:path fnsomics:hasInstrumentPlatform ; 
         sh:class fnsomics:InstrumentPlatform ; 
@@ -294,7 +303,7 @@ fnsomics:Experiment a rdfs:Class, sh:NodeShape ;
     sh:property fnsomics:EnvironmentBiomePropertyShape ;
     sh:property fnsomics:EnvironmentMaterialPropertyShape ;
     sh:property fnsomics:EnvironmentalMediumPropertyShape ;
-    sh:property fnsomics:InstrumentPlatformPropertyShape ;
+    sh:property fnsomics:HasInstrumentPlatformPropertyShape ;
     sh:property fnsomics:InstrumentModelPropertyShape ;
     sh:property fnsomics:InvestigationTypePropertyShape ;
     sh:property fnsomics:IsolatePropertyShape ;
@@ -302,6 +311,7 @@ fnsomics:Experiment a rdfs:Class, sh:NodeShape ;
     sh:property fnsomics:LibraryStrategyPropertyShape ;
     sh:property fnsomics:LocationPropertyShape ;
     sh:property fnsomics:SamplingSitePropertyShape ;
+    sh:property fnsomics:RelatedToRunPropertyShape ;
 .
 
 fnsomics:Run a rdfs:Class, sh:NodeShape ;
@@ -319,4 +329,5 @@ fnsomics:Run a rdfs:Class, sh:NodeShape ;
 fnsomics:InstrumentPlatform a rdfs:Class, sh:NodeShape ;
     sh:description "An instrument platform is a structure or device designed to support and facilitate the use of scientific instruments." ;
     sh:name "Instrument Platform" ;
+    sh:property fnsomics:LabelPropertyShape ;
 .
