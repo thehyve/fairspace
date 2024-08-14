@@ -26,7 +26,7 @@ export const useAskAIData = initQuery => {
         setLoading(true);
         askAIAPI
             .getAllConversations()
-            .then(({data}) => {
+            .then(data => {
                 if (data && data.length > 0) {
                     data.sort((a, b) => new Date(b.start) - new Date(a.start));
 
@@ -193,11 +193,6 @@ export const useAskAIData = initQuery => {
     };
 
     useEffect(() => {
-        getAllConversationHistory();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [conversationHistory]);
-
-    useEffect(() => {
         if (restoreChatStatus) {
             restoreChat(conversationId);
         }
@@ -214,6 +209,7 @@ export const useAskAIData = initQuery => {
         messages,
         responseInfo,
         conversationId,
+        conversationHistory,
         restoreChatStatus,
         restoreChat,
         setRestoreChatStatus,

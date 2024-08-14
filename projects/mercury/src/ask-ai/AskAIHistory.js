@@ -1,5 +1,5 @@
-import React from 'react';
-import {Card, CardContent, CardHeader, IconButton, List, ListItemButton, Typography} from '@mui/material';
+import React, {useEffect} from 'react';
+import {Card, CardContent, CardHeader, Grid, IconButton, List, ListItemButton, Typography} from '@mui/material';
 import HistoryIcon from '@mui/icons-material/History';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import withStyles from '@mui/styles/withStyles';
@@ -8,7 +8,13 @@ import {useAskAIData} from './UseAskAIData';
 
 const AskAIHistory = props => {
     const {classes} = props;
-    const {conversationHistory, conversationId, prepareRestoreChat, deleteChat} = useAskAIData();
+    const {conversationHistory, conversationId, prepareRestoreChat, deleteChat, getAllConversationHistory} =
+        useAskAIData();
+
+    useEffect(() => {
+        getAllConversationHistory();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [conversationHistory]);
 
     return (
         <Card className={classes.historyContainer}>
@@ -28,19 +34,24 @@ const AskAIHistory = props => {
                                 selected={item.id === conversationId}
                                 onClick={() => prepareRestoreChat(item.id)}
                             >
-                                <div>
-                                    <Typography className={classes.listDate} variant="overline">
-                                        {item.start}
-                                    </Typography>
-                                    <div>{item.topic}</div>
-                                </div>
-                                <IconButton
-                                    className={classes.deleteHistoryButton}
-                                    color="primary"
-                                    onClick={() => deleteChat(item.id)}
-                                >
-                                    <DeleteForeverIcon />
-                                </IconButton>
+                                <Grid container alignItems="stretch">
+                                    <Grid item xs={10}>
+                                        <Typography variant="overline">{item.start}</Typography>
+                                    </Grid>
+                                    <Grid item xs={2} align="right">
+                                        <IconButton
+                                            className={classes.deleteHistoryButton}
+                                            color="primary"
+                                            onClick={() => deleteChat(item.id)}
+                                            size="small"
+                                        >
+                                            <DeleteForeverIcon />
+                                        </IconButton>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography>{item.topic}</Typography>
+                                    </Grid>
+                                </Grid>
                             </ListItemButton>
                         ))
                     ) : (

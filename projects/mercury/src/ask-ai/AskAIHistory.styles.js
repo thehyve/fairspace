@@ -5,25 +5,24 @@ const styles = theme => ({
     historyContentContainer: {
         height: '100%'
     },
-    historyListContainer: {
-        borderTop: '1.5px solid ' + theme.palette.primary.light
-        // backgroundColor: theme.palette.mellow.light
-    },
     historyList: {
         display: 'block',
         position: 'relative',
         overflow: 'auto'
     },
     historyListItem: {
-        borderStyle: 'solid',
-        borderWidth: 1,
+        border: '1.5px solid ' + theme.palette.primary.main,
+        borderRadius: theme.shape.borderRadius,
         marginBottom: 6,
         paddingBottom: 6,
         marginRight: 8
     },
-    deleteHistoryButton: {
-        position: 'absolute',
-        marginLeft: '75%'
+    historyDateAndButtonDiv: {
+        width: '100%',
+        display: 'inline'
+    },
+    blockDisplay: {
+        display: 'block'
     },
     noChatHistoryMessage: {
         display: 'flex',
