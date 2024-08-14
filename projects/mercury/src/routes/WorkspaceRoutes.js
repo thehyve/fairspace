@@ -5,7 +5,7 @@ import * as queryString from 'query-string';
 import WorkspaceOverview from '../workspaces/WorkspaceOverview';
 import Collections from '../collections/CollectionsPage';
 import Dashboard from '../dashboard/DashboardPage';
-import LlmSearchPage from '../llm/LlmSearchPage';
+import LlmSearchPage from '../ask-ai/AskAIPage';
 import FilesPage from '../file/FilesPage';
 import {MetadataWrapper} from '../metadata/LinkedDataWrapper';
 import LinkedDataEntityPage from '../metadata/common/LinkedDataEntityPage';

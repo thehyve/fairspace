@@ -6,7 +6,7 @@ export const HEADERS = {'Content-Type': 'application/json', Accept: 'application
 /**
  * Search for resources based on name or description, given query as a simple text.
  */
-class FulltextAPI {
+class AskAIAPI {
     remoteURL = '/api/aisearch/';
 
     // Perform a single search, just a query without any context or follow-up.
@@ -25,7 +25,7 @@ class FulltextAPI {
             .catch(handleHttpError('Error while performing search'));
     }
 
-    // Initialize a chat, no query is send, use 'chat' to ask something.
+    // Initialize a chat, no query is sent, use 'chat' to ask something.
     initializeChat(): Promise<Response> {
         return axios
             .get(this.remoteURL + 'newchat', {headers: HEADERS})
@@ -65,4 +65,4 @@ class FulltextAPI {
     }
 }
 
-export default FulltextAPI;
+export default AskAIAPI;
