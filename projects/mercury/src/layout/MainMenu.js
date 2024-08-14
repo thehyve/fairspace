@@ -123,14 +123,14 @@ const MainMenu = ({open, classes}) => {
                         className={classNames(
                             classes.mainMenuButton,
                             !open && classes.mainMenuButtonSmall,
-                            pathname.startsWith('/search') && classes.mainMenuButtonSelected
+                            pathname.startsWith('/ask') && classes.mainMenuButtonSelected
                         )}
                         key="search"
                         component={NavLink}
                         to="/ask"
                         startIcon={<ChatIcon />}
                     >
-                        {open && 'Chat'}
+                        {open && 'Ask AI'}
                     </Button>
                 )}
                 {externalStorages &&

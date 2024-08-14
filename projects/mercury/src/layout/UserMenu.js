@@ -57,9 +57,6 @@ const styles = theme => ({
     userMenu: {
         backgroundColor: COLORS.fsBlueLightTransp25,
         cursor: 'default'
-    },
-    customFont: {
-        fontFamily: 'sans-serif'
     }
 });
 
