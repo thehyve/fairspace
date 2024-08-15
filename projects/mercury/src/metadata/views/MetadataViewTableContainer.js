@@ -330,7 +330,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const renderTablePaginationLabel = ({from, to, countIsLoading, countHasError}) => (
         <span>
             <Typography variant="body2" component="span" display="inline">
-                {from}-{to} of{' '}
+                {from}-{data?.rows ? Number(from) + data.rows.length - 1 : '...'} of{' '}
             </Typography>
             <Typography variant="body2" component="span" display="inline" className={classes.tablePaginationLabel}>
                 {getTotalCountString(count?.count, to)}
