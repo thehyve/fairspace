@@ -3,16 +3,31 @@ import React, {useContext} from 'react';
 import {Grid} from '@mui/material';
 import MetadataViewContext from '../metadata/views/MetadataViewContext';
 import UserContext from '../users/UserContext';
-import AskAIConversation from './AskAIChat';
+import AskAIChat from './AskAIChat';
 import {getSearchQueryFromString} from '../search/searchUtils';
 import AskAIHistory from './AskAIHistory';
 import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
+import {useAskAIData} from './UseAskAIData';
 
 const AskAIPage = props => {
     const {currentUser, location: {search} = ''} = props;
-    const query = getSearchQueryFromString(search);
+    const initQuery = getSearchQueryFromString(search);
     const {views} = useContext(MetadataViewContext);
     const canViewMetadata = currentUser && currentUser.canViewPublicMetadata && views && views.length > 0;
+    const {
+        query,
+        setQuery,
+        conversationHistory,
+        conversationId,
+        responseDocuments,
+        messages,
+        loading,
+        historyLoading,
+        responseInfo,
+        deleteChat,
+        restoreChat,
+        clearChat
+    } = useAskAIData(initQuery);
 
     usePageTitleUpdater('Ask AI');
 
@@ -24,10 +39,26 @@ const AskAIPage = props => {
             style={{paddingTop: 60, paddingBottom: 60, height: '100%'}}
         >
             <Grid item xs={8}>
-                {canViewMetadata && <AskAIConversation initialQuery={query} />}
+                {canViewMetadata && (
+                    <AskAIChat
+                        query={query}
+                        setQuery={setQuery}
+                        responseDocuments={responseDocuments}
+                        messages={messages}
+                        loading={loading}
+                        responseInfo={responseInfo}
+                        clearChat={clearChat}
+                    />
+                )}
             </Grid>
             <Grid item xs={4}>
-                <AskAIHistory />
+                <AskAIHistory
+                    conversationHistory={conversationHistory}
+                    conversationId={conversationId}
+                    restoreChat={restoreChat}
+                    deleteChat={deleteChat}
+                    historyLoading={historyLoading}
+                />
             </Grid>
         </Grid>
     );

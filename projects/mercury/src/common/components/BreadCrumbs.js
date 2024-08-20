@@ -54,7 +54,8 @@ BreadCrumbs.propTypes = {
 const styles = theme => ({
     root: {
         padding: theme.spacing(1, 2),
-        display: 'flex'
+        display: 'flex',
+        minHeight: 20
     },
     link: {
         display: 'flex'

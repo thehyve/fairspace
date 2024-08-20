@@ -12,68 +12,15 @@ type AskAIResponse = {
 export const useAskAIData = initQuery => {
     const [query, setQuery] = useState(initQuery);
     const [loading, setLoading] = useState(false);
+    const [historyLoading, setHistoryLoading] = useState(false);
     const [error, setError] = useState();
     const [messages, setMessages] = useState([]);
     const [responseInfo, setResponseInfo] = useState('');
     const [responseDocuments, setResponseDocuments] = useState([]);
     const [conversationId, setConversationId] = useState('');
     const [conversationHistory, setConversationHistory] = useState([]);
-    const [restoreChatStatus, setRestoreChatStatus] = useState(false);
 
     const askAIAPI = new AskAIAPI();
-
-    const getAllConversationHistory = () => {
-        setLoading(true);
-        askAIAPI
-            .getAllConversations()
-            .then(data => {
-                if (data && data.length > 0) {
-                    data.sort((a, b) => new Date(b.start) - new Date(a.start));
-
-                    if (JSON.stringify(data) !== JSON.stringify(conversationHistory)) {
-                        setConversationHistory(data);
-                    }
-                }
-                // setMessages(data);
-            })
-            .catch(() => {
-                handleHttpError('Error retrieving chat history.');
-                // setError(e);
-            })
-            .finally(() => setLoading(false));
-    };
-
-    const fetchQueryResponse = searchQuery => {
-        setLoading(true);
-        askAIAPI
-            .chat(searchQuery, conversationId)
-            .then(({data}: {data: AskAIResponse}) => {
-                setResponseDocuments(data.searchResults);
-                setMessages(data.conversation.messages);
-                setConversationId(data.conversationId);
-            })
-            .catch(e => {
-                console.error('Error sending query', e);
-                setError(e);
-            })
-            .finally(() => setLoading(false));
-    };
-
-    const deleteChat = id => {
-        setLoading(true);
-        askAIAPI
-            .deleteChat(id)
-            .then(() => {
-                setMessages([]);
-                setResponseDocuments([]);
-                setConversationId('');
-            })
-            .catch(e => {
-                console.error('Error deleting chat', e);
-                setError(e);
-            })
-            .finally(() => setLoading(false));
-    };
 
     const processResponseDocuments = data => {
         const documents = [];
@@ -125,14 +72,68 @@ export const useAskAIData = initQuery => {
         }
     };
 
-    const prepareRestoreChat = id => {
+    const handleSearchError = e => {
+        setResponseInfo(e);
+        setLoading(false);
+    };
+
+    const performSearch = () => {
+        if (conversationId === '') {
+            return askAIAPI.search(query);
+        }
+        return askAIAPI.chat(query, conversationId);
+    };
+
+    const search = () => {
+        setResponseInfo('');
+        if (query === '') {
+            return;
+        }
         setLoading(true);
-        setQuery('');
-        setResponseDocuments([]);
-        setMessages([]);
-        setConversationId(id);
-        setRestoreChatStatus(true);
-        getAllConversationHistory();
+        performSearch()
+            .then(processResponseMessages)
+            .then(() => setLoading(false))
+            .catch(() => {
+                handleHttpError('Connection error.');
+                handleSearchError('Ask AI search is not available at the moment');
+            })
+            .finally(() => setLoading(false));
+    };
+
+    const getAllConversationHistory = () => {
+        setHistoryLoading(true);
+        askAIAPI
+            .getAllConversations()
+            .then(data => {
+                if (data && data.length > 0) {
+                    data.sort((a, b) => new Date(b.start) - new Date(a.start));
+
+                    if (JSON.stringify(data) !== JSON.stringify(conversationHistory)) {
+                        setConversationHistory(data);
+                    }
+                }
+            })
+            .catch(() => {
+                handleHttpError('Error retrieving chat history.');
+            })
+            .finally(() => setHistoryLoading(false));
+    };
+
+    const deleteChat = id => {
+        setHistoryLoading(true);
+        askAIAPI
+            .deleteChat(id)
+            .then(() => {
+                setMessages([]);
+                setResponseDocuments([]);
+                setConversationId('');
+                getAllConversationHistory();
+            })
+            .catch(e => {
+                console.error('Error deleting chat', e);
+                setError(e);
+            })
+            .finally(() => setHistoryLoading(false));
     };
 
     const clearChat = () => {
@@ -144,81 +145,45 @@ export const useAskAIData = initQuery => {
         getAllConversationHistory();
     };
 
-    const processSearchQueryChange = newQuery => {
-        if (newQuery !== query) {
-            if (responseInfo !== '') {
-                setResponseInfo('');
-                setResponseDocuments([]);
-            }
-            setQuery(newQuery);
-        }
-    };
-
-    const handleSearchError = e => {
-        setResponseInfo(e);
-        setLoading(false);
-    };
-
-    const performSearch = () => {
-        if (conversationId === '') {
-            return askAIAPI.search(query);
-        }
-
-        return askAIAPI.chat(query, conversationId);
-    };
-
-    const prepareFetchSearch = () => {
-        setLoading(true);
-        setResponseInfo('');
-
-        if (query === '') {
-            return;
-        }
-
-        performSearch()
-            .then(processResponseMessages)
-            .then(() => setLoading(false))
-            .catch(() => {
-                handleHttpError('Connection error.');
-                handleSearchError('Ask AI search is not available at the moment');
-            });
-    };
-
     const restoreChat = id => {
+        setLoading(true);
+        setQuery('');
+        setResponseDocuments([]);
+        setMessages([]);
+        setConversationId(id);
         askAIAPI
             .getHistory(id)
             .then(processHistoryResponseMessages)
-            .then(() => setLoading(false))
-            .catch(() => handleHttpError('Error retrieving chat history.'));
+            .catch(() => {
+                handleHttpError('Error retrieving chat history.');
+                handleSearchError('Error retrieving chat history.');
+            })
+            .finally(() => setLoading(false));
     };
 
     useEffect(() => {
-        if (restoreChatStatus) {
-            restoreChat(conversationId);
-        }
-        setRestoreChatStatus(false);
+        getAllConversationHistory();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [conversationId]);
+    }, []);
+
+    useEffect(() => {
+        search();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [query]);
 
     return {
         query,
         setQuery,
         loading,
+        historyLoading,
         error,
         responseDocuments,
         messages,
         responseInfo,
         conversationId,
         conversationHistory,
-        restoreChatStatus,
         restoreChat,
-        setRestoreChatStatus,
         clearChat,
-        prepareFetchSearch,
-        prepareRestoreChat,
-        processSearchQueryChange,
-        getAllConversationHistory,
-        fetchQueryResponse,
         deleteChat
     };
 };

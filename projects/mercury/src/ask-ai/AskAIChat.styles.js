@@ -1,9 +1,6 @@
 import {alpha} from '@mui/material/styles';
 
 const styles = theme => ({
-    searchContainer: {
-        height: '100%'
-    },
     searchGrid: {
         height: '100%',
         width: '100%'
@@ -42,8 +39,11 @@ const styles = theme => ({
     },
     chatResponseSection: {
         padding: '20px 60px 20px 60px',
-        height: '100%',
         width: '100%'
+    },
+    chatSectionBeforeResponse: {
+        paddingTop: 30,
+        paddingBottom: 40
     },
     documentContainer: {
         overflow: 'auto'
@@ -82,33 +82,36 @@ const styles = theme => ({
         justifyContent: 'center',
         height: '100%'
     },
-    modalDialog: {
-        background: theme.palette.primary.main,
+    modalWrapper: {
         position: 'relative',
-        top: 0,
-        width: 800,
-        bgcolor: 'primary',
-        border: '0px solid #000',
-        boxShadow: 0,
-        outline: 'none',
-        p: 4
-    },
-    modalContent: {
-        position: 'relative',
+        '& .MuiBreadcrumbs-root .MuiTypography-root': {
+            color: theme.palette.primary.contrastText
+        },
         top: '10%',
         left: '50%',
         transform: 'translate(-50%, 0px)',
-        maxHeight: '80%',
-        padding: 2,
-        backgroundColor: theme.palette.primary.main,
-        width: 800,
-        overflowY: 'auto'
+        outline: 'none',
+        maxHeight: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        width: 800
+    },
+    modalContent: {
+        background: theme.palette.primary.dark,
+        color: theme.palette.primary.contrastText,
+        bgcolor: 'background.paper',
+        border: '0px solid #000',
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: 0,
+        outline: 'none',
+        overflowY: 'auto',
+        height: '100%',
+        width: '100%'
     },
     closeButton: {
         float: 'right',
         marginTop: 8,
-        marginRight: 8,
-        height: 40
+        marginRight: 8
     },
     adornedEnd: {
         paddingRight: theme.spacing(1)

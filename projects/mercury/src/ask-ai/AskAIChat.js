@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Grid, IconButton, Modal, Paper, TextField, Tooltip, Typography} from '@mui/material';
+import {Button, Card, Grid, IconButton, Modal, Paper, TextField, Tooltip, Typography} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,24 +8,18 @@ import InputAdornment from '@mui/material/InputAdornment';
 import styles from './AskAIChat.styles';
 import LinkedDataEntityPage from '../metadata/common/LinkedDataEntityPage';
 import {LocalSearchAPI} from '../search/SearchAPI';
-import {useAskAIData} from './UseAskAIData';
 import LoadingOverlayWrapper from '../common/components/LoadingOverlayWrapper';
 
+// TODO make this configurable instead of hardcoded value
+const getMetadataEntityType = () => {
+    return 'https://www.fns-cloud.eu/study';
+};
+
 const AskAIChat = props => {
-    const {initialQuery = '', classes} = props;
+    const {query, responseDocuments, messages, loading, responseInfo, clearChat, setQuery, classes} = props;
     const [documentIri, setDocumentIri] = useState('');
     const [openMetadataDialog, setOpenMetadataDialog] = useState(false);
-
-    const {
-        query,
-        responseDocuments,
-        messages,
-        loading,
-        responseInfo,
-        clearChat,
-        processSearchQueryChange,
-        prepareFetchSearch
-    } = useAskAIData(initialQuery);
+    const [inputQuery, setInputQuery] = useState(query);
 
     const handleOpenMetadataDialog = () => setOpenMetadataDialog(true);
     const handleCloseMetadataDialog = () => setOpenMetadataDialog(false);
@@ -40,9 +34,11 @@ const AskAIChat = props => {
 
     const showDocument = documentId => {
         if (documentId !== null && documentId.length > 0) {
-            LocalSearchAPI.lookupSearch(documentId, 'https://www.fns-cloud.eu/study').then(extractDocumentIri);
+            LocalSearchAPI.lookupSearch(documentId, getMetadataEntityType()).then(extractDocumentIri);
         }
     };
+
+    const onMetadataDialogClose = () => setDocumentIri('');
 
     useEffect(() => {
         if (documentIri !== '') {
@@ -52,20 +48,27 @@ const AskAIChat = props => {
         }
     }, [documentIri]);
 
+    useEffect(() => {
+        if (query === '') {
+            setInputQuery('');
+        }
+    }, [query]);
+
+    // TODO this requires further refactoring, since it is a duplication of LinkedDataLink.js
     const renderMetadataDialog = () => (
         <Modal
             open={openMetadataDialog}
-            onClose={handleCloseMetadataDialog}
+            onClose={onMetadataDialogClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <div className={classes.modalContent}>
-                <Box className={classes.modalDialog}>
+            <div className={classes.modalWrapper}>
+                <Card className={classes.modalContent}>
                     <Tooltip title="Close - click or press Esc">
-                        <CloseIcon onClick={handleCloseMetadataDialog} className={classes.closeButton} />
+                        <CloseIcon onClick={onMetadataDialogClose} className={classes.closeButton} />
                     </Tooltip>
                     <LinkedDataEntityPage title="Metadata" subject={documentIri} />
-                </Box>
+                </Card>
             </div>
         </Modal>
     );
@@ -131,15 +134,14 @@ const AskAIChat = props => {
                 variant="outlined"
                 className={classes.searchInput}
                 onChange={event => {
-                    processSearchQueryChange(event.target.value);
+                    setInputQuery(event.target.value);
                 }}
                 onKeyDown={event => {
                     if (event.key === 'Enter') {
-                        processSearchQueryChange(event.target.value);
-                        prepareFetchSearch();
+                        setQuery(inputQuery);
                     }
                 }}
-                value={query}
+                value={inputQuery}
                 InputProps={{
                     classes: {
                         input: classes.inputInput,
@@ -150,7 +152,7 @@ const AskAIChat = props => {
                             <IconButton
                                 className={classes.searchIcon}
                                 color="primary"
-                                onClick={() => prepareFetchSearch()}
+                                onClick={() => setQuery(inputQuery)}
                             >
                                 <SearchIcon />
                             </IconButton>
@@ -162,7 +164,7 @@ const AskAIChat = props => {
     };
 
     return (
-        <Paper className={classes.searchContainer}>
+        <Paper>
             <Grid
                 container
                 className={classes.searchGrid}
@@ -196,7 +198,14 @@ const AskAIChat = props => {
                         alignItems="stretch"
                     >
                         {!responseInfo && !(messages && messages.length > 0) ? (
-                            <Grid item container alignItems="stretch" justifyContent="center" direction="column">
+                            <Grid
+                                item
+                                container
+                                alignItems="stretch"
+                                justifyContent="center"
+                                direction="column"
+                                className={classes.chatSectionBeforeResponse}
+                            >
                                 <Grid item>
                                     <Typography variant="h3" align="center">
                                         Ask AI
