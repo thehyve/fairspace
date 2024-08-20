@@ -1,7 +1,4 @@
 const styles = theme => ({
-    historyContainer: {
-        height: '100%'
-    },
     historyContentContainer: {
         height: '100%'
     },
@@ -28,7 +25,8 @@ const styles = theme => ({
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingTop: 120
+        paddingTop: 80,
+        paddingBottom: 70
     }
 });
 
