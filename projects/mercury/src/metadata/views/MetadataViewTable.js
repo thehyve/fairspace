@@ -31,11 +31,6 @@ type MetadataViewTableProperties = {
 };
 
 const useStyles = makeStyles(() => ({
-    headerRow: {
-        '& .MuiTableCell-root': {
-            borderRadius: 20
-        }
-    },
     headerCellContents: {
         verticalAlign: 'top',
         whiteSpace: 'nowrap'

@@ -14,7 +14,8 @@ const styles = theme => ({
     },
     icon: {
         marginLeft: 10,
-        marginTop: 10
+        marginTop: 10,
+        color: theme.palette.primary.contrastText
     },
     imageIconRoot: {
         marginTop: 10,
