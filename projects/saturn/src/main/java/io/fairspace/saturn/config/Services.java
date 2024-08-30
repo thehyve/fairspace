@@ -21,7 +21,10 @@ import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.search.FileSearchService;
+import io.fairspace.saturn.services.search.JdbcFileSearchService;
 import io.fairspace.saturn.services.search.SearchService;
+import io.fairspace.saturn.services.search.SparqlFileSearchService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.*;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
@@ -31,6 +34,7 @@ import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @Log4j2
@@ -48,6 +52,7 @@ public class Services {
     private final ViewService viewService;
     private final QueryService queryService;
     private final SearchService searchService;
+    private final FileSearchService fileSearchService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final HttpServlet davServlet;
@@ -115,6 +120,18 @@ public class Services {
                 ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
                 : new JdbcQueryService(
                         config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+
+        // File search should be done using JDBC for performance reasons. However, if the view store is not available,
+        // or collections and files view is not configured, we fall back to using SPARQL queries on the RDF database
+        // directly.
+        boolean useSparqlFileSearchService = viewStoreClientFactory == null
+                || viewsConfig.views.stream().noneMatch(view -> protectedResources.containsAll(view.types));
+
+        fileSearchService = useSparqlFileSearchService
+                ? new SparqlFileSearchService(filteredDataset)
+                : new JdbcFileSearchService(
+                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+
         viewService =
                 new ViewService(config, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
 

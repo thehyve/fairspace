@@ -1,14 +1,8 @@
 package io.fairspace.saturn.services.views;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import io.milton.resource.CollectionResource;
@@ -19,8 +13,8 @@ import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
+
+import static io.fairspace.saturn.webdav.PathUtils.getCollectionNameByUri;
 
 import static java.lang.Integer.min;
 
@@ -52,12 +46,6 @@ public class JdbcQueryService implements QueryService {
         this.viewsConfig = viewsConfig;
     }
 
-    public String getCollectionName(String uri) {
-        var rootLocation = rootSubject.getUniqueId() + "/";
-        var location = uri.substring(rootLocation.length());
-        return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
-    }
-
     ViewStoreReader getViewStoreReader() throws SQLException {
         return new ViewStoreReader(searchConfig, viewsConfig, viewStoreClientFactory);
     }
@@ -71,14 +59,14 @@ public class JdbcQueryService implements QueryService {
             return;
         }
         var collections = transactions.calculateRead(m -> rootSubject.getChildren().stream()
-                .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
+                .map(collection -> (Object) getCollectionNameByUri(rootSubject.getUniqueId(), collection.getUniqueId()))
                 .collect(Collectors.toList()));
         if (filters.stream().anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
             // Update existing filters in place
             filters.stream()
                     .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
                     .forEach(filter -> filter.setValues(filter.values.stream()
-                            .map(value -> getCollectionName(value.toString()))
+                            .map(value -> getCollectionNameByUri(rootSubject.getUniqueId(), value.toString()))
                             .filter(collections::contains)
                             .collect(Collectors.toList())));
             return;
@@ -129,17 +117,6 @@ public class JdbcQueryService implements QueryService {
             return new CountDTO(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);
-        }
-    }
-
-    @SneakyThrows
-    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
-        var collectionsForUser = transactions.calculateRead(m -> rootSubject.getChildren().stream()
-                .map(collection -> getCollectionName(collection.getUniqueId()))
-                .collect(Collectors.toList()));
-
-        try (var viewStoreReader = getViewStoreReader()) {
-            return viewStoreReader.searchFiles(request, collectionsForUser);
         }
     }
 }

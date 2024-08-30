@@ -1,10 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import java.util.List;
-
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-
 /**
  * High-level interface for fetching metadata view pages and counts.
  * Implemented using Sparql queries on the RDF database directly
@@ -22,6 +17,4 @@ public interface QueryService {
     ViewPageDTO retrieveViewPage(ViewRequest request);
 
     CountDTO count(CountRequest request);
-
-    List<SearchResultDTO> searchFiles(FileSearchRequest request);
 }

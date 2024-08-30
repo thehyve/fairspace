@@ -243,7 +243,7 @@ public class ViewService {
             }
             case Number, Date -> {
                 if (viewStoreClientFactory != null) {
-                    var range = getColumnRange(view, column);
+                    var range = getViewStoreColumnRange(view, column);
                     if (range != null) {
                         min = range.getStart();
                         max = range.getEnd();
@@ -278,7 +278,7 @@ public class ViewService {
     }
 
     @SneakyThrows
-    private Range getColumnRange(View view, View.Column column) {
+    private Range getViewStoreColumnRange(View view, View.Column column) {
         if (!EnumSet.of(ColumnType.Date, ColumnType.Number).contains(column.type)) {
             return null;
         }
