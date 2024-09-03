@@ -51,8 +51,14 @@ const DashboardPage = props => {
                                 <Typography className={classes.header} variant="h4" paragraph align="center">
                                     Search the metadata
                                 </Typography>
-                                <Grid container spacing={1} direction="row" justifyContent="center">
-                                    <Grid item xs={6} display="flex" justifyContent="center">
+                                <Grid
+                                    container
+                                    spacing={1}
+                                    direction="row"
+                                    justifyContent="center"
+                                    className={classes.domains}
+                                >
+                                    <Grid item xs={6} justifyContent="center">
                                         <DomainInfo
                                             domainName={internalMetadataLabel}
                                             domainLink="/metadata-views"
@@ -61,13 +67,7 @@ const DashboardPage = props => {
                                         />
                                     </Grid>
                                     {externalMetadataSources.map(source => (
-                                        <Grid
-                                            item
-                                            xs={6}
-                                            key={`grid-${source.name}`}
-                                            display="flex"
-                                            justifyContent="center"
-                                        >
+                                        <Grid item xs={6} key={`grid-${source.name}`} justifyContent="center">
                                             <DomainInfo
                                                 domainName={source.label}
                                                 domainLink={'/metadata-sources/' + source.name}
