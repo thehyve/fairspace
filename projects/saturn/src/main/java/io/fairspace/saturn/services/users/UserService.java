@@ -1,35 +1,37 @@
 package io.fairspace.saturn.services.users;
 
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.stream.*;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
 import jakarta.ws.rs.NotFoundException;
-import lombok.extern.log4j.*;
-import org.apache.commons.lang3.*;
-import org.apache.jena.graph.Node;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.sparql.util.Symbol;
 import org.keycloak.admin.client.resource.UsersResource;
 
-import io.fairspace.saturn.auth.RequestContext;
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.dao.PersistentEntity;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.AccessDeniedException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.fairspace.saturn.audit.Audit.audit;
-import static io.fairspace.saturn.auth.RequestContext.getUserURI;
-import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIri;
-
+import static io.fairspace.saturn.auth.RequestContext.getCurrentUserStringUri;
 import static java.util.stream.Collectors.toMap;
 
 @Log4j2
 public class UserService {
-    private final LoadingCache<Boolean, Map<Node, User>> usersCache;
+    private final LoadingCache<Boolean, Map<String, User>> usersCache;
     private final Transactions transactions;
     private final Config.Auth config;
     private final UsersResource usersResource;
@@ -43,7 +45,7 @@ public class UserService {
                 .refreshAfterWrite(30, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
-                    public Map<Node, User> load(Boolean key) {
+                    public Map<String, User> load(Boolean key) {
                         return fetchAndUpdateUsers();
                     }
                 });
@@ -54,10 +56,12 @@ public class UserService {
     }
 
     public User currentUser() {
-        return getUsersMap().get(getUserURI());
+        return getCurrentUserStringUri()
+                .map(uri -> getUsersMap().get(uri))
+                .orElse(null);
     }
 
-    public Map<Node, User> getUsersMap() {
+    public Map<String, User> getUsersMap() {
         try {
             return usersCache.get(Boolean.FALSE);
         } catch (ExecutionException e) {
@@ -66,7 +70,7 @@ public class UserService {
     }
 
     public static Symbol currentUserAsSymbol() {
-        var uri = RequestContext.getCurrentUserStringUri().orElse("anonymous");
+        var uri = getCurrentUserStringUri().orElse("anonymous");
         return Symbol.create(uri);
     }
 
@@ -74,7 +78,7 @@ public class UserService {
      * Fetches users from Keycloak and updates the users in the database
      * if a user does not exist or if the user details have changed.
      */
-    private Map<Node, User> fetchAndUpdateUsers() {
+    private Map<String, User> fetchAndUpdateUsers() {
         var userCount = usersResource.count();
         var keycloakUsers = usersResource.list(0, userCount);
         var updated = new HashSet<User>();
@@ -82,7 +86,7 @@ public class UserService {
             var dao = new DAO(model);
             return keycloakUsers.stream()
                     .map(ku -> {
-                        var iri = generateMetadataIri(ku.getId());
+                        var iri = SparqlUtils.generateMetadataIriFromId(ku.getId());
                         var user = dao.read(User.class, iri);
                         if (user == null) {
                             user = new User();
@@ -128,7 +132,7 @@ public class UserService {
 
                         return user;
                     })
-                    .collect(toMap(PersistentEntity::getIri, u -> u));
+                    .collect(toMap(user -> user.getIri().toString(), u -> u));
         });
 
         if (!updated.isEmpty()) {
@@ -159,7 +163,7 @@ public class UserService {
         final String[] username = new String[1];
         transactions.executeWrite(model -> {
             var dao = new DAO(model);
-            var user = dao.read(User.class, generateMetadataIri(roles.getId()));
+            var user = dao.read(User.class, SparqlUtils.generateMetadataIriFromId(roles.getId()));
             if (user == null) {
                 throw new NotFoundException();
             }
