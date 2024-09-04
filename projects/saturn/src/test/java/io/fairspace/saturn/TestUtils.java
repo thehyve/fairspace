@@ -53,7 +53,7 @@ public class TestUtils {
         user.setId(username);
         user.setUsername(username);
         user.setName(username);
-        user.setIri(SparqlUtils.generateMetadataIri(username));
+        user.setIri(SparqlUtils.generateMetadataIriFromId(username));
         user.setAdmin(isAdmin);
         return user;
     }

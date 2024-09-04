@@ -3,6 +3,7 @@ package io.fairspace.saturn.services;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.Getter;
 import lombok.extern.log4j.*;
 import spark.*;
 import spark.servlet.SparkApplication;
@@ -28,6 +29,7 @@ public abstract class BaseApp implements SparkApplication {
             .configure(WRITE_DATES_AS_TIMESTAMPS, false)
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+    @Getter
     private final String basePath;
 
     protected BaseApp(String basePath) {

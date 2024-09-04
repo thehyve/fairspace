@@ -29,11 +29,15 @@ import static org.apache.jena.system.Txn.*;
 @Log4j2
 public class SparqlUtils {
     public static Node generateMetadataIri() {
-        return generateMetadataIri(randomUUID().toString());
+        return generateMetadataIriFromId(randomUUID().toString());
     }
 
-    public static Node generateMetadataIri(String id) {
+    public static Node generateMetadataIriFromId(String id) {
         return createURI(CONFIG.jena.metadataBaseIRI + id);
+    }
+
+    public static Node generateMetadataIriFromUri(String uri) {
+        return createURI(uri);
     }
 
     public static Instant parseXSDDateTimeLiteral(Literal literal) {

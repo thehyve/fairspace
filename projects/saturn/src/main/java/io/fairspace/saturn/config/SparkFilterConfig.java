@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import spark.servlet.SparkFilter;
 
+import java.util.Arrays;
+
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
@@ -20,7 +22,12 @@ public class SparkFilterConfig {
         var registrationBean = new FilterRegistrationBean<SparkFilter>();
         var sparkFilter = createSparkFilter("/api", svc, CONFIG);
         registrationBean.setFilter(sparkFilter);
-        registrationBean.addUrlPatterns("/api/*");
+        // we cannot set /api/* as the url pattern, because it would override /api/webdav/*
+        // endpoints which defined as a separate servlet
+        String[] urls = Arrays.stream(sparkFilter.getUrls())
+                .map(url -> url + "/*")
+                .toArray(String[]::new);
+        registrationBean.addUrlPatterns(urls);
         return registrationBean;
     }
 }

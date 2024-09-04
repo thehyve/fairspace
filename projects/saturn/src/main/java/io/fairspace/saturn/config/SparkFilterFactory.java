@@ -1,7 +1,5 @@
 package io.fairspace.saturn.config;
 
-import spark.servlet.SparkFilter;
-
 import io.fairspace.saturn.services.features.FeaturesApp;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.maintenance.MaintenanceApp;
@@ -14,7 +12,7 @@ import io.fairspace.saturn.services.views.ViewApp;
 import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 
 public class SparkFilterFactory {
-    public static SparkFilter createSparkFilter(String apiPathPrefix, Services svc, Config config) {
+    public static SaturnSparkFilter createSparkFilter(String apiPathPrefix, Services svc, Config config) {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
