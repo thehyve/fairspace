@@ -1,7 +1,8 @@
 import React, {useContext} from 'react';
 import withStyles from '@mui/styles/withStyles';
+import classNames from 'classnames';
 import {NavLink} from 'react-router-dom';
-import {Divider, Icon, List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
+import {Button, Icon, Stack} from '@mui/material';
 import {Search, SavedSearch, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import ServicesContext from '../common/contexts/ServicesContext';
@@ -13,25 +14,48 @@ import ExternalMetadataSourceContext from '../metadata/metadata-sources/External
 import {getExternalStoragePathPrefix} from '../external-storage/externalStorageUtils';
 import {getExternalMetadataSourcePathPrefix} from '../metadata/external-views/externalMetadataSourceUtils';
 import InternalMetadataSourceContext from '../metadata/metadata-sources/InternalMetadataSourceContext';
+import {COLORS} from '../App.theme';
 
-const styles = {
+const styles = theme => ({
+    buttonStack: {
+        paddingLeft: 20,
+        paddingRight: 20,
+        overflowY: 'auto'
+    },
+    buttonStackCollapsed: {
+        paddingLeft: 10,
+        paddingRight: 10
+    },
     mainMenuButton: {
         paddingTop: 15,
-        paddingBottom: 15
+        paddingBottom: 15,
+        textAlign: 'center',
+        color: theme.palette.primary.contrastText,
+        height: 40,
+        fontSize: 14
+    },
+    mainMenuButtonSmall: {
+        minWidth: 40,
+        width: 40,
+        borderRadius: 20,
+        '& .MuiButton-startIcon': {
+            marginRight: 0,
+            marginLeft: 0
+        }
+    },
+    mainMenuButtonSelected: {
+        backgroundColor: COLORS.fsBlueLightTransp25
     },
     imageIcon: {
         display: 'flex',
         height: 'inherit',
         width: 'inherit'
     },
-    coreMenuImageIcon: {
-        opacity: 0.6
-    },
     iconRoot: {
         textAlign: 'center'
     }
-};
-const MainMenu = ({classes}) => {
+});
+const MainMenu = ({open, classes}) => {
     const {pathname} = window.location;
     const {services} = useContext(ServicesContext);
     const {currentUser} = useContext(UserContext);
@@ -43,92 +67,111 @@ const MainMenu = ({classes}) => {
     const interpolate = s => s.replace('${username}', currentUser.username);
     return (
         <>
-            <List>
-                <ListItemButton
-                    className={classes.mainMenuButton}
+            <Stack spacing={1.5} className={open ? classes.buttonStack : classes.buttonStackCollapsed}>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    className={classNames(
+                        classes.mainMenuButton,
+                        !open && classes.mainMenuButtonSmall,
+                        pathname.startsWith('/dashboard') && classes.mainMenuButtonSelected
+                    )}
                     component={NavLink}
                     to="/dashboard"
-                    selected={pathname.startsWith('/dashboard')}
+                    startIcon={<HomeIcon />}
                 >
-                    <ListItemIcon>
-                        <HomeIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Home" />
-                </ListItemButton>
-                <ListItemButton
-                    className={classes.mainMenuButton}
+                    {open && 'Home'}
+                </Button>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    className={classNames(
+                        classes.mainMenuButton,
+                        !open && classes.mainMenuButtonSmall,
+                        pathname.startsWith('/workspace') && classes.mainMenuButtonSelected
+                    )}
                     component={NavLink}
                     to="/workspaces"
-                    selected={pathname.startsWith('/workspace')}
+                    startIcon={<Widgets />}
                 >
-                    <ListItemIcon>
-                        <Widgets />
-                    </ListItemIcon>
-                    <ListItemText primary="Workspaces" />
-                </ListItemButton>
-                <ListItemButton
-                    className={classes.mainMenuButton}
+                    {open ? 'Workspaces' : null}
+                </Button>
+                <Button
+                    variant="outlined"
+                    size="small"
+                    className={classNames(
+                        classes.mainMenuButton,
+                        !open && classes.mainMenuButtonSmall,
+                        pathname.startsWith('/collections') && classes.mainMenuButtonSelected
+                    )}
                     key="collections"
                     component={NavLink}
                     to="/collections"
-                    selected={pathname.startsWith('/collections')}
+                    startIcon={<Folder />}
                 >
-                    <ListItemIcon>
-                        <Folder />
-                    </ListItemIcon>
-                    <ListItemText primary="Collections" />
-                </ListItemButton>
+                    {open && 'Collections'}
+                </Button>
                 {externalStorages &&
                     externalStorages.map(storage => (
-                        <ListItemButton
-                            className={classes.mainMenuButton}
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            className={classNames(
+                                classes.mainMenuButton,
+                                !open && classes.mainMenuButtonSmall,
+                                pathname.startsWith(getExternalStoragePathPrefix(storage.name)) &&
+                                    classes.mainMenuButtonSelected
+                            )}
                             key={getExternalStoragePathPrefix(storage.name)}
                             component={NavLink}
                             to={getExternalStoragePathPrefix(storage.name)}
-                            selected={pathname.startsWith(getExternalStoragePathPrefix(storage.name))}
+                            startIcon={<FolderSpecial />}
                         >
-                            <ListItemIcon>
-                                <FolderSpecial />
-                            </ListItemIcon>
-                            <ListItemText primary={storage.label} />
-                        </ListItemButton>
+                            {open && storage.label}
+                        </Button>
                     ))}
                 {views && views.length > 0 && currentUser.canViewPublicMetadata && (
-                    <ListItemButton
-                        className={classes.mainMenuButton}
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        className={classNames(
+                            classes.mainMenuButton,
+                            !open && classes.mainMenuButtonSmall,
+                            pathname.startsWith('/metadata-views') && classes.mainMenuButtonSelected
+                        )}
                         key="metadata-views"
                         component={NavLink}
                         to="/metadata-views"
-                        selected={pathname.startsWith('/metadata-views')}
-                    >
-                        <ListItemIcon>
-                            {internalMetadataIcon ? (
+                        startIcon={
+                            internalMetadataIcon ? (
                                 <Icon classes={{root: classes.iconRoot}}>
-                                    <img
-                                        alt="Metadata"
-                                        src={internalMetadataIcon}
-                                        className={`${classes.imageIcon} ${classes.coreMenuImageIcon}`}
-                                    />
+                                    <img alt="Metadata" src={internalMetadataIcon} className={classes.imageIcon} />
                                 </Icon>
                             ) : (
                                 <Search />
-                            )}
-                        </ListItemIcon>
-                        <ListItemText primary={internalMetadataLabel} />
-                    </ListItemButton>
+                            )
+                        }
+                    >
+                        {open && internalMetadataLabel}
+                    </Button>
                 )}
                 {currentUser.canViewPublicMetadata &&
                     externalMetadataSources &&
                     externalMetadataSources.map(source => (
-                        <ListItemButton
-                            className={classes.mainMenuButton}
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            className={classNames(
+                                classes.mainMenuButton,
+                                !open && classes.mainMenuButtonSmall,
+                                pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name)) &&
+                                    classes.mainMenuButtonSelected
+                            )}
                             key={getExternalMetadataSourcePathPrefix(source.name)}
                             component={NavLink}
                             to={getExternalMetadataSourcePathPrefix(source.name)}
-                            selected={pathname.startsWith(getExternalMetadataSourcePathPrefix(source.name))}
-                        >
-                            <ListItemIcon>
-                                {source.icon ? (
+                            startIcon={
+                                source.icon ? (
                                     <Icon classes={{root: classes.iconRoot}}>
                                         <img
                                             alt={source.name}
@@ -138,52 +181,58 @@ const MainMenu = ({classes}) => {
                                     </Icon>
                                 ) : (
                                     <SavedSearch />
-                                )}
-                            </ListItemIcon>
-                            <ListItemText primary={source.label} />
-                        </ListItemButton>
+                                )
+                            }
+                        >
+                            {open && source.label}
+                        </Button>
                     ))}
                 {isAdmin(currentUser) && (
-                    <ListItemButton
-                        className={classes.mainMenuButton}
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        className={classNames(
+                            classes.mainMenuButton,
+                            !open && classes.mainMenuButtonSmall,
+                            pathname.startsWith('/users') && classes.mainMenuButtonSelected
+                        )}
                         key="users"
                         component={NavLink}
                         to="/users"
-                        selected={pathname.startsWith('/users')}
+                        startIcon={<VerifiedUser />}
                     >
-                        <ListItemIcon>
-                            <VerifiedUser />
-                        </ListItemIcon>
-                        <ListItemText primary="Users" />
-                    </ListItemButton>
+                        {open && 'Users'}
+                    </Button>
                 )}
-            </List>
-
-            <div>
-                <Divider />
-                <List>
-                    {services.map(service => (
-                        <ListItemButton
-                            className={classes.mainMenuButton}
-                            component="a"
-                            target="_blank"
-                            href={interpolate(service.url)}
-                            key={'service-' + service.name}
-                        >
-                            <ListItemIcon>
-                                {service.icon ? (
-                                    <Icon classes={{root: classes.iconRoot}}>
-                                        <img alt={service.name} src={service.icon} className={classes.imageIcon} />
-                                    </Icon>
-                                ) : (
-                                    <OpenInNew />
-                                )}
-                            </ListItemIcon>
-                            <ListItemText primary={service.name} />
-                        </ListItemButton>
-                    ))}
-                </List>
-            </div>
+            </Stack>
+            <Stack
+                spacing={1.5}
+                className={open ? classes.buttonStack : classes.buttonStackCollapsed}
+                style={{paddingTop: 30}}
+            >
+                {services.map(service => (
+                    <Button
+                        variant="outlined"
+                        size="small"
+                        className={classNames(classes.mainMenuButton, !open && classes.mainMenuButtonSmall)}
+                        component="a"
+                        target="_blank"
+                        href={interpolate(service.url)}
+                        key={'service-' + service.name}
+                        startIcon={
+                            service.icon ? (
+                                <Icon classes={{root: classes.iconRoot}}>
+                                    <img alt={service.name} src={service.icon} className={classes.imageIcon} />
+                                </Icon>
+                            ) : (
+                                <OpenInNew />
+                            )
+                        }
+                    >
+                        {open && service.name}
+                    </Button>
+                ))}
+            </Stack>
         </>
     );
 };

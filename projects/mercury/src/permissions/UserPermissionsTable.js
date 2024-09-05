@@ -26,7 +26,7 @@ const styles = {
         width: '100%'
     },
     iconCell: {
-        padding: '0 0 0 8px',
+        padding: 0,
         textAlign: 'right'
     },
     emptyPermissions: {
@@ -35,7 +35,7 @@ const styles = {
         fontStyle: 'italic'
     },
     accessDropdown: {
-        fontSize: 14
+        fontSize: 13
     },
     accessIcon: {
         verticalAlign: 'middle',
@@ -43,7 +43,10 @@ const styles = {
     },
     accessCell: {
         padding: 0,
-        minWidth: 100
+        minWidth: 100,
+        '& .MuiOutlinedInput-input': {
+            padding: 5
+        }
     }
 };
 

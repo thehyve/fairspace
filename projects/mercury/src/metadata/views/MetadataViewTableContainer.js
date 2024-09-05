@@ -3,7 +3,7 @@ import {
     CircularProgress,
     FormControlLabel,
     IconButton,
-    Paper,
+    Box,
     TableContainer,
     TablePagination,
     Tooltip,
@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import {useHistory} from 'react-router-dom';
-import {Addchart, ViewColumn, Check} from '@mui/icons-material';
+import {Addchart, ViewColumn, Check, ErrorOutline} from '@mui/icons-material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import Popover from '@mui/material/Popover';
@@ -20,6 +20,7 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import FormGroup from '@mui/material/FormGroup';
 import useDeepCompareEffect from 'use-deep-compare-effect';
+import {useTheme} from '@mui/material/styles';
 
 import type {MetadataViewColumn, MetadataViewFilter} from './MetadataViewAPI';
 import MessageDisplay from '../../common/components/MessageDisplay';
@@ -45,6 +46,7 @@ type MetadataViewTableContainerProperties = {
     setTextFiltersObject: () => {},
     toggleRow: () => {},
     view: string,
+    viewCountDisplayLimit: number,
     collections: Collection[],
     locationContext: string,
     selected: MetadataViewEntityWithLinkedFiles,
@@ -52,7 +54,7 @@ type MetadataViewTableContainerProperties = {
     classes: any
 };
 
-const styles = () => ({
+const styles = theme => ({
     footerButtonDiv: {
         display: 'flex',
         padding: 0,
@@ -67,14 +69,19 @@ const styles = () => ({
         fontSize: 12,
         padding: 2
     },
+    countErrorIcon: {
+        fontSize: 16,
+        marginLeft: 3
+    },
     tableContents: {
         minHeight: '200px',
-        maxHeight: 'calc(100vh - 310px)',
+        maxHeight: 'calc(100vh - 250px)',
         overflowY: 'auto',
         overflowX: 'auto',
         '& .MuiTableCell-stickyHeader': {
-            backgroundColor: 'white'
-        }
+            backgroundColor: theme.palette.background.default
+        },
+        borderRadius: theme.shape.borderRadius
     },
     tableFooter: {
         flex: 1
@@ -86,11 +93,15 @@ const styles = () => ({
         float: 'right',
         maxWidth: 50
     },
+    tablePaginationLabel: {
+        fontWeight: 'bold',
+        alignContent: 'center'
+    },
     viewColumnsFormControl: {
         padding: 10
     },
     messageBox: {
-        padding: 5
+        padding: 0
     }
 });
 
@@ -98,13 +109,15 @@ const LOCAL_STORAGE_METADATA_TABLE_ROWS_NUM_KEY = 'FAIRSPACE_METADATA_TABLE_ROWS
 const SESSION_STORAGE_VISIBLE_COLUMNS_KEY_PREFIX = 'FAIRSPACE_METADATA_VISIBLE_COLUMNS';
 
 export const MetadataViewTableContainer = (props: MetadataViewTableContainerProperties) => {
-    const {view, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} = props;
+    const {view, viewCountDisplayLimit, filters, columns, idColumn, hasInactiveFilters, locationContext, classes} =
+        props;
     const {textFiltersObject, setTextFiltersObject} = props;
 
     const {isFeatureEnabled} = useContext(FeaturesContext);
     const exportToAnalysisEnabled = isFeatureEnabled('ExtraStorage');
     const [exportToAnalysisLoading, setExportToAnalysisLoading] = useState(false);
     const [currentSelectionExported, setCurrentSelectionExported] = useState(false);
+    const theme = useTheme();
 
     const [page, setPage] = useState(0);
     const [visibleColumnNames, setVisibleColumnNames] = useStateWithLocalStorage(
@@ -117,13 +130,14 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
     const columnSelectorOpen = Boolean(anchorEl);
     const history = useHistory();
 
-    const {data, count, error, loading, loadingCount, refreshDataOnly} = useViewData(
+    const {data, count, error, countError, loading, loadingCount, refreshDataOnly} = useViewData(
         view,
         filters,
         textFiltersObject,
         locationContext,
         rowsPerPage
     );
+    const viewCountDisplayLimitReached = viewCountDisplayLimit !== undefined && count.count === viewCountDisplayLimit;
     const [rowCheckboxes, setRowCheckboxes] = React.useState({});
 
     const resetRowCheckboxes = () => {
@@ -241,13 +255,21 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
 
     const renderMessages = () => (
         <div className={classes.messageBox}>
-            {count.timeout && <MessageDisplay small message="The count request timed out." />}
+            {count.timeout && (
+                <MessageDisplay
+                    color="warning"
+                    messageColor={theme.palette.primary.main}
+                    small
+                    message="The count request timed out."
+                />
+            )}
             {hasInactiveFilters && (
                 <MessageDisplay
                     color="primary"
                     isError={false}
                     small
                     message="Apply filters to see data matching your current selection."
+                    messageColor={theme.palette.primary.main}
                 />
             )}
         </div>
@@ -299,14 +321,26 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         </div>
     );
 
-    const labelDisplayedRows = ({from, to, count: totalCount, countIsLoading}) => (
+    const getTotalCountString = (totalCount: number, to: number) => {
+        if (totalCount === undefined) return '...';
+        if (totalCount === -1) return `more than ${to}`;
+        if (viewCountDisplayLimitReached) return `more than ${viewCountDisplayLimit - 1}`;
+        return totalCount;
+    };
+
+    const renderTablePaginationLabel = ({from, to, countIsLoading, countHasError}) => (
         <span>
             <Typography variant="body2" component="span" display="inline">
-                {from}-{to} of{' '}
+                {from}-{data?.rows ? Number(from) + data.rows.length - 1 : '...'} of{' '}
             </Typography>
-            <Typography variant="body2" component="span" display="inline" style={{fontWeight: 'bold'}}>
-                {totalCount !== undefined && totalCount !== -1 ? totalCount.toLocaleString() : 'more than ' + to}
+            <Typography variant="body2" component="span" display="inline" className={classes.tablePaginationLabel}>
+                {getTotalCountString(count?.count, to)}
                 {countIsLoading && <CircularProgress size={14} style={{marginLeft: 3}} />}
+                {(countHasError || count?.timeout) && (
+                    <Tooltip title="Error occured when counting results">
+                        <ErrorOutline size="small" className={classes.countErrorIcon} color="warning" />
+                    </Tooltip>
+                )}
             </Typography>
         </span>
     );
@@ -316,7 +350,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
             return <MessageDisplay message={error.message} />;
         }
 
-        if (count.count === 0 && !data.timeout && !count.timeout) {
+        if (count.count === 0 && !data.timeout) {
             return <MessageDisplay message="No results found." />;
         }
         if (data && data.timeout) {
@@ -342,7 +376,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         setPage(0);
     }, [filters]);
 
-    useEffect(() => {
+    useDeepCompareEffect(() => {
         resetRowCheckboxes();
     }, [data]);
 
@@ -357,7 +391,7 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
         : 0;
 
     return (
-        <Paper>
+        <Box border="1px solid" borderColor={theme.palette.primary.dark} borderRadius={5} sx={{boxShadow: 3}}>
             {renderTableSettings()}
             <LoadingOverlayWrapper loading={!data || loading}>
                 <MetadataViewActiveTextFilters
@@ -420,12 +454,20 @@ export const MetadataViewTableContainer = (props: MetadataViewTableContainerProp
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                         className={classes.tableFooter}
-                        labelDisplayedRows={d => labelDisplayedRows({...d, countIsLoading: loadingCount})}
-                        ActionsComponent={TablePaginationActions}
+                        labelDisplayedRows={d =>
+                            renderTablePaginationLabel({...d, countIsLoading: loadingCount, countHasError: countError})
+                        }
+                        ActionsComponent={p =>
+                            TablePaginationActions({
+                                ...p,
+                                countDisplayLimitReached: viewCountDisplayLimitReached,
+                                hasNextFlag: data?.hasNext
+                            })
+                        }
                     />
                 </div>
             </LoadingOverlayWrapper>
-        </Paper>
+        </Box>
     );
 };
 

@@ -7,14 +7,18 @@ const styles = theme => ({
     title: {
         padding: 8,
         fontWidth: 'bold',
+        backgroundColor: theme.palette.primary.dark,
         '& .MuiCardHeader-action': {
             alignSelf: 'auto',
             margin: 0
+        },
+        '& .MuiIconButton-root': {
+            color: theme.palette.primary.contrastText
         }
     },
     content: {
         '&:last-child': {
-            paddingTop: 0,
+            paddingTop: 8,
             paddingBottom: 8
         },
         padding: 8

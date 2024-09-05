@@ -45,7 +45,7 @@ export const formatPrefix = (prefix: string) => (prefix ? `[${prefix.replace(/[/
 
 const styles = theme => ({
     textHelperBasic: {
-        color: theme.palette.grey['600']
+        color: theme.palette.mellow.main
     },
     textHelperWarning: {
         color: theme.palette.warning.dark

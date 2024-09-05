@@ -57,6 +57,7 @@ saturn:
     enableBasicAuth: true
     defaultUserRoles:
       - canViewPublicMetadata
+  mvRefreshOnStartRequired: true
   persistence:
     files:
       ## A manually managed Persistent Volume and Claim

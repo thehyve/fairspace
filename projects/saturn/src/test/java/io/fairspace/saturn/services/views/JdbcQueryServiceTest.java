@@ -37,7 +37,6 @@ import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
-import io.fairspace.saturn.services.search.FileSearchRequest;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.workspaces.Workspace;
@@ -54,6 +53,7 @@ import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 
 import static org.apache.jena.query.DatasetFactory.wrap;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
@@ -125,7 +125,12 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
 
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
 
-        sut = new JdbcQueryService(ConfigLoader.CONFIG.search, viewStoreClientFactory, tx, davFactory.root);
+        sut = new JdbcQueryService(
+                ConfigLoader.CONFIG.search,
+                loadViewsConfig("src/test/resources/test-views.yaml"),
+                viewStoreClientFactory,
+                tx,
+                davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
 
@@ -343,79 +348,27 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
     }
 
     @Test
-    public void testCountSamples() {
+    public void testCountSamplesWithoutMaxDisplayCount() {
+        selectRegularUser();
+        var requestParams = new CountRequest();
+        requestParams.setView("Sample");
+        var result = sut.count(requestParams);
+        assertEquals(2, result.getCount());
+    }
+
+    @Test
+    public void testCountSubjectWithMaxDisplayCountLimitLessThanTotalCount() {
         var request = new CountRequest();
-        request.setView("Sample");
+        request.setView("Subject");
         var result = sut.count(request);
-        Assert.assertEquals(2, result.getCount());
+        Assert.assertEquals(1, result.getCount());
     }
 
     @Test
-    public void testSearchFiles() {
-        var request = new FileSearchRequest();
-        // There are two files with 'rna' in the file name in coll2.
-        request.setQuery("rna");
-        var results = sut.searchFiles(request);
-        Assert.assertEquals(2, results.size());
-        // Expect the results to be sorted by id
-        Assert.assertEquals("sample-s2-b-rna.fastq", results.get(0).getLabel());
-        Assert.assertEquals("sample-s2-b-rna_copy.fastq", results.get(1).getLabel());
-    }
-
-    @Test
-    public void testSearchFilesRestrictsToAccessibleCollections() {
-        var request = new FileSearchRequest();
-        // There is one file named coffee.jpg in coll1, not accessible by the regular user.
-        request.setQuery("coffee");
-        var results = sut.searchFiles(request);
-        Assert.assertEquals(0, results.size());
-
-        selectAdmin();
-        results = sut.searchFiles(request);
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
-    }
-
-    @Test
-    public void testSearchFilesRestrictsToAccessibleCollectionsAfterReindexing() {
-        maintenanceService.recreateIndex();
-        var request = new FileSearchRequest();
-        // There is one file named coffee.jpg in coll1, not accessible by the regular user.
-        request.setQuery("coffee");
-        var results = sut.searchFiles(request);
-        Assert.assertEquals(0, results.size());
-
-        selectAdmin();
-        results = sut.searchFiles(request);
-        Assert.assertEquals(1, results.size());
-        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
-    }
-
-    @Test
-    public void testSearchFilesRestrictsToParentDirectory() {
-        selectAdmin();
-        var request = new FileSearchRequest();
-        // There is one file named coffee.jpg in coll1.
-        request.setQuery("coffee");
-
-        request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
-        var results = sut.searchFiles(request);
-        Assert.assertEquals(1, results.size());
-
-        request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll2");
-        results = sut.searchFiles(request);
-        Assert.assertEquals(0, results.size());
-    }
-
-    @Test
-    public void testSearchFileDescription() {
-        selectAdmin();
-        var request = new FileSearchRequest();
-        // There is one file named sample-s2-b-rna.fastq with a description
-        request.setQuery("corona");
-
-        // request.setParentIRI(ConfigLoader.CONFIG.publicUrl + "/api/webdav/coll1");
-        var results = sut.searchFiles(request);
-        Assert.assertEquals(1, results.size());
+    public void testCountResourceWithMaxDisplayCountLimitMoreThanTotalCount() {
+        var request = new CountRequest();
+        request.setView("Resource");
+        var result = sut.count(request);
+        Assert.assertEquals(4, result.getCount());
     }
 }

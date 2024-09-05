@@ -36,6 +36,7 @@ const useViewData = (
     const [loading, setLoading] = useState(true);
     const [loadingCount, setLoadingCount] = useState(true);
     const [error, setError] = useState();
+    const [countError, setCountError] = useState();
     const [countRequestCancelToken, setCountRequestCancelToken] = useState();
     const [viewDataRequestCancelToken, setViewDataRequestCancelToken] = useState();
 
@@ -63,15 +64,21 @@ const useViewData = (
         }
         const token = axios.CancelToken.source();
         setCountRequestCancelToken(token);
-        metadataViewAPI.getCount(token, view, allFilters).then(res => {
-            if (res) {
-                if (res.count == null) {
-                    res.count = -1;
+        metadataViewAPI
+            .getCount(token, view, allFilters)
+            .then(res => {
+                if (res) {
+                    if (res.count == null) {
+                        res.count = -1;
+                    }
+                    setCount(res);
                 }
-                setCount(res);
-                setLoadingCount(false);
-            }
-        });
+            })
+            .catch(e => {
+                setCountError(e || true);
+                console.error(e || new Error('Error while fetching counts.'));
+            })
+            .finally(() => setLoadingCount(false));
     };
 
     const fetchViewData = (newPage: number, newRowsPerPage: number): Promise<MetadataViewData> => {
@@ -133,6 +140,7 @@ const useViewData = (
         loading,
         loadingCount,
         error,
+        countError,
         refreshDataOnly
     };
 };

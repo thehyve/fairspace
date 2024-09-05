@@ -91,6 +91,7 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
                 disableToolbar
                 variant="inline"
                 inputFormat={DATE_FORMAT}
+                views={['year', 'month', 'day']}
                 invalidDateMessage="Invalid date format"
                 margin="normal"
                 label={label}
@@ -117,10 +118,8 @@ const DateSelectionFacet = (props: MetadataViewFacetProperties) => {
 
     return (
         <Grid container>
-            <Grid item>
-                {renderDatePicker(value[0], handleMinDateChange, 'Start date', minDate, value[1], minDate)}
-            </Grid>
-            <Grid item>{renderDatePicker(value[1], handleMaxDateChange, 'End date', value[0], maxDate, maxDate)}</Grid>
+            <Grid item>{renderDatePicker(value[0], handleMinDateChange, 'Date from', minDate, value[1], minDate)}</Grid>
+            <Grid item>{renderDatePicker(value[1], handleMaxDateChange, 'Date to', value[0], maxDate, maxDate)}</Grid>
         </Grid>
     );
 };

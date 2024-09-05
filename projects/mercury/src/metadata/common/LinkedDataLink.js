@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import * as PropTypes from 'prop-types';
-import {Box, Modal, Tooltip} from '@mui/material';
+import {Card, Modal, Tooltip} from '@mui/material';
 import withStyles from '@mui/styles/withStyles';
 import CloseIcon from '@mui/icons-material/Close';
 import LinkedDataEntityPage from './LinkedDataEntityPage';
@@ -17,13 +17,13 @@ const renderModal = (classes, open, handleClose, uri) => (
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
     >
-        <div className={classes.modalContent}>
-            <Box className={classes.modalDialog}>
+        <div className={classes.modalWrapper}>
+            <Card className={classes.modalContent}>
                 <Tooltip title="Close - click or press 'Esc'">
                     <CloseIcon onClick={handleClose} className={classes.closeButton} />
                 </Tooltip>
                 <LinkedDataEntityPage title="Metadata" subject={uri} />
-            </Box>
+            </Card>
         </div>
     </Modal>
 );
