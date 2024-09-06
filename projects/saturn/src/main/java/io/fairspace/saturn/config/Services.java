@@ -59,6 +59,7 @@ public class Services {
     private final MetadataService metadataService;
     private final ViewService viewService;
     private final QueryService queryService;
+    private final SparqlQueryService sparqlQueryService;
     private final SearchService searchService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
@@ -124,8 +125,10 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
+        // TODO: to be refactored when getting rid of the Services class
+        sparqlQueryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset, transactions);
         queryService = viewStoreClientFactory == null
-                ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
+                ? sparqlQueryService
                 : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
         viewService =
                 new ViewService(config, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);

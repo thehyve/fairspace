@@ -48,6 +48,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation "org.apache.jena:jena-text:${jena_version}"
     implementation "io.milton:milton-server-ce:${milton_version}"
@@ -70,10 +71,6 @@ dependencies {
 
     implementation "org.postgresql:postgresql:${postgresqlVersion}"
     implementation "com.zaxxer:HikariCP:5.1.0"
-
-//    runtimeOnly 'org.apache.logging.log4j:log4j-api:2.23.0'
-//    runtimeOnly 'org.apache.logging.log4j:log4j-core:2.23.0'
-//    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j2-impl:2.23.0'
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"

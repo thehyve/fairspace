@@ -35,5 +35,4 @@ public class SecurityConfig {
         return http.build();
     }
 
-    //todo:  add user service referring to Jena
 }

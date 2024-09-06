@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.views;
 
+import java.io.ByteArrayOutputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,14 +10,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import io.fairspace.saturn.rdf.transactions.Transactions;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryCancelledException;
 import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
@@ -68,11 +74,32 @@ public class SparqlQueryService implements QueryService {
     private final Config.Search config;
     private final ViewsConfig searchConfig;
     private final Dataset ds;
+    private final Transactions transactions;
 
-    public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds) {
+    public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds, Transactions transactions) {
         this.config = config;
         this.searchConfig = viewsConfig;
         this.ds = ds;
+        this.transactions = transactions;
+    }
+
+    /**
+     * Execute a SPARQL query and return the results as a JSON string.
+     */
+    public String executeQuery(String sparqlQuery) {
+        return transactions.calculateRead(model -> {
+            Query query = QueryFactory.create(sparqlQuery, Syntax.syntaxARQ);
+            try (QueryExecution queryExecution = QueryExecutionFactory.create(query, model)) {
+                ResultSet resultSet = queryExecution.execSelect();
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+                return outputStream.toString();
+            } catch (Exception e) {
+                log.error("Error executing query: \n{}", sparqlQuery, e);
+                throw new RuntimeException(e);
+            }
+        });
+
     }
 
     public ViewPageDTO retrieveViewPage(ViewRequest request) {
