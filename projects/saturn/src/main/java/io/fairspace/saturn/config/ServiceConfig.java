@@ -2,6 +2,7 @@ package io.fairspace.saturn.config;
 
 import java.sql.SQLException;
 
+import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
@@ -50,6 +51,11 @@ public class ServiceConfig {
     @Bean
     public SparqlQueryService getSparqlQueryService(Services services) {
         return services.getSparqlQueryService();
+    }
+
+    @Bean
+    public UserService getUserService(Services services) {
+        return services.getUserService();
     }
 
     @Bean

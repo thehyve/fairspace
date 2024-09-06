@@ -1,4 +1,4 @@
-package io.fairspace.saturn.rdf.controller.validation;
+package io.fairspace.saturn.controller.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
