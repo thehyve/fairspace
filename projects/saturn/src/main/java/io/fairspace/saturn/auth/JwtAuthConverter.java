@@ -1,4 +1,4 @@
-package io.fairspace.saturn.auth.spring;
+package io.fairspace.saturn.auth;
 
 import java.util.Collection;
 import java.util.Map;

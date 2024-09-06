@@ -10,7 +10,7 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.fairspace.saturn.auth.spring.KeycloakClientProperties;
+import io.fairspace.saturn.auth.KeycloakClientProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 

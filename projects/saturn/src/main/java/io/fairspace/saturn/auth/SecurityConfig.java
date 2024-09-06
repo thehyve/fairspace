@@ -1,4 +1,4 @@
-package io.fairspace.saturn.auth.spring;
+package io.fairspace.saturn.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
