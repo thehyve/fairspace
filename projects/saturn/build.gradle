@@ -1,7 +1,7 @@
 buildscript {
     ext {
         jena_version = '5.0.0'
-        milton_version = '4.0.2.2101' // Milton >= 4 is migrated to Jakarta EE 9, which is not compatible with Jena < 5 (no stable release of Jena 5 yet). To be updated when Jena 5 is released.
+        milton_version = '4.0.2.2101'
         mockitoVersion = '5.11.0'
         jacksonVersion = '2.15.3' // check what version is used by Jena
         postgresqlVersion = '42.7.2'

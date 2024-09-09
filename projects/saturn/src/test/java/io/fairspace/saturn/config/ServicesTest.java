@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.config.properties.FeatureProperties;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
@@ -23,7 +24,7 @@ public class ServicesTest {
     @Before
     public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        svc = new Services(config, viewsConfig, dataset, null, null);
+        svc = new Services(config, viewsConfig, dataset, new FeatureProperties(), null, null);
     }
 
     @Test

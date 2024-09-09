@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.config.properties.FeatureProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +19,9 @@ public class SparkFilterConfig {
 
     // todo: to be removed once switched to Spring MVC
     @Bean
-    public FilterRegistrationBean<SparkFilter> sparkFilter(Services svc) {
+    public FilterRegistrationBean<SparkFilter> sparkFilter(Services svc, FeatureProperties featureProperties) {
         var registrationBean = new FilterRegistrationBean<SparkFilter>();
-        var sparkFilter = createSparkFilter("/api", svc, CONFIG);
+        var sparkFilter = createSparkFilter("/api", svc, CONFIG, featureProperties);
         registrationBean.setFilter(sparkFilter);
         // we cannot set /api/* as the url pattern, because it would override /api/webdav/*
         // endpoints which defined as a separate servlet

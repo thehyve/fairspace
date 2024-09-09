@@ -30,3 +30,7 @@ jwt:
     converter:
       resource-id: workspace-client
       principal-attribute: preferred_username
+
+application:
+  features:
+    - ExtraStorage

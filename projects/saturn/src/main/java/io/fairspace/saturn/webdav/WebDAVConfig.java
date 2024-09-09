@@ -1,6 +1,9 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.Services;
+import io.fairspace.saturn.config.condition.ConditionalOnMultiValuedProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +16,13 @@ public class WebDAVConfig {
 
     @Bean
     public ServletRegistrationBean<WebDAVServlet> webDavServlet(Services svcs) {
-        ServletRegistrationBean<WebDAVServlet> bean =
-                new ServletRegistrationBean<>(svcs.getDavServlet(), "/api/webdav/*");
-        bean.setLoadOnStartup(1);
-        return bean;
+        return new ServletRegistrationBean<>(svcs.getDavServlet(), "/api/webdav/*");
+    }
+
+    @Bean
+    @ConditionalOnMultiValuedProperty(prefix = "application", name = "features", havingValue = "ExtraStorage")
+    public ServletRegistrationBean<WebDAVServlet> webDavExtraStorageServlet(Services svcs) {
+        return new ServletRegistrationBean<>(svcs.getExtraDavServlet(), "/api/extra-storage/*");
     }
 
     /**

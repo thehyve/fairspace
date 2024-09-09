@@ -1,5 +1,6 @@
 package io.fairspace.saturn.config;
 
+import io.fairspace.saturn.config.properties.FeatureProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -14,6 +15,6 @@ public class SparkFilterFactoryTest {
 
     @Test
     public void itCreatesAFilter() {
-        assertNotNull(SparkFilterFactory.createSparkFilter("/some/path", svc, new Config()));
+        assertNotNull(SparkFilterFactory.createSparkFilter("/some/path", svc, new Config(), new FeatureProperties()));
     }
 }

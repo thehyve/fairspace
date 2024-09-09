@@ -2,6 +2,7 @@ package io.fairspace.saturn.config;
 
 import java.io.File;
 
+import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.milton.resource.Resource;
 import jakarta.servlet.http.HttpServlet;
 import lombok.Getter;
@@ -67,7 +68,7 @@ public class Services {
 
     private final BlobStore extraBlobStore;
     private final DavFactory extraDavFactory;
-    private final HttpServlet extraDavServlet;
+    private final WebDAVServlet extraDavServlet;
     private final DatasetGraph filteredDatasetGraph;
     private final HealthService healthService;
     private final MaintenanceService maintenanceService;
@@ -76,6 +77,7 @@ public class Services {
             @NonNull Config config,
             @NonNull ViewsConfig viewsConfig,
             @NonNull Dataset dataset,
+            FeatureProperties featureProperties,
             ViewStoreClientFactory viewStoreClientFactory,
             UsersResource usersResource) {
         this.config = config;
@@ -92,7 +94,7 @@ public class Services {
                 dataset.getContext());
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        if (CONFIG.features.contains(Feature.ExtraStorage)) {
+        if (featureProperties.getFeatures().contains(Feature.ExtraStorage)) {
             extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
             extraDavFactory = new DavFactory(
                     dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"),

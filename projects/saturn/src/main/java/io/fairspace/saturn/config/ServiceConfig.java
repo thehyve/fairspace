@@ -2,6 +2,7 @@ package io.fairspace.saturn.config;
 
 import java.sql.SQLException;
 
+import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class ServiceConfig {
 
     // todo: make the init done by Spring
     @Bean
-    public Services getService(Keycloak keycloak) {
+    public Services getService(Keycloak keycloak, FeatureProperties featureProperties) {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (CONFIG.viewDatabase.enabled) {
             try {
@@ -44,6 +45,7 @@ public class ServiceConfig {
                 CONFIG,
                 VIEWS_CONFIG,
                 ds,
+                featureProperties,
                 viewStoreClientFactory,
                 keycloak.realm(keycloakClientProperties.getRealm()).users());
     }

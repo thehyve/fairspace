@@ -50,9 +50,6 @@ public class Config {
     public ExtraStorage extraStorage = new ExtraStorage();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
-    public final Set<Feature> features = new HashSet<>();
-
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
 
     public Caches caches = new Caches();
