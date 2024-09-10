@@ -3,6 +3,7 @@ package io.fairspace.saturn.config;
 import java.sql.SQLException;
 
 import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class ServiceConfig {
 
     // todo: make the init done by Spring
     @Bean
-    public Services getService(Keycloak keycloak, FeatureProperties featureProperties) {
+    public Services getService(Keycloak keycloak, FeatureProperties featureProperties, JenaProperties jenaProperties) {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (CONFIG.viewDatabase.enabled) {
             try {
@@ -39,15 +40,15 @@ public class ServiceConfig {
                 throw new RuntimeException("Error connecting to the view database", e);
             }
         }
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, viewStoreClientFactory);
-
+        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory);
         return new Services(
                 CONFIG,
                 VIEWS_CONFIG,
                 ds,
                 featureProperties,
                 viewStoreClientFactory,
-                keycloak.realm(keycloakClientProperties.getRealm()).users());
+                keycloak.realm(keycloakClientProperties.getRealm()).users(),
+                jenaProperties);
     }
 
     @Bean

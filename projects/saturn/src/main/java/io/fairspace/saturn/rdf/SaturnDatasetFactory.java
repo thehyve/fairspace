@@ -2,6 +2,7 @@ package io.fairspace.saturn.rdf;
 
 import java.io.File;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
 import lombok.extern.log4j.*;
 import org.apache.jena.datatypes.TypeMapper;
 import org.apache.jena.dboe.base.file.Location;
@@ -26,14 +27,14 @@ public class SaturnDatasetFactory {
      * is wrapped with a number of wrapper classes, each adding a new feature.
      * Currently it adds transaction logging and applies default vocabulary if needed.
      */
-    public static Dataset connect(Config.Jena config, ViewStoreClientFactory viewStoreClientFactory) {
-        var restoreNeeded = isRestoreNeeded(config.datasetPath);
+    public static Dataset connect(JenaProperties jenaProperties, ViewStoreClientFactory viewStoreClientFactory) {
+        var restoreNeeded = isRestoreNeeded(jenaProperties.getDatasetPath());
 
         // Create a TDB2 dataset graph
-        var dsg = connectCreate(Location.create(config.datasetPath.getAbsolutePath()), config.storeParams, null)
+        var dsg = connectCreate(Location.create(jenaProperties.getDatasetPath().getAbsolutePath()), jenaProperties.getStoreParams(), null)
                 .getDatasetGraph();
 
-        var txnLog = new LocalTransactionLog(config.transactionLogPath, new SparqlTransactionCodec());
+        var txnLog = new LocalTransactionLog(jenaProperties.getTransactionLogPath(), new SparqlTransactionCodec());
 
         if (viewStoreClientFactory != null) {
             dsg = new TxnIndexDatasetGraph(dsg, viewStoreClientFactory);

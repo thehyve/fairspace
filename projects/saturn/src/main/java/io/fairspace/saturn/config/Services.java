@@ -3,6 +3,7 @@ package io.fairspace.saturn.config;
 import java.io.File;
 
 import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
 import io.milton.resource.Resource;
 import jakarta.servlet.http.HttpServlet;
 import lombok.Getter;
@@ -79,10 +80,11 @@ public class Services {
             @NonNull Dataset dataset,
             FeatureProperties featureProperties,
             ViewStoreClientFactory viewStoreClientFactory,
-            UsersResource usersResource) {
+            UsersResource usersResource,
+            JenaProperties jenaProperties) {
         this.config = config;
         this.transactions =
-                config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
+                jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions, usersResource);
 

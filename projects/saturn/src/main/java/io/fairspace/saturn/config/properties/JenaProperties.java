@@ -1,0 +1,38 @@
+package io.fairspace.saturn.config.properties;
+
+import lombok.Data;
+import org.apache.jena.tdb2.params.StoreParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.io.File;
+
+@Data
+@Component
+@ConfigurationProperties(prefix = "application.jena")
+public class JenaProperties {
+
+    private static String metadataBaseIRI;
+
+    private File datasetPath;
+
+    private File transactionLogPath;
+
+    private boolean bulkTransactions;
+
+    private final StoreParams storeParams;
+
+    public static String getMetadataBaseIra() {
+        return JenaProperties.metadataBaseIRI;
+    }
+
+    // Not a common practice, but a way to make the value available in a static context
+    @Autowired
+    public JenaProperties(@Value("${application.jena.metadataBaseIRI}") String metadataBaseIRI,
+                   StoreParamsProperties storeParamsProperties) {
+        JenaProperties.metadataBaseIRI = metadataBaseIRI;
+        this.storeParams = storeParamsProperties.buildStoreParams();
+    }
+}

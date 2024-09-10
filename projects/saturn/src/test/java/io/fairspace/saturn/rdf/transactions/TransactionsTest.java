@@ -3,6 +3,8 @@ package io.fairspace.saturn.rdf.transactions;
 import java.io.File;
 import java.io.IOException;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.LockMRSW;
@@ -20,13 +22,13 @@ import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
 
 public class TransactionsTest {
-    private Config.Jena config = new Config.Jena();
+    private JenaProperties config = new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
     private Dataset ds;
 
     @Before
     public void before() {
-        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config.setDatasetPath(new File(getTempDirectory(), randomUUID().toString()));
+        config.setTransactionLogPath(new File(getTempDirectory(), randomUUID().toString()));
 
         ds = SaturnDatasetFactory.connect(config, null);
     }
@@ -34,7 +36,7 @@ public class TransactionsTest {
     @After
     public void after() throws IOException {
         ds.close();
-        deleteDirectory(config.datasetPath);
+        deleteDirectory(config.getDatasetPath());
         ds = null;
     }
 

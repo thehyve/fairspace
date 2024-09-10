@@ -1,13 +1,5 @@
 package io.fairspace.saturn.config;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -27,6 +19,13 @@ import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 public class Config {
     static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory())
             .registerModule(new SimpleModule()
@@ -38,8 +37,6 @@ public class Config {
     public int livenessPort = 8091;
 
     public String publicUrl = "http://localhost:8080";
-
-    public Jena jena = new Jena();
 
     public Auth auth = new Auth();
 

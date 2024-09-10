@@ -1,21 +1,25 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import java.io.File;
-import java.io.IOException;
-
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import java.io.File;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.apache.commons.io.FileUtils.getTempDirectory;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.junit.Assert.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class RestoreTest {
     private final Statement stmt1 = createStatement(
@@ -27,19 +31,19 @@ public class RestoreTest {
             createProperty("http://example.com/property2"),
             createResource("http://example.com/object2"));
 
-    private Config.Jena config;
+    private JenaProperties config;
 
     @Before
     public void before() {
-        config = new Config.Jena();
-        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config = new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
+        config.setDatasetPath(new File(getTempDirectory(), randomUUID().toString()));
+        config.setTransactionLogPath(new File(getTempDirectory(), randomUUID().toString()));
     }
 
     @After
     public void after() {
-        config.transactionLogPath.delete();
-        config.datasetPath.delete();
+        config.getTransactionLogPath().delete();
+        config.getDatasetPath().delete();
     }
 
     @Test
@@ -50,8 +54,8 @@ public class RestoreTest {
             txn1.executeWrite(m -> m.add(stmt2));
         }
 
-        deleteDirectory(config.datasetPath);
-        assertFalse(config.datasetPath.exists());
+        deleteDirectory(config.getDatasetPath());
+        assertFalse(config.getDatasetPath().exists());
 
         try (var txn2 = newDataset()) {
             txn2.executeRead(m -> {
@@ -77,14 +81,14 @@ public class RestoreTest {
 
         txn1.close();
 
-        deleteDirectory(config.datasetPath);
+        deleteDirectory(config.getDatasetPath());
 
         try (var txn2 = newDataset()) {
             txn2.executeRead(m -> assertEquals(before, m.listStatements().toSet()));
         }
     }
 
-    private Transactions newDataset() throws IOException {
+    private Transactions newDataset() {
         return new BulkTransactions(SaturnDatasetFactory.connect(config, null));
     }
 }

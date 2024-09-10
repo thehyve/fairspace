@@ -1,39 +1,49 @@
 package io.fairspace.saturn.rdf;
 
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Consumer;
-
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.services.search.SearchResultDTO;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.graph.Node;
-import org.apache.jena.query.*;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.core.*;
+import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 
-import io.fairspace.saturn.services.search.SearchResultDTO;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
-import static org.apache.jena.system.Txn.*;
+import static org.apache.jena.system.Txn.calculateRead;
+import static org.apache.jena.system.Txn.executeRead;
+import static org.apache.jena.system.Txn.executeWrite;
 
 @Log4j2
 public class SparqlUtils {
+
     public static Node generateMetadataIri() {
         return generateMetadataIriFromId(randomUUID().toString());
     }
 
     public static Node generateMetadataIriFromId(String id) {
-        return createURI(CONFIG.jena.metadataBaseIRI + id);
+        return createURI(JenaProperties.getMetadataBaseIra() + id);
     }
 
     public static Node generateMetadataIriFromUri(String uri) {
@@ -49,6 +59,7 @@ public class SparqlUtils {
         return createTypedLiteral(GregorianCalendar.from(ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())));
     }
 
+    // TODO: it should be a part of data layer, not utils
     /**
      * Execute a SELECT query and process the rows of the results with the handler code.
      *

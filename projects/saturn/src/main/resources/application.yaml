@@ -32,5 +32,45 @@ jwt:
       principal-attribute: preferred_username
 
 application:
+  jena:
+    # Base IRI for all metadata entities
+    metadataBaseIRI: ${METADATA_BASE_IRI:http://localhost/iri/}
+    # Jena's TDB2 database path
+    datasetPath: ${DATASET_PATH:/Users/anton/git/rdm/fairspace/projects/saturn/data/db}
+    # Path of the transaction log
+    transactionLogPath: ${TRANSACTION_LOG_PATH:data/log}
+    bulkTransactions: ${BULK_TRANSACTIONS:true}
+    tbd-store-params:
+      file_mode: "mapped"
+      block_size: 8193
+      block_read_cache_size: 5000
+      block_write_cache_size: 1000
+      node2nodeid_cache_size: 200000
+      nodeid2node_cache_size: 750000
+      node_miss_cache_size: 1000
+      nodetable: "nodes"
+      triple_index_primary: "SPO"
+      triple_indexes:
+        - "SPO"
+        - "POS"
+        - "OSP"
+      quad_index_primary: "GSPO"
+      quad_indexes:
+        - "GSPO"
+        - "GPOS"
+        - "GOSP"
+        - "POSG"
+        - "OSPG"
+        - "SPOG"
+      prefixtable: "prefixes"
+      prefix_index_primary: "GPU"
+      prefix_indexes:
+        - "GPU"
   features:
     - ExtraStorage
+  view-database:
+    enabled: false
+    url: jdbc:postgresql://localhost:9432/fairspace
+    autoCommit: false
+    maxPoolSize: 50
+    connectionTimeout: 1000
