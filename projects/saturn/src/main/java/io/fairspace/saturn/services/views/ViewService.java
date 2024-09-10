@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.fairspace.saturn.config.properties.CacheProperties;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -105,18 +106,19 @@ public class ViewService {
     private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
 
     public ViewService(
-            Config config,
+            Config.Search searchConfig,
+            CacheProperties cacheProperties,
             ViewsConfig viewsConfig,
             Dataset ds,
             ViewStoreClientFactory viewStoreClientFactory,
             MetadataPermissions metadataPermissions) {
-        this.searchConfig = config.search;
+        this.searchConfig = searchConfig;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.metadataPermissions = metadataPermissions;
-        this.facetsCache = buildCache(this::fetchFacets, config.caches.facets);
-        this.viewsCache = buildCache(this::fetchViews, config.caches.views);
+        this.facetsCache = buildCache(this::fetchFacets, cacheProperties.getFacets());
+        this.viewsCache = buildCache(this::fetchViews, cacheProperties.getViews());
         refreshCaches();
     }
 
@@ -291,10 +293,10 @@ public class ViewService {
     }
 
     private <T> LoadingCache<Boolean, List<T>> buildCache(
-            Supplier<List<T>> fetchSupplier, Config.CacheConfig cacheConfig) {
+            Supplier<List<T>> fetchSupplier, CacheProperties.Cache cacheConfig) {
         var cacheBuilder = CacheBuilder.newBuilder();
-        if (cacheConfig.autoRefreshEnabled) {
-            cacheBuilder.refreshAfterWrite(cacheConfig.refreshFrequencyInHours, TimeUnit.HOURS);
+        if (cacheConfig.isAutoRefreshEnabled()) {
+            cacheBuilder.refreshAfterWrite(cacheConfig.getRefreshFrequencyInHours(), TimeUnit.HOURS);
         }
         return cacheBuilder.build(new CacheLoader<>() {
             @Override
@@ -302,9 +304,9 @@ public class ViewService {
                 var cachedObjects = fetchSupplier.get();
                 log.info(
                         "List of {} has been cached, {} {} in total",
-                        cacheConfig.name,
+                        cacheConfig.getName(),
                         cachedObjects.size(),
-                        cacheConfig.name);
+                        cacheConfig.getName());
                 return cachedObjects;
             }
         });

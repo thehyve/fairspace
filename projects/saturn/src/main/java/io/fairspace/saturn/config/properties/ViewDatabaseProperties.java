@@ -11,6 +11,8 @@ public class ViewDatabaseProperties {
 
     private boolean enabled;
     private String url;
+    private String username;
+    private String password;
     private boolean autoCommitEnabled;
     private int maxPoolSize;
     private int connectionTimeout;

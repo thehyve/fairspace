@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -56,16 +57,16 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, Config.Search search)
+    public ViewStoreClientFactory(ViewsConfig viewsConfig, ViewDatabaseProperties  viewDatabaseProperties, Config.Search search)
             throws SQLException {
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
-        databaseConfig.setJdbcUrl(viewDatabase.url);
-        databaseConfig.setUsername(viewDatabase.username);
-        databaseConfig.setPassword(viewDatabase.password);
-        databaseConfig.setAutoCommit(viewDatabase.autoCommit);
-        databaseConfig.setConnectionTimeout(viewDatabase.connectionTimeout);
-        databaseConfig.setMaximumPoolSize(viewDatabase.maxPoolSize);
+        databaseConfig.setJdbcUrl(viewDatabaseProperties.getUrl());
+        databaseConfig.setUsername(viewDatabaseProperties.getUsername());
+        databaseConfig.setPassword(viewDatabaseProperties.getPassword());
+        databaseConfig.setAutoCommit(viewDatabaseProperties.isAutoCommitEnabled());
+        databaseConfig.setConnectionTimeout(viewDatabaseProperties.getConnectionTimeout());
+        databaseConfig.setMaximumPoolSize(viewDatabaseProperties.getMaxPoolSize());
 
         dataSource = new HikariDataSource(databaseConfig);
 

@@ -1,11 +1,14 @@
 package io.fairspace.saturn.config;
 
-import java.sql.SQLException;
-
+import io.fairspace.saturn.auth.KeycloakClientProperties;
+import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
+import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
@@ -13,9 +16,7 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.fairspace.saturn.auth.KeycloakClientProperties;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.services.views.ViewStoreClientFactory;
+import java.sql.SQLException;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
@@ -31,11 +32,14 @@ public class ServiceConfig {
 
     // todo: make the init done by Spring
     @Bean
-    public Services getService(Keycloak keycloak, FeatureProperties featureProperties, JenaProperties jenaProperties) {
+    public Services getService(Keycloak keycloak, FeatureProperties featureProperties,
+                               JenaProperties jenaProperties,
+                               ViewDatabaseProperties viewDatabaseProperties,
+                               CacheProperties cacheProperties) {
         ViewStoreClientFactory viewStoreClientFactory = null;
-        if (CONFIG.viewDatabase.enabled) {
+        if (viewDatabaseProperties.isEnabled()) {
             try {
-                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, CONFIG.viewDatabase, CONFIG.search);
+                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, viewDatabaseProperties, CONFIG.search);
             } catch (SQLException e) {
                 throw new RuntimeException("Error connecting to the view database", e);
             }
@@ -48,7 +52,8 @@ public class ServiceConfig {
                 featureProperties,
                 viewStoreClientFactory,
                 keycloak.realm(keycloakClientProperties.getRealm()).users(),
-                jenaProperties);
+                jenaProperties,
+                cacheProperties);
     }
 
     @Bean

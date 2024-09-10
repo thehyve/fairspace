@@ -2,6 +2,7 @@ package io.fairspace.saturn.config;
 
 import java.io.File;
 
+import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.milton.resource.Resource;
@@ -81,7 +82,8 @@ public class Services {
             FeatureProperties featureProperties,
             ViewStoreClientFactory viewStoreClientFactory,
             UsersResource usersResource,
-            JenaProperties jenaProperties) {
+            JenaProperties jenaProperties,
+            CacheProperties cacheProperties) {
         this.config = config;
         this.transactions =
                 jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
@@ -135,7 +137,7 @@ public class Services {
                 ? sparqlQueryService
                 : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
         viewService =
-                new ViewService(config, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
+                new ViewService(config.search, cacheProperties, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
 
         maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
 
