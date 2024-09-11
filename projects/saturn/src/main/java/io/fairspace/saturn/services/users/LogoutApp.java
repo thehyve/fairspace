@@ -11,11 +11,13 @@ import static spark.Spark.get;
 public class LogoutApp extends BaseApp {
     private final UserService service;
     private final Config config;
+    private final String publicUrl;
 
-    public LogoutApp(String basePath, UserService service, Config config) {
+    public LogoutApp(String basePath, UserService service, Config config, String publicUrl) {
         super(basePath);
         this.service = service;
         this.config = config;
+        this.publicUrl = publicUrl;
     }
 
     @Override
@@ -27,7 +29,7 @@ public class LogoutApp extends BaseApp {
             res.header(
                     "Location",
                     "%srealms/%s/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s"
-                            .formatted(config.auth.authServerUrl, config.auth.realm, config.publicUrl, idToken));
+                            .formatted(config.auth.authServerUrl, config.auth.realm, publicUrl, idToken));
             return "";
         });
     }

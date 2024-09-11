@@ -43,11 +43,13 @@ public class ViewUpdater implements AutoCloseable {
     private final ViewStoreClient viewStoreClient;
     private final DatasetGraph dsg;
     private final Graph graph;
+    private final String publicUrl;
 
-    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg) {
+    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg, String publicUrl) {
         this.viewStoreClient = viewStoreClient;
         this.dsg = dsg;
         this.graph = dsg.getDefaultGraph();
+        this.publicUrl = publicUrl;
     }
 
     @Override
@@ -127,7 +129,7 @@ public class ViewUpdater implements AutoCloseable {
     private void addCollectionToProtectedResourceRow(String type, Node subject, Map<String, Object> row) {
         if (protectedResources.contains(type)) {
             // set collection name
-            var rootLocation = CONFIG.publicUrl + "/api/webdav" + "/";
+            var rootLocation = publicUrl + "/api/webdav" + "/";
             if (subject.getURI().startsWith(rootLocation)) {
                 var location = subject.getURI().substring(rootLocation.length());
                 var collection = URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);

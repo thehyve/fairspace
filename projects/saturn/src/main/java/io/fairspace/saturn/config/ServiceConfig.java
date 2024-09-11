@@ -39,7 +39,8 @@ public class ServiceConfig {
                                ViewDatabaseProperties viewDatabaseProperties,
                                CacheProperties cacheProperties,
                                SearchProperties searchProperties,
-                               @Value("${application.webDav.blobStorePath}") String webDavBlobStorePath) {
+                               @Value("${application.webDav.blobStorePath}") String webDavBlobStorePath,
+                               @Value("${application.publicUrl}") String publicUrl) {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (viewDatabaseProperties.isEnabled()) {
             try {
@@ -48,7 +49,7 @@ public class ServiceConfig {
                 throw new RuntimeException("Error connecting to the view database", e);
             }
         }
-        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory);
+        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory, publicUrl);
         return new Services(
                 CONFIG,
                 VIEWS_CONFIG,
@@ -59,7 +60,8 @@ public class ServiceConfig {
                 jenaProperties,
                 cacheProperties,
                 searchProperties,
-                webDavBlobStorePath);
+                webDavBlobStorePath,
+                publicUrl);
     }
 
     @Bean

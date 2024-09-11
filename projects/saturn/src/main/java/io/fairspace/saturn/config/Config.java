@@ -29,11 +29,7 @@ public class Config {
                     .addSerializer(new StoreParamsSerializer())
                     .addDeserializer(StoreParams.class, new StoreParamsDeserializer()));
 
-    public int port = 8090;
-
     public int livenessPort = 8091;
-
-    public String publicUrl = "http://localhost:8080";
 
     public Auth auth = new Auth();
 

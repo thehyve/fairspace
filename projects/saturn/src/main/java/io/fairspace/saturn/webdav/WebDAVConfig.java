@@ -1,9 +1,7 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.config.condition.ConditionalOnMultiValuedProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

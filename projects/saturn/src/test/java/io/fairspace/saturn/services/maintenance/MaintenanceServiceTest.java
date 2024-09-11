@@ -32,7 +32,7 @@ public class MaintenanceServiceTest {
     private final ViewStoreClientFactory viewStoreClientFactory = mock(ViewStoreClientFactory.class);
     private final ViewService viewService = mock(ViewService.class);
     private final MaintenanceService sut =
-            spy(new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService));
+            spy(new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService, "localhost"));
 
     @Test
     public void testReindexingIsNotAllowedForNotAdmins() {

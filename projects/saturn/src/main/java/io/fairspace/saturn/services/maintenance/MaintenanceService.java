@@ -31,16 +31,18 @@ public class MaintenanceService {
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final ViewService viewService;
+    private final String publicUrl;
 
     public MaintenanceService(
             @NonNull UserService userService,
             @NonNull Dataset dataset,
             ViewStoreClientFactory viewStoreClientFactory,
-            ViewService viewService) {
+            ViewService viewService, String publicUrl) {
         this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.viewService = viewService;
+        this.publicUrl = publicUrl;
     }
 
     public boolean disabled() {
@@ -72,7 +74,7 @@ public class MaintenanceService {
 
     public void recreateIndex() {
         try (var viewStoreClient = viewStoreClientFactory.build();
-                var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph())) {
+                var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph(), publicUrl)) {
             var start = new Date().getTime();
             // Index entities
             for (var view : ConfigLoader.VIEWS_CONFIG.views) {

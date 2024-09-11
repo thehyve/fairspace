@@ -89,7 +89,8 @@ public class Services {
             JenaProperties jenaProperties,
             CacheProperties cacheProperties,
             SearchProperties searchProperties,
-            String webDavBlobStorePath) {
+            String webDavBlobStorePath,
+            String publicUrl) {
         this.config = config;
         this.transactions =
                 jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
@@ -98,7 +99,7 @@ public class Services {
 
         blobStore = new LocalBlobStore(new File(webDavBlobStorePath));
         davFactory = new DavFactory(
-                dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"),
+                dataset.getDefaultModel().createResource(publicUrl + "/api/webdav"),
                 blobStore,
                 userService,
                 dataset.getContext());
@@ -107,7 +108,7 @@ public class Services {
         if (featureProperties.getFeatures().contains(Feature.ExtraStorage)) {
             extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
             extraDavFactory = new DavFactory(
-                    dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"),
+                    dataset.getDefaultModel().createResource(publicUrl + "/api/extra-storage"),
                     extraBlobStore,
                     userService,
                     dataset.getContext());
@@ -144,7 +145,7 @@ public class Services {
         viewService =
                 new ViewService(searchProperties, cacheProperties, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
 
-        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
+        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService, publicUrl);
 
         searchService = new SearchService(filteredDataset);
 

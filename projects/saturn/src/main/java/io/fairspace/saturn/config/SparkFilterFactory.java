@@ -13,7 +13,7 @@ import io.fairspace.saturn.services.views.ViewApp;
 import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 
 public class SparkFilterFactory {
-    public static SaturnSparkFilter createSparkFilter(String apiPathPrefix, Services svc, Config config, FeatureProperties featureProperties) {
+    public static SaturnSparkFilter createSparkFilter(String apiPathPrefix, Services svc, Config config, FeatureProperties featureProperties, String publicUrl) {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
@@ -24,6 +24,6 @@ public class SparkFilterFactory {
                 new FeaturesApp(apiPathPrefix + "/features", featureProperties.getFeatures()),
                 new HealthApp(apiPathPrefix + "/health", svc.getHealthService()),
                 new MaintenanceApp(apiPathPrefix + "/maintenance", svc.getMaintenanceService()),
-                new LogoutApp("/logout", svc.getUserService(), config));
+                new LogoutApp("/logout", svc.getUserService(), config, publicUrl));
     }
 }

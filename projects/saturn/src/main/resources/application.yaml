@@ -32,6 +32,7 @@ jwt:
       principal-attribute: preferred_username
 
 application:
+  publicUrl: ${PUBLIC_URL:http://localhost:8080}
   jena:
     # Base IRI for all metadata entities
     metadataBaseIRI: ${METADATA_BASE_IRI:http://localhost/iri/}
