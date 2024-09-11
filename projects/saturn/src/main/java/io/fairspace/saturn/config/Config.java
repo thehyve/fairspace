@@ -12,9 +12,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsCodec;
@@ -40,26 +37,10 @@ public class Config {
 
     public Auth auth = new Auth();
 
-    public WebDAV webDAV = new WebDAV();
-
     public ExtraStorage extraStorage = new ExtraStorage();
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     public Map<String, String> services = new HashMap<>();
-
-    public Search search = new Search();
-
-    public static class Jena {
-        public String metadataBaseIRI = "http://localhost/iri/";
-
-        public File datasetPath = new File("data/db");
-
-        public final StoreParams storeParams = StoreParams.getDftStoreParams();
-
-        public File transactionLogPath = new File("data/log");
-
-        public boolean bulkTransactions = true;
-    }
 
     public static class Auth {
         public String authServerUrl = "http://localhost:5100/";
@@ -70,17 +51,6 @@ public class Config {
 
         @JsonSetter(nulls = Nulls.AS_EMPTY)
         public final Set<String> defaultUserRoles = new HashSet<>();
-    }
-
-    public static class WebDAV {
-        public String blobStorePath = "data/blobs";
-    }
-
-    public static class Search {
-        public long pageRequestTimeout = 10_000;
-        public long countRequestTimeout = 100_1000;
-        /** maxJoinItems is used to limit number of joined entries (from the join view) to decrease the response size */
-        public int maxJoinItems = 50;
     }
 
     public static class ExtraStorage {

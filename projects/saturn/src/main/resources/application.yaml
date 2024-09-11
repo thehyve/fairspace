@@ -69,7 +69,7 @@ application:
   features:
     - ExtraStorage
   view-database:
-    enabled: false
+    enabled: ${VIEW_DATABASE_ENABLED:false}
     url: ${VIEW_DATABASE_URL:jdbc:postgresql://localhost:9432/fairspace}
     username: ${VIEW_DATABASE_USERNAME:fairspace}
     autoCommitEnabled: ${VIEW_DATABASE_AUTO_COMMIT:false}
@@ -79,9 +79,16 @@ application:
   cache:
     facets:
       name: "facets"
-      auto-refresh-enabled: false
-      refresh-frequency-in-hours: 240
+      autoRefreshEnabled: false
+      refreshFrequencyInHours: 240
     views:
       name: "views"
-      auto-refresh-enabled: false
-      refresh-frequency-in-hours: 240
+      autoRefreshEnabled: false
+      refreshFrequencyInHours: 240
+  search:
+    pageRequestTimeout: 10000
+    countRequestTimeout: 60000
+    maxJoinItems: 50
+  webDav:
+    # Path of the WebDAV's local blob store
+    blobStorePath: ${WEBDAV_BLOB_STORE_PATH:data/blobs}

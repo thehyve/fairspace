@@ -1,16 +1,15 @@
 package io.fairspace.saturn.services.views;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -22,16 +21,15 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
-import io.fairspace.saturn.services.AccessDeniedException;
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
-import io.fairspace.saturn.vocabulary.FS;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import static io.fairspace.saturn.config.ViewsConfig.View;
-
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -97,7 +95,7 @@ public class ViewService {
     public static final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS =
             "User does not have permissions to read facets";
 
-    private final Config.Search searchConfig;
+    private final SearchProperties searchProperties;
     private final ViewsConfig viewsConfig;
     private final Dataset ds;
     private final ViewStoreClientFactory viewStoreClientFactory;
@@ -106,13 +104,13 @@ public class ViewService {
     private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
 
     public ViewService(
-            Config.Search searchConfig,
+            SearchProperties searchProperties,
             CacheProperties cacheProperties,
             ViewsConfig viewsConfig,
             Dataset ds,
             ViewStoreClientFactory viewStoreClientFactory,
             MetadataPermissions metadataPermissions) {
-        this.searchConfig = searchConfig;
+        this.searchProperties = searchProperties;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
         this.viewStoreClientFactory = viewStoreClientFactory;
@@ -287,7 +285,7 @@ public class ViewService {
         if (!EnumSet.of(ColumnType.Date, ColumnType.Number).contains(column.type)) {
             return null;
         }
-        try (var reader = new ViewStoreReader(searchConfig, viewStoreClientFactory)) {
+        try (var reader = new ViewStoreReader(searchProperties, viewStoreClientFactory)) {
             return reader.aggregate(view.name, column.name);
         }
     }

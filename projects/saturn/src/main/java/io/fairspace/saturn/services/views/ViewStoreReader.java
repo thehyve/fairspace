@@ -1,5 +1,16 @@
 package io.fairspace.saturn.services.views;
 
+import com.google.common.collect.Sets;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.vocabulary.FS;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,18 +32,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Sets;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
-
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
@@ -46,14 +45,14 @@ import static io.fairspace.saturn.services.views.Table.idColumn;
  */
 @Slf4j
 public class ViewStoreReader implements AutoCloseable {
-    final Config.Search searchConfig;
+    final SearchProperties searchProperties;
     final ViewStoreClient.ViewStoreConfiguration configuration;
     final Connection connection;
 
     // TODO: in whole class, use StringBuilder instead of String concats
-    public ViewStoreReader(Config.Search searchConfig, ViewStoreClientFactory viewStoreClientFactory)
+    public ViewStoreReader(SearchProperties searchProperties, ViewStoreClientFactory viewStoreClientFactory)
             throws SQLException {
-        this.searchConfig = searchConfig;
+        this.searchProperties = searchProperties;
         this.configuration = viewStoreClientFactory.configuration;
         this.connection = viewStoreClientFactory.getConnection();
     }
@@ -380,7 +379,7 @@ public class ViewStoreReader implements AutoCloseable {
                 filters,
                 String.format(
                         "order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit))) {
-            query.setQueryTimeout((int) searchConfig.pageRequestTimeout);
+            query.setQueryTimeout(searchProperties.getPageRequestTimeout());
             var result = query.executeQuery();
             Map<String, ViewRow> rowsById = new HashMap<>();
             while (result.next()) {
@@ -425,7 +424,7 @@ public class ViewStoreReader implements AutoCloseable {
                         joinView.include.stream().map(i -> joinView.view + "_" + i))
                 .collect(Collectors.toSet());
 
-        var rows = new ViewRowCollection(searchConfig.maxJoinItems);
+        var rows = new ViewRowCollection(searchProperties.getMaxJoinItems());
 
         if (!ids.isEmpty()) {
             try (var query = getJoinQuery(view, joinedTable, ids);
@@ -573,7 +572,7 @@ public class ViewStoreReader implements AutoCloseable {
 
     public long countRows(String view, List<ViewFilter> filters) throws SQLTimeoutException {
         try (var q = query(view, "count(*) as rowCount", filters, null)) {
-            q.setQueryTimeout((int) searchConfig.countRequestTimeout);
+            q.setQueryTimeout(searchProperties.getCountRequestTimeout());
             var result = q.executeQuery();
             result.next();
             return result.getLong("rowCount");
@@ -615,7 +614,7 @@ public class ViewStoreReader implements AutoCloseable {
                 statement.setString(i + 1, values.get(i));
             }
 
-            statement.setQueryTimeout((int) searchConfig.pageRequestTimeout);
+            statement.setQueryTimeout(searchProperties.getPageRequestTimeout());
 
             var result = statement.executeQuery();
             return convertResult(result);

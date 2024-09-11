@@ -1,16 +1,14 @@
 package io.fairspace.saturn.services.views;
 
-import java.io.ByteArrayOutputStream;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.vocabulary.FS;
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.Dataset;
@@ -40,18 +38,18 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
+import java.io.ByteArrayOutputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
-
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -71,13 +69,13 @@ import static org.apache.jena.system.Txn.calculateRead;
 @Log4j2
 public class SparqlQueryService implements QueryService {
     private static final String RESOURCES_VIEW = "Resource";
-    private final Config.Search config;
+    private final SearchProperties searchProperties;
     private final ViewsConfig searchConfig;
     private final Dataset ds;
     private final Transactions transactions;
 
-    public SparqlQueryService(Config.Search config, ViewsConfig viewsConfig, Dataset ds, Transactions transactions) {
-        this.config = config;
+    public SparqlQueryService(SearchProperties searchProperties, ViewsConfig viewsConfig, Dataset ds, Transactions transactions) {
+        this.searchProperties = searchProperties;
         this.searchConfig = viewsConfig;
         this.ds = ds;
         this.transactions = transactions;
@@ -117,7 +115,7 @@ public class SparqlQueryService implements QueryService {
         try (var selectExecution = QueryExecution.create()
                 .dataset(ds)
                 .query(query)
-                .timeout(config.countRequestTimeout)
+                .timeout(searchProperties.getCountRequestTimeout())
                 .build()) {
             return calculateRead(ds, () -> {
                 var iris = new ArrayList<Resource>();
@@ -440,7 +438,7 @@ public class SparqlQueryService implements QueryService {
         try (var execution = QueryExecution.create()
                 .dataset(ds)
                 .query(query)
-                .timeout(config.countRequestTimeout)
+                .timeout(searchProperties.getCountRequestTimeout())
                 .build()) {
             return calculateRead(ds, () -> {
                 long count = 0;

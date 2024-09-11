@@ -4,6 +4,7 @@ import io.fairspace.saturn.auth.KeycloakClientProperties;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.users.UserService;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,11 +37,13 @@ public class ServiceConfig {
     public Services getService(Keycloak keycloak, FeatureProperties featureProperties,
                                JenaProperties jenaProperties,
                                ViewDatabaseProperties viewDatabaseProperties,
-                               CacheProperties cacheProperties) {
+                               CacheProperties cacheProperties,
+                               SearchProperties searchProperties,
+                               @Value("${application.webDav.blobStorePath}") String webDavBlobStorePath) {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (viewDatabaseProperties.isEnabled()) {
             try {
-                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, viewDatabaseProperties, CONFIG.search);
+                viewStoreClientFactory = new ViewStoreClientFactory(VIEWS_CONFIG, viewDatabaseProperties, searchProperties);
             } catch (SQLException e) {
                 throw new RuntimeException("Error connecting to the view database", e);
             }
@@ -53,7 +57,9 @@ public class ServiceConfig {
                 viewStoreClientFactory,
                 keycloak.realm(keycloakClientProperties.getRealm()).users(),
                 jenaProperties,
-                cacheProperties);
+                cacheProperties,
+                searchProperties,
+                webDavBlobStorePath);
     }
 
     @Bean

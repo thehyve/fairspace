@@ -1,5 +1,14 @@
 package io.fairspace.saturn.services.views;
 
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.milton.resource.CollectionResource;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -10,16 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import io.milton.resource.CollectionResource;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
-
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
 
 import static java.lang.Integer.min;
 
@@ -34,15 +33,15 @@ import static java.lang.Integer.min;
 public class JdbcQueryService implements QueryService {
     private final Transactions transactions;
     private final CollectionResource rootSubject;
-    private final Config.Search searchConfig;
+    private final SearchProperties searchProperties;
     private final ViewStoreClientFactory viewStoreClientFactory;
 
     public JdbcQueryService(
-            Config.Search searchConfig,
+            SearchProperties searchProperties,
             ViewStoreClientFactory viewStoreClientFactory,
             Transactions transactions,
             CollectionResource rootSubject) {
-        this.searchConfig = searchConfig;
+        this.searchProperties = searchProperties;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.transactions = transactions;
         this.rootSubject = rootSubject;
@@ -55,7 +54,7 @@ public class JdbcQueryService implements QueryService {
     }
 
     ViewStoreReader getViewStoreReader() throws SQLException {
-        return new ViewStoreReader(searchConfig, viewStoreClientFactory);
+        return new ViewStoreReader(searchProperties, viewStoreClientFactory);
     }
 
     @SneakyThrows

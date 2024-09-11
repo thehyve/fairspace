@@ -1,6 +1,7 @@
 package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
@@ -8,9 +9,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServicesTest {
     private Dataset dataset = DatasetFactory.create();
@@ -24,7 +25,7 @@ public class ServicesTest {
     @Before
     public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        svc = new Services(config, viewsConfig, dataset, new FeatureProperties(), null, null, null);
+        svc = new Services(config, viewsConfig, dataset, new FeatureProperties(), null, null, null, null, null, null);
     }
 
     @Test

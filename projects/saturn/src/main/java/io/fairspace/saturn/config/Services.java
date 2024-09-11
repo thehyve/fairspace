@@ -5,6 +5,7 @@ import java.io.File;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.SearchProperties;
 import io.milton.resource.Resource;
 import jakarta.servlet.http.HttpServlet;
 import lombok.Getter;
@@ -44,13 +45,16 @@ import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
+import org.springframework.beans.factory.annotation.Value;
 
 import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @Log4j2
 @Getter
+// TODO: get rid of the Services class as it makes no sense to have a class that contains all services implementing IoC
 public class Services {
+
     public static final Symbol METADATA_SERVICE = Symbol.create("metadata_service");
 
     private final Config config;
@@ -83,14 +87,16 @@ public class Services {
             ViewStoreClientFactory viewStoreClientFactory,
             UsersResource usersResource,
             JenaProperties jenaProperties,
-            CacheProperties cacheProperties) {
+            CacheProperties cacheProperties,
+            SearchProperties searchProperties,
+            String webDavBlobStorePath) {
         this.config = config;
         this.transactions =
                 jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
         userService = new UserService(config.auth, transactions, usersResource);
 
-        blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
+        blobStore = new LocalBlobStore(new File(webDavBlobStorePath));
         davFactory = new DavFactory(
                 dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"),
                 blobStore,
@@ -131,13 +137,12 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        // TODO: to be refactored when getting rid of the Services class
-        sparqlQueryService = new SparqlQueryService(config.search, viewsConfig, filteredDataset, transactions);
+        sparqlQueryService = new SparqlQueryService(searchProperties, viewsConfig, filteredDataset, transactions);
         queryService = viewStoreClientFactory == null
                 ? sparqlQueryService
-                : new JdbcQueryService(config.search, viewStoreClientFactory, transactions, davFactory.root);
+                : new JdbcQueryService(searchProperties, viewStoreClientFactory, transactions, davFactory.root);
         viewService =
-                new ViewService(config.search, cacheProperties, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
+                new ViewService(searchProperties, cacheProperties, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
 
         maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
 
