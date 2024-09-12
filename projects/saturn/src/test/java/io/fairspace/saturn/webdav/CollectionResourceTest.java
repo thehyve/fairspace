@@ -1,5 +1,6 @@
 package io.fairspace.saturn.webdav;
 
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import org.apache.jena.rdf.model.Model;
@@ -50,6 +51,9 @@ public class CollectionResourceTest {
     @Mock
     MetadataService metadataService;
 
+    @Mock
+    WebDavProperties webDavProperties;
+
     Context context = new Context();
 
     @Before
@@ -61,7 +65,7 @@ public class CollectionResourceTest {
                 .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1);
 
         context.set(METADATA_SERVICE, metadataService);
-        var factory = new DavFactory(model.createResource(baseUri), store, userService, context);
+        var factory = new DavFactory(model.createResource(baseUri), store, userService, context, webDavProperties);
         resource = new CollectionResource(factory, COLLECTION_1, Access.Manage);
 
         setupRequestContext();

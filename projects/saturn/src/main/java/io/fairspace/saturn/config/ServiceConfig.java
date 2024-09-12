@@ -6,6 +6,7 @@ import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
@@ -39,7 +40,7 @@ public class ServiceConfig {
                                ViewDatabaseProperties viewDatabaseProperties,
                                CacheProperties cacheProperties,
                                SearchProperties searchProperties,
-                               @Value("${application.webDav.blobStorePath}") String webDavBlobStorePath,
+                               WebDavProperties webDavProperties,
                                @Value("${application.publicUrl}") String publicUrl) {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (viewDatabaseProperties.isEnabled()) {
@@ -60,7 +61,7 @@ public class ServiceConfig {
                 jenaProperties,
                 cacheProperties,
                 searchProperties,
-                webDavBlobStorePath,
+                webDavProperties,
                 publicUrl);
     }
 

@@ -90,6 +90,10 @@ application:
     pageRequestTimeout: 10000
     countRequestTimeout: 60000
     maxJoinItems: 50
-  webDav:
+  web-dav:
     # Path of the WebDAV's local blob store
     blobStorePath: ${WEBDAV_BLOB_STORE_PATH:data/blobs}
+    extra-storage:
+      blobStorePath: "data/extra-blobs"
+      defaultRootCollections:
+        - "analysis-export"

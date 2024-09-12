@@ -1,10 +1,11 @@
 package io.fairspace.saturn.config;
 
-import java.io.File;
-import java.io.IOException;
-
-import lombok.extern.log4j.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.util.ResourceUtils;
+
+import java.io.IOException;
 
 @Log4j2
 public class ConfigLoader {
@@ -16,7 +17,7 @@ public class ConfigLoader {
         try {
             var settingsFile = ResourceUtils.getFile("classpath:saturn-config.yaml");
             if (settingsFile.exists()) {
-                return Config.MAPPER.readValue(settingsFile, Config.class);
+                return new ObjectMapper(new YAMLFactory()).readValue(settingsFile, Config.class);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error loading configuration", e);

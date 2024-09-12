@@ -6,8 +6,8 @@ import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.resource.Resource;
-import jakarta.servlet.http.HttpServlet;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
@@ -45,9 +45,7 @@ import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
-import org.springframework.beans.factory.annotation.Value;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @Log4j2
@@ -89,7 +87,7 @@ public class Services {
             JenaProperties jenaProperties,
             CacheProperties cacheProperties,
             SearchProperties searchProperties,
-            String webDavBlobStorePath,
+            WebDavProperties webDavProperties,
             String publicUrl) {
         this.config = config;
         this.transactions =
@@ -97,23 +95,25 @@ public class Services {
 
         userService = new UserService(config.auth, transactions, usersResource);
 
-        blobStore = new LocalBlobStore(new File(webDavBlobStorePath));
+        blobStore = new LocalBlobStore(new File(webDavProperties.getBlobStorePath()));
         davFactory = new DavFactory(
                 dataset.getDefaultModel().createResource(publicUrl + "/api/webdav"),
                 blobStore,
                 userService,
-                dataset.getContext());
+                dataset.getContext(),
+                webDavProperties);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
         if (featureProperties.getFeatures().contains(Feature.ExtraStorage)) {
-            extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
+            extraBlobStore = new DeletableLocalBlobStore(new File(webDavProperties.getExtraStorage().getBlobStorePath()));
             extraDavFactory = new DavFactory(
                     dataset.getDefaultModel().createResource(publicUrl + "/api/extra-storage"),
                     extraBlobStore,
                     userService,
-                    dataset.getContext());
+                    dataset.getContext(),
+                    webDavProperties);
             extraDavServlet = new WebDAVServlet(extraDavFactory, transactions, extraBlobStore);
-            initExtraStorageRootDirectories();
+            initExtraStorageRootDirectories(webDavProperties.getExtraStorage());
         } else {
             extraBlobStore = null;
             extraDavFactory = null;
@@ -152,9 +152,9 @@ public class Services {
         healthService = new HealthService(viewStoreClientFactory == null ? null : viewStoreClientFactory.dataSource);
     }
 
-    private void initExtraStorageRootDirectories() {
+    private void initExtraStorageRootDirectories(WebDavProperties.ExtraStorage extraStorage) {
         this.transactions.calculateWrite(ds2 -> {
-            for (var rc : CONFIG.extraStorage.defaultRootCollections) {
+            for (var rc : extraStorage.getDefaultRootCollections()) {
                 try {
                     extraDavFactory.root.createCollection(rc);
                 } catch (Exception e) {

@@ -1,7 +1,15 @@
 package io.fairspace.saturn.webdav;
 
-import java.net.URI;
-
+import io.fairspace.saturn.config.properties.WebDavProperties;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.fairspace.saturn.webdav.resources.CollectionResource;
+import io.fairspace.saturn.webdav.resources.CollectionRootResource;
+import io.fairspace.saturn.webdav.resources.DirectoryResource;
+import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
+import io.fairspace.saturn.webdav.resources.FileResource;
+import io.fairspace.saturn.webdav.resources.RootResource;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
@@ -9,10 +17,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.fairspace.saturn.webdav.resources.*;
+import java.net.URI;
 
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
 import static io.fairspace.saturn.util.EnumUtils.max;
@@ -33,7 +38,11 @@ public class DavFactory implements ResourceFactory {
     private final String baseUri;
 
     public DavFactory(
-            org.apache.jena.rdf.model.Resource rootSubject, BlobStore store, UserService userService, Context context) {
+            org.apache.jena.rdf.model.Resource rootSubject,
+            BlobStore store,
+            UserService userService,
+            Context context,
+            WebDavProperties webDavProperties) {
         this.rootSubject = rootSubject;
         this.store = store;
         this.userService = userService;
@@ -44,7 +53,7 @@ public class DavFactory implements ResourceFactory {
                 .toString();
         root = uri.toString().endsWith("/api/webdav")
                 ? new CollectionRootResource(this)
-                : new ExtraStorageRootResource(this);
+                : new ExtraStorageRootResource(this, webDavProperties);
     }
 
     @Override
@@ -130,7 +139,7 @@ public class DavFactory implements ResourceFactory {
         if (!access.canList()
                 && userService.currentUser().isCanViewPublicMetadata()
                 && (coll.hasLiteral(FS.accessMode, MetadataPublished.name())
-                        || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
+                || coll.hasLiteral(FS.accessMode, DataPublished.name()))) {
             access = Access.List;
         }
 
