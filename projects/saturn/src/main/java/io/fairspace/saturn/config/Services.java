@@ -1,28 +1,15 @@
 package io.fairspace.saturn.config;
 
-import java.io.File;
-
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
-import io.milton.resource.Resource;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.util.Symbol;
-import org.keycloak.admin.client.resource.UsersResource;
-
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.health.HealthService;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
@@ -46,6 +33,17 @@ import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
+import io.milton.resource.Resource;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.util.Symbol;
+import org.keycloak.admin.client.resource.UsersResource;
+
+import java.io.File;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
@@ -75,7 +73,6 @@ public class Services {
     private final DavFactory extraDavFactory;
     private final WebDAVServlet extraDavServlet;
     private final DatasetGraph filteredDatasetGraph;
-    private final HealthService healthService;
     private final MaintenanceService maintenanceService;
 
     public Services(
@@ -151,7 +148,6 @@ public class Services {
 
         searchService = new SearchService(filteredDataset);
 
-        healthService = new HealthService(viewStoreClientFactory == null ? null : viewStoreClientFactory.dataSource);
     }
 
     private void initExtraStorageRootDirectories(WebDavProperties.ExtraStorage extraStorage) {

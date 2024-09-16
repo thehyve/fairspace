@@ -3,7 +3,6 @@ package io.fairspace.saturn.config;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.services.features.FeaturesApp;
-import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.maintenance.MaintenanceApp;
 import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
@@ -26,7 +25,6 @@ public class SparkFilterFactory {
                 new VocabularyApp(apiPathPrefix + "/vocabulary"),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
                 new FeaturesApp(apiPathPrefix + "/features", featureProperties.getFeatures()),
-                new HealthApp(apiPathPrefix + "/health", svc.getHealthService()),
                 new MaintenanceApp(apiPathPrefix + "/maintenance", svc.getMaintenanceService()),
                 new LogoutApp("/logout", svc.getUserService(), keycloakClientProperties, publicUrl));
     }

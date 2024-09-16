@@ -100,3 +100,17 @@ application:
       blobStorePath: "data/extra-blobs"
       defaultRootCollections:
         - "analysis-export"
+
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    readinessState:
+      enabled: true
+    livenessState:
+      enabled: true
+  server:
+    port: 8091
