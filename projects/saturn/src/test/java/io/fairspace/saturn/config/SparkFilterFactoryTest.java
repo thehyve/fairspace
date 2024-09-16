@@ -1,6 +1,7 @@
 package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -15,6 +16,6 @@ public class SparkFilterFactoryTest {
 
     @Test
     public void itCreatesAFilter() {
-        assertNotNull(SparkFilterFactory.createSparkFilter("/some/path", svc, new Config(), new FeatureProperties()));
+        assertNotNull(SparkFilterFactory.createSparkFilter("/some/path", svc, new KeycloakClientProperties(), new FeatureProperties(), ""));
     }
 }

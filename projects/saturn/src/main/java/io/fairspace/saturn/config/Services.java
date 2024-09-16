@@ -5,6 +5,7 @@ import java.io.File;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.resource.Resource;
@@ -88,12 +89,13 @@ public class Services {
             CacheProperties cacheProperties,
             SearchProperties searchProperties,
             WebDavProperties webDavProperties,
+            KeycloakClientProperties keycloakClientProperties,
             String publicUrl) {
         this.config = config;
         this.transactions =
                 jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
-        userService = new UserService(config.auth, transactions, usersResource);
+        userService = new UserService(keycloakClientProperties, transactions, usersResource);
 
         blobStore = new LocalBlobStore(new File(webDavProperties.getBlobStorePath()));
         davFactory = new DavFactory(

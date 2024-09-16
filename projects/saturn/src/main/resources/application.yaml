@@ -3,10 +3,13 @@ server:
 
 # Configuration to access the Keycloak server (user lists, user count, etc.)
 keycloak:
-  auth-server-url: http://localhost:5100
-  realm: fairspace
-  client-id: workspace-client
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:5100}
+  realm: ${KEYCLOAK_REALM:fairspace}
+  client-id: ${KEYCLOAK_CLIENT_ID:workspace-client}
   client-secret: ${KEYCLOAK_CLIENT_SECRET:**********}
+  super-admin-user: ${KEYCLOAK_SUPER_ADMIN_USER:organisation-admin}
+  default-user-roles:
+    -
 
 # Configuration of Saturn as a resource server
 spring:

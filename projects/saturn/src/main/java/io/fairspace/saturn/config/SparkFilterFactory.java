@@ -1,6 +1,7 @@
 package io.fairspace.saturn.config;
 
 import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.services.features.FeaturesApp;
 import io.fairspace.saturn.services.health.HealthApp;
 import io.fairspace.saturn.services.maintenance.MaintenanceApp;
@@ -13,7 +14,10 @@ import io.fairspace.saturn.services.views.ViewApp;
 import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 
 public class SparkFilterFactory {
-    public static SaturnSparkFilter createSparkFilter(String apiPathPrefix, Services svc, Config config, FeatureProperties featureProperties, String publicUrl) {
+    public static SaturnSparkFilter createSparkFilter(String apiPathPrefix, Services svc,
+                                                      KeycloakClientProperties keycloakClientProperties,
+                                                      FeatureProperties featureProperties,
+                                                      String publicUrl) {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
@@ -24,6 +28,6 @@ public class SparkFilterFactory {
                 new FeaturesApp(apiPathPrefix + "/features", featureProperties.getFeatures()),
                 new HealthApp(apiPathPrefix + "/health", svc.getHealthService()),
                 new MaintenanceApp(apiPathPrefix + "/maintenance", svc.getMaintenanceService()),
-                new LogoutApp("/logout", svc.getUserService(), config, publicUrl));
+                new LogoutApp("/logout", svc.getUserService(), keycloakClientProperties, publicUrl));
     }
 }

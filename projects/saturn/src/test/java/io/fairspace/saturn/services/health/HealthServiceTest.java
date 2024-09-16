@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import com.zaxxer.hikari.HikariDataSource;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
@@ -29,13 +31,13 @@ public class HealthServiceTest extends PostgresAwareTest {
     @Before
     public void before()
             throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
-        var viewDatabase = new Config.ViewDatabase();
-        viewDatabase.url = postgres.getJdbcUrl();
-        viewDatabase.username = postgres.getUsername();
-        viewDatabase.password = postgres.getPassword();
-        viewDatabase.maxPoolSize = 5;
+        var viewDatabase = new ViewDatabaseProperties();
+//        viewDatabase.url = postgres.getJdbcUrl();
+//        viewDatabase.username = postgres.getUsername();
+//        viewDatabase.password = postgres.getPassword();
+//        viewDatabase.maxPoolSize = 5;
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, new Config.Search());
+        viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, new SearchProperties());
 
         healthService = new HealthService(viewStoreClientFactory.dataSource);
     }

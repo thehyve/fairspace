@@ -3,7 +3,7 @@ package io.fairspace.saturn.services.users;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -33,12 +33,12 @@ import static java.util.stream.Collectors.toMap;
 public class UserService {
     private final LoadingCache<Boolean, Map<String, User>> usersCache;
     private final Transactions transactions;
-    private final Config.Auth config;
+    private final KeycloakClientProperties keycloakClientProperties;
     private final UsersResource usersResource;
     private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
 
-    public UserService(Config.Auth config, Transactions transactions, UsersResource usersResource) {
-        this.config = config;
+    public UserService(KeycloakClientProperties keycloakClientProperties, Transactions transactions, UsersResource usersResource) {
+        this.keycloakClientProperties = keycloakClientProperties;
         this.transactions = transactions;
         this.usersResource = usersResource;
         usersCache = CacheBuilder.newBuilder()
@@ -93,14 +93,14 @@ public class UserService {
                             user.setIri(iri);
                             user.setId(ku.getId());
 
-                            if (config.superAdminUser.equalsIgnoreCase(ku.getUsername())) {
+                            if (keycloakClientProperties.getSuperAdminUser().equalsIgnoreCase(ku.getUsername())) {
                                 user.setSuperadmin(true);
                                 user.setAdmin(true);
                                 user.setCanViewPublicMetadata(true);
                                 user.setCanViewPublicData(true);
                             }
 
-                            for (var role : config.defaultUserRoles) {
+                            for (var role : keycloakClientProperties.getDefaultUserRoles()) {
                                 switch (role) {
                                     case "admin" -> user.setAdmin(true);
                                     case "canViewPublicMetadata" -> user.setCanViewPublicMetadata(true);

@@ -27,7 +27,6 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
-import static io.fairspace.saturn.FusekiConfig.API_PREFIX;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.toXSDDateTimeLiteral;
 
@@ -153,7 +152,7 @@ public class WebDAVServlet extends HttpServlet {
 
     public static boolean isMetadataRequest() {
         // todo: test the change
-        return (API_PREFIX + "/metadata/").equalsIgnoreCase(getCurrentRequest().getRequestURI());
+        return ("/api/metadata/").equalsIgnoreCase(getCurrentRequest().getRequestURI());
     }
 
     public static BlobInfo getBlob() {

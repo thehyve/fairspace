@@ -1,6 +1,6 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.auth.KeycloakClientProperties;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
@@ -31,16 +31,16 @@ import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 @RequiredArgsConstructor
 public class ServiceConfig {
 
-    private final KeycloakClientProperties keycloakClientProperties;
-
     // todo: make the init done by Spring
     @Bean
-    public Services getService(Keycloak keycloak, FeatureProperties featureProperties,
+    public Services getService(Keycloak keycloak,
+                               FeatureProperties featureProperties,
                                JenaProperties jenaProperties,
                                ViewDatabaseProperties viewDatabaseProperties,
                                CacheProperties cacheProperties,
                                SearchProperties searchProperties,
                                WebDavProperties webDavProperties,
+                               KeycloakClientProperties keycloakClientProperties,
                                @Value("${application.publicUrl}") String publicUrl) {
         ViewStoreClientFactory viewStoreClientFactory = null;
         if (viewDatabaseProperties.isEnabled()) {
@@ -62,6 +62,7 @@ public class ServiceConfig {
                 cacheProperties,
                 searchProperties,
                 webDavProperties,
+                keycloakClientProperties,
                 publicUrl);
     }
 
@@ -76,7 +77,7 @@ public class ServiceConfig {
     }
 
     @Bean
-    public Keycloak getKeycloak() {
+    public Keycloak getKeycloak(KeycloakClientProperties keycloakClientProperties) {
         return KeycloakBuilder.builder()
                 .serverUrl(keycloakClientProperties.getAuthServerUrl())
                 .realm(keycloakClientProperties.getRealm())
