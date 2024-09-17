@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.services.BaseApp;
 

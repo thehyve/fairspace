@@ -32,7 +32,6 @@ import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.vocabulary.FS;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;

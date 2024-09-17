@@ -20,7 +20,6 @@ import io.fairspace.saturn.vocabulary.FS;
 import io.fairspace.saturn.webdav.Access;
 import io.fairspace.saturn.webdav.DavFactory;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
 
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;

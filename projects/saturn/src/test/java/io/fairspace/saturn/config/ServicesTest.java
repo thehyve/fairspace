@@ -9,13 +9,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class ServicesTest {
     private Dataset dataset = DatasetFactory.create();
-    private Config config = new Config();
     private ViewsConfig viewsConfig = new ViewsConfig();
     private Services svc;
 
@@ -25,12 +23,7 @@ public class ServicesTest {
     @Before
     public void before() {
         environmentVariables.set("KEYCLOAK_CLIENT_SECRET", "secret");
-        svc = new Services(config, viewsConfig, dataset, new FeatureProperties(), null, null, null, null, null, null, null, "localhost");
-    }
-
-    @Test
-    public void getConfig() {
-        assertEquals(config, svc.getConfig());
+        svc = new Services(viewsConfig, dataset, new FeatureProperties(), null, null, null, null, null, null, null, "localhost");
     }
 
     @Test

@@ -24,7 +24,6 @@ import org.springframework.lang.Nullable;
 
 import java.sql.SQLException;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 
 /**
@@ -47,7 +46,6 @@ public class ServiceConfig {
                                @Value("${application.publicUrl}") String publicUrl) {
         var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory, publicUrl);
         return new Services(
-                CONFIG,
                 VIEWS_CONFIG,
                 ds,
                 featureProperties,

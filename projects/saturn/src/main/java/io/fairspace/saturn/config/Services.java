@@ -54,7 +54,6 @@ public class Services {
 
     public static final Symbol METADATA_SERVICE = Symbol.create("metadata_service");
 
-    private final Config config;
     private final Transactions transactions;
 
     private final WorkspaceService workspaceService;
@@ -76,7 +75,6 @@ public class Services {
     private final MaintenanceService maintenanceService;
 
     public Services(
-            @NonNull Config config,
             @NonNull ViewsConfig viewsConfig,
             @NonNull Dataset dataset,
             FeatureProperties featureProperties,
@@ -88,7 +86,6 @@ public class Services {
             WebDavProperties webDavProperties,
             KeycloakClientProperties keycloakClientProperties,
             String publicUrl) {
-        this.config = config;
         this.transactions =
                 jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 

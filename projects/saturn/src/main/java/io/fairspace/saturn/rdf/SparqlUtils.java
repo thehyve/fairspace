@@ -26,7 +26,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
 import static org.apache.jena.graph.NodeFactory.createURI;
