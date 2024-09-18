@@ -23,9 +23,11 @@ public class SaturnDatasetFactory {
     /**
      * Returns a dataset to work with.
      * We're playing Russian dolls here.
-     * The original TDB2 dataset graph, which in fact consists of a number of wrappers itself (Jena uses wrappers everywhere),
+     * The original TDB2 dataset graph, which in fact consists of a number of
+     * wrappers itself (Jena uses wrappers everywhere),
      * is wrapped with a number of wrapper classes, each adding a new feature.
-     * Currently it adds transaction logging and applies default vocabulary if needed.
+     * Currently it adds transaction logging and applies default vocabulary if
+     * needed.
      */
     public static Dataset connect(JenaProperties jenaProperties, ViewStoreClientFactory viewStoreClientFactory, String publicUrl) {
         var restoreNeeded = isRestoreNeeded(jenaProperties.getDatasetPath());
@@ -41,6 +43,7 @@ public class SaturnDatasetFactory {
         }
 
         if (restoreNeeded) {
+            log.warn("Jena restore is needed, starting automatic restore.");
             restore(dsg, txnLog);
         }
 

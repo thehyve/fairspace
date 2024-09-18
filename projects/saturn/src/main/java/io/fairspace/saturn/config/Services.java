@@ -13,6 +13,9 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.search.FileSearchService;
+import io.fairspace.saturn.services.search.JdbcFileSearchService;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.DeletionValidator;
 import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
@@ -21,6 +24,7 @@ import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
 import io.fairspace.saturn.services.metadata.validation.URIPrefixValidator;
 import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.services.search.SearchService;
+import io.fairspace.saturn.services.search.SparqlFileSearchService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.JdbcQueryService;
 import io.fairspace.saturn.services.views.QueryService;
@@ -43,6 +47,8 @@ import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
 import org.keycloak.admin.client.resource.UsersResource;
 
+import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
+import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 import java.io.File;
 
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
@@ -64,6 +70,7 @@ public class Services {
     private final QueryService queryService;
     private final SparqlQueryService sparqlQueryService;
     private final SearchService searchService;
+    private final FileSearchService fileSearchService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
     private final WebDAVServlet davServlet;
@@ -136,8 +143,21 @@ public class Services {
 
         sparqlQueryService = new SparqlQueryService(searchProperties, viewsConfig, filteredDataset, transactions);
         queryService = viewStoreClientFactory == null
-                ? sparqlQueryService
-                : new JdbcQueryService(searchProperties, viewStoreClientFactory, transactions, davFactory.root);
+                ? new SparqlQueryService(searchProperties, viewsConfig, filteredDataset)
+                : new JdbcQueryService(
+                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+
+        // File search should be done using JDBC for performance reasons. However, if the view store is not available,
+        // or collections and files view is not configured, we fall back to using SPARQL queries on the RDF database
+        // directly.
+        boolean useSparqlFileSearchService = viewStoreClientFactory == null
+                || viewsConfig.views.stream().noneMatch(view -> protectedResources.containsAll(view.types));
+
+        fileSearchService = useSparqlFileSearchService
+                ? new SparqlFileSearchService(filteredDataset)
+                : new JdbcFileSearchService(
+                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+
         viewService =
                 new ViewService(searchProperties, cacheProperties, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
 

@@ -14,16 +14,18 @@ import AlterWorkspacePermissionsDialog from './AlterWorkspacePermissionsDialog';
 import WorkspacePermissionsTable from './WorkspacePermissionsTable';
 import type {PrincipalPermission} from '../collections/CollectionAPI';
 
-const styles = {
+const styles = theme => ({
     tableWrapper: {
-        border: '1px solid #e0e0e0',
-        borderRadius: 6,
+        border: '1px solid',
+        borderColor: theme.palette.primary.main,
+        borderRadius: theme.shape.borderRadius,
+        overflow: 'hidden',
         marginTop: 4,
         display: 'table',
         width: '99%'
     },
     header: {
-        backgroundColor: '#f5f5f5',
+        backgroundColor: theme.palette.primary.main,
         color: 'black',
         fontWeight: 'normal',
         display: 'flex',
@@ -35,9 +37,10 @@ const styles = {
     addButton: {
         marginLeft: 'auto',
         paddingTop: 0,
-        paddingBottom: 0
+        paddingBottom: 0,
+        color: theme.palette.primary.contrastText
     }
-};
+});
 
 export const WorkspacePermissionsComponent = ({permissions, setPermission, collection, workspaces, classes}) => {
     const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);

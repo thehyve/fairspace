@@ -171,10 +171,7 @@ public class ViewService {
                         columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
                     for (var j : v.join) {
-                        var joinView = viewsConfig.views.stream()
-                                .filter(view -> view.name.equalsIgnoreCase(j.view))
-                                .findFirst()
-                                .orElse(null);
+                        var joinView = viewsConfig.getViewConfig(j.view).orElse(null);
                         if (joinView == null) {
                             continue;
                         }
@@ -189,7 +186,7 @@ public class ViewService {
                             columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
                         }
                     }
-                    return new ViewDTO(v.name, v.title, columns);
+                    return new ViewDTO(v.name, v.title, columns, v.maxDisplayCount);
                 })
                 .collect(toList());
     }
@@ -246,7 +243,7 @@ public class ViewService {
             }
             case Number, Date -> {
                 if (viewStoreClientFactory != null) {
-                    var range = getColumnRange(view, column);
+                    var range = getViewStoreColumnRange(view, column);
                     if (range != null) {
                         min = range.getStart();
                         max = range.getEnd();
@@ -281,11 +278,11 @@ public class ViewService {
     }
 
     @SneakyThrows
-    private Range getColumnRange(View view, View.Column column) {
+    private Range getViewStoreColumnRange(View view, View.Column column) {
         if (!EnumSet.of(ColumnType.Date, ColumnType.Number).contains(column.type)) {
             return null;
         }
-        try (var reader = new ViewStoreReader(searchProperties, viewStoreClientFactory)) {
+        try (var reader = new ViewStoreReader(searchProperties, viewsConfig, viewStoreClientFactory)) {
             return reader.aggregate(view.name, column.name);
         }
     }

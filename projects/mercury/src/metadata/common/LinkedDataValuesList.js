@@ -5,7 +5,7 @@ import {Add, Clear} from '@mui/icons-material';
 import {FixedSizeList as List} from 'react-window';
 
 import {LABEL_URI, MAX_LIST_LENGTH, STRING_URI} from '../../constants';
-import styles from './LinkedDataValuesTable.styles';
+import styles from './LinkedDataValuesList.styles';
 import StringValue from './values/StringValue';
 
 type AddValueToListProps = {
@@ -24,7 +24,7 @@ const AddValueToList = (props: AddValueToListProps) => {
     const isStringValue = AddComponent === StringValue;
     return (
         <Grid container spacing={1} alignItems="center" className={classes.addValue} data-testid={'' + labelId}>
-            <Grid item xs={isStringValue ? 10 : 12}>
+            <Grid item xs={isStringValue ? 10 : 12} styles={{paddingTop: 0}}>
                 <AddComponent
                     data-testid="add-value-input"
                     variant="outlined"

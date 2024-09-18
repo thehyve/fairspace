@@ -1,0 +1,104 @@
+name: Build and deploy docs to Github Pages
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  build-saturn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log details
+        run: |
+          BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          echo "Triggered on branch: $BRANCH"
+
+      - name: Set up Ruby (required for gem installation)
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3.2'
+
+      - name: Install Asciidoctor to build docs
+        run: |
+          gem install asciidoctor
+          gem install asciidoctor-pdf
+          gem install rouge
+
+      - name: Build Docs - Collect needed files
+        run: |
+          set -e
+          
+          # Initialize variables
+          PROJECT_FILES=(
+            "projects/saturn/src/main/resources/log4j2.properties"
+            "projects/saturn/src/main/resources/system-vocabulary.ttl"
+            "projects/saturn/taxonomies.ttl"
+            "projects/saturn/views.yaml"
+            "projects/saturn/vocabulary.ttl"
+          )
+          BUILD_DIR=./docs/build
+          version=$(cat VERSION)
+          
+          # Create build directory
+          mkdir -p $BUILD_DIR/docs
+          
+          # Copy all files to the build directory
+          cp ./README.adoc $BUILD_DIR
+          sed -i -e "s/VERSION/${version}/" $BUILD_DIR/README.adoc
+          cp -r ./docs/images $BUILD_DIR/docs/
+          for f in ${PROJECT_FILES[*]}; do
+            mkdir -p "$BUILD_DIR/$(dirname "$f")"
+            cp "$f" "$BUILD_DIR/"$(dirname "$f")""
+          done
+
+      - name: Build Docs - Generate PDF and HTML
+        run: |
+          set -e
+          
+          BUILD_DIR=./docs/build
+          
+          asciidoctor-pdf -a pdf-theme=./docs/pdf-theme.yml -o $BUILD_DIR/Fairspace.pdf $BUILD_DIR/README.adoc || {
+            echo "Error building PDF"
+            popd
+            exit 1
+          }
+          
+          asciidoctor -a toc=left -D $BUILD_DIR/ -o index.html $BUILD_DIR/README.adoc || {
+            echo "Error building site"
+            popd
+            exit 1
+          }
+          
+          rm $BUILD_DIR/README.adoc
+
+      - name: Deploy Docs (push to Github Pages, will be deployed automatically)
+        env:
+          CI_SERVICE_ACCOUNT_USER: ${{ secrets.CI_SERVICE_ACCOUNT_USER }}
+          CI_SERVICE_ACCOUNT_PASSWORD: ${{ secrets.FNS_PAT }}
+          DOCS_REPOSITORY_NAME: ${{ vars.DOCS_REPOSITORY_NAME }}
+        run: |
+          set -e
+          
+          DOCS_REPO_URL="https://${CI_SERVICE_ACCOUNT_USER}:${CI_SERVICE_ACCOUNT_PASSWORD}@github.com/thehyve/${DOCS_REPOSITORY_NAME}"
+          echo "Cloning documentation repository ${DOCS_REPOSITORY_NAME} ..."
+          git clone --branch main "${DOCS_REPO_URL}" fairspace-docs
+          
+          DOCS_DIR=$(pwd)/fairspace-docs
+          echo "Copying documentation to ${DOCS_DIR} ..."
+          cp -r ./docs/build/* "${DOCS_DIR}/"
+          cd "${DOCS_DIR}"
+          
+          if [ ! "$(git status -s)" == "" ]; then
+            echo "Committing and pushing changes to ${DOCS_REPOSITORY_NAME} ..."
+            git config  --global user.email "${CI_SERVICE_ACCOUNT_USER}@thehyve.nl"
+            git config  --global user.name "${CI_SERVICE_ACCOUNT_USER}"
+            git add .
+            git commit -a -m "Update documentation"
+            git push "${DOCS_REPO_URL}" main
+          else
+            echo "Documentation unchanged."
+          fi

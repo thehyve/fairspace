@@ -3,7 +3,7 @@ import {configure, shallow} from 'enzyme';
 import Adapter from '@wojtekmaj/enzyme-adapter-react-17';
 
 import {STRING_URI} from '../../../constants';
-import LinkedDataValuesTable from '../LinkedDataValuesList';
+import LinkedDataValuesList from '../LinkedDataValuesList';
 import {LinkedDataRelationTable} from '../LinkedDataRelationTable';
 
 // Enzyme is obsolete, the Adapter allows running our old tests.
@@ -28,7 +28,7 @@ describe('LinkedDataRelationTable elements', () => {
         const wrapper = shallow(
             <LinkedDataRelationTable history={historyMock} property={defaultProperty} editorPath="/metadata" />
         );
-        const table = wrapper.find(LinkedDataValuesTable);
+        const table = wrapper.find(LinkedDataValuesList);
 
         expect(table.length).toEqual(1);
 

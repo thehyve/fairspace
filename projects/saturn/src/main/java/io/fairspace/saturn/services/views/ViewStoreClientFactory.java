@@ -26,6 +26,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
@@ -33,7 +48,6 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 @Slf4j
 public class ViewStoreClientFactory {
 
-    @Getter
     private final MaterializedViewService materializedViewService;
 
     public ViewStoreClient build() throws SQLException {
@@ -80,11 +94,16 @@ public class ViewStoreClientFactory {
                 List.of(idColumn(), valueColumn("type", ColumnType.Text), valueColumn("label", ColumnType.Text))));
 
         configuration = new ViewStoreClient.ViewStoreConfiguration(viewsConfig);
+        // todo: configuration is initialized within the loop below, do the initialization in constructor
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
-        materializedViewService = new MaterializedViewService(dataSource, configuration, searchProperties.getMaxJoinItems());
-        materializedViewService.createOrUpdateAllMaterializedViews();
+        materializedViewService = new MaterializedViewService(dataSource, configuration, searchProperties.getMaxJoinItems);
+        if (viewDatabase.mvRefreshOnStartRequired) {
+            materializedViewService.createOrUpdateAllMaterializedViews();
+        } else {
+            log.warn("Skipping materialized view refresh on start");
+        }
     }
 
     public Connection getConnection() throws SQLException {

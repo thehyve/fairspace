@@ -20,6 +20,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.milton.resource.CollectionResource;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
+
+import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
+
+import static io.fairspace.saturn.webdav.PathUtils.getCollectionNameByUri;
+
 import static java.lang.Integer.min;
 
 /**
@@ -34,10 +45,12 @@ public class JdbcQueryService implements QueryService {
     private final Transactions transactions;
     private final CollectionResource rootSubject;
     private final SearchProperties searchProperties;
+    private final ViewsConfig viewsConfig;
     private final ViewStoreClientFactory viewStoreClientFactory;
 
     public JdbcQueryService(
             SearchProperties searchProperties,
+            ViewsConfig viewsConfig,
             ViewStoreClientFactory viewStoreClientFactory,
             Transactions transactions,
             CollectionResource rootSubject) {
@@ -45,16 +58,11 @@ public class JdbcQueryService implements QueryService {
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.transactions = transactions;
         this.rootSubject = rootSubject;
-    }
-
-    public String getCollectionName(String uri) {
-        var rootLocation = rootSubject.getUniqueId() + "/";
-        var location = uri.substring(rootLocation.length());
-        return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
+        this.viewsConfig = viewsConfig;
     }
 
     ViewStoreReader getViewStoreReader() throws SQLException {
-        return new ViewStoreReader(searchProperties, viewStoreClientFactory);
+        return new ViewStoreReader(searchProperties, viewsConfig, viewStoreClientFactory);
     }
 
     @SneakyThrows
@@ -66,14 +74,14 @@ public class JdbcQueryService implements QueryService {
             return;
         }
         var collections = transactions.calculateRead(m -> rootSubject.getChildren().stream()
-                .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
+                .map(collection -> (Object) getCollectionNameByUri(rootSubject.getUniqueId(), collection.getUniqueId()))
                 .collect(Collectors.toList()));
         if (filters.stream().anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
             // Update existing filters in place
             filters.stream()
                     .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
                     .forEach(filter -> filter.setValues(filter.values.stream()
-                            .map(value -> getCollectionName(value.toString()))
+                            .map(value -> getCollectionNameByUri(rootSubject.getUniqueId(), value.toString()))
                             .filter(collections::contains)
                             .collect(Collectors.toList())));
             return;
@@ -124,17 +132,6 @@ public class JdbcQueryService implements QueryService {
             return new CountDTO(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
             return new CountDTO(0, true);
-        }
-    }
-
-    @SneakyThrows
-    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
-        var collectionsForUser = transactions.calculateRead(m -> rootSubject.getChildren().stream()
-                .map(collection -> getCollectionName(collection.getUniqueId()))
-                .collect(Collectors.toList()));
-
-        try (var viewStoreReader = getViewStoreReader()) {
-            return viewStoreReader.searchFiles(request, collectionsForUser);
         }
     }
 }

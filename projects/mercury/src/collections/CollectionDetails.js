@@ -4,6 +4,7 @@ import {
     Card,
     CardContent,
     CardHeader,
+    Divider,
     FormControl,
     FormGroup,
     FormLabel,
@@ -18,6 +19,7 @@ import {
 } from '@mui/material';
 import {CloudDownload, Folder, MoreVert} from '@mui/icons-material';
 import {useHistory, withRouter} from 'react-router-dom';
+import withStyles from '@mui/styles/withStyles';
 
 import CollectionEditor from './CollectionEditor';
 import type {Collection, Resource, Status} from './CollectionAPI';
@@ -74,6 +76,14 @@ type CollectionDetailsState = {
     unpublishing: boolean,
     anchorEl: any
 };
+
+const styles = theme => ({
+    card: {
+        '& .MuiCardHeader-root .MuiSvgIcon-root': {
+            color: theme.palette.primary.contrastText
+        }
+    }
+});
 
 class CollectionDetails extends React.Component<CollectionDetailsProps, CollectionDetailsState> {
     static defaultProps = {
@@ -265,6 +275,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
     renderDeleted = (dateDeleted: string, deletedBy: User) =>
         dateDeleted && [
+            <Divider component="li" />,
             <ListItem key="dateDeleted" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted</FormLabel>
@@ -273,6 +284,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                     </FormGroup>
                 </FormControl>
             </ListItem>,
+            <Divider component="li" />,
             <ListItem key="deletedBy" disableGutters>
                 <FormControl>
                     <FormLabel>Deleted by</FormLabel>
@@ -351,7 +363,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
 
         return (
             <>
-                <Card>
+                <Card className={this.props.classes.card}>
                     <CardHeader
                         action={
                             menuItems &&
@@ -363,6 +375,7 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                                             aria-owns={anchorEl ? 'long-menu' : undefined}
                                             aria-haspopup="true"
                                             onClick={this.handleMenuClick}
+                                            styles={{color: 'white'}}
                                         >
                                             <MoreVert />
                                         </IconButton>
@@ -388,7 +401,10 @@ class CollectionDetails extends React.Component<CollectionDetailsProps, Collecti
                             {collection.description}
                         </Typography>
                         <List>
-                            <ListItem disableGutters>{this.renderCollectionOwner(ownerWorkspace)}</ListItem>
+                            <ListItem disableGutters divider>
+                                {this.renderCollectionOwner(ownerWorkspace)}
+                            </ListItem>
+                            <Divider component="li" />
                             <ListItem disableGutters>{this.renderCollectionStatus()}</ListItem>
                             {this.renderDeleted(collection.dateDeleted, deletedBy)}
                         </List>
@@ -540,4 +556,4 @@ const ContextualCollectionDetails = props => {
     );
 };
 
-export default withRouter(ContextualCollectionDetails);
+export default withRouter(withStyles(styles)(ContextualCollectionDetails));

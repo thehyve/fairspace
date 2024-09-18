@@ -1,25 +1,29 @@
 const styles = theme => ({
-    modalDialog: {
-        background: theme.palette.grey['200'],
+    modalWrapper: {
         position: 'relative',
-        top: 0,
-        width: 800,
-        bgcolor: 'background.paper',
-        border: '0px solid #000',
-        boxShadow: 0,
-        outline: 'none',
-        p: 4
-    },
-    modalContent: {
-        position: 'relative',
+        '& .MuiBreadcrumbs-root .MuiTypography-root': {
+            color: theme.palette.primary.contrastText
+        },
         top: '10%',
         left: '50%',
         transform: 'translate(-50%, 0px)',
-        maxHeight: '80%',
-        padding: 2,
-        backgroundColor: theme.palette.primary.main,
-        width: 800,
-        overflowY: 'auto'
+        outline: 'none',
+        maxHeight: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        width: 800
+    },
+    modalContent: {
+        background: theme.palette.primary.dark,
+        color: theme.palette.primary.contrastText,
+        bgcolor: 'background.paper',
+        border: '0px solid #000',
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: 0,
+        outline: 'none',
+        overflowY: 'auto',
+        height: '100%',
+        width: '100%'
     },
     closeButton: {
         float: 'right',

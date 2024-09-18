@@ -48,6 +48,10 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
         }
     }
 
+    public DatasetGraph getDatasetGraph() {
+        return dsg;
+    }
+
     @Override
     public void begin(TxnType type) {
         begin(TxnType.convert(type));

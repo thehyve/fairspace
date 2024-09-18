@@ -7,14 +7,14 @@ import styles from './DomainInfo.styles';
 const DomainInfo = props => {
     const {domainName, domainLink, domainIcon, classes} = props;
     return (
-        <div className={classes.outerMargin}>
+        <div className={classes.outerDiv}>
             <Link href={domainLink} className={classes.link}>
                 <Paper className={classes.paper}>
-                    <Typography variant="h6" className={classes.domainText}>
+                    <Typography variant="h5" className={classes.domainText}>
                         {domainName}
                     </Typography>
                     {domainIcon ? (
-                        <Icon classes={{root: classes.imageIconRoot}}>
+                        <Icon classes={{root: classes.imageIconRoot}} size="large">
                             <img alt={domainName} src={domainIcon} className={classes.imageIcon} />
                         </Icon>
                     ) : (

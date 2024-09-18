@@ -1,5 +1,8 @@
 package io.fairspace.saturn.webdav;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 import io.milton.http.exceptions.BadRequestException;
 
 import static org.apache.commons.lang3.StringUtils.strip;
@@ -36,5 +39,11 @@ public class PathUtils {
         if (name.contains("\\")) {
             throw new BadRequestException("The collection name contains an illegal character (\\)");
         }
+    }
+
+    public static String getCollectionNameByUri(String rootSubjectUri, String uri) {
+        var rootLocation = rootSubjectUri + "/";
+        var location = uri.substring(rootLocation.length());
+        return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
     }
 }

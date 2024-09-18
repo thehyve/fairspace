@@ -1,18 +1,22 @@
 const styles = theme => ({
-    paper: {
-        width: '200px',
-        height: '100px',
-        borderStyle: 'solid',
-        borderColor: theme.palette.primary.light,
-        borderWidth: 2,
-        textAlign: 'center'
+    outerDiv: {
+        padding: 10
     },
-    outerMargin: {
-        margin: 10
+    paper: {
+        marginRight: 1,
+        height: 100,
+        minWidth: 90,
+        border: 'none',
+        background: theme.palette.primary.main,
+        '&:hover': {
+            backgroundColor: theme.palette.primary.light
+        },
+        textAlign: 'center'
     },
     icon: {
         marginLeft: 10,
-        marginTop: 10
+        marginTop: 10,
+        color: theme.palette.primary.contrastText
     },
     imageIconRoot: {
         marginTop: 10,
@@ -25,10 +29,12 @@ const styles = theme => ({
         width: 'inherit'
     },
     domainText: {
-        color: theme.palette.grey[700]
+        color: theme.palette.primary.contrastText,
+        paddingTop: 10
     },
     link: {
-        textDecoration: 'none'
+        textDecoration: 'none',
+        alignItems: 'center'
     }
 });
 

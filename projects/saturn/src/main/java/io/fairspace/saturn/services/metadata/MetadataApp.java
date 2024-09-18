@@ -17,10 +17,10 @@ import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.util.ValidationUtils.validate;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
 
+import static java.lang.Boolean.TRUE;
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static java.lang.Boolean.FALSE;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.eclipse.jetty.http.MimeTypes.Type.APPLICATION_JSON;
 import static spark.Spark.delete;
@@ -51,7 +51,7 @@ public class MetadataApp extends BaseApp {
 
         put("/", (req, res) -> {
             var model = deserialize(req.body(), req.contentType());
-            var doMaterializedViewsRefresh = req.queryParamOrDefault(DO_VIEWS_UPDATE, FALSE.toString());
+            var doMaterializedViewsRefresh = req.queryParamOrDefault(DO_VIEWS_UPDATE, TRUE.toString());
 
             api.put(model, Boolean.valueOf(doMaterializedViewsRefresh));
 
@@ -60,7 +60,7 @@ public class MetadataApp extends BaseApp {
         });
         patch("/", (req, res) -> {
             var model = deserialize(req.body(), req.contentType());
-            var doViewsUpdate = req.queryParamOrDefault(DO_VIEWS_UPDATE, FALSE.toString());
+            var doViewsUpdate = req.queryParamOrDefault(DO_VIEWS_UPDATE, TRUE.toString());
             api.patch(model, Boolean.valueOf(doViewsUpdate));
 
             res.status(SC_NO_CONTENT);
@@ -77,7 +77,7 @@ public class MetadataApp extends BaseApp {
                 }
             } else {
                 var model = deserialize(req.body(), req.contentType());
-                var doMaterializedViewsRefresh = req.queryParamOrDefault(DO_VIEWS_UPDATE, FALSE.toString());
+                var doMaterializedViewsRefresh = req.queryParamOrDefault(DO_VIEWS_UPDATE, TRUE.toString());
                 api.delete(model, Boolean.valueOf(doMaterializedViewsRefresh));
             }
 

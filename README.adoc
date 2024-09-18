@@ -1239,7 +1239,7 @@ curl -X POST -H 'Content-type: application/json' -H 'Accept: application/json' -
 |===
 3+| ``POST /api/views/count``
 
-3+| Count rows of a view matching request filters.
+3+| Count rows of a view matching request filters. If `maxDisplayCount` configured in the `views.yaml` for a view, then the count for the view is limited by this value if total count exceeds it. Otherwise, the total count is returned.
 3+| _Parameters:_
 | ``view``
 | string
@@ -1743,18 +1743,67 @@ Only allowed for administrators.
 | ``403``
 | Operation not allowed. The current user is not an administrator.
 | ``409``
+| Maintenance (reindexing or compacting) is already in progress.
+| ``503``
+| Service not available. This means that the application is configured not to use a view database.
+|===
+
+|===
+2+| ``POST /api/maintenance/compact``
+
+2+| Compact the Jena TDB database files.
+
+Jena database files grow fast when using transactions. This operation will compact the database files to reduce their size. If data is inserted using many small transactions the files will be reduced to 10-20% of their original size.
+
+Only allowed for administrators.
+2+| _Response:_
+| ``204``
+| Asynchronous task to compact Jena files has started.
+| ``403``
+| Operation not allowed. The current user is not an administrator.
+| ``409``
+| Maintenance (reindexing or compacting) is already in progress.
+| ``503``
+| Service not available. This means that the application is configured not to use a view database.
+|===
+
+
+.Example of compacting Jena using curl
+[%collapsible]
+====
+[source, bash]
+----
+curl -X POST 'http://localhost:8080/api/maintenance/compact'
+----
+====
+
+|===
+2+| ``GET /api/maintenance/status``
+
+2+| Get the status of maintenance tasks.
+
+It is not possible to run more than one maintenance task at the same time. If you start a task while another task is running, the new task will be rejected. If you want to know in advance whether a task is running, you can use this endpoint.
+
+A text is return
+
+2+| _Response:_
+| ``200``
+| Returns "active" or "inactive"
+| ``403``
+| Operation not allowed. The current user is not an administrator.
+| ``409``
 | Reindexing is already in progress.
 | ``503``
 | Service not available. This means that the application is configured not to use a view database.
 |===
 
 
-.Example recreate index using curl
+.Example of getting the maintenance status using curl
 [%collapsible]
 ====
 [source, bash]
 ----
-curl -X POST 'http://localhost:8080/api/maintenance/reindex'
+curl -X POST 'http://localhost:8080/api/maintenance/status'
 ----
 ====
 
@@ -1900,7 +1949,8 @@ Multiple external Fairspace metadata pages can be configured simultaneously. A l
 | String to be used as a display name of the metadata source.
 | ``url``
 | Fairspace instance to connect to. If the url is not specified, the metadata source will be treated as the internal one.
-| *Important!* There should only be a single configuration of internal metadata (only the first one will not be ignored).
+
+*Important!* There should only be a single configuration of internal metadata (only the first one will not be ignored).
 | ``icon-name``
 | Name of an icon configured in the "icons" section of values.yaml file. If the name is not specified, there will be a default icon used.
 |===
@@ -2498,18 +2548,20 @@ DOCKER_LOGGING_DRIVER=json-file
 ----
 
 To run the development version, checkout this repository,
-navigate to ``projects/mercury`` and run
+navigate to ``projects/mercury`` and run the following commands (``yarn install`` only has to be ran the first time running fairspace).
 
 [source, shell]
 ----
+yarn install
 yarn dev
 ----
+
 
 This will start a Keycloak instance for authentication at port ``5100``,
 the backend application named Saturn at port ``8080`` and the
 user interface at port ``3000``.
 
-At first run, you need to configure the service account in Keycloak.
+At first run, you need to configure the service account in Keycloak. If you cannot log in, you might need to restart fairspace by closing it and running ``yarn dev`` again.
 
 * Navigate to link:http://localhost:5100[http://localhost:5100]
 * Login with credentials ``keycloak``, ``keycloak``
@@ -2518,7 +2570,7 @@ At first run, you need to configure the service account in Keycloak.
 ** Click `Clients` in the left menu -> Select 'workspace-client'
 ** Choose tab `Service Account Roles`
 ** Click `Assign Role`
-** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Asign role`.
+** Select `Filter by clients` from the drop down menu and search for role name `view-users`. Then click `Assign`.
 
 Now everything should be ready to start using Fairspace:
 
@@ -2549,16 +2601,16 @@ ghcr.io/thehyve/helm-charts/fairspace (GitHub Packages of the Fairspace reposito
 
 We provide a number of charts for various components that can be used in combination, or separately:
 
-- _Fairspace Keycloak_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>.
-(Chart source: https://github.com/thehyve/fairspace-keycloak[].)
-- _Fairspace_: Installs the Fairspace application, including the _saturn_ backend, _pluto_ proxy, _mercury_ frontend and a PostgreSQL database, and configures an ingress node for Fairspace.
-- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically. (Chart source: https://github.com/thehyve/fairspace-jupyter[].)
+- _Fairspace Keycloak_: Installs Keycloak and configures an ingress node for Keycloak. This chart is not required if Keycloak is already installed separately. You still need to <<Configure a Keycloak realm for Fairspace,configure a Keycloak realm for Fairspace>>
+(chart source: https://github.com/thehyve/fairspace-keycloak[]).
+- _Fairspace_: Installs the Fairspace application, including the _saturn_ backend, _pluto_ proxy, _mercury_ frontend and a PostgreSQL database, and configures an ingress node for Fairspace (chart source: https://github.com/thehyve/fairspace[]).
+- _Jupyter_: Installs a version of Jupyter Hub that uses Keycloak for authentication and launches a link:https://jupyter-docker-stacks.readthedocs.io/en/latest/using/selecting.html#jupyter-datascience-notebook[jupyter-datascience-notebook] based Jupyter notebook with the Fairspace collections file system mounted automatically (chart source: https://github.com/thehyve/fairspace-jupyter[]).
 
 ==== Instructions for deploying to Google Cloud
 
 ===== Download and install helm and gcloud
 
-* Download ``helm 3.14.3`` from https://github.com/helm/helm/releases/tag/v3.14.3
+* Download ``helm 3.14.3`` (or higher) from https://github.com/helm/helm/releases/tag/v3.14.3
 * Extract the downloaded archive to ``~/bin/helm`` and check with:
 +
 [source, shell]
@@ -2572,22 +2624,11 @@ We provide a number of charts for various components that can be used in combina
 +
 [source, shell]
 ----
-gcloud container clusters get-credentials <cluster id> --zone europe-west1-b
+gcloud iam service-accounts keys create credentials.json --iam-account <iam account id, e.g. fairspace-207108@appspot.gserviceaccount.com>
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
+gcloud container clusters get-credentials <cluster id, e.g. fairspacecicluster> --zone europe-west1-b --project <project id, e.g. fairspace-207108>
 ----
-+
-Use ``fairspacecicluster`` as cluster id for the CI environment.
-Ensure that your Google account has access to the ``fairspace-207108`` GCP project and set the project property
-+
-[source, shell]
-----
-gcloud config set project fairspace-207108
-----
-Log in using
-+
-[source, shell]
-----
-gcloud auth login
-----
+
 * Check if all tools are correctly installed:
 +
 [source, shell]
@@ -2598,18 +2639,6 @@ gcloud container clusters list
 kubectl get ns
 # List helm releases (deployments)
 ~/bin/helm/helm list -A
-----
-
-===== Initialise helm and login to Fairspace GitHub Packages
-[source, shell]
-----
-# Add the stable repo (prepare and use personal access token, also known as PAT, within your GitHub account as a password)
-~/bin/helm/helm registry login ghcr.io/fairspace/helm-charts --username <your github account> --password-stdin
-# (Optional) Add the fairspace repo via the GCS plugin for writing
-~/bin/helm/helm plugin install https://github.com/hayorov/helm-gcs.git --version 0.4.2
-gcloud iam service-accounts keys create credentials.json --iam-account fairspace-207108@appspot.gserviceaccount.com
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/credentials.json
-~/bin/helm/helm repo add fairspace-gcs gs://fairspace-helm
 ----
 
 ===== Configure DNS
@@ -2624,16 +2653,10 @@ Create DNS records for the ``keycloak.example.com``, ``fairspace.example.com`` a
 ===== Fetch charts
 [source, shell]
 ----
-# Update repo
-~/bin/helm/helm repo update
-# List available fairspace-keycloak chart versions
-~/bin/helm/helm search repo --versions fairspace/fairspace-keycloak
 # Fetch the fairspace-keycloak chart
-~/bin/helm/helm pull fairspace/fairspace-keycloak --version 0.7.0
-# List available fairspace chart versions
-~/bin/helm/helm search repo --versions fairspace/fairspace
+~/bin/helm/helm pull oci://ghcr.io/thehyve/fairspace/helm-charts/fairspace-keycloak --version 0.7.0
 # Fetch the fairspace chart
-~/bin/helm/helm pull fairspace/fairspace --version 1.0.0
+~/bin/helm/helm pull oci://ghcr.io/thehyve/fairspace/helm-charts/fairspace --version 2.0.1
 ----
 
 ===== Deploy Keycloak
@@ -2646,7 +2669,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace Keycloak chart:
 [source, shell]
 ----
-~/bin/helm/helm install keycloak-new fairspace/fairspace-keycloak --version 0.7.0 --namespace keycloak-new \
+~/bin/helm/helm install keycloak-new fairspace-keycloak-0.7.0.tgz --namespace=keycloak-new \
 -f /path/to/fairspace-keycloak-values.yaml
 ----
 You can pass values files with ``-f`` or ``--values``.
@@ -2721,7 +2744,7 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Fairspace chart:
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 1.0.0 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace-2.0.1.tgz --namespace=fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml
 ----
 You can pass values files with ``-f`` and provide a file for a specified
@@ -2818,7 +2841,7 @@ Additionally, to include custom icons for `fairspace.icons` option, you need to 
 
 [source, shell]
 ----
-~/bin/helm/helm install fairspace-new fairspace/fairspace --version 1.0.0 --namespace fairspace-new \
+~/bin/helm/helm install fairspace-new fairspace-2.0.1.tgz --namespace=fairspace-new \
 -f /path/to/values.yaml --set-file saturn.vocabulary=/path/to/vocabulary.ttl --set-file saturn.views=/path/to/views.yaml --set-file svgicons.extra-icon=/path/to/extra-icon.svg
 ----
 
@@ -2834,7 +2857,8 @@ Create a new deployment (called _release_ in helm terminology) and
 install the Jupyter Hub chart:
 [source, shell]
 ----
-~/bin/helm/helm install jupyterhub-new fairspace/jupyter --version 0.8.9 --namespace jupyterhub-new \
+~/bin/helm/helm pull oci://ghcr.io/thehyve/fairspace/helm-charts/fairspace-jupyter --version 0.8.9
+~/bin/helm/helm install jupyterhub-new fairspace-jupyter-0.8.9.tgz --namespace=jupyterhub-new \
 -f /path/to/values.yaml
 ----
 You can pass values files with ``-f``.
@@ -2874,7 +2898,7 @@ jupyterhub:
 To update a deployment using a new chart:
 [source, shell]
 ----
-~/bin/helm/helm upgrade fairspace-new fairspace-1.0.0.tgz
+~/bin/helm/helm upgrade fairspace-new fairspace-2.0.1.tgz
 ----
 With ``helm upgrade`` you can also pass new values files with ``-f``
 and pass files with ``--set-file`` as for ``helm install``.
@@ -3268,7 +3292,7 @@ To address this issue, materialized views are used for enhanced performance.
 There are two types of materialized views: one for denormalized data, which includes the view ID and attribute data of Set/TermSet types, and another for joined views.
 For each joined view, there is one corresponding join materialized view (as specified in the views.yaml config).
 
-Materialized views are refreshed during database reindexing and metadata updates, provided that the doViewsUpdate flag is set to true in the metadata endpoints.
+Materialized views are refreshed during database reindexing, on Saturn initialization stage and metadata updates, provided that the doViewsUpdate flag is set to true in the metadata endpoints. The refresh is performed concurrently what allows for the system to be available during the update providing the old version of data until the new one is ready. To skip materialized views refresh on Saturn initialization stage, update the Saturn ConfigMap setting false value to `viewDatabase.mvRefreshOnStartRequired`.
 
 ==== Extra file storage
 
