@@ -1,7 +1,5 @@
 package io.fairspace.saturn.controller;
 
-import io.fairspace.saturn.controller.validation.ValidSparqlReadQuery;
-import io.fairspace.saturn.services.views.SparqlQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -10,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.fairspace.saturn.controller.validation.ValidSparqlReadQuery;
+import io.fairspace.saturn.services.views.SparqlQueryService;
 
 @RestController
 @RequestMapping("/api/rdf")
@@ -31,5 +32,4 @@ public class SparqlController {
         var json = sparqlQueryService.executeQuery(sparqlQuery);
         return ResponseEntity.ok(json);
     }
-
 }

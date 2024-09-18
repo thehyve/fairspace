@@ -1,12 +1,13 @@
 package io.fairspace.saturn.config.health;
 
-import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import org.springframework.boot.actuate.availability.ReadinessStateHealthIndicator;
 import org.springframework.boot.availability.ApplicationAvailability;
 import org.springframework.boot.availability.AvailabilityState;
 import org.springframework.boot.availability.ReadinessState;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+
+import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 
 @Component
 public class FairspaceReadinessStateHealthIndicator extends ReadinessStateHealthIndicator {
@@ -15,8 +16,8 @@ public class FairspaceReadinessStateHealthIndicator extends ReadinessStateHealth
 
     private final ViewStoreClientFactory viewStoreClientFactory;
 
-    public FairspaceReadinessStateHealthIndicator(ApplicationAvailability availability,
-                                                  @Nullable ViewStoreClientFactory viewStoreClientFactory) {
+    public FairspaceReadinessStateHealthIndicator(
+            ApplicationAvailability availability, @Nullable ViewStoreClientFactory viewStoreClientFactory) {
         super(availability);
         this.viewStoreClientFactory = viewStoreClientFactory;
     }

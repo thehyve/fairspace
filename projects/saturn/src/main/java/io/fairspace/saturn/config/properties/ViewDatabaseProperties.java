@@ -16,5 +16,5 @@ public class ViewDatabaseProperties {
     private boolean autoCommitEnabled;
     private int maxPoolSize;
     private int connectionTimeout;
-
+    private boolean mvRefreshOnStartRequired;
 }

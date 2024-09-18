@@ -1,8 +1,9 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
-import io.fairspace.saturn.services.views.ViewStoreClientFactory;
-import io.fairspace.saturn.services.views.ViewUpdater;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.jena.graph.Node;
@@ -11,9 +12,9 @@ import org.apache.jena.query.TxnType;
 import org.apache.jena.query.text.changes.TextQuadAction;
 import org.apache.jena.sparql.core.DatasetGraph;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
+import io.fairspace.saturn.services.views.ViewStoreClientFactory;
+import io.fairspace.saturn.services.views.ViewUpdater;
 
 import static io.fairspace.saturn.services.users.UserService.currentUserAsSymbol;
 

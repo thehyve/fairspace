@@ -45,8 +45,7 @@ public class RequestContext {
     }
 
     public static Node getUserURI() {
-        return getJwt()
-                .map(JwtClaimAccessor::getSubject)
+        return getJwt().map(JwtClaimAccessor::getSubject)
                 .map(SparqlUtils::generateMetadataIriFromId)
                 .or(() -> Optional.ofNullable(currentUserUri.get()).map(SparqlUtils::generateMetadataIriFromUri))
                 .orElse(null);

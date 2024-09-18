@@ -1,13 +1,13 @@
 package io.fairspace.saturn.config.properties;
 
+import java.util.List;
+
 import lombok.Data;
 import org.apache.jena.dboe.base.block.FileMode;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.apache.jena.tdb2.params.StoreParamsBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Data
 @Component
@@ -55,10 +55,20 @@ public class StoreParamsProperties {
     }
 
     private boolean isStoreParamsSet() {
-        return fileMode != null || blockSize != null || blockReadCacheSize != null ||
-                blockWriteCacheSize != null || node2nodeidCacheSize != null || nodeid2nodeCacheSize != null ||
-                nodeMissCacheSize != null || nodeTable != null || tripleIndexPrimary != null ||
-                tripleIndexes != null || quadIndexPrimary != null || quadIndexes != null ||
-                prefixTable != null || prefixIndexPrimary != null || prefixIndexes != null;
+        return fileMode != null
+                || blockSize != null
+                || blockReadCacheSize != null
+                || blockWriteCacheSize != null
+                || node2nodeidCacheSize != null
+                || nodeid2nodeCacheSize != null
+                || nodeMissCacheSize != null
+                || nodeTable != null
+                || tripleIndexPrimary != null
+                || tripleIndexes != null
+                || quadIndexPrimary != null
+                || quadIndexes != null
+                || prefixTable != null
+                || prefixIndexPrimary != null
+                || prefixIndexes != null;
     }
 }

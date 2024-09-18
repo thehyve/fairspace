@@ -1,14 +1,15 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.StoreParamsProperties;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import java.io.File;
+
 import org.apache.jena.rdf.model.Statement;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.io.FileUtils.deleteDirectory;

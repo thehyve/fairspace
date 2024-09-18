@@ -13,7 +13,8 @@ public class LogoutApp extends BaseApp {
     private final KeycloakClientProperties keycloakClientProperties;
     private final String publicUrl;
 
-    public LogoutApp(String basePath, UserService service, KeycloakClientProperties keycloakClientProperties, String publicUrl) {
+    public LogoutApp(
+            String basePath, UserService service, KeycloakClientProperties keycloakClientProperties, String publicUrl) {
         super(basePath);
         this.service = service;
         this.keycloakClientProperties = keycloakClientProperties;
@@ -29,7 +30,11 @@ public class LogoutApp extends BaseApp {
             res.header(
                     "Location",
                     "%srealms/%s/protocol/openid-connect/logout?post_logout_redirect_uri=%s&id_token_hint=%s"
-                            .formatted(keycloakClientProperties.getAuthServerUrl(), keycloakClientProperties.getRealm(), publicUrl, idToken));
+                            .formatted(
+                                    keycloakClientProperties.getAuthServerUrl(),
+                                    keycloakClientProperties.getRealm(),
+                                    publicUrl,
+                                    idToken));
             return "";
         });
     }

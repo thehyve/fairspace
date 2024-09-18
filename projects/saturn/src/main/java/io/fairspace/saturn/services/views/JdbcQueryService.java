@@ -1,16 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.milton.resource.CollectionResource;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
@@ -24,8 +13,8 @@ import io.milton.resource.CollectionResource;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
 

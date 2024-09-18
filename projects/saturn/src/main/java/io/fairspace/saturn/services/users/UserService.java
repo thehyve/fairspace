@@ -1,19 +1,5 @@
 package io.fairspace.saturn.services.users;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import io.fairspace.saturn.config.properties.KeycloakClientProperties;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.AccessDeniedException;
-import jakarta.ws.rs.NotFoundException;
-import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.sparql.util.Symbol;
-import org.keycloak.admin.client.resource.UsersResource;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,8 +11,24 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import jakarta.ws.rs.NotFoundException;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.sparql.util.Symbol;
+import org.keycloak.admin.client.resource.UsersResource;
+
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.AccessDeniedException;
+
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUserStringUri;
+
 import static java.util.stream.Collectors.toMap;
 
 @Log4j2
@@ -37,7 +39,8 @@ public class UserService {
     private final UsersResource usersResource;
     private final ExecutorService threadpool = Executors.newSingleThreadExecutor();
 
-    public UserService(KeycloakClientProperties keycloakClientProperties, Transactions transactions, UsersResource usersResource) {
+    public UserService(
+            KeycloakClientProperties keycloakClientProperties, Transactions transactions, UsersResource usersResource) {
         this.keycloakClientProperties = keycloakClientProperties;
         this.transactions = transactions;
         this.usersResource = usersResource;
@@ -56,9 +59,7 @@ public class UserService {
     }
 
     public User currentUser() {
-        return getCurrentUserStringUri()
-                .map(uri -> getUsersMap().get(uri))
-                .orElse(null);
+        return getCurrentUserStringUri().map(uri -> getUsersMap().get(uri)).orElse(null);
     }
 
     public Map<String, User> getUsersMap() {

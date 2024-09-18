@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.http.Auth;
 import io.milton.http.Request;
 import io.milton.http.exceptions.BadRequestException;
@@ -16,6 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.vocabulary.FS;
 import io.fairspace.saturn.webdav.Access;
 import io.fairspace.saturn.webdav.DavFactory;
@@ -32,11 +32,6 @@ public class ExtraStorageRootResource extends RootResource {
     public ExtraStorageRootResource(DavFactory factory, WebDavProperties webDavProperties) {
         super(factory);
         this.webDavProperties = webDavProperties;
-    }
-
-    @Override
-    public boolean authorise(Request request, Request.Method method, Auth auth) {
-        return true;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import org.apache.jena.rdf.model.Model;
@@ -13,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.services.metadata.MetadataService;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
@@ -31,16 +31,16 @@ public class CollectionResourceTest {
     public static final String BASE_PATH = "/api/webdav";
     private static final String baseUri = "http://example.com" + BASE_PATH;
 
-    private Model model = createTxnMem().getDefaultModel();
+    private final Model model = createTxnMem().getDefaultModel();
     private CollectionResource resource;
 
-    private Resource WORKSPACE_1 = model.createResource("http://localhost/iri/W1");
-    private Resource WORKSPACE_2 = model.createResource("http://localhost/iri/W2");
-    private Resource COLLECTION_1 = model.createResource("http://localhost/iri/C1");
-    private Resource USER_1 = model.createResource("http://localhost/iri/userid1");
-    private Resource USER_2 = model.createResource("http://localhost/iri/userid2");
-    private Resource USER_3 = model.createResource("http://localhost/iri/userid3");
-    private Resource USER_4 = model.createResource("http://localhost/iri/userid4");
+    private final Resource WORKSPACE_1 = model.createResource("http://localhost/iri/W1");
+    private final Resource WORKSPACE_2 = model.createResource("http://localhost/iri/W2");
+    private final Resource COLLECTION_1 = model.createResource("http://localhost/iri/C1");
+    private final Resource USER_1 = model.createResource("http://localhost/iri/userid1");
+    private final Resource USER_2 = model.createResource("http://localhost/iri/userid2");
+    private final Resource USER_3 = model.createResource("http://localhost/iri/userid3");
+    private final Resource USER_4 = model.createResource("http://localhost/iri/userid4");
 
     @Mock
     BlobStore store;

@@ -42,7 +42,8 @@ public class MaintenanceService {
             @NonNull UserService userService,
             @NonNull Dataset dataset,
             ViewStoreClientFactory viewStoreClientFactory,
-            ViewService viewService, String publicUrl) {
+            ViewService viewService,
+            String publicUrl) {
         this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
@@ -130,17 +131,13 @@ public class MaintenanceService {
      * @return the underlying dataset graph that supports compacting
      */
     public static DatasetGraph unwrap(DatasetGraph dsg) {
-        if (dsg == null || dsg instanceof DatasetGraphSwitchable) {
-            return dsg;
-        }
-        if (dsg instanceof TxnLogDatasetGraph) {
-            return unwrap(((TxnLogDatasetGraph) dsg).getDatasetGraph());
-        }
+        return switch (dsg) {
+            case null -> dsg;
+            case DatasetGraphSwitchable datasetGraphSwitchable -> dsg;
+            case TxnLogDatasetGraph txnLogDatasetGraph -> unwrap(txnLogDatasetGraph.getDatasetGraph());
+            case TxnIndexDatasetGraph txnIndexDatasetGraph -> unwrap(txnIndexDatasetGraph.getDatasetGraph());
+            default -> null;
+        };
 
-        if (dsg instanceof TxnIndexDatasetGraph) {
-            return unwrap(((TxnIndexDatasetGraph) dsg).getDatasetGraph());
-        }
-
-        return null;
     }
 }

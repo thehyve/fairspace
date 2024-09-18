@@ -3,8 +3,6 @@ package io.fairspace.saturn.rdf.transactions;
 import java.io.File;
 import java.io.IOException;
 
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import org.apache.jena.dboe.transaction.txn.TransactionException;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.shared.LockMRSW;
@@ -12,7 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;

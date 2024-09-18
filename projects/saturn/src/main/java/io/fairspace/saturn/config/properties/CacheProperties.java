@@ -21,6 +21,5 @@ public class CacheProperties {
         private boolean autoRefreshEnabled;
 
         private Long refreshFrequencyInHours;
-
     }
 }

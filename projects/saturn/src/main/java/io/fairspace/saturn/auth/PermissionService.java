@@ -1,8 +1,9 @@
 package io.fairspace.saturn.auth;
 
-import io.fairspace.saturn.services.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import io.fairspace.saturn.services.users.UserService;
 
 @Service
 @RequiredArgsConstructor
@@ -15,5 +16,4 @@ public class PermissionService {
         var user = userService.currentUser();
         return user != null && user.isCanQueryMetadata();
     }
-
 }

@@ -1,11 +1,12 @@
 package io.fairspace.saturn.config.properties;
 
-import io.fairspace.saturn.config.Feature;
+import java.util.Set;
+
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import io.fairspace.saturn.config.Feature;
 
 @Data
 @Component
@@ -13,5 +14,4 @@ import java.util.Set;
 public class FeatureProperties {
 
     private Set<Feature> features;
-
 }

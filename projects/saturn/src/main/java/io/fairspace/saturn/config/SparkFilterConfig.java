@@ -1,14 +1,15 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.config.properties.FeatureProperties;
-import io.fairspace.saturn.config.properties.KeycloakClientProperties;
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import spark.servlet.SparkFilter;
 
-import java.util.Arrays;
+import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 
 import static io.fairspace.saturn.config.SparkFilterFactory.createSparkFilter;
 
@@ -20,17 +21,18 @@ public class SparkFilterConfig {
 
     // todo: to be removed once switched to Spring MVC
     @Bean
-    public FilterRegistrationBean<SparkFilter> sparkFilter(Services svc, FeatureProperties featureProperties,
-                                                           KeycloakClientProperties keycloakClientProperties,
-                                                           @Value("${application.publicUrl}") String publicUrl) {
+    public FilterRegistrationBean<SparkFilter> sparkFilter(
+            Services svc,
+            FeatureProperties featureProperties,
+            KeycloakClientProperties keycloakClientProperties,
+            @Value("${application.publicUrl}") String publicUrl) {
         var registrationBean = new FilterRegistrationBean<SparkFilter>();
         var sparkFilter = createSparkFilter("/api", svc, keycloakClientProperties, featureProperties, publicUrl);
         registrationBean.setFilter(sparkFilter);
         // we cannot set /api/* as the url pattern, because it would override /api/webdav/*
         // endpoints which defined as a separate servlet
-        String[] urls = Arrays.stream(sparkFilter.getUrls())
-                .map(url -> url + "/*")
-                .toArray(String[]::new);
+        String[] urls =
+                Arrays.stream(sparkFilter.getUrls()).map(url -> url + "/*").toArray(String[]::new);
         registrationBean.addUrlPatterns(urls);
         return registrationBean;
     }

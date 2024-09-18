@@ -1,13 +1,14 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.config.Services;
-import io.fairspace.saturn.config.condition.ConditionalOnMultiValuedProperty;
+import java.util.Arrays;
+
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
-import java.util.Arrays;
+import io.fairspace.saturn.config.Services;
+import io.fairspace.saturn.config.condition.ConditionalOnMultiValuedProperty;
 
 @Configuration
 public class WebDAVConfig {
@@ -32,7 +33,8 @@ public class WebDAVConfig {
     @Bean
     public StrictHttpFirewall webDavFilterFirewall() {
         final StrictHttpFirewall firewall = new StrictHttpFirewall();
-        firewall.setAllowedHttpMethods(Arrays.stream(ExtendedHttpMethod.values()).map(Enum::name).toList());
+        firewall.setAllowedHttpMethods(
+                Arrays.stream(ExtendedHttpMethod.values()).map(Enum::name).toList());
         return firewall;
     }
 

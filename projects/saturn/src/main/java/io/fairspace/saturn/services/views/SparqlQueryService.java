@@ -1,14 +1,15 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
+import java.io.ByteArrayOutputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
 import org.apache.jena.query.Dataset;
@@ -17,7 +18,6 @@ import org.apache.jena.query.QueryCancelledException;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
@@ -38,18 +38,16 @@ import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
 
-import java.io.ByteArrayOutputStream;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getResourceProperties;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -73,7 +71,8 @@ public class SparqlQueryService implements QueryService {
     private final Dataset ds;
     private final Transactions transactions;
 
-    public SparqlQueryService(SearchProperties searchProperties, ViewsConfig viewsConfig, Dataset ds, Transactions transactions) {
+    public SparqlQueryService(
+            SearchProperties searchProperties, ViewsConfig viewsConfig, Dataset ds, Transactions transactions) {
         this.searchProperties = searchProperties;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
@@ -96,7 +95,6 @@ public class SparqlQueryService implements QueryService {
                 throw new RuntimeException(e);
             }
         });
-
     }
 
     public ViewPageDTO retrieveViewPage(ViewRequest request) {

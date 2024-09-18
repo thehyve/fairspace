@@ -1,16 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import com.google.common.collect.Sets;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
-import io.fairspace.saturn.vocabulary.FS;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,6 +21,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.common.collect.Sets;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.ViewsConfig.ColumnType;
+import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.services.search.FileSearchRequest;
+import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.vocabulary.FS;
+
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
@@ -51,7 +53,8 @@ public class ViewStoreReader implements AutoCloseable {
     final Connection connection;
 
     // TODO: in whole class, use StringBuilder instead of String concats
-    public ViewStoreReader(SearchProperties searchProperties, ViewsConfig viewsConfig, ViewStoreClientFactory viewStoreClientFactory)
+    public ViewStoreReader(
+            SearchProperties searchProperties, ViewsConfig viewsConfig, ViewStoreClientFactory viewStoreClientFactory)
             throws SQLException {
         this.searchProperties = searchProperties;
         this.viewsConfig = viewsConfig;

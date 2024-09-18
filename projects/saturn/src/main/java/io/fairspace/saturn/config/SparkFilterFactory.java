@@ -13,10 +13,12 @@ import io.fairspace.saturn.services.views.ViewApp;
 import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 
 public class SparkFilterFactory {
-    public static SaturnSparkFilter createSparkFilter(String apiPathPrefix, Services svc,
-                                                      KeycloakClientProperties keycloakClientProperties,
-                                                      FeatureProperties featureProperties,
-                                                      String publicUrl) {
+    public static SaturnSparkFilter createSparkFilter(
+            String apiPathPrefix,
+            Services svc,
+            KeycloakClientProperties keycloakClientProperties,
+            FeatureProperties featureProperties,
+            String publicUrl) {
         return new SaturnSparkFilter(
                 new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),

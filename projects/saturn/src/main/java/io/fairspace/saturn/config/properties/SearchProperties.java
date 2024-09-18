@@ -17,5 +17,4 @@ public class SearchProperties {
      * maxJoinItems is used to limit number of joined entries (from the join view) to decrease the response size
      */
     private int maxJoinItems;
-
 }

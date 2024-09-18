@@ -13,9 +13,6 @@ import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.*;
-import io.fairspace.saturn.services.search.FileSearchService;
-import io.fairspace.saturn.services.search.JdbcFileSearchService;
 import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.DeletionValidator;
 import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
@@ -23,6 +20,8 @@ import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredic
 import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
 import io.fairspace.saturn.services.metadata.validation.URIPrefixValidator;
 import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
+import io.fairspace.saturn.services.search.FileSearchService;
+import io.fairspace.saturn.services.search.JdbcFileSearchService;
 import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.search.SparqlFileSearchService;
 import io.fairspace.saturn.services.users.UserService;
@@ -47,10 +46,9 @@ import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
 import org.keycloak.admin.client.resource.UsersResource;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
-import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 import java.io.File;
 
+import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @Log4j2
@@ -108,7 +106,8 @@ public class Services {
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
         if (featureProperties.getFeatures().contains(Feature.ExtraStorage)) {
-            extraBlobStore = new DeletableLocalBlobStore(new File(webDavProperties.getExtraStorage().getBlobStorePath()));
+            extraBlobStore = new DeletableLocalBlobStore(
+                    new File(webDavProperties.getExtraStorage().getBlobStorePath()));
             extraDavFactory = new DavFactory(
                     dataset.getDefaultModel().createResource(publicUrl + "/api/extra-storage"),
                     extraBlobStore,
@@ -143,9 +142,9 @@ public class Services {
 
         sparqlQueryService = new SparqlQueryService(searchProperties, viewsConfig, filteredDataset, transactions);
         queryService = viewStoreClientFactory == null
-                ? new SparqlQueryService(searchProperties, viewsConfig, filteredDataset)
+                ? new SparqlQueryService(searchProperties, viewsConfig, filteredDataset, transactions)
                 : new JdbcQueryService(
-                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+                        searchProperties, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
 
         // File search should be done using JDBC for performance reasons. However, if the view store is not available,
         // or collections and files view is not configured, we fall back to using SPARQL queries on the RDF database
@@ -156,15 +155,20 @@ public class Services {
         fileSearchService = useSparqlFileSearchService
                 ? new SparqlFileSearchService(filteredDataset)
                 : new JdbcFileSearchService(
-                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+                        searchProperties, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
 
-        viewService =
-                new ViewService(searchProperties, cacheProperties, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
+        viewService = new ViewService(
+                searchProperties,
+                cacheProperties,
+                viewsConfig,
+                filteredDataset,
+                viewStoreClientFactory,
+                metadataPermissions);
 
-        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService, publicUrl);
+        maintenanceService =
+                new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService, publicUrl);
 
         searchService = new SearchService(filteredDataset);
-
     }
 
     private void initExtraStorageRootDirectories(WebDavProperties.ExtraStorage extraStorage) {

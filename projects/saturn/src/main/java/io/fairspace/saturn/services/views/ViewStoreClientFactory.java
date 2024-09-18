@@ -1,21 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
-import io.fairspace.saturn.vocabulary.FS;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -36,10 +20,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
@@ -70,9 +55,8 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig,
-                                  ViewDatabaseProperties  viewDatabaseProperties,
-                                  SearchProperties searchProperties)
+    public ViewStoreClientFactory(
+            ViewsConfig viewsConfig, ViewDatabaseProperties viewDatabaseProperties, SearchProperties searchProperties)
             throws SQLException {
         log.debug("Initializing the database connection");
         var databaseConfig = new HikariConfig();
@@ -98,8 +82,9 @@ public class ViewStoreClientFactory {
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
-        materializedViewService = new MaterializedViewService(dataSource, configuration, searchProperties.getMaxJoinItems);
-        if (viewDatabase.mvRefreshOnStartRequired) {
+        materializedViewService =
+                new MaterializedViewService(dataSource, configuration, searchProperties.getMaxJoinItems());
+        if (viewDatabaseProperties.isMvRefreshOnStartRequired()) {
             materializedViewService.createOrUpdateAllMaterializedViews();
         } else {
             log.warn("Skipping materialized view refresh on start");
