@@ -3,6 +3,8 @@ package io.fairspace.saturn.rdf;
 import java.io.File;
 import java.io.IOException;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,8 +14,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
-
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -54,7 +54,7 @@ public class SaturnDatasetFactoryTest {
     public void testUnwrappingDatasetGraphIsOfRightType() {
         // give
         var viewStoreClientFactory = mock(ViewStoreClientFactory.class);
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, viewStoreClientFactory);
+        var ds = SaturnDatasetFactory.connect(new JenaProperties("", new StoreParamsProperties()), viewStoreClientFactory, "");
 
         var dataSetGraph = MaintenanceService.unwrap(ds.asDatasetGraph());
 

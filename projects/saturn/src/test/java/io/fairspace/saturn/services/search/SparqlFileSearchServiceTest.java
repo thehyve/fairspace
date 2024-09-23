@@ -1,26 +1,6 @@
 package io.fairspace.saturn.services.search;
 
-import java.io.IOException;
-
-import io.milton.http.ResourceFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.MakeCollectionableResource;
-import io.milton.resource.PutableResource;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.util.Context;
-import org.eclipse.jetty.server.Authentication;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import io.fairspace.saturn.config.ConfigLoader;
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
@@ -37,18 +17,41 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.MakeCollectionableResource;
+import io.milton.resource.PutableResource;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.util.Context;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static io.fairspace.saturn.TestUtils.*;
+import java.io.IOException;
+
+import static io.fairspace.saturn.TestUtils.createTestUser;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-
 import static org.apache.jena.query.DatasetFactory.wrap;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SparqlFileSearchServiceTest {
     static final String BASE_PATH = "/api/webdav";
-    static final String baseUri = ConfigLoader.CONFIG.publicUrl + BASE_PATH;
+    static final String baseUri = "http://localhost:8080" + BASE_PATH;
 
     @Mock
     BlobStore store;
@@ -64,37 +67,37 @@ public class SparqlFileSearchServiceTest {
     FileSearchService fileSearchService;
 
     User user;
-    Authentication.User userAuthentication;
+//    Authentication.User userAuthentication;
     User user2;
-    Authentication.User user2Authentication;
+//    Authentication.User user2Authentication;
     User workspaceManager;
-    Authentication.User workspaceManagerAuthentication;
+//    Authentication.User workspaceManagerAuthentication;
     User admin;
-    Authentication.User adminAuthentication;
-    private org.eclipse.jetty.server.Request request;
+//    Authentication.User adminAuthentication;
+    private HttpServletRequest request;
 
     private void selectRegularUser() {
-        lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
+//        lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
         lenient().when(userService.currentUser()).thenReturn(user);
     }
 
     private void selectAdmin() {
-        lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
+//        lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
 
     private void setupUsers(Model model) {
-        userAuthentication = mockAuthentication("user");
+//        userAuthentication = mockAuthentication("user");
         user = createTestUser("user", false);
         user.setCanViewPublicMetadata(true);
         new DAO(model).write(user);
-        user2Authentication = mockAuthentication("user2");
+//        user2Authentication = mockAuthentication("user2");
         user2 = createTestUser("user2", false);
         new DAO(model).write(user2);
         workspaceManager = createTestUser("workspace-admin", false);
         new DAO(model).write(workspaceManager);
-        workspaceManagerAuthentication = mockAuthentication("workspace-admin");
-        adminAuthentication = mockAuthentication("admin");
+//        workspaceManagerAuthentication = mockAuthentication("workspace-admin");
+//        adminAuthentication = mockAuthentication("admin");
         admin = createTestUser("admin", true);
         new DAO(model).write(admin);
     }
@@ -110,7 +113,7 @@ public class SparqlFileSearchServiceTest {
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
+        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
