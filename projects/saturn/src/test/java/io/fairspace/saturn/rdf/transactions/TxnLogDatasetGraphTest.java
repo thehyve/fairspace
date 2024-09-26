@@ -1,22 +1,29 @@
 package io.fairspace.saturn.rdf.transactions;
 
-import java.io.IOException;
-
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.io.IOException;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
-
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
 import static org.apache.jena.sparql.core.DatasetGraphFactory.createTxnMem;
 import static org.apache.jena.sparql.core.Quad.defaultGraphNodeGenerated;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TxnLogDatasetGraphTest {
@@ -35,6 +42,11 @@ public class TxnLogDatasetGraphTest {
         setupRequestContext();
         ds = DatasetFactory.wrap(new TxnLogDatasetGraph(createTxnMem(), log));
         txn = new BulkTransactions(ds);
+    }
+
+    @After
+    public void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test

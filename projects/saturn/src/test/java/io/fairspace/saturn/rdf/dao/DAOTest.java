@@ -1,5 +1,7 @@
 package io.fairspace.saturn.rdf.dao;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
@@ -44,6 +46,8 @@ public class DAOTest {
         entity = new Entity();
         entityWithInheritedProperties = new EntityWithInheritedProperties();
         basicEntity = new LifecycleAwareEntity();
+        // the line below looks ridiculous, but it is necessary to set static field of metadata base URI
+        new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
         setupRequestContext();
     }
 

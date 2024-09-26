@@ -54,7 +54,10 @@ public class SaturnDatasetFactoryTest {
     public void testUnwrappingDatasetGraphIsOfRightType() {
         // give
         var viewStoreClientFactory = mock(ViewStoreClientFactory.class);
-        var ds = SaturnDatasetFactory.connect(new JenaProperties("", new StoreParamsProperties()), viewStoreClientFactory, "");
+        var jenaProperties = new JenaProperties("", new StoreParamsProperties());
+        jenaProperties.setDatasetPath(new File("data/db"));
+        jenaProperties.setTransactionLogPath(new File("data/log"));
+        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory, "");
 
         var dataSetGraph = MaintenanceService.unwrap(ds.asDatasetGraph());
 
