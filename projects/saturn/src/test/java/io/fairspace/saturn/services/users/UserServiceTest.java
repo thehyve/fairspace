@@ -1,128 +1,126 @@
 package io.fairspace.saturn.services.users;
 
-import java.util.*;
-import java.util.stream.*;
-
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.eclipse.jetty.server.*;
-import org.junit.*;
-import org.junit.runner.*;
-import org.keycloak.admin.client.resource.*;
-import org.keycloak.representations.idm.*;
-import org.mockito.*;
-import org.mockito.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.rdf.dao.*;
-import io.fairspace.saturn.rdf.transactions.*;
-import io.fairspace.saturn.services.workspaces.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static io.fairspace.saturn.TestUtils.*;
+import static io.fairspace.saturn.TestUtils.ADMIN;
+import static io.fairspace.saturn.TestUtils.USER;
+import static io.fairspace.saturn.TestUtils.createTestUser;
+import static io.fairspace.saturn.TestUtils.mockAuthentication;
+import static io.fairspace.saturn.TestUtils.selectAdmin;
+import static io.fairspace.saturn.TestUtils.selectRegularUser;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIriFromId;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
-// todo: fix the tests
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
-        private HttpServletRequest request;
-        private Transactions tx = new SimpleTransactions(createTxnMem());
-        private WorkspaceService workspaceService;
+    private final Transactions tx = new SimpleTransactions(createTxnMem());
+    private WorkspaceService workspaceService;
 
-        @Mock
-        private UsersResource usersResource;
+    @Mock
+    private UsersResource usersResource;
 
-        private UserService userService;
-        User user;
-        Authentication.User userAuthentication;
-        User admin;
-        Authentication.User adminAuthentication;
-        List<UserRepresentation> keycloakUsers;
+    private UserService userService;
+    User user;
+    User admin;
+    List<UserRepresentation> keycloakUsers;
 
-        private void selectRegularUser() {
-            lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
-        }
+    @Before
+    public void setUp() {
+        setupRequestContext(ADMIN);
 
-        private void selectAdmin() {
-            lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
-        }
+        tx.executeWrite(model -> {
+            mockAuthentication(USER);
+            user = createTestUser(USER, false);
+            user.setCanViewPublicData(true);
+            user.setCanViewPublicMetadata(true);
+            new DAO(model).write(user);
+            mockAuthentication(ADMIN);
+            admin = createTestUser(ADMIN, true);
+            new DAO(model).write(admin);
+        });
 
-        @Before
-        public void setUp() {
-            setupRequestContext();
-            request = getCurrentRequest();
+        keycloakUsers = List.of(user, admin).stream()
+                .map(user -> {
+                    var keycloakUser = new UserRepresentation();
+                    keycloakUser.setId(user.getId());
+                    keycloakUser.setUsername(user.getUsername());
+                    return keycloakUser;
+                })
+                .collect(Collectors.toList());
+        when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
 
-            tx.executeWrite(model -> {
-                userAuthentication = mockAuthentication("user");
-                user = createTestUser("user", false);
-                user.setCanViewPublicData(true);
-                user.setCanViewPublicMetadata(true);
-                new DAO(model).write(user);
-                adminAuthentication = mockAuthentication("admin");
-                admin = createTestUser("admin", true);
-                new DAO(model).write(admin);
-            });
+        userService = new UserService(new KeycloakClientProperties(), tx, usersResource);
+        workspaceService = new WorkspaceService(tx, userService);
 
-            keycloakUsers = List.of(user, admin).stream()
-                    .map(user -> {
-                        var keycloakUser = new UserRepresentation();
-                        keycloakUser.setId(user.getId());
-                        keycloakUser.setUsername(user.getUsername());
-                        return keycloakUser;
-                    })
-                    .collect(Collectors.toList());
-            when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
+        selectAdmin();
+        // Create test workspace
+        workspaceService.createWorkspace(Workspace.builder().code("ws1").build());
+    }
 
-            userService = new UserService(ConfigLoader.CONFIG.auth, tx, usersResource);
-            workspaceService = new WorkspaceService(tx, userService);
+    private void triggerKeycloakUserUpdate() {
+        selectAdmin();
+        var update = new UserRolesUpdate();
+        update.setId("user");
+        // Invalidate users cache in the user service
+        userService.update(update);
 
-            selectAdmin();
-            // Create test workspace
-            workspaceService.createWorkspace(Workspace.builder().code("ws1").build());
-        }
+        // Change Keycloak info, triggering a database write
+        // when the user cache is refreshed
+        keycloakUsers.get(0).setLastName("Updated");
+        when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
+    }
 
-        private void triggerKeycloakUserUpdate() {
-            selectAdmin();
-            var update = new UserRolesUpdate();
-            update.setId("user");
-            // Invalidate users cache in the user service
-            userService.update(update);
+    /**
+     * In some parts of the application, the current user object is requested
+     * to perform access checks. Requesting the current user may trigger a read from
+     * Keycloak, as the list of users is cached by Saturn only for limited time (see
+     * {@link UserService#UserService(Config.Auth, Transactions, UsersResource)}).
+     * <p>
+     * While fetching the list of users, Saturn may update the user objects in the RDF database
+     * when some user properties have changed in Keycloak or when new users have been added.
+     * That update did trigger a transaction error when occurring during a read action, such as fetching
+     * the list of workspaces (see <a href="https://thehyve.atlassian.net/browse/VRE-1455">VRE-1455</a>).
+     * <p>
+     * This test ensures that such updates happen asynchronously, not interfering with the
+     * ongoing read transaction.
+     */
+    @Test
+    public void testFetchUsersWhileFetchingWorkspaces() throws InterruptedException {
+        var pristineUser = tx.calculateRead(model -> new DAO(model).read(User.class,
+                generateMetadataIriFromId("user")));
+        Assert.assertEquals("user", pristineUser.getName());
 
-            // Change Keycloak info, triggering a database write
-            // when the user cache is refreshed
-            keycloakUsers.get(0).setLastName("Updated");
-            when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
-        }
+        triggerKeycloakUserUpdate();
 
-        /**
-         * In some parts of the application, the current user object is requested
-         * to perform access checks. Requesting the current user may trigger a read from
-         * Keycloak, as the list of users is cached by Saturn only for limited time (see
-         * {@link UserService#UserService(Config.Auth, Transactions, UsersResource)}).
-         *
-         * While fetching the list of users, Saturn may update the user objects in the RDF database
-         * when some user properties have changed in Keycloak or when new users have been added.
-         * That update did trigger a transaction error when occurring during a read action, such as fetching
-         * the list of workspaces (see <a href="https://thehyve.atlassian.net/browse/VRE-1455">VRE-1455</a>).
-         *
-         * This test ensures that such updates happen asynchronously, not interfering with the
-         * ongoing read transaction.
-         */
-        @Test
-        public void testFetchUsersWhileFetchingWorkspaces() throws InterruptedException {
-            var pristineUser = tx.calculateRead(model -> new DAO(model).read(User.class,
-     generateMetadataIri("user")));
-            Assert.assertEquals("user", pristineUser.getName());
+        selectRegularUser();
+        // Fetching the list of workspaces triggers fetching the current user (for access checks).
+        // This will trigger saving the updated user (in a write transactions) during a read transaction.
+        workspaceService.listWorkspaces();
 
-            triggerKeycloakUserUpdate();
-
-            selectRegularUser();
-            // Fetching the list of workspaces triggers fetching the current user (for access checks).
-            // This will trigger saving the updated user (in a write transactions) during a read transaction.
-            workspaceService.listWorkspaces();
-
-            Thread.sleep(500);
-            var updatedUser = tx.calculateRead(model -> new DAO(model).read(User.class, generateMetadataIri("user")));
-            // Check that the updated user was correctly saved to the database.
-            Assert.assertEquals("Updated", updatedUser.getName());
-        }
+        Thread.sleep(500);
+        var updatedUser = tx.calculateRead(model -> new DAO(model).read(User.class, generateMetadataIriFromId("user")));
+        // Check that the updated user was correctly saved to the database.
+        Assert.assertEquals("Updated", updatedUser.getName());
+    }
 }

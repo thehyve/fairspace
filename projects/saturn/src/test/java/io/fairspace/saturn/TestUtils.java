@@ -6,6 +6,7 @@ import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.users.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.jena.rdf.model.Model;
+import org.jetbrains.annotations.NotNull;
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -21,10 +22,16 @@ import static java.time.Instant.now;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class TestUtils {
+
+    public static final String ADMIN = "admin";
+
+    public static final String USER = "user";
+
     public static void ensureRecentInstant(Instant instant) {
         assertNotNull(instant);
         assertTrue(instant.isAfter(now().minusSeconds(1)));
@@ -49,23 +56,10 @@ public class TestUtils {
         var mockAuthentication = Mockito.mock(Authentication.class);
 
         // Set the mocked authentication into the security context
-        when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+        lenient().when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
 
-        var claims = new HashMap<String, Object>();
-        claims.put("preferred_username", "fullname");
-        claims.put("sub", username);
-        claims.put("email", "johndoe@example.com");
-        claims.put("name", "fullname");
-
-        // Create a mock Jwt object and set the claims
-        Jwt mockJwt = Jwt.withTokenValue("mock-token")
-                .header("alg", "RS256")
-                .claim("preferred_username", claims.get("preferred_username"))
-                .claim("sub", claims.get("sub"))
-                .claim("email", claims.get("email"))
-                .claim("name", claims.get("name"))
-                .build();
-        when(mockAuthentication.getPrincipal()).thenReturn(mockJwt);
+        Jwt mockJwt = getMockedJwt(username);
+        lenient().when(mockAuthentication.getPrincipal()).thenReturn(mockJwt);
         // Set the mocked SecurityContext in the SecurityContextHolder
         SecurityContextHolder.setContext(mockSecurityContext);
     }
@@ -81,10 +75,10 @@ public class TestUtils {
     }
 
     // todo: implement this method with Spring Security
-    public static void setupRequestContext() {
+    public static void setupRequestContext(final String username) {
         var request = mock(HttpServletRequest.class);
         RequestContext.setCurrentRequest(request);
-        RequestContext.setCurrentUserStringUri(SparqlUtils.generateMetadataIriFromId("user").getURI());
+        RequestContext.setCurrentUserStringUri(SparqlUtils.generateMetadataIriFromId(username).getURI());
         // this is a trick for tests to pass security context to other threads
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         // Create a mock SecurityContext
@@ -94,25 +88,41 @@ public class TestUtils {
         var mockAuthentication = Mockito.mock(Authentication.class);
 
         // Set the mocked authentication into the security context
-        when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
+        lenient().when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
 
+        Jwt mockJwt = getMockedJwt(username);
+        lenient().when(mockAuthentication.getPrincipal()).thenReturn(mockJwt);
+        // Set the mocked SecurityContext in the SecurityContextHolder
+        SecurityContextHolder.setContext(mockSecurityContext);
+    }
+
+    private static @NotNull Jwt getMockedJwt(String username) {
         var claims = new HashMap<String, Object>();
         claims.put("preferred_username", "fullname");
-        claims.put("sub", "userid");
+        claims.put("sub", username);
         claims.put("email", "johndoe@example.com");
         claims.put("name", "fullname");
-
-        // Create a mock Jwt object and set the claims
-        Jwt mockJwt = Jwt.withTokenValue("mock-token")
+        return Jwt.withTokenValue("mock-token")
                 .header("alg", "RS256")
                 .claim("preferred_username", claims.get("preferred_username"))
                 .claim("sub", claims.get("sub"))
                 .claim("email", claims.get("email"))
                 .claim("name", claims.get("name"))
                 .build();
-        when(mockAuthentication.getPrincipal()).thenReturn(mockJwt);
-        // Set the mocked SecurityContext in the SecurityContextHolder
-        SecurityContextHolder.setContext(mockSecurityContext);
+    }
+
+    public static void setupRequestContext() {
+        setupRequestContext("user");
+    }
+
+    public static void selectRegularUser() {
+        mockAuthentication(USER);
+//        setupRequestContext(USER);
+    }
+
+    public static void selectAdmin() {
+        mockAuthentication(ADMIN);
+//        setupRequestContext(ADMIN);
     }
 
     public static ViewsConfig loadViewsConfig(String path) {
