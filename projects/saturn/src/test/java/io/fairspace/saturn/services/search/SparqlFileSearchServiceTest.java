@@ -67,37 +67,27 @@ public class SparqlFileSearchServiceTest {
     FileSearchService fileSearchService;
 
     User user;
-//    Authentication.User userAuthentication;
     User user2;
-//    Authentication.User user2Authentication;
     User workspaceManager;
-//    Authentication.User workspaceManagerAuthentication;
     User admin;
-//    Authentication.User adminAuthentication;
     private HttpServletRequest request;
 
     private void selectRegularUser() {
-//        lenient().when(request.getAuthentication()).thenReturn(userAuthentication);
         lenient().when(userService.currentUser()).thenReturn(user);
     }
 
     private void selectAdmin() {
-//        lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
 
     private void setupUsers(Model model) {
-//        userAuthentication = mockAuthentication("user");
         user = createTestUser("user", false);
         user.setCanViewPublicMetadata(true);
         new DAO(model).write(user);
-//        user2Authentication = mockAuthentication("user2");
         user2 = createTestUser("user2", false);
         new DAO(model).write(user2);
         workspaceManager = createTestUser("workspace-admin", false);
         new DAO(model).write(workspaceManager);
-//        workspaceManagerAuthentication = mockAuthentication("workspace-admin");
-//        adminAuthentication = mockAuthentication("admin");
         admin = createTestUser("admin", true);
         new DAO(model).write(admin);
     }

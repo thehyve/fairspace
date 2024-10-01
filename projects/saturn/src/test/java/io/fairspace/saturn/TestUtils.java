@@ -2,6 +2,8 @@ package io.fairspace.saturn;
 
 import io.fairspace.saturn.auth.RequestContext;
 import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.users.User;
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,6 +93,8 @@ public class TestUtils {
         lenient().when(mockSecurityContext.getAuthentication()).thenReturn(mockAuthentication);
 
         Jwt mockJwt = getMockedJwt(username);
+        // just to set static private metadata base IRI
+        new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
         lenient().when(mockAuthentication.getPrincipal()).thenReturn(mockJwt);
         // Set the mocked SecurityContext in the SecurityContextHolder
         SecurityContextHolder.setContext(mockSecurityContext);
@@ -117,12 +121,10 @@ public class TestUtils {
 
     public static void selectRegularUser() {
         mockAuthentication(USER);
-//        setupRequestContext(USER);
     }
 
     public static void selectAdmin() {
         mockAuthentication(ADMIN);
-//        setupRequestContext(ADMIN);
     }
 
     public static ViewsConfig loadViewsConfig(String path) {

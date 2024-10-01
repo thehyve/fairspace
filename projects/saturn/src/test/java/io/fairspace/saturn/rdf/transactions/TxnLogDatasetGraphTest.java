@@ -54,7 +54,7 @@ public class TxnLogDatasetGraphTest {
         txn.calculateWrite(m -> m.add(statement).remove(statement));
 
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
+        verify(log).onMetadata(eq("user"), eq("fullname"), anyLong());
         verify(log)
                 .onAdd(
                         defaultGraphNodeGenerated,
@@ -79,7 +79,7 @@ public class TxnLogDatasetGraphTest {
         });
 
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
+        verify(log).onMetadata(eq("user"), eq("fullname"), anyLong());
         verify(log)
                 .onAdd(
                         defaultGraphNodeGenerated,
@@ -113,7 +113,7 @@ public class TxnLogDatasetGraphTest {
         } catch (Exception ignore) {
         }
         verify(log).onBegin();
-        verify(log).onMetadata(eq("userid"), eq("fullname"), anyLong());
+        verify(log).onMetadata(eq("user"), eq("fullname"), anyLong());
         verify(log)
                 .onAdd(
                         defaultGraphNodeGenerated,

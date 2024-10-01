@@ -1,10 +1,10 @@
 package io.fairspace.saturn.services.views;
 
+import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.auth.RequestContext;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
@@ -40,8 +40,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.fairspace.saturn.PostgresAwareTest;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -52,7 +50,6 @@ import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.services.views.ViewService.USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS;
 import static org.apache.jena.sparql.core.DatasetImpl.wrap;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -164,15 +161,6 @@ public class ViewServiceTest extends PostgresAwareTest {
             // then
             Assert.assertEquals(views.size(), 4);
             verify(sut, never()).fetchViews();
-        }
-
-        private ViewDatabaseProperties buildViewDatabaseConfig() {
-            var viewDatabase = new ViewDatabaseProperties();
-            viewDatabase.setUrl(postgres.getJdbcUrl());
-            viewDatabase.setUsername(postgres.getUsername());
-            viewDatabase.setPassword(postgres.getPassword());
-            viewDatabase.setMaxPoolSize(5);
-            return viewDatabase;
         }
 
         private void loadTestData(Dataset ds)

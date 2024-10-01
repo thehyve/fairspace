@@ -59,14 +59,7 @@ public class ViewStoreClientFactory {
             ViewsConfig viewsConfig, ViewDatabaseProperties viewDatabaseProperties, SearchProperties searchProperties)
             throws SQLException {
         log.debug("Initializing the database connection");
-        var databaseConfig = new HikariConfig();
-        databaseConfig.setJdbcUrl(viewDatabaseProperties.getUrl());
-        databaseConfig.setUsername(viewDatabaseProperties.getUsername());
-        databaseConfig.setPassword(viewDatabaseProperties.getPassword());
-        databaseConfig.setAutoCommit(viewDatabaseProperties.isAutoCommitEnabled());
-        databaseConfig.setConnectionTimeout(viewDatabaseProperties.getConnectionTimeout());
-        databaseConfig.setMaximumPoolSize(viewDatabaseProperties.getMaxPoolSize());
-
+        var databaseConfig = getHikariConfig(viewDatabaseProperties);
         dataSource = new HikariDataSource(databaseConfig);
 
         try (var connection = dataSource.getConnection()) {
@@ -89,6 +82,17 @@ public class ViewStoreClientFactory {
         } else {
             log.warn("Skipping materialized view refresh on start");
         }
+    }
+
+    private static HikariConfig getHikariConfig(ViewDatabaseProperties viewDatabaseProperties) {
+        var databaseConfig = new HikariConfig();
+        databaseConfig.setJdbcUrl(viewDatabaseProperties.getUrl());
+        databaseConfig.setUsername(viewDatabaseProperties.getUsername());
+        databaseConfig.setPassword(viewDatabaseProperties.getPassword());
+        databaseConfig.setAutoCommit(viewDatabaseProperties.isAutoCommitEnabled());
+        databaseConfig.setConnectionTimeout(viewDatabaseProperties.getConnectionTimeout());
+        databaseConfig.setMaximumPoolSize(viewDatabaseProperties.getMaxPoolSize());
+        return databaseConfig;
     }
 
     public Connection getConnection() throws SQLException {
