@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        jena_version = '5.0.0'
+        jena_version = '5.1.0'
         milton_version = '4.0.2.2101'
         mockitoVersion = '5.11.0'
         jacksonVersion = '2.15.3' // check what version is used by Jena
