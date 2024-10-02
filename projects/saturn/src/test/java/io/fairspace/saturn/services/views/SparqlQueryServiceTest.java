@@ -1,24 +1,9 @@
 package io.fairspace.saturn.services.views;
 
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.config.properties.WebDavProperties;
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
-import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
-import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceRole;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.webdav.DavFactory;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
@@ -38,9 +23,25 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
+import io.fairspace.saturn.services.metadata.MetadataService;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.TestUtils.ADMIN;
 import static io.fairspace.saturn.TestUtils.USER;
@@ -49,6 +50,7 @@ import static io.fairspace.saturn.TestUtils.loadViewsConfig;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -101,7 +103,7 @@ public class SparqlQueryServiceTest {
         lenient().when(userService.currentUser()).thenReturn(user);
     }
 
-    private void setupUsers(Model model) {
+    private void setupUsers() {
         user = createTestUser(USER, false);
         user.setCanViewPublicMetadata(true);
         dao.write(user);
@@ -125,7 +127,8 @@ public class SparqlQueryServiceTest {
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var davFactory =
+                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
@@ -142,7 +145,7 @@ public class SparqlQueryServiceTest {
 
         dao = new DAO(model);
 
-        setupUsers(model);
+        setupUsers();
 
         setupRequestContext();
         HttpServletRequest request = getCurrentRequest();
@@ -185,12 +188,12 @@ public class SparqlQueryServiceTest {
         // The implementation does not sort results. Probably deterministic,
         // but no certain order is guaranteed.
         var row = page.getRows()
-                .get(0)
-                .get("Sample")
-                .iterator()
-                .next()
-                .getValue()
-                .equals("http://example.com/samples#s1-a")
+                        .get(0)
+                        .get("Sample")
+                        .iterator()
+                        .next()
+                        .getValue()
+                        .equals("http://example.com/samples#s1-a")
                 ? page.getRows().get(0)
                 : page.getRows().get(1);
         assertEquals(
@@ -228,8 +231,6 @@ public class SparqlQueryServiceTest {
         var request = new CountRequest();
         request.setView("Resource");
 
-        var myReq = new ViewRequest();
-        myReq.setView("Resource");
         var result = queryService.count(request);
         Assert.assertEquals(3, result.getCount());
     }

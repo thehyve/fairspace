@@ -133,11 +133,10 @@ public class MaintenanceService {
     public static DatasetGraph unwrap(DatasetGraph dsg) {
         return switch (dsg) {
             case null -> dsg;
-            case DatasetGraphSwitchable datasetGraphSwitchable -> dsg;
+            case DatasetGraphSwitchable ignored -> dsg;
             case TxnLogDatasetGraph txnLogDatasetGraph -> unwrap(txnLogDatasetGraph.getDatasetGraph());
             case TxnIndexDatasetGraph txnIndexDatasetGraph -> unwrap(txnIndexDatasetGraph.getDatasetGraph());
             default -> null;
         };
-
     }
 }

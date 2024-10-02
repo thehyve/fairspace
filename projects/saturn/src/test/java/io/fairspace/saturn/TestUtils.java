@@ -1,11 +1,10 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.auth.RequestContext;
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.StoreParamsProperties;
-import io.fairspace.saturn.rdf.SparqlUtils;
-import io.fairspace.saturn.services.users.User;
+import java.io.File;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.HashMap;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.jena.rdf.model.Model;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +14,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.Instant;
-import java.util.HashMap;
+import io.fairspace.saturn.auth.RequestContext;
+import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.rdf.SparqlUtils;
+import io.fairspace.saturn.services.users.User;
 
 import static java.time.Instant.now;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class TestUtils {
 
@@ -80,7 +80,8 @@ public class TestUtils {
     public static void setupRequestContext(final String username) {
         var request = mock(HttpServletRequest.class);
         RequestContext.setCurrentRequest(request);
-        RequestContext.setCurrentUserStringUri(SparqlUtils.generateMetadataIriFromId(username).getURI());
+        RequestContext.setCurrentUserStringUri(
+                SparqlUtils.generateMetadataIriFromId(username).getURI());
         // this is a trick for tests to pass security context to other threads
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
         // Create a mock SecurityContext

@@ -1,9 +1,8 @@
 package io.fairspace.saturn.config;
 
-import io.fairspace.saturn.config.properties.CacheProperties;
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.StoreParamsProperties;
-import io.fairspace.saturn.config.properties.WebDavProperties;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.junit.Before;
@@ -11,11 +10,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
+import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.webdav.resources.ExtraStorageRootResource;
-
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -42,7 +42,17 @@ public class ServicesTest {
         webDavProperties.setExtraStorage(extraStorage);
         var cacheProperties = new CacheProperties();
         svc = new Services(
-                viewsConfig, dataset, featureProperties, null, null, jenaProperties, cacheProperties, null, webDavProperties, null, "localhost");
+                viewsConfig,
+                dataset,
+                featureProperties,
+                null,
+                null,
+                jenaProperties,
+                cacheProperties,
+                null,
+                webDavProperties,
+                null,
+                "localhost");
     }
 
     @Test

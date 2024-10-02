@@ -1,11 +1,9 @@
 package io.fairspace.saturn.services.users;
 
-import io.fairspace.saturn.config.properties.KeycloakClientProperties;
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,8 +13,12 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 
 import static io.fairspace.saturn.TestUtils.ADMIN;
 import static io.fairspace.saturn.TestUtils.USER;
@@ -24,6 +26,7 @@ import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIriFromId;
+
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -57,7 +60,7 @@ public class UserServiceTest {
             dao.write(admin);
         });
 
-        keycloakUsers = List.of(user, admin).stream()
+        keycloakUsers = Stream.of(user, admin)
                 .map(user -> {
                     var keycloakUser = new UserRepresentation();
                     keycloakUser.setId(user.getId());
@@ -92,7 +95,7 @@ public class UserServiceTest {
 
         // Change Keycloak info, triggering a database write
         // when the user cache is refreshed
-        keycloakUsers.get(0).setLastName("Updated");
+        keycloakUsers.getFirst().setLastName("Updated");
         when(usersResource.list(any(), any())).thenReturn(keycloakUsers);
     }
 
@@ -100,7 +103,7 @@ public class UserServiceTest {
      * In some parts of the application, the current user object is requested
      * to perform access checks. Requesting the current user may trigger a read from
      * Keycloak, as the list of users is cached by Saturn only for limited time (see
-     * {@link UserService#UserService(Config.Auth, Transactions, UsersResource)}).
+     * {@link UserService(KeycloakClientProperties, Transactions, UsersResource)}).
      * <p>
      * While fetching the list of users, Saturn may update the user objects in the RDF database
      * when some user properties have changed in Keycloak or when new users have been added.
@@ -112,8 +115,8 @@ public class UserServiceTest {
      */
     @Test
     public void testFetchUsersWhileFetchingWorkspaces() throws InterruptedException {
-        var pristineUser = tx.calculateRead(model -> new DAO(model).read(User.class,
-                generateMetadataIriFromId("user")));
+        var pristineUser =
+                tx.calculateRead(model -> new DAO(model).read(User.class, generateMetadataIriFromId("user")));
         Assert.assertEquals("user", pristineUser.getName());
 
         triggerKeycloakUserUpdate();

@@ -1,5 +1,25 @@
 package io.fairspace.saturn.services.search;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.MakeCollectionableResource;
+import io.milton.resource.PutableResource;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.util.Context;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
@@ -23,26 +43,6 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.milton.http.ResourceFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.MakeCollectionableResource;
-import io.milton.resource.PutableResource;
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.util.Context;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 import static io.fairspace.saturn.TestUtils.ADMIN;
 import static io.fairspace.saturn.TestUtils.USER;
@@ -51,6 +51,7 @@ import static io.fairspace.saturn.TestUtils.loadViewsConfig;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.lenient;
@@ -81,7 +82,6 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
     User user2;
     User workspaceManager;
     User admin;
-    private HttpServletRequest request;
 
     private void selectRegularUser() {
         mockAuthentication(USER);
@@ -93,7 +93,7 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
 
-    private void setupUsers(Model model) {
+    private void setupUsers() {
         user = createTestUser("user", false);
         user.setCanViewPublicMetadata(true);
         dao.write(user);
@@ -114,31 +114,36 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         var viewDatabase = buildViewDatabaseConfig();
         var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, searchProperties);
 
-        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
+        var dsg = new TxnIndexDatasetGraph(
+                DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
 
-        var viewService = new ViewService(searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
+        var viewService = new ViewService(
+                searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
 
-        maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, "http://localhost:8080");
+        maintenanceService =
+                new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, "http://localhost:8080");
 
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
-        fileSearchService = new JdbcFileSearchService(searchProperties, config, viewStoreClientFactory, tx, davFactory.root);
+        var davFactory =
+                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        fileSearchService =
+                new JdbcFileSearchService(searchProperties, config, viewStoreClientFactory, tx, davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
         dao = new DAO(model);
 
-        setupUsers(model);
+        setupUsers();
 
         setupRequestContext();
-        request = getCurrentRequest();
+        var request = getCurrentRequest();
 
         selectAdmin();
 
@@ -193,7 +198,7 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         selectAdmin();
         results = fileSearchService.searchFiles(request);
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
+        Assert.assertEquals("coffee.jpg", results.getFirst().getLabel());
     }
 
     @Test
@@ -208,7 +213,7 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         selectAdmin();
         results = fileSearchService.searchFiles(request);
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("coffee.jpg", results.get(0).getLabel());
+        Assert.assertEquals("coffee.jpg", results.getFirst().getLabel());
     }
 
     @Test

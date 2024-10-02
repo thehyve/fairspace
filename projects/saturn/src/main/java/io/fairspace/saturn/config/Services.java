@@ -1,5 +1,17 @@
 package io.fairspace.saturn.config;
 
+import java.io.File;
+
+import io.milton.resource.Resource;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.util.Symbol;
+import org.keycloak.admin.client.resource.UsersResource;
+
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
@@ -36,17 +48,6 @@ import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
-import io.milton.resource.Resource;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j2;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.sparql.core.DatasetGraph;
-import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.util.Symbol;
-import org.keycloak.admin.client.resource.UsersResource;
-
-import java.io.File;
 
 import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;

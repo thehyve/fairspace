@@ -1,5 +1,7 @@
 package io.fairspace.saturn.rdf.transactions;
 
+import java.io.IOException;
+
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -11,9 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.io.IOException;
-
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+
 import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
@@ -97,7 +98,7 @@ public class TxnLogDatasetGraphTest {
     }
 
     @Test
-    public void shouldNotLogReadTransactions() throws IOException {
+    public void shouldNotLogReadTransactions() {
         txn.executeRead(m -> m.listStatements().toList());
 
         verifyNoMoreInteractions(log);

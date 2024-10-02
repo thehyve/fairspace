@@ -1,9 +1,9 @@
 package io.fairspace.saturn.webdav;
 
+import java.io.IOException;
+import java.util.Vector;
+
 import com.pivovarit.function.ThrowingConsumer;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.milton.http.ResourceFactory;
 import io.milton.resource.FolderResource;
 import jakarta.servlet.ServletInputStream;
@@ -16,10 +16,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.IOException;
-import java.util.Vector;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -72,18 +74,18 @@ public class WebDAVServletTest {
         setupRequestContext();
 
         doAnswer(invocation -> {
-            ThrowingConsumer job = invocation.getArgument(0);
-            job.accept(null);
-            return null;
-        })
+                    ThrowingConsumer job = invocation.getArgument(0);
+                    job.accept(null);
+                    return null;
+                })
                 .when(txn)
                 .executeRead(any());
 
         doAnswer(invocation -> {
-            ThrowingConsumer job = invocation.getArgument(0);
-            job.accept(null);
-            return null;
-        })
+                    ThrowingConsumer job = invocation.getArgument(0);
+                    job.accept(null);
+                    return null;
+                })
                 .when(txn)
                 .executeWrite(any());
     }

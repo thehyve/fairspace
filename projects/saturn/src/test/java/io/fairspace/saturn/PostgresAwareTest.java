@@ -1,10 +1,11 @@
 package io.fairspace.saturn;
 
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.testcontainers.containers.PostgreSQLContainer;
+
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 
 public class PostgresAwareTest {
 

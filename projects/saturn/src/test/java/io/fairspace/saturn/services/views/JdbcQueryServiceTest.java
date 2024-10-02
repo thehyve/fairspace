@@ -6,17 +6,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.fairspace.saturn.config.properties.CacheProperties;
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
 import io.milton.http.exceptions.ConflictException;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.MakeCollectionableResource;
 import io.milton.resource.PutableResource;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
@@ -30,6 +25,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.properties.CacheProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -90,7 +89,6 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
     User user;
     User workspaceManager;
     User admin;
-    private HttpServletRequest request;
 
     private void selectRegularUser() {
         mockAuthentication(USER);
@@ -121,7 +119,8 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var vocabulary = model.read("test-vocabulary.ttl", "TTL");
         dao = new DAO(model);
 
-        var viewService = new ViewService(searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
+        var viewService = new ViewService(
+                searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
 
         maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, PUBLIC_URL);
 
@@ -129,7 +128,8 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
 
         var context = new Context();
 
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var davFactory =
+                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
 
         sut = new JdbcQueryService(
                 searchProperties,
@@ -145,7 +145,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         setupUsers();
 
         setupRequestContext();
-        request = getCurrentRequest();
+        var request = getCurrentRequest();
 
         selectAdmin();
 
@@ -195,7 +195,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setSize(10);
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
-        var row = page.getRows().get(0);
+        var row = page.getRows().getFirst();
         Assert.assertEquals(
                 Set.of(
                         "Sample",
@@ -233,7 +233,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setSize(10);
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
-        var row = page.getRows().get(0);
+        var row = page.getRows().getFirst();
         Assert.assertEquals(
                 Set.of(
                         "Sample",
@@ -313,7 +313,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setIncludeJoinedViews(true);
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
-        var row1 = page.getRows().get(0);
+        var row1 = page.getRows().getFirst();
         Assert.assertEquals(
                 "Sample A for subject 1",
                 row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
@@ -339,7 +339,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         request.setIncludeJoinedViews(true);
         var page = sut.retrieveViewPage(request);
         Assert.assertEquals(2, page.getRows().size());
-        var row1 = page.getRows().get(0);
+        var row1 = page.getRows().getFirst();
         Assert.assertEquals(
                 "Sample A for subject 1",
                 row1.get("Sample").stream().findFirst().orElseThrow().getLabel());

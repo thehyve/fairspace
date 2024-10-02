@@ -3,8 +3,6 @@ package io.fairspace.saturn.rdf;
 import java.io.File;
 import java.io.IOException;
 
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import org.apache.jena.tdb2.store.DatasetGraphSwitchable;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,6 +10,8 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 
@@ -31,7 +31,7 @@ public class SaturnDatasetFactoryTest {
     }
 
     @Test
-    public void testIsRestoreNeededForNonExistingDirectory() throws IOException {
+    public void testIsRestoreNeededForNonExistingDirectory() {
         File nonExistentDirectory = new File(testFolder.getRoot(), "non-existent-directory");
         assertTrue(SaturnDatasetFactory.isRestoreNeeded(nonExistentDirectory));
     }

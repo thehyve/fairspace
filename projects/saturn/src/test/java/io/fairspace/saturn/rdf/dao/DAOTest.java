@@ -1,7 +1,11 @@
 package io.fairspace.saturn.rdf.dao;
 
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.jena.graph.Node;
@@ -10,15 +14,13 @@ import org.apache.jena.vocabulary.RDF;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 
 import static io.fairspace.saturn.TestUtils.ensureRecentInstant;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.util.ValidationUtils.validateIRI;
+
 import static java.time.Instant.now;
 import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -407,7 +409,7 @@ public class DAOTest {
     }
 
     @RDFType("http://example.com/iri/NoDefaultConstructor")
-    private class NoDefaultConstructor extends PersistentEntity {
+    private static class NoDefaultConstructor extends PersistentEntity {
         final int value;
 
         private NoDefaultConstructor(int value) {

@@ -1,5 +1,24 @@
 package io.fairspace.saturn.services.search;
 
+import java.io.IOException;
+
+import io.milton.http.ResourceFactory;
+import io.milton.http.exceptions.BadRequestException;
+import io.milton.http.exceptions.ConflictException;
+import io.milton.http.exceptions.NotAuthorizedException;
+import io.milton.resource.MakeCollectionableResource;
+import io.milton.resource.PutableResource;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.core.DatasetImpl;
+import org.apache.jena.sparql.util.Context;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
@@ -17,29 +36,11 @@ import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import io.fairspace.saturn.webdav.DavFactory;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
-import io.milton.http.ResourceFactory;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.resource.MakeCollectionableResource;
-import io.milton.resource.PutableResource;
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.core.DatasetImpl;
-import org.apache.jena.sparql.util.Context;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -70,7 +71,6 @@ public class SparqlFileSearchServiceTest {
     User user2;
     User workspaceManager;
     User admin;
-    private HttpServletRequest request;
 
     private void selectRegularUser() {
         lenient().when(userService.currentUser()).thenReturn(user);
@@ -103,7 +103,8 @@ public class SparqlFileSearchServiceTest {
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var davFactory =
+                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
@@ -116,7 +117,7 @@ public class SparqlFileSearchServiceTest {
         setupUsers(model);
 
         setupRequestContext();
-        request = getCurrentRequest();
+        var request = getCurrentRequest();
 
         selectAdmin();
 

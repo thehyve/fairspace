@@ -1,18 +1,10 @@
 package io.fairspace.saturn.webdav;
 
-import io.fairspace.saturn.config.properties.WebDavProperties;
-import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
-import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.users.User;
-import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceRole;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.vocabulary.FS;
-import io.fairspace.saturn.webdav.blobstore.BlobInfo;
-import io.fairspace.saturn.webdav.blobstore.BlobStore;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import javax.xml.namespace.QName;
+
 import io.milton.http.Request;
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -37,10 +29,19 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.xml.namespace.QName;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
+import io.fairspace.saturn.rdf.dao.DAO;
+import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.users.User;
+import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import io.fairspace.saturn.vocabulary.FS;
+import io.fairspace.saturn.webdav.blobstore.BlobInfo;
+import io.fairspace.saturn.webdav.blobstore.BlobStore;
 
 import static io.fairspace.saturn.TestUtils.ADMIN;
 import static io.fairspace.saturn.TestUtils.USER;
@@ -48,6 +49,7 @@ import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
+
 import static io.milton.http.ResponseStatus.SC_FORBIDDEN;
 import static java.lang.String.format;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
@@ -77,9 +79,6 @@ public class DavFactoryTest {
 
     @Mock
     UserService userService;
-
-    @Mock
-    MetadataService metadataService;
 
     WorkspaceService workspaceService;
     Workspace workspace;
@@ -113,6 +112,7 @@ public class DavFactoryTest {
 
     @Before
     public void before() {
+        JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
         workspaceService = new WorkspaceService(tx, userService);
         factory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
 
@@ -221,8 +221,7 @@ public class DavFactoryTest {
 
         selectAdmin();
         assertEquals(1, root.getChildren().size());
-        assertEquals(Access.Manage, ((DavFactory) factory).getAccess(model.getResource(baseUri + "/" +
-                collName)));
+        assertEquals(Access.Manage, ((DavFactory) factory).getAccess(model.getResource(baseUri + "/" + collName)));
 
         model.removeAll(
                 model.getResource(admin.getIri().getURI()),
@@ -232,8 +231,7 @@ public class DavFactoryTest {
     }
 
     @Test(expected = ConflictException.class)
-    public void testCreateCollectionTwiceFails() throws NotAuthorizedException, BadRequestException,
-            ConflictException {
+    public void testCreateCollectionTwiceFails() throws NotAuthorizedException, BadRequestException, ConflictException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         assertNotNull(root.createCollection("coll"));
         assertNull(root.createCollection("coll"));
@@ -260,8 +258,7 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testCreateFile() throws NotAuthorizedException, BadRequestException, ConflictException,
-            IOException {
+    public void testCreateFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
@@ -297,8 +294,7 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testOverwriteFile() throws NotAuthorizedException, BadRequestException, ConflictException,
-            IOException {
+    public void testOverwriteFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
@@ -317,8 +313,7 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testGetVersion() throws NotAuthorizedException, BadRequestException, ConflictException,
-            IOException {
+    public void testGetVersion() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
@@ -360,8 +355,7 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testDeleteFile() throws NotAuthorizedException, BadRequestException, ConflictException,
-            IOException {
+    public void testDeleteFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
@@ -465,8 +459,7 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testRenameFile() throws NotAuthorizedException, BadRequestException, ConflictException,
-            IOException {
+    public void testRenameFile() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll = (FolderResource) root.createCollection("coll");
 
@@ -512,8 +505,7 @@ public class DavFactoryTest {
     }
 
     @Test
-    public void testCopyDirectory() throws NotAuthorizedException, BadRequestException, ConflictException,
-            IOException {
+    public void testCopyDirectory() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
         var root = (MakeCollectionableResource) factory.getResource(null, BASE_PATH);
         var coll1 = (FolderResource) root.createCollection("c1");
         var coll2 = (FolderResource) root.createCollection("c2");
