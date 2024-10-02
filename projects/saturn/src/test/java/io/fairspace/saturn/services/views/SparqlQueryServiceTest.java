@@ -47,8 +47,6 @@ import static io.fairspace.saturn.TestUtils.USER;
 import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.loadViewsConfig;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
-import static io.fairspace.saturn.TestUtils.selectAdmin;
-import static io.fairspace.saturn.TestUtils.selectRegularUser;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.wrap;
@@ -87,22 +85,30 @@ public class SparqlQueryServiceTest {
     User workspaceManager;
     User admin;
 
+    // TODO: move the selectUser methods to a parent with mocked UserService
     private void selectExternalUser() {
         mockAuthentication("user2");
         lenient().when(userService.currentUser()).thenReturn(user2);
     }
 
-    private void setupUsers(Model model) {
+    private void selectAdmin() {
+        mockAuthentication(ADMIN);
+        lenient().when(userService.currentUser()).thenReturn(admin);
+    }
+
+    private void selectRegularUser() {
         mockAuthentication(USER);
+        lenient().when(userService.currentUser()).thenReturn(user);
+    }
+
+    private void setupUsers(Model model) {
         user = createTestUser(USER, false);
         user.setCanViewPublicMetadata(true);
         dao.write(user);
-        mockAuthentication("user2");
         user2 = createTestUser("user2", false);
         dao.write(user2);
         workspaceManager = createTestUser("workspace-admin", false);
         dao.write(workspaceManager);
-        mockAuthentication(ADMIN);
         admin = createTestUser(ADMIN, true);
         dao.write(admin);
     }
@@ -179,12 +185,12 @@ public class SparqlQueryServiceTest {
         // The implementation does not sort results. Probably deterministic,
         // but no certain order is guaranteed.
         var row = page.getRows()
-                        .get(0)
-                        .get("Sample")
-                        .iterator()
-                        .next()
-                        .getValue()
-                        .equals("http://example.com/samples#s1-a")
+                .get(0)
+                .get("Sample")
+                .iterator()
+                .next()
+                .getValue()
+                .equals("http://example.com/samples#s1-a")
                 ? page.getRows().get(0)
                 : page.getRows().get(1);
         assertEquals(
@@ -217,9 +223,13 @@ public class SparqlQueryServiceTest {
     }
 
     @Test
-    public void testCountResourceWithMaxDisplayCountLimitMoreThanTotalCount() {
+    public void testCountResourceWithAccess() {
+        selectRegularUser();
         var request = new CountRequest();
         request.setView("Resource");
+
+        var myReq = new ViewRequest();
+        myReq.setView("Resource");
         var result = queryService.count(request);
         Assert.assertEquals(3, result.getCount());
     }

@@ -44,8 +44,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static io.fairspace.saturn.TestUtils.ADMIN;
+import static io.fairspace.saturn.TestUtils.USER;
 import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.loadViewsConfig;
+import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static org.apache.jena.query.DatasetFactory.wrap;
@@ -81,10 +84,12 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
     private HttpServletRequest request;
 
     private void selectRegularUser() {
+        mockAuthentication(USER);
         lenient().when(userService.currentUser()).thenReturn(user);
     }
 
     private void selectAdmin() {
+        mockAuthentication(ADMIN);
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
 

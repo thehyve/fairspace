@@ -6,7 +6,6 @@ import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +22,7 @@ import static io.fairspace.saturn.TestUtils.ADMIN;
 import static io.fairspace.saturn.TestUtils.USER;
 import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
-import static io.fairspace.saturn.TestUtils.selectAdmin;
-import static io.fairspace.saturn.TestUtils.selectRegularUser;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
-import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.rdf.SparqlUtils.generateMetadataIriFromId;
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,10 +50,11 @@ public class UserServiceTest {
             user = createTestUser(USER, false);
             user.setCanViewPublicData(true);
             user.setCanViewPublicMetadata(true);
-            new DAO(model).write(user);
+            DAO dao = new DAO(model);
+            dao.write(user);
             mockAuthentication(ADMIN);
             admin = createTestUser(ADMIN, true);
-            new DAO(model).write(admin);
+            dao.write(admin);
         });
 
         keycloakUsers = List.of(user, admin).stream()
@@ -76,6 +73,14 @@ public class UserServiceTest {
         selectAdmin();
         // Create test workspace
         workspaceService.createWorkspace(Workspace.builder().code("ws1").build());
+    }
+
+    public static void selectRegularUser() {
+        mockAuthentication(USER);
+    }
+
+    public static void selectAdmin() {
+        mockAuthentication(ADMIN);
     }
 
     private void triggerKeycloakUserUpdate() {

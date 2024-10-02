@@ -116,15 +116,7 @@ public class TestUtils {
     }
 
     public static void setupRequestContext() {
-        setupRequestContext("user");
-    }
-
-    public static void selectRegularUser() {
-        mockAuthentication(USER);
-    }
-
-    public static void selectAdmin() {
-        mockAuthentication(ADMIN);
+        setupRequestContext(USER);
     }
 
     public static ViewsConfig loadViewsConfig(String path) {
