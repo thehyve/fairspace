@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.fairspace.saturn.config.properties.CacheProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.milton.http.ResourceFactory;
@@ -84,6 +85,8 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
     QueryService sut;
     MaintenanceService maintenanceService;
 
+    private DAO dao;
+
     User user;
     User workspaceManager;
     User admin;
@@ -102,6 +105,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
     @Before
     public void before()
             throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
         var viewDatabase = buildViewDatabaseConfig();
         ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
         SearchProperties searchProperties = new SearchProperties();
@@ -114,7 +118,8 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
-        var vocabulary = model.read("test-vocabulary.ttl");
+        var vocabulary = model.read("test-vocabulary.ttl", "TTL");
+        dao = new DAO(model);
 
         var viewService = new ViewService(searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
 
@@ -137,19 +142,14 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
 
         api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
 
-        user = createTestUser("user", false);
-        new DAO(model).write(user);
-        workspaceManager = createTestUser("workspace-admin", false);
-        new DAO(model).write(workspaceManager);
-        admin = createTestUser("admin", true);
-        new DAO(model).write(admin);
+        setupUsers();
 
         setupRequestContext();
         request = getCurrentRequest();
 
         selectAdmin();
 
-        var taxonomies = model.read("test-taxonomies.ttl");
+        var taxonomies = model.read("test-taxonomies.ttl", "TTL");
         api.put(taxonomies, Boolean.TRUE);
 
         var workspace = workspaceService.createWorkspace(
@@ -173,8 +173,18 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
 
         coll3.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
 
-        var testdata = model.read("testdata.ttl");
+        var testdata = model.read("testdata.ttl", "TTL");
+        model.write(System.out, "TURTLE");
         api.put(testdata, Boolean.TRUE);
+    }
+
+    private void setupUsers() {
+        user = createTestUser("user", false);
+        dao.write(user);
+        workspaceManager = createTestUser("workspace-admin", false);
+        dao.write(workspaceManager);
+        admin = createTestUser("admin", true);
+        dao.write(admin);
     }
 
     @Test

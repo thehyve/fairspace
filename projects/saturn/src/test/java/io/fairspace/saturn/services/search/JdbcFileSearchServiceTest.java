@@ -1,14 +1,13 @@
 package io.fairspace.saturn.services.search;
 
 import io.fairspace.saturn.PostgresAwareTest;
-import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
-import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
-import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
@@ -34,7 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
-import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Context;
 import org.junit.Assert;
 import org.junit.Before;
@@ -74,6 +72,8 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
     FileSearchService fileSearchService;
     MaintenanceService maintenanceService;
 
+    private DAO dao;
+
     User user;
     User user2;
     User workspaceManager;
@@ -91,41 +91,44 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
     private void setupUsers(Model model) {
         user = createTestUser("user", false);
         user.setCanViewPublicMetadata(true);
-        new DAO(model).write(user);
+        dao.write(user);
         user2 = createTestUser("user2", false);
-        new DAO(model).write(user2);
+        dao.write(user2);
         workspaceManager = createTestUser("workspace-admin", false);
-        new DAO(model).write(workspaceManager);
+        dao.write(workspaceManager);
         admin = createTestUser("admin", true);
-        new DAO(model).write(admin);
+        dao.write(admin);
     }
 
     @Before
     public void before()
             throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
-        var dsg = DatasetGraphFactory.createTxnMem();
+        JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
+        var config = loadViewsConfig("src/test/resources/test-views.yaml");
+        var searchProperties = buildSearchProperties();
+        var viewDatabase = buildViewDatabaseConfig();
+        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, searchProperties);
+
+        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
 
+        var viewService = new ViewService(searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
+
+        maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, "http://localhost:8080");
+
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
         var davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
-        var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
-        var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
-        var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
-
-        fileSearchService = new SparqlFileSearchService(filteredDataset);
-        var viewDatabase = buildViewDatabaseConfig();
-        ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, new SearchProperties());
-        var viewService = new ViewService(new SearchProperties(), new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
-        maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, "http://localhost:8080");
+        fileSearchService = new JdbcFileSearchService(searchProperties, config, viewStoreClientFactory, tx, davFactory.root);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+
+        dao = new DAO(model);
 
         setupUsers(model);
 
@@ -135,7 +138,7 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         selectAdmin();
 
         var taxonomies = model.read("test-taxonomies.ttl");
-        api.put(taxonomies, Boolean.FALSE);
+        api.put(taxonomies, Boolean.TRUE);
 
         var workspace = workspaceService.createWorkspace(
                 Workspace.builder().code("Test").build());
@@ -153,10 +156,13 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
 
         var coll2 = (PutableResource) root.createCollection("coll2");
         coll2.createNew("sample-s2-b-rna.fastq", null, 0L, "chemical/seq-na-fastq");
-        coll2.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
+
+        var coll3 = (PutableResource) root.createCollection("coll3");
+
+        coll3.createNew("sample-s2-b-rna_copy.fastq", null, 0L, "chemical/seq-na-fastq");
 
         var testdata = model.read("testdata.ttl");
-        api.put(testdata, Boolean.FALSE);
+        api.put(testdata, Boolean.TRUE);
     }
 
     @Test

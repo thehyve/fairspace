@@ -1,5 +1,6 @@
 package io.fairspace.saturn.services.views;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
@@ -79,6 +80,8 @@ public class SparqlQueryServiceTest {
     MetadataService api;
     QueryService queryService;
 
+    private DAO dao;
+
     User user;
     User user2;
     User workspaceManager;
@@ -93,19 +96,20 @@ public class SparqlQueryServiceTest {
         mockAuthentication(USER);
         user = createTestUser(USER, false);
         user.setCanViewPublicMetadata(true);
-        new DAO(model).write(user);
+        dao.write(user);
         mockAuthentication("user2");
         user2 = createTestUser("user2", false);
-        new DAO(model).write(user2);
+        dao.write(user2);
         workspaceManager = createTestUser("workspace-admin", false);
-        new DAO(model).write(workspaceManager);
+        dao.write(workspaceManager);
         mockAuthentication(ADMIN);
         admin = createTestUser(ADMIN, true);
-        new DAO(model).write(admin);
+        dao.write(admin);
     }
 
     @Before
     public void before() throws NotAuthorizedException, BadRequestException, ConflictException, IOException {
+        JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
         var dsg = DatasetGraphFactory.createTxnMem();
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
@@ -129,6 +133,8 @@ public class SparqlQueryServiceTest {
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+
+        dao = new DAO(model);
 
         setupUsers(model);
 

@@ -1,5 +1,6 @@
 package io.fairspace.saturn;
 
+import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -26,5 +27,13 @@ public class PostgresAwareTest {
         viewDatabase.setPassword(postgres.getPassword());
         viewDatabase.setMaxPoolSize(5);
         return viewDatabase;
+    }
+
+    protected SearchProperties buildSearchProperties() {
+        SearchProperties searchProperties = new SearchProperties();
+        searchProperties.setCountRequestTimeout(60000);
+        searchProperties.setPageRequestTimeout(10000);
+        searchProperties.setMaxJoinItems(50);
+        return searchProperties;
     }
 }

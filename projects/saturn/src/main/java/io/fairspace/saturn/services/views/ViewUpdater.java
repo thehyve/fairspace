@@ -87,7 +87,7 @@ public class ViewUpdater implements AutoCloseable {
         if (labelNode == null) {
             return null;
         }
-        return labelNode.toString();
+        return labelNode.getLiteral().toString(false);
     }
 
     public Object getValue(ViewsConfig.View.Column column, Node node) throws SQLException {

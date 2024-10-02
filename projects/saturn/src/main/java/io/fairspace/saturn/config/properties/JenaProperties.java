@@ -2,6 +2,7 @@ package io.fairspace.saturn.config.properties;
 
 import java.io.File;
 
+import com.google.common.annotations.VisibleForTesting;
 import lombok.Data;
 import org.apache.jena.tdb2.params.StoreParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,11 @@ public class JenaProperties {
 
     public static String getMetadataBaseIra() {
         return JenaProperties.metadataBaseIRI;
+    }
+
+    @VisibleForTesting
+    public static void setMetadataBaseIRI(String metadataBaseIRI) {
+        JenaProperties.metadataBaseIRI = metadataBaseIRI;
     }
 
     // Not a common practice, but a way to make the value available in a static context
