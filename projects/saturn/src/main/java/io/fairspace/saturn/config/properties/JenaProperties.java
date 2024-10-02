@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "application.jena")
 public class JenaProperties {
 
+    // TODO: this is a terrible idea to make it static, it's a quick fix for SparqlUtils & RequestContext
     private static String metadataBaseIRI;
 
     private File datasetPath;
