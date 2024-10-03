@@ -29,6 +29,9 @@ import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
+import io.fairspace.saturn.controller.dto.ValueDto;
+import io.fairspace.saturn.controller.dto.request.CountRequest;
+import io.fairspace.saturn.controller.dto.request.ViewRequest;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -207,19 +210,19 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
                 row.keySet());
         Assert.assertEquals(
                 "Sample A for subject 1",
-                row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+                row.get("Sample").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 "Blood",
-                row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+                row.get("Sample_nature").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 "Liver",
-                row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+                row.get("Sample_topography").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 45.2f,
                 ((Number) row.get("Sample_tumorCellularity").stream()
                                 .findFirst()
                                 .orElseThrow()
-                                .getValue())
+                                .value())
                         .floatValue(),
                 0.01);
     }
@@ -245,19 +248,19 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
                 row.keySet());
         Assert.assertEquals(
                 "Sample A for subject 1",
-                row.get("Sample").stream().findFirst().orElseThrow().getLabel());
+                row.get("Sample").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 "Blood",
-                row.get("Sample_nature").stream().findFirst().orElseThrow().getLabel());
+                row.get("Sample_nature").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 "Liver",
-                row.get("Sample_topography").stream().findFirst().orElseThrow().getLabel());
+                row.get("Sample_topography").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 45.2f,
                 ((Number) row.get("Sample_tumorCellularity").stream()
                                 .findFirst()
                                 .orElseThrow()
-                                .getValue())
+                                .value())
                         .floatValue(),
                 0.01);
     }
@@ -316,17 +319,15 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var row1 = page.getRows().getFirst();
         Assert.assertEquals(
                 "Sample A for subject 1",
-                row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+                row1.get("Sample").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(1, row1.get("Subject").size());
         var row2 = page.getRows().get(1);
         Assert.assertEquals(
                 "Sample B for subject 2",
-                row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+                row2.get("Sample").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 Set.of("RNA-seq", "Whole genome sequencing"),
-                row2.get("Resource_analysisType").stream()
-                        .map(ValueDTO::getLabel)
-                        .collect(Collectors.toSet()));
+                row2.get("Resource_analysisType").stream().map(ValueDto::label).collect(Collectors.toSet()));
     }
 
     @Test
@@ -342,17 +343,15 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var row1 = page.getRows().getFirst();
         Assert.assertEquals(
                 "Sample A for subject 1",
-                row1.get("Sample").stream().findFirst().orElseThrow().getLabel());
+                row1.get("Sample").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(1, row1.get("Subject").size());
         var row2 = page.getRows().get(1);
         Assert.assertEquals(
                 "Sample B for subject 2",
-                row2.get("Sample").stream().findFirst().orElseThrow().getLabel());
+                row2.get("Sample").stream().findFirst().orElseThrow().label());
         Assert.assertEquals(
                 Set.of("RNA-seq", "Whole genome sequencing"),
-                row2.get("Resource_analysisType").stream()
-                        .map(ValueDTO::getLabel)
-                        .collect(Collectors.toSet()));
+                row2.get("Resource_analysisType").stream().map(ValueDto::label).collect(Collectors.toSet()));
     }
 
     @Test
@@ -361,7 +360,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var requestParams = new CountRequest();
         requestParams.setView("Sample");
         var result = sut.count(requestParams);
-        assertEquals(2, result.getCount());
+        assertEquals(2, result.count());
     }
 
     @Test
@@ -369,7 +368,7 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var request = new CountRequest();
         request.setView("Subject");
         var result = sut.count(request);
-        Assert.assertEquals(1, result.getCount());
+        Assert.assertEquals(1, result.count());
     }
 
     @Test
@@ -377,6 +376,6 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
         var request = new CountRequest();
         request.setView("Resource");
         var result = sut.count(request);
-        Assert.assertEquals(4, result.getCount());
+        Assert.assertEquals(4, result.count());
     }
 }

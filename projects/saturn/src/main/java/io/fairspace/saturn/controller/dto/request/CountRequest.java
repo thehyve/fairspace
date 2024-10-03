@@ -1,13 +1,13 @@
-package io.fairspace.saturn.services.views;
+package io.fairspace.saturn.controller.dto.request;
 
 import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+import io.fairspace.saturn.services.views.ViewFilter;
+
+@Data
 public class CountRequest {
     @NotBlank
     private String view;

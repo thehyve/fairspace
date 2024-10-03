@@ -75,16 +75,13 @@ dependencies {
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.10.2'
     testImplementation "org.testcontainers:postgresql:1.19.6"
     testImplementation('com.github.stefanbirkner:system-rules:1.19.0') {
         exclude group: 'junit', module:'junit-dep'
     }
 
-    constraints {
-//        implementation('com.fasterxml.jackson.core:jackson-databind:2.9.10.1') {
-//            because 'previous versions have security vulnerabilities'
-//        }
-    }
 }
 
 jacocoTestReport {
@@ -117,4 +114,5 @@ test {
     // They also blocks usage of testing library mocking environment variables,
     // That is why this additional arg for tests is needed
     jvmArgs = ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
+    useJUnitPlatform()
 }

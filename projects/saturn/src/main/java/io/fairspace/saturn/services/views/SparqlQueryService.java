@@ -42,6 +42,11 @@ import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.controller.dto.CountDto;
+import io.fairspace.saturn.controller.dto.ValueDto;
+import io.fairspace.saturn.controller.dto.ViewPageDto;
+import io.fairspace.saturn.controller.dto.request.CountRequest;
+import io.fairspace.saturn.controller.dto.request.ViewRequest;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.vocabulary.FS;
 
@@ -97,7 +102,7 @@ public class SparqlQueryService implements QueryService {
         });
     }
 
-    public ViewPageDTO retrieveViewPage(ViewRequest request) {
+    public ViewPageDto retrieveViewPage(ViewRequest request) {
         var query = getQuery(request, false);
 
         log.debug("Executing query:\n{}", query);
@@ -133,7 +138,7 @@ public class SparqlQueryService implements QueryService {
                         .map(resource -> fetch(resource, request.getView()))
                         .collect(toList());
 
-                return ViewPageDTO.builder()
+                return ViewPageDto.builder()
                         .rows(rows)
                         .hasNext(hasNext)
                         .timeout(timeout)
@@ -142,10 +147,10 @@ public class SparqlQueryService implements QueryService {
         }
     }
 
-    private Map<String, Set<ValueDTO>> fetch(Resource resource, String viewName) {
+    private Map<String, Set<ValueDto>> fetch(Resource resource, String viewName) {
         var view = getView(viewName);
 
-        var result = new HashMap<String, Set<ValueDTO>>();
+        var result = new HashMap<String, Set<ValueDto>>();
         result.put(view.name, Set.of(toValueDTO(resource)));
 
         for (var c : view.columns) {
@@ -183,7 +188,7 @@ public class SparqlQueryService implements QueryService {
         return result;
     }
 
-    private Set<ValueDTO> getValues(Resource resource, View.Column column) {
+    private Set<ValueDto> getValues(Resource resource, View.Column column) {
         return new TreeSet<>(resource.listProperties(createProperty(column.source))
                 .mapWith(Statement::getObject)
                 .mapWith(this::toValueDTO)
@@ -196,13 +201,13 @@ public class SparqlQueryService implements QueryService {
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }
 
-    private ValueDTO toValueDTO(RDFNode node) {
+    private ValueDto toValueDTO(RDFNode node) {
         if (node.isLiteral()) {
             var value = node.asLiteral().getValue();
             if (value instanceof XSDDateTime) {
                 value = ofEpochMilli(((XSDDateTime) value).asCalendar().getTimeInMillis());
             }
-            return new ValueDTO(value.toString(), value);
+            return new ValueDto(value.toString(), value);
         }
         var resource = node.asResource();
         var label = resource.listProperties(RDFS.label)
@@ -210,7 +215,7 @@ public class SparqlQueryService implements QueryService {
                 .map(Statement::getString)
                 .orElseGet(resource::getLocalName);
 
-        return new ValueDTO(label, resource.getURI());
+        return new ValueDto(label, resource.getURI());
     }
 
     private Query getQuery(CountRequest request, boolean isCount) {
@@ -424,7 +429,7 @@ public class SparqlQueryService implements QueryService {
         return Boolean.getBoolean(value);
     }
 
-    public CountDTO count(CountRequest request) {
+    public CountDto count(CountRequest request) {
         var query = getQuery(request, true);
 
         log.debug("Querying the total number of matches: \n{}", query);
@@ -440,13 +445,13 @@ public class SparqlQueryService implements QueryService {
                 if (queryResult.hasNext()) {
                     var row = queryResult.next();
                     var count = row.getLiteral("count").getLong();
-                    return new CountDTO(count, false);
+                    return new CountDto(count, false);
                 } else {
-                    return new CountDTO(0, false);
+                    return new CountDto(0, false);
                 }
             });
         } catch (QueryCancelledException e) {
-            return new CountDTO(0, true);
+            return new CountDto(0, true);
         }
     }
 }

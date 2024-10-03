@@ -1,11 +1,11 @@
-package io.fairspace.saturn.services.views;
+package io.fairspace.saturn.controller.dto.request;
 
 import jakarta.validation.constraints.Min;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class ViewRequest extends CountRequest {
     @Min(1)
     private Integer page;
