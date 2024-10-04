@@ -8,16 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import io.fairspace.saturn.auth.JwtAuthConverterProperties;
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.controller.dto.CountDto;
 import io.fairspace.saturn.controller.dto.FacetDto;
@@ -39,8 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ViewController.class)
-@ImportAutoConfiguration(exclude = {SecurityAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})
-public class ViewControllerTest {
+public class ViewControllerTest extends BaseControllerTest {
 
     private static final String VIEWS_URL_TEMPLATE = "/api/views/";
 
@@ -53,19 +47,13 @@ public class ViewControllerTest {
     @MockBean
     private QueryService queryService;
 
-    @MockBean
-    private JwtAuthConverterProperties jwtAuthConverterProperties;
-
-    @MockBean
-    private Services services;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
-        when(services.getViewService()).thenReturn(viewService);
-        when(services.getQueryService()).thenReturn(queryService);
+        when(getService().getViewService()).thenReturn(viewService);
+        when(getService().getQueryService()).thenReturn(queryService);
     }
 
     @Test

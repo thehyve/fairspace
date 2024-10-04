@@ -3,7 +3,6 @@ package io.fairspace.saturn.controller;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,20 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.servlet.OAuth2ResourceServerAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import io.fairspace.saturn.auth.JwtAuthConverterProperties;
-import io.fairspace.saturn.config.Services;
-import io.fairspace.saturn.services.IRIModule;
 import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceRole;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
@@ -42,35 +32,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(WorkspaceController.class)
-@ImportAutoConfiguration(exclude = {SecurityAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})
-@Import(WorkspaceControllerTest.CustomObjectMapperConfig.class)
-class WorkspaceControllerTest {
+class WorkspaceControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @MockBean
-    private JwtAuthConverterProperties jwtAuthConverterProperties;
-
-    @MockBean
-    private Services services;
 
     @MockBean
     private WorkspaceService workspaceService;
 
     @BeforeEach
     void setUp() {
-        when(services.getWorkspaceService()).thenReturn(workspaceService);
-    }
-
-    @TestConfiguration
-    static class CustomObjectMapperConfig {
-        @Bean
-        public ObjectMapper objectMapper() {
-            return new ObjectMapper()
-                    .registerModule(new IRIModule())
-                    .findAndRegisterModules(); // Automatically registers JavaTimeModule, etc.
-        }
+        when(getService().getWorkspaceService()).thenReturn(workspaceService);
     }
 
     @Test
