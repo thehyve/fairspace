@@ -1,4 +1,4 @@
-package io.fairspace.saturn.controller;
+package io.fairspace.saturn.controller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

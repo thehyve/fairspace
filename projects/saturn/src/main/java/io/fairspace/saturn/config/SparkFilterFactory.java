@@ -9,7 +9,6 @@ import io.fairspace.saturn.services.metadata.VocabularyApp;
 import io.fairspace.saturn.services.search.SearchApp;
 import io.fairspace.saturn.services.users.LogoutApp;
 import io.fairspace.saturn.services.users.UserApp;
-import io.fairspace.saturn.services.workspaces.WorkspaceApp;
 
 public class SparkFilterFactory {
     public static SaturnSparkFilter createSparkFilter(
@@ -19,7 +18,7 @@ public class SparkFilterFactory {
             FeatureProperties featureProperties,
             String publicUrl) {
         return new SaturnSparkFilter(
-                new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
+                //                new WorkspaceApp(apiPathPrefix + "/workspaces", svc.getWorkspaceService()),
                 new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
                 //                new ViewApp(apiPathPrefix + "/views", svc.getViewService(), svc.getQueryService()),
                 new SearchApp(apiPathPrefix + "/search", svc.getSearchService(), svc.getFileSearchService()),
