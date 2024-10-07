@@ -7,6 +7,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,13 +44,14 @@ public class MetadataController {
     private final Services services;
 
     @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
-    public String getMetadata(
+    public ResponseEntity<String> getMetadata(
             @RequestParam(required = false) String subject,
             @RequestParam(name = "withValueProperties", defaultValue = "false") boolean withValueProperties,
             @RequestHeader(value = HttpHeaders.ACCEPT, required = false) String acceptHeader) {
-        Model model = services.getMetadataService().get(subject, withValueProperties);
+        var model = services.getMetadataService().get(subject, withValueProperties);
         var format = getFormat(acceptHeader);
-        return serialize(model, format);
+        var metadata = serialize(model, format);
+        return ResponseEntity.ok(metadata);
     }
 
     @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
