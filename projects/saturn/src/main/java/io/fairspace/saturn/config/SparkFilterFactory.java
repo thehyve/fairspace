@@ -4,7 +4,6 @@ import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.services.features.FeaturesApp;
 import io.fairspace.saturn.services.maintenance.MaintenanceApp;
-import io.fairspace.saturn.services.metadata.MetadataApp;
 import io.fairspace.saturn.services.metadata.VocabularyApp;
 import io.fairspace.saturn.services.search.SearchApp;
 import io.fairspace.saturn.services.users.LogoutApp;
@@ -18,7 +17,6 @@ public class SparkFilterFactory {
             FeatureProperties featureProperties,
             String publicUrl) {
         return new SaturnSparkFilter(
-                new MetadataApp(apiPathPrefix + "/metadata", svc.getMetadataService()),
                 new SearchApp(apiPathPrefix + "/search", svc.getSearchService(), svc.getFileSearchService()),
                 new VocabularyApp(apiPathPrefix + "/vocabulary"),
                 new UserApp(apiPathPrefix + "/users", svc.getUserService()),
