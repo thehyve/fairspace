@@ -2463,7 +2463,7 @@ use `--set-file` option:
 This should also restart the Saturn pod. If not, trigger the restart manually.
 +
 For local development - replace vocabulary file in link:projects/saturn/src/main/resources/vocabulary.ttl[vocabulary.ttl]
-and views configuration in link:projects/saturn/src/main/resources/views.yaml[views.ttl].
+and views configuration in link:projects/saturn/src/main/resources/views.yaml[views.yaml].
 Restart Saturn run.
 +
 . Load data for new entities or properties.
