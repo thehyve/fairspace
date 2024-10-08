@@ -74,7 +74,7 @@ application:
   features:
     - ExtraStorage
   view-database:
-    enabled: ${VIEW_DATABASE_ENABLED:false}
+    enabled: ${VIEW_DATABASE_ENABLED:true}
     url: ${VIEW_DATABASE_URL:jdbc:postgresql://localhost:9432/fairspace}
     username: ${VIEW_DATABASE_USERNAME:fairspace}
     autoCommitEnabled: ${VIEW_DATABASE_AUTO_COMMIT:false}
