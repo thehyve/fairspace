@@ -25,6 +25,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
@@ -138,7 +139,11 @@ public class SparqlQueryServiceTest {
         searchProperties.setPageRequestTimeout(10000);
         searchProperties.setMaxJoinItems(50);
         queryService = new SparqlQueryService(
-                searchProperties, loadViewsConfig("src/test/resources/test-views.yaml"), filteredDataset, tx);
+                searchProperties,
+                new JenaProperties("http://localhost/iri/", new StoreParamsProperties()),
+                loadViewsConfig("src/test/resources/test-views.yaml"),
+                filteredDataset,
+                tx);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
