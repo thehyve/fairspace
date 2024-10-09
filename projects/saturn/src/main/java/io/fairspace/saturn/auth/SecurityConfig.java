@@ -21,7 +21,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(req -> req.getServletPath().contains("/actuator/health/**"))
+                        .requestMatchers(req -> req.getServletPath().contains("/actuator/health"))
                         .permitAll()
                         .requestMatchers(req -> req.getServletPath().endsWith("/favicon.ico"))
                         .permitAll()
