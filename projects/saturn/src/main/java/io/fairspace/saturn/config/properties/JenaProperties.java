@@ -26,7 +26,7 @@ public class JenaProperties {
 
     private final StoreParams storeParams;
 
-    public static String getMetadataBaseIra() {
+    public static String getMetadataBaseIri() {
         return JenaProperties.metadataBaseIRI;
     }
 
