@@ -43,7 +43,7 @@ public class SparqlUtils {
     }
 
     public static Node generateMetadataIriFromId(String id) {
-        return createURI(JenaProperties.getMetadataBaseIra() + id);
+        return createURI(JenaProperties.getMetadataBaseIri() + id);
     }
 
     public static Node generateMetadataIriFromUri(String uri) {

@@ -21,18 +21,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(req -> req.getServletPath().contains("/actuator/health/**"))
+                        .requestMatchers(req -> req.getServletPath().contains("/actuator/health"))
                         .permitAll()
                         .requestMatchers(req -> req.getServletPath().endsWith("/favicon.ico"))
                         .permitAll()
                         .anyRequest()
-                        .permitAll())
+                        .authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)))
                 .sessionManagement(
                         (sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(
                         (exceptionHandling) -> exceptionHandling.authenticationEntryPoint(new UnauthorizedEntryPoint()))
-                .cors(Customizer.withDefaults()); // todo: check that cors enabled
+                .cors(Customizer.withDefaults());
 
         return http.build();
     }

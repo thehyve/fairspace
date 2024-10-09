@@ -141,9 +141,10 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
-        sparqlQueryService = new SparqlQueryService(searchProperties, viewsConfig, filteredDataset, transactions);
+        sparqlQueryService =
+                new SparqlQueryService(searchProperties, jenaProperties, viewsConfig, filteredDataset, transactions);
         queryService = viewStoreClientFactory == null
-                ? new SparqlQueryService(searchProperties, viewsConfig, filteredDataset, transactions)
+                ? new SparqlQueryService(searchProperties, jenaProperties, viewsConfig, filteredDataset, transactions)
                 : new JdbcQueryService(
                         searchProperties, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
 

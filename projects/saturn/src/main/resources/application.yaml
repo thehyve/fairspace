@@ -45,6 +45,7 @@ application:
     # Path of the transaction log
     transactionLogPath: ${TRANSACTION_LOG_PATH:data/log}
     bulkTransactions: ${BULK_TRANSACTIONS:true}
+    sparql-query-timeout: ${SPARQL_TIMEOUT:30000}
     tbd-store-params:
       file_mode: "mapped"
       block_size: 8193

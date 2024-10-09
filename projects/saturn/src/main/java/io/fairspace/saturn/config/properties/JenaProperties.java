@@ -24,9 +24,11 @@ public class JenaProperties {
 
     private boolean bulkTransactions;
 
+    private long sparqlQueryTimeout;
+
     private final StoreParams storeParams;
 
-    public static String getMetadataBaseIra() {
+    public static String getMetadataBaseIri() {
         return JenaProperties.metadataBaseIRI;
     }
 

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.jena.datatypes.xsd.XSDDateTime;
@@ -16,7 +17,6 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryCancelledException;
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
@@ -41,6 +41,7 @@ import org.apache.jena.vocabulary.RDFS;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.controller.dto.CountDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
@@ -72,13 +73,19 @@ import static org.apache.jena.system.Txn.calculateRead;
 public class SparqlQueryService implements QueryService {
     private static final String RESOURCES_VIEW = "Resource";
     private final SearchProperties searchProperties;
+    private final JenaProperties jenaProperties;
     private final ViewsConfig viewsConfig;
     private final Dataset ds;
     private final Transactions transactions;
 
     public SparqlQueryService(
-            SearchProperties searchProperties, ViewsConfig viewsConfig, Dataset ds, Transactions transactions) {
+            SearchProperties searchProperties,
+            JenaProperties jenaProperties,
+            ViewsConfig viewsConfig,
+            Dataset ds,
+            Transactions transactions) {
         this.searchProperties = searchProperties;
+        this.jenaProperties = jenaProperties;
         this.viewsConfig = viewsConfig;
         this.ds = ds;
         this.transactions = transactions;
@@ -90,7 +97,11 @@ public class SparqlQueryService implements QueryService {
     public String executeQuery(String sparqlQuery) {
         return transactions.calculateRead(model -> {
             Query query = QueryFactory.create(sparqlQuery, Syntax.syntaxARQ);
-            try (QueryExecution queryExecution = QueryExecutionFactory.create(query, model)) {
+            try (QueryExecution queryExecution = QueryExecution.create()
+                    .query(query)
+                    .dataset(ds)
+                    .timeout(jenaProperties.getSparqlQueryTimeout(), TimeUnit.MILLISECONDS)
+                    .build()) {
                 ResultSet resultSet = queryExecution.execSelect();
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 ResultSetFormatter.outputAsJSON(outputStream, resultSet);
