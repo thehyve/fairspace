@@ -24,6 +24,7 @@ import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
+import io.fairspace.saturn.controller.dto.request.FileSearchRequest;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;

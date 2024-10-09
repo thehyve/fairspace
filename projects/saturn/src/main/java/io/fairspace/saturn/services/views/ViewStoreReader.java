@@ -30,9 +30,9 @@ import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.controller.dto.SearchResultDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.controller.dto.request.FileSearchRequest;
 import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
@@ -611,7 +611,7 @@ public class ViewStoreReader implements AutoCloseable {
         }
     }
 
-    public List<SearchResultDTO> searchFiles(FileSearchRequest request, List<String> userCollections) {
+    public List<SearchResultDto> searchFiles(FileSearchRequest request, List<String> userCollections) {
         if (userCollections == null || userCollections.isEmpty()) {
             return Collections.emptyList();
         }
@@ -654,10 +654,10 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     @SneakyThrows
-    private List<SearchResultDTO> convertResult(ResultSet resultSet) {
-        var rows = new ArrayList<SearchResultDTO>();
+    private List<SearchResultDto> convertResult(ResultSet resultSet) {
+        var rows = new ArrayList<SearchResultDto>();
         while (resultSet.next()) {
-            var row = SearchResultDTO.builder()
+            var row = SearchResultDto.builder()
                     .id(resultSet.getString("id"))
                     .label(resultSet.getString("label"))
                     .type(FS.NS + resultSet.getString("type"))

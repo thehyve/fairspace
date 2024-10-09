@@ -5,6 +5,9 @@ import java.util.List;
 import lombok.extern.log4j.*;
 import org.apache.jena.query.*;
 
+import io.fairspace.saturn.controller.dto.SearchResultDto;
+import io.fairspace.saturn.controller.dto.SearchResultsDto;
+import io.fairspace.saturn.controller.dto.request.LookupSearchRequest;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.vocabulary.FS;
 
@@ -50,20 +53,20 @@ public class SearchService {
         this.ds = ds;
     }
 
-    public SearchResultsDTO getLookupSearchResults(LookupSearchRequest request) {
-        return SearchResultsDTO.builder()
+    public SearchResultsDto getLookupSearchResults(LookupSearchRequest request) {
+        return SearchResultsDto.builder()
                 .results(getResourceByText(request))
                 .query(request.getQuery())
                 .build();
     }
 
-    private List<SearchResultDTO> getResourceByText(LookupSearchRequest request) {
+    private List<SearchResultDto> getResourceByText(LookupSearchRequest request) {
         var binding = new QuerySolutionMap();
         binding.add("query", createStringLiteral(request.getQuery()));
         binding.add("type", createResource(request.getResourceType()));
 
         var results = SparqlUtils.getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding, ds);
-        if (results.size() > 0) {
+        if (!results.isEmpty()) {
             return results;
         }
 
