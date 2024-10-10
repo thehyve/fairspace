@@ -148,15 +148,6 @@ public class UserService {
         return users;
     }
 
-    // todo: implement logout
-    public void logoutCurrent() {
-        //        try {
-        //            getCurrentRequest().logout();
-        //        } catch (ServletException e) {
-        //            throw new RuntimeException(e);
-        //        }
-    }
-
     public void update(UserRolesUpdate roles) {
         if (!currentUser().isAdmin()) {
             throw new AccessDeniedException();

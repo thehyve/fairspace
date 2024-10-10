@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.config.properties.FeatureProperties;
-import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -17,7 +16,6 @@ public class SparkFilterFactoryTest {
 
     @Test
     public void itCreatesAFilter() {
-        assertNotNull(SparkFilterFactory.createSparkFilter(
-                "/some/path", svc, new KeycloakClientProperties(), new FeatureProperties(), ""));
+        assertNotNull(SparkFilterFactory.createSparkFilter("/some/path", svc, new FeatureProperties()));
     }
 }
