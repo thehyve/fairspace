@@ -15,7 +15,7 @@ import io.fairspace.saturn.services.IRIModule;
 
 @ImportAutoConfiguration(exclude = {SecurityAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})
 @Import(BaseControllerTest.CustomObjectMapperConfig.class)
-class BaseControllerTest {
+public class BaseControllerTest {
 
     @MockBean
     private JwtAuthConverterProperties jwtAuthConverterProperties;
