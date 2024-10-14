@@ -3,7 +3,6 @@ package io.fairspace.saturn.controller;
 import java.util.List;
 import java.util.Map;
 
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
@@ -21,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.services.workspaces.UserRoleDto;
 import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 
 @RestController
 @RequestMapping("${application.basePath}/workspaces")
@@ -63,7 +62,6 @@ public class WorkspaceController {
     @PatchMapping(value = "/users/", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setUserRole(@RequestBody UserRoleDto userRoleDto) {
-        workspaceService
-                .setUserRole(userRoleDto.getWorkspace(), userRoleDto.getUser(), userRoleDto.getRole());
+        workspaceService.setUserRole(userRoleDto.getWorkspace(), userRoleDto.getUser(), userRoleDto.getRole());
     }
 }

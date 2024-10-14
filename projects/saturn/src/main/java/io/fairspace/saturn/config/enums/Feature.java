@@ -1,4 +1,4 @@
-package io.fairspace.saturn.config;
+package io.fairspace.saturn.config.enums;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

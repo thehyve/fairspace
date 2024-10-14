@@ -10,6 +10,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 
+import io.fairspace.saturn.config.enums.Feature;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;

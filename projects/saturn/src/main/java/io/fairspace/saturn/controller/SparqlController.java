@@ -1,6 +1,5 @@
 package io.fairspace.saturn.controller;
 
-import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -9,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.controller.validation.ValidSparqlReadQuery;
 import io.fairspace.saturn.services.AccessDeniedException;
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 
 @RestController
