@@ -1,29 +1,26 @@
 package io.fairspace.saturn.config;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.dataformat.yaml.*;
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.Nulls;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
-public class ViewsConfig {
+@Component
+@PropertySource("classpath:views.yaml")
+public class ViewsConfigProperties {
 
-    private Map<String, View> nameToViewConfigMap;
+    //    private Map<String, View> nameToViewConfigMap;
 
-    public static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
-
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
     public List<View> views = new ArrayList<>();
-
-    public Optional<View> getViewConfig(String viewName) {
-        if (nameToViewConfigMap == null) {
-            nameToViewConfigMap = views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
-        }
-        return Optional.ofNullable(nameToViewConfigMap.get(viewName));
-    }
 
     public enum ColumnType {
         Text,
