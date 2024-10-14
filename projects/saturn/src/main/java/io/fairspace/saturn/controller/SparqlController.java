@@ -13,6 +13,8 @@ import io.fairspace.saturn.controller.validation.ValidSparqlReadQuery;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 
+import static io.fairspace.saturn.controller.enums.CustomMediaType.APPLICATION_SPARQL_QUERY;
+
 @RestController
 @RequestMapping("${application.basePath}/rdf")
 @Validated
@@ -29,7 +31,7 @@ public class SparqlController {
      * @param sparqlQuery the SPARQL query
      * @return the result of the query (JSON)
      */
-    @PostMapping(value = "/query", consumes = "application/sparql-query", produces = "application/json")
+    @PostMapping(value = "/query", consumes = APPLICATION_SPARQL_QUERY)
     // todo: uncomment the line below and remove the metadataPermissions.hasMetadataQueryPermission() call once
     //  the MetadataPermissions is available in the IoC container
     //  @PreAuthorize("@metadataPermissions.hasMetadataQueryPermission()")

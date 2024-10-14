@@ -6,7 +6,6 @@ import java.util.Map;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,19 +34,19 @@ public class WorkspaceController {
         this.services = services;
     }
 
-    @PutMapping(value = "/")
+    @PutMapping("/")
     public ResponseEntity<Workspace> createWorkspace(@RequestBody Workspace workspace) {
         var createdWorkspace = services.getWorkspaceService().createWorkspace(workspace);
         return ResponseEntity.ok(createdWorkspace);
     }
 
-    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/")
     public ResponseEntity<List<Workspace>> listWorkspaces() {
         var workspaces = services.getWorkspaceService().listWorkspaces();
         return ResponseEntity.ok(workspaces);
     }
 
-    @DeleteMapping(value = "/")
+    @DeleteMapping("/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWorkspace(@RequestParam("workspace") String workspaceUri) {
         services.getWorkspaceService().deleteWorkspace(NodeFactory.createURI(workspaceUri));
@@ -60,7 +59,7 @@ public class WorkspaceController {
         return ResponseEntity.ok(users);
     }
 
-    @PatchMapping(value = "/users/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/users/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setUserRole(@RequestBody UserRoleDto userRoleDto) {
         services.getWorkspaceService()

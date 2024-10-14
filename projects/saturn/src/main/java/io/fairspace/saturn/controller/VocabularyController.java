@@ -14,10 +14,10 @@ import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @RestController
-@RequestMapping("${application.basePath}/vocabulary/")
+@RequestMapping("${application.basePath}/vocabulary")
 public class VocabularyController {
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<String> getVocabulary(
             @RequestHeader(value = HttpHeaders.ACCEPT, required = false) String acceptHeader) {
         var format = getFormat(acceptHeader);

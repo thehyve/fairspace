@@ -11,18 +11,18 @@ import io.fairspace.saturn.services.users.UserRolesUpdate;
 import io.fairspace.saturn.services.users.UserService;
 
 @RestController
-@RequestMapping("${application.basePath}/users/")
+@RequestMapping("${application.basePath}/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<Collection<User>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
-    @PatchMapping
+    @PatchMapping("/")
     public ResponseEntity<Void> updateUserRoles(@RequestBody UserRolesUpdate update) {
         userService.update(update);
         return ResponseEntity.noContent().build();

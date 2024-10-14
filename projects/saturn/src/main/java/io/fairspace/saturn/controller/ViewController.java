@@ -1,7 +1,6 @@
 package io.fairspace.saturn.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,28 +28,25 @@ public class ViewController {
         this.services = services;
     }
 
-    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/")
     public ViewsDto getViews() {
         var views = services.getViewService().getViews();
         return new ViewsDto(views);
     }
 
-    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/")
     public ResponseEntity<ViewPageDto> getViewData(@Valid @RequestBody ViewRequest requestBody) {
         var result = services.getQueryService().retrieveViewPage(requestBody);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping(value = "/facets", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/facets")
     public ResponseEntity<FacetsDto> getFacets() {
         var facets = services.getViewService().getFacets();
         return ResponseEntity.ok(new FacetsDto(facets));
     }
 
-    @PostMapping(
-            value = "/count",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping("/count")
     public ResponseEntity<CountDto> count(@Valid @RequestBody CountRequest requestBody) {
         var result = services.getQueryService().count(requestBody);
         return ResponseEntity.ok(result);
