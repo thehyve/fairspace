@@ -40,7 +40,7 @@ application:
     # Base IRI for all metadata entities
     metadataBaseIRI: ${METADATA_BASE_IRI:http://localhost/iri/}
     # Jena's TDB2 database path
-    datasetPath: ${DATASET_PATH:/Users/anton/git/rdm/fairspace/projects/saturn/data/db}
+    datasetPath: ${DATASET_PATH:data/db}
     # Path of the transaction log
     transactionLogPath: ${TRANSACTION_LOG_PATH:data/log}
     bulkTransactions: ${BULK_TRANSACTIONS:true}

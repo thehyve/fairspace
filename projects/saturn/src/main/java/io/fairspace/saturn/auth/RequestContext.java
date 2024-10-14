@@ -55,10 +55,6 @@ public class RequestContext {
         return getJwt().map(Jwt::getClaims).map(SaturnClaims::from).orElseGet(SaturnClaims::emptyClaims);
     }
 
-    public static String getIdTokenString() {
-        return getJwt().map(Jwt::getTokenValue).orElse(null);
-    }
-
     private static Optional<Authentication> getAuthentication() {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
