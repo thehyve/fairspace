@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import lombok.extern.log4j.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
@@ -38,51 +38,41 @@ public class WorkspaceService {
 
     public List<Workspace> listWorkspaces() {
         return tx.calculateRead(m -> {
-            try {
-                var user = m.wrapAsResource(getUserURI());
-                return new DAO(m)
-                        .list(Workspace.class).stream()
-                                .peek(ws -> {
-                                    var res = m.wrapAsResource(ws.getIri());
-                                    ws.setCanManage(userService.currentUser().isAdmin()
-                                            || user.hasProperty(FS.isManagerOf, res));
-                                    ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
-                                    var workspaceCollections = m.listSubjectsWithProperty(FS.ownedBy, res)
-                                            .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
-                                            .toList();
-                                    var totalCollectionCount = workspaceCollections.size();
-                                    var nonDeletedCollectionCount = (int) workspaceCollections.stream()
-                                            .filter(collection -> !collection.hasProperty(FS.dateDeleted))
-                                            .count();
-                                    var memberCount = m.listSubjectsWithProperty(RDF.type, FS.User)
-                                            .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
-                                            .toList()
-                                            .size();
-                                    var managers = new DAO(m)
-                                            .list(User.class).stream()
-                                                    .filter(u -> m.wrapAsResource(u.getIri())
-                                                            .hasProperty(FS.isManagerOf, res))
-                                                    .collect(toList());
-                                    ws.setSummary(WorkspaceSummary.builder()
-                                            .totalCollectionCount(totalCollectionCount)
-                                            .nonDeletedCollectionCount(nonDeletedCollectionCount)
-                                            .memberCount(memberCount + managers.size())
-                                            .build());
-                                    ws.setManagers(managers);
-                                })
-                                .filter(ws -> userService.currentUser().isCanViewPublicMetadata()
-                                        || ws.isCanManage()
-                                        || ws.isCanCollaborate())
-                                .collect(toList());
-            } catch (Throwable e) {
-                log.error("+++++++++++++++++++++++++++++");
-                log.error("+++++++++++++++++++++++++++++");
-                log.error("+++++++++++++++++++++++++++++");
-                log.error("+++++++++++++++++++++++++++++");
-                log.error("+++++++++++++++++++++++++++++");
-                log.error("Error listing workspaces", e);
-                throw e;
-            }
+            var user = m.wrapAsResource(getUserURI());
+            return new DAO(m)
+                    .list(Workspace.class).stream()
+                            .peek(ws -> {
+                                var res = m.wrapAsResource(ws.getIri());
+                                ws.setCanManage(
+                                        userService.currentUser().isAdmin() || user.hasProperty(FS.isManagerOf, res));
+                                ws.setCanCollaborate(ws.isCanManage() || user.hasProperty(FS.isMemberOf, res));
+                                var workspaceCollections = m.listSubjectsWithProperty(FS.ownedBy, res)
+                                        .filterKeep(r -> r.hasProperty(RDF.type, FS.Collection))
+                                        .toList();
+                                var totalCollectionCount = workspaceCollections.size();
+                                var nonDeletedCollectionCount = (int) workspaceCollections.stream()
+                                        .filter(collection -> !collection.hasProperty(FS.dateDeleted))
+                                        .count();
+                                var memberCount = m.listSubjectsWithProperty(RDF.type, FS.User)
+                                        .filterKeep(u -> u.hasProperty(FS.isMemberOf, res))
+                                        .toList()
+                                        .size();
+                                var managers = new DAO(m)
+                                        .list(User.class).stream()
+                                                .filter(u -> m.wrapAsResource(u.getIri())
+                                                        .hasProperty(FS.isManagerOf, res))
+                                                .collect(toList());
+                                ws.setSummary(WorkspaceSummary.builder()
+                                        .totalCollectionCount(totalCollectionCount)
+                                        .nonDeletedCollectionCount(nonDeletedCollectionCount)
+                                        .memberCount(memberCount + managers.size())
+                                        .build());
+                                ws.setManagers(managers);
+                            })
+                            .filter(ws -> userService.currentUser().isCanViewPublicMetadata()
+                                    || ws.isCanManage()
+                                    || ws.isCanCollaborate())
+                            .collect(toList());
         });
     }
 
