@@ -11,7 +11,7 @@ import io.fairspace.saturn.services.users.UserRolesUpdate;
 import io.fairspace.saturn.services.users.UserService;
 
 @RestController
-@RequestMapping("/api/users/")
+@RequestMapping("${application.basePath}/users/")
 @RequiredArgsConstructor
 public class UserController {
 

@@ -38,8 +38,7 @@ public class WorkspaceController {
     @PutMapping(value = "/")
     public ResponseEntity<Workspace> createWorkspace(@RequestBody Workspace workspace) {
         var createdWorkspace = services.getWorkspaceService().createWorkspace(workspace);
-        return ResponseEntity.ok(
-                createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
+        return ResponseEntity.ok(createdWorkspace);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)

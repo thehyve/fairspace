@@ -14,7 +14,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 
 @RestController
-@RequestMapping("/api/rdf")
+@RequestMapping("${application.basePath}/rdf")
 @Validated
 @RequiredArgsConstructor
 public class SparqlController {
