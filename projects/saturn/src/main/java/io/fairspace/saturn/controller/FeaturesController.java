@@ -12,13 +12,13 @@ import io.fairspace.saturn.config.enums.Feature;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 
 @RestController
-@RequestMapping("/api/features/")
+@RequestMapping("${application.basePath}/features")
 @RequiredArgsConstructor
 public class FeaturesController {
 
     private final FeatureProperties featureProperties;
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<Set<Feature>> getFeatures() {
         return ResponseEntity.ok(featureProperties.getFeatures());
     }

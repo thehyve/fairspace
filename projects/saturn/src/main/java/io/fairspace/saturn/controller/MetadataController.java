@@ -32,7 +32,7 @@ import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 
 @Log4j2
 @RestController
-@RequestMapping("/api/metadata/")
+@RequestMapping("${application.basePath}/metadata")
 @RequiredArgsConstructor
 @Validated
 public class MetadataController {
@@ -43,7 +43,9 @@ public class MetadataController {
 
     private final Services services;
 
-    @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
+    @GetMapping(
+            value = "/",
+            produces = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
     public ResponseEntity<String> getMetadata(
             @RequestParam(required = false) String subject,
             @RequestParam(name = "withValueProperties", defaultValue = "false") boolean withValueProperties,
@@ -54,7 +56,9 @@ public class MetadataController {
         return ResponseEntity.ok(metadata);
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
+    @PutMapping(
+            value = "/",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void putMetadata(
             @RequestBody String body,
@@ -66,6 +70,7 @@ public class MetadataController {
     }
 
     @PatchMapping(
+            value = "/",
             consumes = {MediaType.APPLICATION_JSON_VALUE, APPLICATION_LD_JSON, TEXT_TURTLE, APPLICATION_N_TRIPLES})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void patchMetadata(
@@ -76,7 +81,7 @@ public class MetadataController {
         services.getMetadataService().patch(model, doViewsUpdate);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteMetadata(
             @RequestParam(required = false) @ValidIri String subject,

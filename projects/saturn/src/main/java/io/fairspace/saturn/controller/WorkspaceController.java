@@ -1,13 +1,12 @@
 package io.fairspace.saturn.controller;
 
-import java.util.List;
-import java.util.Map;
-
-import lombok.RequiredArgsConstructor;
+import io.fairspace.saturn.services.workspaces.UserRoleDto;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,10 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.services.workspaces.UserRoleDto;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceRole;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import java.util.List;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("${application.basePath}/workspaces")
@@ -33,20 +31,19 @@ public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
 
-    @PutMapping(value = "/")
+    @PutMapping("/")
     public ResponseEntity<Workspace> createWorkspace(@RequestBody Workspace workspace) {
         var createdWorkspace = workspaceService.createWorkspace(workspace);
-        return ResponseEntity.ok(
-                createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
+        return ResponseEntity.ok(createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
     }
 
-    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/")
     public ResponseEntity<List<Workspace>> listWorkspaces() {
         var workspaces = workspaceService.listWorkspaces();
         return ResponseEntity.ok(workspaces);
     }
 
-    @DeleteMapping(value = "/")
+    @DeleteMapping("/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWorkspace(@RequestParam("workspace") String workspaceUri) {
         workspaceService.deleteWorkspace(NodeFactory.createURI(workspaceUri));
@@ -59,7 +56,7 @@ public class WorkspaceController {
         return ResponseEntity.ok(users);
     }
 
-    @PatchMapping(value = "/users/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/users/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setUserRole(@RequestBody UserRoleDto userRoleDto) {
         workspaceService.setUserRole(userRoleDto.getWorkspace(), userRoleDto.getUser(), userRoleDto.getRole());

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.fairspace.saturn.config.Services;
 
 @RestController
-@RequestMapping("/api/maintenance")
+@RequestMapping("${application.basePath}/maintenance")
 @RequiredArgsConstructor
 public class MaintenanceController {
 

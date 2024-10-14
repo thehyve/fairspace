@@ -184,8 +184,8 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         var results = fileSearchService.searchFiles(request);
         Assert.assertEquals(2, results.size());
         // Expect the results to be sorted by id
-        Assert.assertEquals("sample-s2-b-rna.fastq", results.get(0).getLabel());
-        Assert.assertEquals("sample-s2-b-rna_copy.fastq", results.get(1).getLabel());
+        Assert.assertEquals("sample-s2-b-rna.fastq", results.get(0).label());
+        Assert.assertEquals("sample-s2-b-rna_copy.fastq", results.get(1).label());
     }
 
     @Test
@@ -199,7 +199,7 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         selectAdmin();
         results = fileSearchService.searchFiles(request);
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("coffee.jpg", results.getFirst().getLabel());
+        Assert.assertEquals("coffee.jpg", results.getFirst().label());
     }
 
     @Test
@@ -214,7 +214,7 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
         selectAdmin();
         results = fileSearchService.searchFiles(request);
         Assert.assertEquals(1, results.size());
-        Assert.assertEquals("coffee.jpg", results.getFirst().getLabel());
+        Assert.assertEquals("coffee.jpg", results.getFirst().label());
     }
 
     @Test
