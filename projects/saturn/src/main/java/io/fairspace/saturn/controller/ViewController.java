@@ -36,7 +36,7 @@ public class ViewController {
     }
 
     @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ViewPageDto> createView(@Valid @RequestBody ViewRequest requestBody) {
+    public ResponseEntity<ViewPageDto> getViewData(@Valid @RequestBody ViewRequest requestBody) {
         var result = services.getQueryService().retrieveViewPage(requestBody);
         return ResponseEntity.ok(result);
     }

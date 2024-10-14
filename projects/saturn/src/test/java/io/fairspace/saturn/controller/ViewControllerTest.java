@@ -73,7 +73,7 @@ public class ViewControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void testCreateViewSuccess() throws Exception {
+    public void testGetViewDataSuccess() throws Exception {
         // Mock request body and response
         var viewRequest = new ViewRequest();
         viewRequest.setView("view1");
@@ -141,7 +141,7 @@ public class ViewControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void testCreateViewValidationFailure() throws Exception {
+    public void testGetViewDataValidationFailure() throws Exception {
         // Test validation error (e.g., invalid request body)
         var invalidRequestBody = new ViewRequest();
         invalidRequestBody.setPage(0); // Invalid page (must be >= 1)
