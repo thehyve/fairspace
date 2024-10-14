@@ -59,20 +59,12 @@ public class Services {
 
     public static final Symbol METADATA_SERVICE = Symbol.create("metadata_service");
 
-    private final Transactions transactions;
-
-    private final WorkspaceService workspaceService;
-    private final UserService userService;
-    private final MetadataPermissions metadataPermissions;
     private final MetadataService metadataService;
     private final ViewService viewService;
     private final QueryService queryService;
     private final SparqlQueryService sparqlQueryService;
     private final SearchService searchService;
     private final FileSearchService fileSearchService;
-    private final BlobStore blobStore;
-    private final DavFactory davFactory;
-    private final WebDAVServlet davServlet;
 
     private final BlobStore extraBlobStore;
     private final DavFactory extraDavFactory;
@@ -80,31 +72,24 @@ public class Services {
     private final DatasetGraph filteredDatasetGraph;
     private final MaintenanceService maintenanceService;
 
+    private Transactions transactions;
+
     public Services(
+            UserService userService,
             @NonNull ViewsConfig viewsConfig,
             @NonNull Dataset dataset,
             FeatureProperties featureProperties,
             ViewStoreClientFactory viewStoreClientFactory,
-            UsersResource usersResource,
             JenaProperties jenaProperties,
             CacheProperties cacheProperties,
             SearchProperties searchProperties,
             WebDavProperties webDavProperties,
-            KeycloakClientProperties keycloakClientProperties,
+            Transactions transactions,
+            MetadataPermissions metadataPermissions,
+            DavFactory davFactory,
             String publicUrl) {
-        this.transactions =
-                jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
-        userService = new UserService(keycloakClientProperties, transactions, usersResource);
-
-        blobStore = new LocalBlobStore(new File(webDavProperties.getBlobStorePath()));
-        davFactory = new DavFactory(
-                dataset.getDefaultModel().createResource(publicUrl + "/api/webdav"),
-                blobStore,
-                userService,
-                dataset.getContext(),
-                webDavProperties);
-        davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
+        this.transactions = transactions;
 
         if (featureProperties.getFeatures().contains(Feature.ExtraStorage)) {
             extraBlobStore = new DeletableLocalBlobStore(
@@ -122,10 +107,6 @@ public class Services {
             extraDavFactory = null;
             extraDavServlet = null;
         }
-
-        workspaceService = new WorkspaceService(transactions, userService);
-
-        metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
 
         var metadataValidator = new ComposedValidator(
                 new MachineOnlyClassesValidator(VOCABULARY),

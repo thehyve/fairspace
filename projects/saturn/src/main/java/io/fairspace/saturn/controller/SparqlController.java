@@ -1,5 +1,6 @@
 package io.fairspace.saturn.controller;
 
+import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +22,7 @@ public class SparqlController {
 
     private final SparqlQueryService sparqlQueryService;
 
-    private final Services services;
+    private final MetadataPermissions metadataPermissions;
 
     /**
      * Execute a read-only SPARQL query.
@@ -34,7 +35,7 @@ public class SparqlController {
     //  the MetadataPermissions is available in the IoC container
     //  @PreAuthorize("@metadataPermissions.hasMetadataQueryPermission()")
     public ResponseEntity<String> executeSparqlQuery(@ValidSparqlReadQuery @RequestBody String sparqlQuery) {
-        if (!services.getMetadataPermissions().hasMetadataQueryPermission()) {
+        if (!metadataPermissions.hasMetadataQueryPermission()) {
             throw new AccessDeniedException("You do not have permission to execute SPARQL queries.");
         }
         var json = sparqlQueryService.executeQuery(sparqlQuery);

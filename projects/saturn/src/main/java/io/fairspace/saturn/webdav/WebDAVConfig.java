@@ -14,8 +14,8 @@ import io.fairspace.saturn.config.condition.ConditionalOnMultiValuedProperty;
 public class WebDAVConfig {
 
     @Bean
-    public ServletRegistrationBean<WebDAVServlet> webDavServlet(Services svcs) {
-        return new ServletRegistrationBean<>(svcs.getDavServlet(), "/api/webdav/*");
+    public ServletRegistrationBean<WebDAVServlet> webDavServlet(WebDAVServlet webDavServlet) {
+        return new ServletRegistrationBean<>(webDavServlet, "/api/webdav/*");
     }
 
     @Bean

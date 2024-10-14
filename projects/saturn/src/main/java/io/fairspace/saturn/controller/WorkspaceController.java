@@ -3,6 +3,8 @@ package io.fairspace.saturn.controller;
 import java.util.List;
 import java.util.Map;
 
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import lombok.RequiredArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.springframework.http.HttpStatus;
@@ -27,44 +29,41 @@ import io.fairspace.saturn.services.workspaces.WorkspaceRole;
 @RestController
 @RequestMapping("${application.basePath}/workspaces")
 @Validated
+@RequiredArgsConstructor
 public class WorkspaceController {
 
-    private final Services services;
-
-    public WorkspaceController(Services services) {
-        this.services = services;
-    }
+    private final WorkspaceService workspaceService;
 
     @PutMapping(value = "/")
     public ResponseEntity<Workspace> createWorkspace(@RequestBody Workspace workspace) {
-        var createdWorkspace = services.getWorkspaceService().createWorkspace(workspace);
+        var createdWorkspace = workspaceService.createWorkspace(workspace);
         return ResponseEntity.ok(
                 createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Workspace>> listWorkspaces() {
-        var workspaces = services.getWorkspaceService().listWorkspaces();
+        var workspaces = workspaceService.listWorkspaces();
         return ResponseEntity.ok(workspaces);
     }
 
     @DeleteMapping(value = "/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWorkspace(@RequestParam("workspace") String workspaceUri) {
-        services.getWorkspaceService().deleteWorkspace(NodeFactory.createURI(workspaceUri));
+        workspaceService.deleteWorkspace(NodeFactory.createURI(workspaceUri));
     }
 
     @GetMapping(value = "/users/")
     public ResponseEntity<Map<Node, WorkspaceRole>> getUsers(@RequestParam("workspace") String workspaceUri) {
         var uri = NodeFactory.createURI(workspaceUri);
-        var users = services.getWorkspaceService().getUsers(uri);
+        var users = workspaceService.getUsers(uri);
         return ResponseEntity.ok(users);
     }
 
     @PatchMapping(value = "/users/", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setUserRole(@RequestBody UserRoleDto userRoleDto) {
-        services.getWorkspaceService()
+        workspaceService
                 .setUserRole(userRoleDto.getWorkspace(), userRoleDto.getUser(), userRoleDto.getRole());
     }
 }

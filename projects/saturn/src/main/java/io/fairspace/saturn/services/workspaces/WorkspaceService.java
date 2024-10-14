@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.*;
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
@@ -18,6 +19,7 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.vocabulary.FS;
+import org.springframework.stereotype.Service;
 
 import static io.fairspace.saturn.audit.Audit.audit;
 import static io.fairspace.saturn.auth.RequestContext.getUserURI;
@@ -27,14 +29,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toList;
 
 @Log4j2
+@Service
+@RequiredArgsConstructor
 public class WorkspaceService {
-    private final Transactions tx;
-    private final UserService userService;
 
-    public WorkspaceService(Transactions tx, UserService userService) {
-        this.tx = tx;
-        this.userService = userService;
-    }
+    private final Transactions tx;
+
+    private final UserService userService;
 
     public List<Workspace> listWorkspaces() {
         return tx.calculateRead(m -> {
