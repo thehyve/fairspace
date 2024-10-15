@@ -33,7 +33,7 @@ class FeaturesControllerTest extends BaseControllerTest {
         when(featureProperties.getFeatures()).thenReturn(features);
 
         // Perform GET request and verify the response
-        mockMvc.perform(get("/api/features/").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/features/").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("[\"ExtraStorage\"]"));

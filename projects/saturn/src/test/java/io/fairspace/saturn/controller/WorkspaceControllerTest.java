@@ -52,7 +52,7 @@ class WorkspaceControllerTest extends BaseControllerTest {
 
         when(workspaceService.createWorkspace(any(Workspace.class))).thenReturn(workspace);
 
-        mockMvc.perform(put("/api/workspaces/")
+        mockMvc.perform(put("/workspaces/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"code\": \"WS001\", \"title\": \"New Workspace\"}"))
                 .andExpect(status().isOk()) // Use isCreated() if HTTP 201 Created is implemented
@@ -66,7 +66,7 @@ class WorkspaceControllerTest extends BaseControllerTest {
 
         when(workspaceService.listWorkspaces()).thenReturn(List.of(workspace));
 
-        mockMvc.perform(get("/api/workspaces/").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/workspaces/").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].code").value("WS001"));
@@ -76,8 +76,7 @@ class WorkspaceControllerTest extends BaseControllerTest {
     void deleteWorkspace_shouldDeleteWorkspace() throws Exception {
         String workspaceUri = "http://example.com/workspace/1";
 
-        mockMvc.perform(delete("/api/workspaces/").param("workspace", workspaceUri))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/workspaces/").param("workspace", workspaceUri)).andExpect(status().isNoContent());
 
         Mockito.verify(workspaceService).deleteWorkspace(NodeFactory.createURI(workspaceUri));
     }
@@ -89,7 +88,7 @@ class WorkspaceControllerTest extends BaseControllerTest {
 
         when(workspaceService.getUsers(any())).thenReturn(users);
 
-        mockMvc.perform(get("/api/workspaces/users/").param("workspace", workspaceUri))
+        mockMvc.perform(get("/workspaces/users/").param("workspace", workspaceUri))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$['http://example.com/user/1']").value("Member"));
     }
@@ -97,7 +96,7 @@ class WorkspaceControllerTest extends BaseControllerTest {
     @Test
     void setUserRole_shouldUpdateUserRole() throws Exception {
         mockMvc.perform(
-                        patch("/api/workspaces/users/")
+                        patch("/workspaces/users/")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         "{\"workspace\": \"http://example.com/workspace/1\", \"user\": \"http://example.com/user/1\", \"role\": \"Manager\"}"))

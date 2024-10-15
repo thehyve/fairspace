@@ -32,7 +32,7 @@ import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 
 @Log4j2
 @RestController
-@RequestMapping("${application.basePath}/metadata")
+@RequestMapping("/metadata")
 @RequiredArgsConstructor
 @Validated
 public class MetadataController {

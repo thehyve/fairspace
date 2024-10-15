@@ -36,8 +36,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ViewController.class)
 public class ViewControllerTest extends BaseControllerTest {
 
-    private static final String VIEWS_URL_TEMPLATE = "/api/views/";
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -58,12 +56,11 @@ public class ViewControllerTest extends BaseControllerTest {
 
     @Test
     public void testGetViewsSuccess() throws Exception {
-        // Mock data for getViews
         var viewDto = new ViewDto("view1", "View 1", List.of(), 100L);
 
         when(viewService.getViews()).thenReturn(List.of(viewDto));
 
-        mockMvc.perform(get(VIEWS_URL_TEMPLATE).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/views/").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.views", hasSize(1)))
                 .andExpect(jsonPath("$.views[0].name", is("view1")))
@@ -91,7 +88,7 @@ public class ViewControllerTest extends BaseControllerTest {
 
         when(queryService.retrieveViewPage(viewRequest)).thenReturn(viewPageDto);
 
-        mockMvc.perform(post(VIEWS_URL_TEMPLATE)
+        mockMvc.perform(post("/views/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(viewRequest)))
                 .andExpect(status().isOk())
@@ -112,7 +109,7 @@ public class ViewControllerTest extends BaseControllerTest {
 
         when(viewService.getFacets()).thenReturn(List.of(facetDto));
 
-        mockMvc.perform(get(VIEWS_URL_TEMPLATE + "facets").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/views/facets").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.facets", hasSize(1)))
                 .andExpect(jsonPath("$.facets[0].name", is("facet1")))
@@ -132,7 +129,7 @@ public class ViewControllerTest extends BaseControllerTest {
 
         when(queryService.count(countRequest)).thenReturn(countDto);
 
-        mockMvc.perform(post(VIEWS_URL_TEMPLATE + "count")
+        mockMvc.perform(post("/views/count")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(countRequest)))
                 .andExpect(status().isOk())
@@ -147,7 +144,7 @@ public class ViewControllerTest extends BaseControllerTest {
         invalidRequestBody.setPage(0); // Invalid page (must be >= 1)
         invalidRequestBody.setSize(0); // Invalid size (must be >= 1)
 
-        mockMvc.perform(post(VIEWS_URL_TEMPLATE)
+        mockMvc.perform(post("/views/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequestBody)))
                 .andExpect(status().isBadRequest());

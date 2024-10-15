@@ -13,7 +13,7 @@ import io.fairspace.saturn.controller.dto.request.FileSearchRequest;
 import io.fairspace.saturn.controller.dto.request.LookupSearchRequest;
 
 @RestController
-@RequestMapping("${application.basePath}/search")
+@RequestMapping("/search")
 @RequiredArgsConstructor
 public class SearchController {
 

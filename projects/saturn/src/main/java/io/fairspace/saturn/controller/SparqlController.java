@@ -16,7 +16,7 @@ import io.fairspace.saturn.services.views.SparqlQueryService;
 import static io.fairspace.saturn.controller.enums.CustomMediaType.APPLICATION_SPARQL_QUERY;
 
 @RestController
-@RequestMapping("${application.basePath}/rdf")
+@RequestMapping("/rdf")
 @Validated
 @RequiredArgsConstructor
 public class SparqlController {

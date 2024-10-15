@@ -49,7 +49,7 @@ public class MetadataControllerTest extends BaseControllerTest {
                 "test-value");
         Mockito.when(metadataService.get(eq("http://example.com"), eq(false))).thenReturn(mockModel);
 
-        mockMvc.perform(get("/api/metadata/")
+        mockMvc.perform(get("/metadata/")
                         .param("subject", "http://example.com")
                         .param("withValueProperties", "false")
                         .header("Accept", TEXT_TURTLE))
@@ -66,10 +66,7 @@ public class MetadataControllerTest extends BaseControllerTest {
                 ex:subject ex:property "value" .
                 """;
 
-        mockMvc.perform(put("/api/metadata/")
-                        .content(body)
-                        .contentType(TEXT_TURTLE)
-                        .param("doViewsUpdate", "true"))
+        mockMvc.perform(put("/metadata/").content(body).contentType(TEXT_TURTLE).param("doViewsUpdate", "true"))
                 .andExpect(status().isNoContent());
 
         Mockito.verify(metadataService).put(any(Model.class), eq(true));
@@ -83,7 +80,7 @@ public class MetadataControllerTest extends BaseControllerTest {
                 ex:subject ex:property "updated-value" .
                 """;
 
-        mockMvc.perform(patch("/api/metadata/")
+        mockMvc.perform(patch("/metadata/")
                         .content(body)
                         .contentType(TEXT_TURTLE)
                         .param("doViewsUpdate", "false"))
@@ -96,7 +93,7 @@ public class MetadataControllerTest extends BaseControllerTest {
     public void testDeleteMetadataBySubject() throws Exception {
         Mockito.when(metadataService.softDelete(any())).thenReturn(true);
 
-        mockMvc.perform(delete("/api/metadata/").param("subject", "http://example.com"))
+        mockMvc.perform(delete("/metadata/").param("subject", "http://example.com"))
                 .andExpect(status().isNoContent());
 
         Mockito.verify(metadataService).softDelete(any());
@@ -110,7 +107,7 @@ public class MetadataControllerTest extends BaseControllerTest {
                 ex:subject ex:property "value" .
                 """;
 
-        mockMvc.perform(delete("/api/metadata/")
+        mockMvc.perform(delete("/metadata/")
                         .content(body)
                         .contentType(TEXT_TURTLE)
                         .param("doViewsUpdate", "true"))
@@ -123,7 +120,7 @@ public class MetadataControllerTest extends BaseControllerTest {
     public void testDeleteMetadataSubjectNotFound() throws Exception {
         Mockito.when(metadataService.softDelete(any())).thenReturn(false);
 
-        mockMvc.perform(delete("/api/metadata/").param("subject", "http://example.com"))
+        mockMvc.perform(delete("/metadata/").param("subject", "http://example.com"))
                 .andExpect(status().isBadRequest());
     }
 }

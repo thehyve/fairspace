@@ -24,7 +24,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("${application.basePath}/workspaces")
+@RequestMapping("/workspaces")
 @Validated
 @RequiredArgsConstructor
 public class WorkspaceController {

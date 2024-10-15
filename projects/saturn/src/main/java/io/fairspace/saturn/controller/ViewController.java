@@ -18,7 +18,7 @@ import io.fairspace.saturn.controller.dto.request.CountRequest;
 import io.fairspace.saturn.controller.dto.request.ViewRequest;
 
 @RestController
-@RequestMapping("${application.basePath}/views")
+@RequestMapping("/views")
 @Validated
 public class ViewController {
 

@@ -18,7 +18,7 @@ class VocabularyControllerTest extends BaseControllerTest {
 
     @Test
     void testGetVocabularyWithJsonLd() throws Exception {
-        mockMvc.perform(get("/api/vocabulary/").header(HttpHeaders.ACCEPT, "application/ld+json"))
+        mockMvc.perform(get("/vocabulary/").header(HttpHeaders.ACCEPT, "application/ld+json"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CONTENT_TYPE, "application/ld+json"));
     }
