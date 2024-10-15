@@ -36,7 +36,7 @@ import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobFileItem;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 
-import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
+import static io.fairspace.saturn.config.MetadataConfig.METADATA_SERVICE;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;

@@ -1,9 +1,9 @@
 package io.fairspace.saturn.controller;
 
-import io.fairspace.saturn.services.workspaces.UserRoleDto;
-import io.fairspace.saturn.services.workspaces.Workspace;
-import io.fairspace.saturn.services.workspaces.WorkspaceRole;
-import io.fairspace.saturn.services.workspaces.WorkspaceService;
+import java.util.List;
+import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.springframework.http.HttpStatus;
@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
+import io.fairspace.saturn.services.workspaces.UserRoleDto;
+import io.fairspace.saturn.services.workspaces.Workspace;
+import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 
 @RestController
 @RequestMapping("/workspaces")
@@ -34,7 +35,8 @@ public class WorkspaceController {
     @PutMapping("/")
     public ResponseEntity<Workspace> createWorkspace(@RequestBody Workspace workspace) {
         var createdWorkspace = workspaceService.createWorkspace(workspace);
-        return ResponseEntity.ok(createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
+        return ResponseEntity.ok(
+                createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
     }
 
     @GetMapping("/")

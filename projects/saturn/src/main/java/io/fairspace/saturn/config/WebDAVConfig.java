@@ -31,7 +31,7 @@ public class WebDAVConfig {
     @Qualifier("webDavServletRegistrationBean")
     public ServletRegistrationBean<WebDAVServlet> getWebDavServletRegistrationBean(
             @Qualifier("webDavServlet") WebDAVServlet webDavServlet) {
-        return new ServletRegistrationBean<>(webDavServlet, "/api/webdav/*");
+        return new ServletRegistrationBean<>(webDavServlet, "/webdav/*");
     }
 
     @Bean
@@ -43,7 +43,7 @@ public class WebDAVConfig {
     @Bean
     @Qualifier("davFactory")
     public DavFactory getDavFactory(
-            Dataset dataset,
+            @Qualifier("dataset") Dataset dataset,
             @Qualifier("blobStore") BlobStore blobStore,
             UserService userService,
             WebDavProperties webDavProperties) {

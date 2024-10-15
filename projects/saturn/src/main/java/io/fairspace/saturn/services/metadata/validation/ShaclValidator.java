@@ -15,9 +15,7 @@ public class ShaclValidator extends VocabularyAwareValidator {
 
     public ShaclValidator(Model vocabulary) {
         super(vocabulary);
-
         shapes = Shapes.parse(vocabulary);
-        ;
     }
 
     @Override

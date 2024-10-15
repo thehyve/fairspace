@@ -31,7 +31,7 @@ public class WebDAVExtraStorageConfig {
     @Qualifier("extraWebDavServletRegistrationBean")
     public ServletRegistrationBean<WebDAVServlet> getExtraWebDavServletRegistrationBean(
             @Qualifier("extraDavServlet") WebDAVServlet extraDavServlet) {
-        return new ServletRegistrationBean<>(extraDavServlet, "/api/extra-storage/*");
+        return new ServletRegistrationBean<>(extraDavServlet, "/extra-storage/*");
     }
 
     @Bean
@@ -44,7 +44,7 @@ public class WebDAVExtraStorageConfig {
     @Bean
     @Qualifier("extraDavFactory")
     public DavFactory getExtraDavFactory(
-            Dataset dataset,
+            @Qualifier("dataset") Dataset dataset,
             @Qualifier("extraBlobStore") BlobStore extraBlobStore,
             UserService userService,
             Transactions transactions,
