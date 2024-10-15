@@ -12,7 +12,7 @@ import io.fairspace.saturn.config.Feature;
 import io.fairspace.saturn.config.properties.FeatureProperties;
 
 @RestController
-@RequestMapping("${application.basePath}/features")
+@RequestMapping("/features")
 @RequiredArgsConstructor
 public class FeaturesController {
 

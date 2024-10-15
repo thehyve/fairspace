@@ -15,13 +15,13 @@ public class WebDAVConfig {
 
     @Bean
     public ServletRegistrationBean<WebDAVServlet> webDavServlet(Services svcs) {
-        return new ServletRegistrationBean<>(svcs.getDavServlet(), "/api/webdav/*");
+        return new ServletRegistrationBean<>(svcs.getDavServlet(), "/webdav/*");
     }
 
     @Bean
     @ConditionalOnMultiValuedProperty(prefix = "application", name = "features", havingValue = "ExtraStorage")
     public ServletRegistrationBean<WebDAVServlet> webDavExtraStorageServlet(Services svcs) {
-        return new ServletRegistrationBean<>(svcs.getExtraDavServlet(), "/api/extra-storage/*");
+        return new ServletRegistrationBean<>(svcs.getExtraDavServlet(), "/extra-storage/*");
     }
 
     /**

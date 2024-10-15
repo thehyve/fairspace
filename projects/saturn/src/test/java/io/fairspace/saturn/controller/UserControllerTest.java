@@ -36,7 +36,7 @@ class UserControllerTest extends BaseControllerTest {
         var users = List.of(user1, user2);
         when(service.getUsers()).thenReturn(users);
 
-        mockMvc.perform(get("/api/users/").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/users/").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()) // Expect 200 OK
                 .andExpect(
                         content()
@@ -84,7 +84,7 @@ class UserControllerTest extends BaseControllerTest {
         doNothing().when(service).update(update);
 
         mockMvc.perform(
-                        patch("/api/users/")
+                        patch("/users/")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
@@ -102,14 +102,11 @@ class UserControllerTest extends BaseControllerTest {
 
     @Test
     void testGetCurrentUser() throws Exception {
-        // Create a test user for the current user endpoint
         var currentUser = createTestUser("1", "Current User", "currentuser@example.com", "currentuser", true, true);
 
-        // Mock service behavior to return the current user
         when(service.currentUser()).thenReturn(currentUser);
 
-        // Perform GET request to /api/users/current
-        mockMvc.perform(get("/api/users/current").accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/users/current").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()) // Expect 200 OK
                 .andExpect(
                         content()

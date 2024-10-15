@@ -14,7 +14,7 @@ import static io.fairspace.saturn.services.metadata.Serialization.serialize;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @RestController
-@RequestMapping("${application.basePath}/vocabulary")
+@RequestMapping("/vocabulary")
 public class VocabularyController {
 
     @GetMapping("/")

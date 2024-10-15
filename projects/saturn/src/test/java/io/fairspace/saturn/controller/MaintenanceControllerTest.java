@@ -36,7 +36,7 @@ class MaintenanceControllerTest extends BaseControllerTest {
     void testStartReindex() throws Exception {
         doNothing().when(maintenanceService).startRecreateIndexTask();
 
-        mockMvc.perform(post("/api/maintenance/reindex").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/maintenance/reindex").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent()); // Expect 204 No Content
         verify(maintenanceService).startRecreateIndexTask();
     }
@@ -45,7 +45,7 @@ class MaintenanceControllerTest extends BaseControllerTest {
     void testCompactRdfStorage() throws Exception {
         doNothing().when(maintenanceService).compactRdfStorageTask();
 
-        mockMvc.perform(post("/api/maintenance/compact").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/maintenance/compact").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent()); // Expect 204 No Content
         verify(maintenanceService).compactRdfStorageTask();
     }
@@ -54,7 +54,7 @@ class MaintenanceControllerTest extends BaseControllerTest {
     void testGetStatusActive() throws Exception {
         when(maintenanceService.active()).thenReturn(true);
 
-        mockMvc.perform(get("/api/maintenance/status").accept(MediaType.TEXT_PLAIN))
+        mockMvc.perform(get("/maintenance/status").accept(MediaType.TEXT_PLAIN))
                 .andExpect(status().isOk()) // Expect 200 OK
                 .andExpect(content().string("active")); // Expect content "active"
         verify(maintenanceService).active();
@@ -64,7 +64,7 @@ class MaintenanceControllerTest extends BaseControllerTest {
     void testGetStatusInactive() throws Exception {
         when(maintenanceService.active()).thenReturn(false);
 
-        mockMvc.perform(get("/api/maintenance/status").accept(MediaType.TEXT_PLAIN))
+        mockMvc.perform(get("/maintenance/status").accept(MediaType.TEXT_PLAIN))
                 .andExpect(status().isOk()) // Expect 200 OK
                 .andExpect(content().string("inactive")); // Expect content "inactive"
         verify(maintenanceService).active();

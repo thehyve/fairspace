@@ -1,5 +1,7 @@
 server:
   port: 8090
+  servlet:
+    context-path: /api
 
 # Configuration to access the Keycloak server (user lists, user count, etc.)
 keycloak:
@@ -35,7 +37,6 @@ jwt:
       principal-attribute: preferred_username
 
 application:
-  basePath: /api
   publicUrl: ${PUBLIC_URL:http://localhost:8080}
   jena:
     # Base IRI for all metadata entities

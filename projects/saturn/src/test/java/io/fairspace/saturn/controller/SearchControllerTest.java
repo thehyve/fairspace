@@ -53,7 +53,7 @@ class SearchControllerTest extends BaseControllerTest {
         when(fileSearchService.searchFiles(any(FileSearchRequest.class))).thenReturn(mockResults);
 
         mockMvc.perform(
-                        post("/api/search/files")
+                        post("/search/files")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """
@@ -101,7 +101,7 @@ class SearchControllerTest extends BaseControllerTest {
                 .thenReturn(resultsDTO);
 
         mockMvc.perform(
-                        post("/api/search/lookup")
+                        post("/search/lookup")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(
                                         """

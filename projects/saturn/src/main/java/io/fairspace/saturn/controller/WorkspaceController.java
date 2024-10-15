@@ -24,7 +24,7 @@ import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceRole;
 
 @RestController
-@RequestMapping("${application.basePath}/workspaces")
+@RequestMapping("/workspaces")
 @Validated
 public class WorkspaceController {
 
