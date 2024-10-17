@@ -2,7 +2,6 @@ package io.fairspace.saturn.config;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetImpl;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +21,7 @@ public class RdfStorageConfig {
     private String publicUrl;
 
     @Bean
-    @Qualifier("dataset")
-    public Dataset getDataset(
+    public Dataset dataset(
             ViewsProperties viewsProperties,
             JenaProperties jenaProperties,
             @Nullable ViewStoreClientFactory viewStoreClientFactory) {
@@ -31,8 +29,7 @@ public class RdfStorageConfig {
     }
 
     @Bean
-    @Qualifier("filteredDataset")
-    public Dataset getFilteredDataset(Dataset dataset, MetadataPermissions metadataPermissions) {
+    public Dataset filteredDataset(Dataset dataset, MetadataPermissions metadataPermissions) {
         var filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         return DatasetImpl.wrap(filteredDatasetGraph);
     }

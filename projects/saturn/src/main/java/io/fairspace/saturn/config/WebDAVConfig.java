@@ -28,21 +28,18 @@ public class WebDAVConfig {
     private String publicUrl;
 
     @Bean
-    @Qualifier("webDavServletRegistrationBean")
-    public ServletRegistrationBean<WebDAVServlet> getWebDavServletRegistrationBean(
+    public ServletRegistrationBean<WebDAVServlet> webDavServletRegistrationBean(
             @Qualifier("webDavServlet") WebDAVServlet webDavServlet) {
         return new ServletRegistrationBean<>(webDavServlet, "/webdav/*");
     }
 
     @Bean
-    //    @Qualifier("blobStore")
     public BlobStore blobStore(WebDavProperties webDavProperties) {
         return new LocalBlobStore(new File(webDavProperties.getBlobStorePath()));
     }
 
     @Bean
-    @Qualifier("davFactory")
-    public DavFactory getDavFactory(
+    public DavFactory davFactory(
             @Qualifier("dataset") Dataset dataset,
             @Qualifier("blobStore") BlobStore blobStore,
             UserService userService,
@@ -56,8 +53,7 @@ public class WebDAVConfig {
     }
 
     @Bean
-    @Qualifier("webDavServlet")
-    public WebDAVServlet getWebDavServlet(
+    public WebDAVServlet webDavServlet(
             @Qualifier("davFactory") DavFactory davFactory,
             Transactions transactions,
             @Qualifier("blobStore") BlobStore blobStore) {

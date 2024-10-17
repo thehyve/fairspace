@@ -28,22 +28,19 @@ public class WebDAVExtraStorageConfig {
     private String publicUrl;
 
     @Bean
-    @Qualifier("extraWebDavServletRegistrationBean")
-    public ServletRegistrationBean<WebDAVServlet> getExtraWebDavServletRegistrationBean(
+    public ServletRegistrationBean<WebDAVServlet> extraWebDavServletRegistrationBean(
             @Qualifier("extraDavServlet") WebDAVServlet extraDavServlet) {
         return new ServletRegistrationBean<>(extraDavServlet, "/extra-storage/*");
     }
 
     @Bean
-    @Qualifier("extraBlobStore")
-    public BlobStore getExtraBlobStore(WebDavProperties webDavProperties) {
+    public BlobStore extraBlobStore(WebDavProperties webDavProperties) {
         return new DeletableLocalBlobStore(
                 new File(webDavProperties.getExtraStorage().getBlobStorePath()));
     }
 
     @Bean
-    @Qualifier("extraDavFactory")
-    public DavFactory getExtraDavFactory(
+    public DavFactory extraDavFactory(
             @Qualifier("dataset") Dataset dataset,
             @Qualifier("extraBlobStore") BlobStore extraBlobStore,
             UserService userService,
@@ -60,8 +57,7 @@ public class WebDAVExtraStorageConfig {
     }
 
     @Bean
-    @Qualifier("extraDavServlet")
-    public WebDAVServlet getExtraDavServlet(
+    public WebDAVServlet extraDavServlet(
             @Qualifier("extraDavFactory") DavFactory davFactory,
             Transactions transactions,
             @Qualifier("extraBlobStore") BlobStore blobStore) {

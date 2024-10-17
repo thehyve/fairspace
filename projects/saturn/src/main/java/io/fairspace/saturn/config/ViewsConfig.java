@@ -17,14 +17,14 @@ import io.fairspace.saturn.services.views.ViewStoreClient;
 public class ViewsConfig {
 
     @Bean
-    public ViewsProperties getViewsProperties(@Qualifier("yamlObjectMapper") ObjectMapper yamlObjectMapper) {
+    public ViewsProperties viewsProperties(@Qualifier("yamlObjectMapper") ObjectMapper yamlObjectMapper) {
         var viewsProperties = loadViewsConfig(yamlObjectMapper);
         viewsProperties.init();
         return viewsProperties;
     }
 
     @Bean
-    ViewStoreClient.ViewStoreConfiguration getViewStoreConfiguration(ViewsProperties viewsProperties) {
+    ViewStoreClient.ViewStoreConfiguration viewStoreConfiguration(ViewsProperties viewsProperties) {
         return new ViewStoreClient.ViewStoreConfiguration(viewsProperties);
     }
 

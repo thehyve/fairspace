@@ -24,8 +24,7 @@ import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protecte
 public class ServiceConfig {
 
     @Bean
-    @Qualifier("queryService")
-    public QueryService getQueryService(
+    public QueryService queryService(
             SparqlQueryService sparqlQueryService,
             @Nullable ViewStoreClientFactory viewStoreClientFactory,
             Transactions transactions,
@@ -37,7 +36,7 @@ public class ServiceConfig {
     }
 
     @Bean
-    public FileSearchService getFileSearchService(
+    public FileSearchService fileSearchService(
             @Qualifier("filteredDataset") Dataset filteredDataset,
             @Nullable ViewStoreClientFactory viewStoreClientFactory,
             ViewsProperties viewsProperties,

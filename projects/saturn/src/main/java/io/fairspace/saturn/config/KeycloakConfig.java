@@ -13,12 +13,12 @@ import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 public class KeycloakConfig {
 
     @Bean
-    public UsersResource getUsersResource(Keycloak keycloak, KeycloakClientProperties keycloakClientProperties) {
+    public UsersResource usersResource(Keycloak keycloak, KeycloakClientProperties keycloakClientProperties) {
         return keycloak.realm(keycloakClientProperties.getRealm()).users();
     }
 
     @Bean
-    public Keycloak getKeycloak(KeycloakClientProperties keycloakClientProperties) {
+    public Keycloak keycloak(KeycloakClientProperties keycloakClientProperties) {
         return KeycloakBuilder.builder()
                 .serverUrl(keycloakClientProperties.getAuthServerUrl())
                 .realm(keycloakClientProperties.getRealm())
