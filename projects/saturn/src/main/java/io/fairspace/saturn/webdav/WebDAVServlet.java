@@ -22,7 +22,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.jena.rdf.model.Literal;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.webdav.blobstore.BlobInfo;
@@ -53,10 +52,7 @@ public class WebDAVServlet extends HttpServlet {
     private final HttpManager httpManager;
     private final BlobStore store;
 
-    public WebDAVServlet(
-            @Qualifier("davFactory") ResourceFactory factory,
-            Transactions txn,
-            @Qualifier("blobStore") BlobStore store) {
+    public WebDAVServlet(ResourceFactory factory, Transactions txn, BlobStore store) {
         this.store = store;
 
         httpManager = new HttpManagerBuilder() {

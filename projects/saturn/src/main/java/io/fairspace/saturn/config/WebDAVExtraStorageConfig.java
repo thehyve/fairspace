@@ -3,6 +3,7 @@ package io.fairspace.saturn.config;
 import java.io.File;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -45,13 +46,17 @@ public class WebDAVExtraStorageConfig {
             @Qualifier("extraBlobStore") BlobStore extraBlobStore,
             UserService userService,
             Transactions transactions,
-            WebDavProperties webDavProperties) {
+            WebDavProperties webDavProperties,
+            @Qualifier("userVocabulary") Model userVocabulary,
+            @Qualifier("vocabulary") Model vocabulary) {
         var extraDavFactory = new DavFactory(
                 dataset.getDefaultModel().createResource(publicUrl + WEB_DAV_EXTRA_URL_PATH),
                 extraBlobStore,
                 userService,
                 dataset.getContext(),
-                webDavProperties);
+                webDavProperties,
+                userVocabulary,
+                vocabulary);
         initExtraStorageRootDirectories(webDavProperties.getExtraStorage(), extraDavFactory, transactions);
         return extraDavFactory;
     }

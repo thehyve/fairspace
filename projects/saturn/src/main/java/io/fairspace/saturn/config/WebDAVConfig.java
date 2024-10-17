@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -43,13 +44,17 @@ public class WebDAVConfig {
             @Qualifier("dataset") Dataset dataset,
             @Qualifier("blobStore") BlobStore blobStore,
             UserService userService,
-            WebDavProperties webDavProperties) {
+            WebDavProperties webDavProperties,
+            @Qualifier("userVocabulary") Model userVocabulary,
+            @Qualifier("vocabulary") Model vocabulary) {
         return new DavFactory(
                 dataset.getDefaultModel().createResource(publicUrl + WEB_DAV_URL_PATH),
                 blobStore,
                 userService,
                 dataset.getContext(),
-                webDavProperties);
+                webDavProperties,
+                userVocabulary,
+                vocabulary);
     }
 
     @Bean

@@ -6,7 +6,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import io.milton.http.Auth;
@@ -21,6 +26,7 @@ import io.milton.resource.DeletableCollectionResource;
 import io.milton.resource.FolderResource;
 import io.milton.resource.Resource;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.shacl.vocabulary.SHACLM;
@@ -38,9 +44,10 @@ import io.fairspace.saturn.webdav.blobstore.BlobInfo;
 
 import static io.fairspace.saturn.config.MetadataConfig.METADATA_SERVICE;
 import static io.fairspace.saturn.rdf.ModelUtils.getStringProperty;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 import static io.fairspace.saturn.webdav.DavFactory.childSubject;
-import static io.fairspace.saturn.webdav.PathUtils.*;
+import static io.fairspace.saturn.webdav.PathUtils.encodePath;
+import static io.fairspace.saturn.webdav.PathUtils.normalizePath;
+import static io.fairspace.saturn.webdav.PathUtils.splitPath;
 import static io.fairspace.saturn.webdav.WebDAVServlet.getBlob;
 import static io.fairspace.saturn.webdav.WebDAVServlet.setErrorMessage;
 
@@ -50,8 +57,17 @@ import static org.apache.jena.graph.NodeFactory.createURI;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 
 public class DirectoryResource extends BaseResource implements FolderResource, DeletableCollectionResource {
-    public DirectoryResource(DavFactory factory, org.apache.jena.rdf.model.Resource subject, Access access) {
-        super(factory, subject, access);
+
+    private final Model vocabulary;
+
+    public DirectoryResource(
+            DavFactory factory,
+            org.apache.jena.rdf.model.Resource subject,
+            Access access,
+            Model userVocabulary,
+            Model vocabulary) {
+        super(factory, subject, access, userVocabulary);
+        this.vocabulary = vocabulary;
     }
 
     @Override
@@ -276,7 +292,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
                         throw new BadRequestException(this);
                     }
 
-                    var classShape = s.getPropertyResourceValue(RDF.type).inModel(VOCABULARY);
+                    var classShape = s.getPropertyResourceValue(RDF.type).inModel(vocabulary);
                     var propertyShapes = new HashMap<String, org.apache.jena.rdf.model.Resource>();
 
                     classShape
@@ -367,7 +383,7 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
             for (var v : e.getViolations()) {
                 var path = v.getSubject().replaceFirst(subject.getURI(), "");
                 path = URLDecoder.decode(path, StandardCharsets.UTF_8);
-                var propertyShapes = VOCABULARY.listResourcesWithProperty(SHACLM.path, createURI(v.getPredicate()));
+                var propertyShapes = vocabulary.listResourcesWithProperty(SHACLM.path, createURI(v.getPredicate()));
                 var propertyName = propertyShapes.hasNext()
                         ? getStringProperty(propertyShapes.next(), SHACLM.name)
                         : createURI(v.getPredicate()).getLocalName();

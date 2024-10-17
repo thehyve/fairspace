@@ -2,6 +2,7 @@ package io.fairspace.saturn.config;
 
 import io.milton.resource.Resource;
 import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.Symbol;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +20,6 @@ import io.fairspace.saturn.services.metadata.validation.URIPrefixValidator;
 import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.webdav.DavFactory;
 
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
-
 @Configuration
 public class MetadataConfig {
 
@@ -31,16 +30,19 @@ public class MetadataConfig {
             Transactions transactions,
             @Qualifier("davFactory") DavFactory davFactory,
             MetadataPermissions metadataPermissions,
-            @Qualifier("dataset") Dataset dataset) {
+            @Qualifier("dataset") Dataset dataset,
+            @Qualifier("vocabulary") Model vocabulary,
+            @Qualifier("systemVocabulary") Model systemVocabulary) {
         // TODO: validators to be managed by Spring
         var metadataValidator = new ComposedValidator(
-                new MachineOnlyClassesValidator(VOCABULARY),
-                new ProtectMachineOnlyPredicatesValidator(VOCABULARY),
+                new MachineOnlyClassesValidator(vocabulary),
+                new ProtectMachineOnlyPredicatesValidator(vocabulary),
                 new URIPrefixValidator(((Resource) davFactory.root).getUniqueId()),
                 new DeletionValidator(),
                 new UniqueLabelValidator(),
-                new ShaclValidator(VOCABULARY));
-        var metadataService = new MetadataService(transactions, VOCABULARY, metadataValidator, metadataPermissions);
+                new ShaclValidator(vocabulary));
+        var metadataService =
+                new MetadataService(transactions, vocabulary, systemVocabulary, metadataValidator, metadataPermissions);
         dataset.getContext().set(METADATA_SERVICE, metadataService);
         return metadataService;
     }

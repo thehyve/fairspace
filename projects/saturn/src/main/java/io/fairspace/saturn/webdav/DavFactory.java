@@ -6,6 +6,7 @@ import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.NotAuthorizedException;
 import io.milton.resource.Resource;
 import org.apache.jena.graph.Node;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 
@@ -35,6 +36,8 @@ public class DavFactory implements ResourceFactory {
     public final UserService userService;
     public final Context context;
     public final RootResource root;
+    public final Model userVocabulary;
+    public final Model vocabulary;
     // Represents the root URI, not stored in the database
     private final String baseUri;
 
@@ -43,11 +46,15 @@ public class DavFactory implements ResourceFactory {
             BlobStore store,
             UserService userService,
             Context context,
-            WebDavProperties webDavProperties) {
+            WebDavProperties webDavProperties,
+            Model userVocabulary,
+            Model vocabulary) {
         this.rootSubject = rootSubject;
         this.store = store;
         this.userService = userService;
         this.context = context;
+        this.userVocabulary = userVocabulary;
+        this.vocabulary = vocabulary;
         var uri = URI.create(rootSubject.getURI());
         this.baseUri = URI.create(
                         uri.getScheme() + "://" + uri.getHost() + (uri.getPort() > 0 ? ":" + uri.getPort() : ""))
@@ -91,16 +98,16 @@ public class DavFactory implements ResourceFactory {
 
     public Resource getResourceByType(org.apache.jena.rdf.model.Resource subject, Access access) {
         if (subject.hasProperty(RDF.type, FS.File)) {
-            return new FileResource(this, subject, access);
+            return new FileResource(this, subject, access, userVocabulary);
         }
         if (subject.hasProperty(RDF.type, FS.Directory)) {
-            return new DirectoryResource(this, subject, access);
+            return new DirectoryResource(this, subject, access, userVocabulary, vocabulary);
         }
         if (subject.hasProperty(RDF.type, FS.Collection)) {
-            return new CollectionResource(this, subject, access);
+            return new CollectionResource(this, subject, access, userVocabulary, vocabulary);
         }
         if (subject.hasProperty(RDF.type, FS.ExtraStorageDirectory)) {
-            return new DirectoryResource(this, subject, access);
+            return new DirectoryResource(this, subject, access, userVocabulary, vocabulary);
         }
 
         return null;
