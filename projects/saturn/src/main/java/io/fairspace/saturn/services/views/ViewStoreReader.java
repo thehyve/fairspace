@@ -25,17 +25,18 @@ import com.google.common.collect.Sets;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties.ColumnType;
+import io.fairspace.saturn.config.properties.ViewsProperties.View;
 import io.fairspace.saturn.controller.dto.SearchResultDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
 import io.fairspace.saturn.controller.dto.request.FileSearchRequest;
 import io.fairspace.saturn.vocabulary.FS;
 
-import static io.fairspace.saturn.config.ViewsConfig.ColumnType.Date;
+import static io.fairspace.saturn.config.properties.ViewsProperties.ColumnType.Date;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 
 /**
@@ -47,25 +48,28 @@ import static io.fairspace.saturn.services.views.Table.idColumn;
  * collections in a filter with 'Resource_collection' as field.
  */
 @Slf4j
-public class ViewStoreReader implements AutoCloseable {
+@Component
+public class ViewStoreReader {
     final SearchProperties searchProperties;
-    final ViewsConfig viewsConfig;
+    final ViewsProperties viewsProperties;
     final ViewStoreClient.ViewStoreConfiguration configuration;
-    final Connection connection;
+    final ViewStoreClientFactory viewStoreClientFactory;
 
-    // TODO: in whole class, use StringBuilder instead of String concats
     public ViewStoreReader(
-            SearchProperties searchProperties, ViewsConfig viewsConfig, ViewStoreClientFactory viewStoreClientFactory)
-            throws SQLException {
+            SearchProperties searchProperties,
+            ViewsProperties viewsProperties,
+            ViewStoreClientFactory viewStoreClientFactory,
+            ViewStoreClient.ViewStoreConfiguration configuration) {
         this.searchProperties = searchProperties;
-        this.viewsConfig = viewsConfig;
-        this.configuration = viewStoreClientFactory.configuration;
-        this.connection = viewStoreClientFactory.getConnection();
+        this.viewsProperties = viewsProperties;
+        this.configuration = configuration;
+        this.viewStoreClientFactory = viewStoreClientFactory;
     }
 
     List<Object> getLabelsByIds(List<String> ids) throws SQLException {
         String query = "select label from label where id = ANY(?::text[])";
-        try (var preparedStatement = connection.prepareStatement(query)) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var preparedStatement = connection.prepareStatement(query)) {
             var array = preparedStatement.getConnection().createArrayOf("text", ids.toArray());
             preparedStatement.setArray(1, array);
             var result = preparedStatement.executeQuery();
@@ -78,7 +82,8 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     String iriForLabel(String type, String label) throws SQLException {
-        try (var query = connection.prepareStatement("select id from label where type = ? and label = ?")) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var query = connection.prepareStatement("select id from label where type = ? and label = ?")) {
             query.setString(1, type);
             query.setString(2, label);
             var result = query.executeQuery();
@@ -292,7 +297,8 @@ public class ViewStoreReader implements AutoCloseable {
                 .collect(Collectors.joining(" and "));
     }
 
-    PreparedStatement query(String view, List<ViewFilter> filters, String scope, boolean isCount) throws SQLException {
+    PreparedStatement query(Connection connection, String view, List<ViewFilter> filters, String scope, boolean isCount)
+            throws SQLException {
         if (filters == null) {
             filters = Collections.emptyList();
         }
@@ -351,7 +357,7 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     private String transformToCountQuery(String viewName, String query) {
-        boolean isCountLimitDefined = viewsConfig
+        boolean isCountLimitDefined = viewsProperties
                 .getViewConfig(viewName)
                 .map(c -> c.maxDisplayCount != null)
                 .orElse(false);
@@ -361,7 +367,7 @@ public class ViewStoreReader implements AutoCloseable {
             // we just set limit for the query and then wrap with count query
             // on UI user either exact number if less the limit or "more than 'limit'" if more
             query = "select count(*) as rowCount from ( " + query + " limit %s) as count";
-            query = query.formatted(viewsConfig
+            query = query.formatted(viewsProperties
                     .getViewConfig(viewName)
                     .map(c -> c.maxDisplayCount)
                     .orElseThrow());
@@ -402,11 +408,14 @@ public class ViewStoreReader implements AutoCloseable {
 
     private Map<String, ViewRow> getViewRowsForNonSetType(View view, List<ViewFilter> filters, int offset, int limit)
             throws SQLException {
-        try (var query = query(
-                view.name,
-                filters,
-                String.format("order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit),
-                false)) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var query = query(
+                        connection,
+                        view.name,
+                        filters,
+                        String.format(
+                                "order by id %s limit %d", offset > 0 ? String.format("offset %d", offset) : "", limit),
+                        false)) {
             query.setQueryTimeout(searchProperties.getPageRequestTimeout());
             var result = query.executeQuery();
             Map<String, ViewRow> rowsById = new HashMap<>();
@@ -424,7 +433,8 @@ public class ViewStoreReader implements AutoCloseable {
         var columns = String.join(", ", valueSetProperties);
         var query = "select %sid, %s from mv_%s where %sid = ANY(?::text[])".formatted(view, columns, view, view);
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var ps = connection.prepareStatement(query)) {
             Array array = ps.getConnection().createArrayOf("text", viewIds);
             ps.setArray(1, array);
             ResultSet resultSet = ps.executeQuery();
@@ -455,7 +465,8 @@ public class ViewStoreReader implements AutoCloseable {
         var rows = new ViewRowCollection(searchProperties.getMaxJoinItems());
 
         if (!ids.isEmpty()) {
-            try (var query = getJoinQuery(view, joinedTable, ids);
+            try (var connection = viewStoreClientFactory.getConnection();
+                    var query = getJoinQuery(connection, view, joinedTable, ids);
                     var result = query.executeQuery()) {
                 while (result.next()) {
                     var id = result.getString(viewIdColumn);
@@ -513,11 +524,10 @@ public class ViewStoreReader implements AutoCloseable {
         }
     }
 
-    private PreparedStatement getJoinQuery(String view, Table joinedTable, Collection<String> ids) throws SQLException {
-
+    private PreparedStatement getJoinQuery(
+            Connection connection, String view, Table joinedTable, Collection<String> ids) throws SQLException {
         var query = "select * from mv_%s_join_%s where %s = ANY(?::text[])"
                 .formatted(view, joinedTable.name, idColumn(view).name);
-
         var ps = connection.prepareStatement(query);
         var array = ps.getConnection().createArrayOf("text", ids.toArray());
         ps.setArray(1, array);
@@ -538,8 +548,9 @@ public class ViewStoreReader implements AutoCloseable {
         }
         var table = configuration.viewTables.get(view);
         var columnDefinition = table.getColumn(column.toLowerCase());
-        try (PreparedStatement query = connection.prepareStatement("select min(" + columnDefinition.name
-                + ") as min, max(" + columnDefinition.name + ") as max" + " from " + table.name)) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var query = connection.prepareStatement("select min(" + columnDefinition.name + ") as min, max("
+                        + columnDefinition.name + ") as max" + " from " + table.name)) {
             var result = query.executeQuery();
             if (!result.next()) {
                 return null;
@@ -599,7 +610,8 @@ public class ViewStoreReader implements AutoCloseable {
     }
 
     public long countRows(String view, List<ViewFilter> filters) throws SQLTimeoutException {
-        try (var q = query(view, filters, null, true)) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var q = query(connection, view, filters, null, true)) {
             q.setQueryTimeout(searchProperties.getCountRequestTimeout());
             var result = q.executeQuery();
             result.next();
@@ -637,7 +649,8 @@ public class ViewStoreReader implements AutoCloseable {
                 .append(idConstraint)
                 .append("order by id asc limit 1000");
 
-        try (var statement = connection.prepareStatement(queryString.toString())) {
+        try (var connection = viewStoreClientFactory.getConnection();
+                var statement = connection.prepareStatement(queryString.toString())) {
             for (int i = 0; i < values.size(); i++) {
                 statement.setString(i + 1, values.get(i));
             }
@@ -667,10 +680,5 @@ public class ViewStoreReader implements AutoCloseable {
             rows.add(row);
         }
         return rows;
-    }
-
-    @Override
-    public void close() throws Exception {
-        connection.close();
     }
 }

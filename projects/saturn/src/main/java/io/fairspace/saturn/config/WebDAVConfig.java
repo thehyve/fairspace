@@ -35,8 +35,8 @@ public class WebDAVConfig {
     }
 
     @Bean
-    @Qualifier("blobStore")
-    public BlobStore getBlobStore(WebDavProperties webDavProperties) {
+    //    @Qualifier("blobStore")
+    public BlobStore blobStore(WebDavProperties webDavProperties) {
         return new LocalBlobStore(new File(webDavProperties.getBlobStorePath()));
     }
 

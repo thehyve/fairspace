@@ -9,6 +9,7 @@ import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
 
 import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.rdf.transactions.LocalTransactionLog;
 import io.fairspace.saturn.rdf.transactions.SparqlTransactionCodec;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
@@ -32,7 +33,10 @@ public class SaturnDatasetFactory {
      * needed.
      */
     public static Dataset connect(
-            JenaProperties jenaProperties, ViewStoreClientFactory viewStoreClientFactory, String publicUrl) {
+            ViewsProperties viewsProperties,
+            JenaProperties jenaProperties,
+            ViewStoreClientFactory viewStoreClientFactory,
+            String publicUrl) {
         var restoreNeeded = isRestoreNeeded(jenaProperties.getDatasetPath());
 
         // Create a TDB2 dataset graph
@@ -45,7 +49,7 @@ public class SaturnDatasetFactory {
         var txnLog = new LocalTransactionLog(jenaProperties.getTransactionLogPath(), new SparqlTransactionCodec());
 
         if (viewStoreClientFactory != null) {
-            dsg = new TxnIndexDatasetGraph(dsg, viewStoreClientFactory, publicUrl);
+            dsg = new TxnIndexDatasetGraph(viewsProperties, dsg, viewStoreClientFactory, publicUrl);
         }
 
         if (restoreNeeded) {

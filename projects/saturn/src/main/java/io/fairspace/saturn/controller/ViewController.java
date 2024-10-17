@@ -34,9 +34,9 @@ public class ViewController {
     }
 
     @GetMapping("/")
-    public ViewsDto getViews() {
+    public ResponseEntity<ViewsDto> getViews() {
         var views = viewService.getViews();
-        return new ViewsDto(views);
+        return ResponseEntity.ok(new ViewsDto(views));
     }
 
     @PostMapping("/")
