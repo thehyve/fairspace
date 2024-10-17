@@ -20,10 +20,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import io.fairspace.saturn.config.Config;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.ViewsConfig.ColumnType;
 import io.fairspace.saturn.config.ViewsConfig.View;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
@@ -54,17 +55,11 @@ public class ViewStoreClientFactory {
     final ViewStoreClient.ViewStoreConfiguration configuration;
     public final DataSource dataSource;
 
-    public ViewStoreClientFactory(ViewsConfig viewsConfig, Config.ViewDatabase viewDatabase, Config.Search search)
+    public ViewStoreClientFactory(
+            ViewsConfig viewsConfig, ViewDatabaseProperties viewDatabaseProperties, SearchProperties searchProperties)
             throws SQLException {
         log.debug("Initializing the database connection");
-        var databaseConfig = new HikariConfig();
-        databaseConfig.setJdbcUrl(viewDatabase.url);
-        databaseConfig.setUsername(viewDatabase.username);
-        databaseConfig.setPassword(viewDatabase.password);
-        databaseConfig.setAutoCommit(viewDatabase.autoCommit);
-        databaseConfig.setConnectionTimeout(viewDatabase.connectionTimeout);
-        databaseConfig.setMaximumPoolSize(viewDatabase.maxPoolSize);
-
+        var databaseConfig = getHikariConfig(viewDatabaseProperties);
         dataSource = new HikariDataSource(databaseConfig);
 
         try (var connection = dataSource.getConnection()) {
@@ -80,12 +75,24 @@ public class ViewStoreClientFactory {
         for (View view : viewsConfig.views) {
             createOrUpdateView(view);
         }
-        materializedViewService = new MaterializedViewService(dataSource, configuration, search.maxJoinItems);
-        if (viewDatabase.mvRefreshOnStartRequired) {
+        materializedViewService =
+                new MaterializedViewService(dataSource, configuration, searchProperties.getMaxJoinItems());
+        if (viewDatabaseProperties.isMvRefreshOnStartRequired()) {
             materializedViewService.createOrUpdateAllMaterializedViews();
         } else {
             log.warn("Skipping materialized view refresh on start");
         }
+    }
+
+    private static HikariConfig getHikariConfig(ViewDatabaseProperties viewDatabaseProperties) {
+        var databaseConfig = new HikariConfig();
+        databaseConfig.setJdbcUrl(viewDatabaseProperties.getUrl());
+        databaseConfig.setUsername(viewDatabaseProperties.getUsername());
+        databaseConfig.setPassword(viewDatabaseProperties.getPassword());
+        databaseConfig.setAutoCommit(viewDatabaseProperties.isAutoCommitEnabled());
+        databaseConfig.setConnectionTimeout(viewDatabaseProperties.getConnectionTimeout());
+        databaseConfig.setMaximumPoolSize(viewDatabaseProperties.getMaxPoolSize());
+        return databaseConfig;
     }
 
     public Connection getConnection() throws SQLException {

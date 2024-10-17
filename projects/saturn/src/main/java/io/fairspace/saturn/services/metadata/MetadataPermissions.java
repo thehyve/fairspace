@@ -53,4 +53,9 @@ public class MetadataPermissions {
         }
         return userService.currentUser().isCanAddSharedMetadata();
     }
+
+    public boolean hasMetadataQueryPermission() {
+        var user = userService.currentUser();
+        return user != null && user.isCanQueryMetadata();
+    }
 }

@@ -36,16 +36,19 @@ public class MaintenanceService {
     private final Dataset dataset;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final ViewService viewService;
+    private final String publicUrl;
 
     public MaintenanceService(
             @NonNull UserService userService,
             @NonNull Dataset dataset,
             ViewStoreClientFactory viewStoreClientFactory,
-            ViewService viewService) {
+            ViewService viewService,
+            String publicUrl) {
         this.userService = userService;
         this.dataset = dataset;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.viewService = viewService;
+        this.publicUrl = publicUrl;
     }
 
     public boolean disabled() {
@@ -107,7 +110,7 @@ public class MaintenanceService {
      */
     public void recreateIndex() {
         try (var viewStoreClient = viewStoreClientFactory.build();
-                var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph())) {
+                var viewUpdater = new ViewUpdater(viewStoreClient, dataset.asDatasetGraph(), publicUrl)) {
             var start = new Date().getTime();
             // Index entities
             for (var view : ConfigLoader.VIEWS_CONFIG.views) {
@@ -128,17 +131,12 @@ public class MaintenanceService {
      * @return the underlying dataset graph that supports compacting
      */
     public static DatasetGraph unwrap(DatasetGraph dsg) {
-        if (dsg == null || dsg instanceof DatasetGraphSwitchable) {
-            return dsg;
-        }
-        if (dsg instanceof TxnLogDatasetGraph) {
-            return unwrap(((TxnLogDatasetGraph) dsg).getDatasetGraph());
-        }
-
-        if (dsg instanceof TxnIndexDatasetGraph) {
-            return unwrap(((TxnIndexDatasetGraph) dsg).getDatasetGraph());
-        }
-
-        return null;
+        return switch (dsg) {
+            case null -> dsg;
+            case DatasetGraphSwitchable ignored -> dsg;
+            case TxnLogDatasetGraph txnLogDatasetGraph -> unwrap(txnLogDatasetGraph.getDatasetGraph());
+            case TxnIndexDatasetGraph txnIndexDatasetGraph -> unwrap(txnIndexDatasetGraph.getDatasetGraph());
+            default -> null;
+        };
     }
 }

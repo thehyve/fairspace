@@ -1,48 +1,64 @@
 package io.fairspace.saturn.config;
 
 import java.io.File;
-import javax.servlet.http.HttpServlet;
 
 import io.milton.resource.Resource;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.extern.log4j.*;
+import lombok.extern.log4j.Log4j2;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetImpl;
 import org.apache.jena.sparql.util.Symbol;
+import org.keycloak.admin.client.resource.UsersResource;
 
+import io.fairspace.saturn.config.properties.CacheProperties;
+import io.fairspace.saturn.config.properties.FeatureProperties;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.KeycloakClientProperties;
+import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.BulkTransactions;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
-import io.fairspace.saturn.services.health.HealthService;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.services.metadata.MetadataService;
-import io.fairspace.saturn.services.metadata.validation.*;
+import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
+import io.fairspace.saturn.services.metadata.validation.DeletionValidator;
+import io.fairspace.saturn.services.metadata.validation.MachineOnlyClassesValidator;
+import io.fairspace.saturn.services.metadata.validation.ProtectMachineOnlyPredicatesValidator;
+import io.fairspace.saturn.services.metadata.validation.ShaclValidator;
+import io.fairspace.saturn.services.metadata.validation.URIPrefixValidator;
+import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.services.search.FileSearchService;
 import io.fairspace.saturn.services.search.JdbcFileSearchService;
 import io.fairspace.saturn.services.search.SearchService;
 import io.fairspace.saturn.services.search.SparqlFileSearchService;
 import io.fairspace.saturn.services.users.UserService;
-import io.fairspace.saturn.services.views.*;
+import io.fairspace.saturn.services.views.JdbcQueryService;
+import io.fairspace.saturn.services.views.QueryService;
+import io.fairspace.saturn.services.views.SparqlQueryService;
+import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
-import io.fairspace.saturn.webdav.*;
+import io.fairspace.saturn.webdav.DavFactory;
+import io.fairspace.saturn.webdav.WebDAVServlet;
 import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.blobstore.DeletableLocalBlobStore;
 import io.fairspace.saturn.webdav.blobstore.LocalBlobStore;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @Log4j2
 @Getter
+// TODO: get rid of the Services class as it makes no sense to have a class that contains all services implementing IoC
 public class Services {
+
     public static final Symbol METADATA_SERVICE = Symbol.create("metadata_service");
 
-    private final Config config;
     private final Transactions transactions;
 
     private final WorkspaceService workspaceService;
@@ -51,47 +67,56 @@ public class Services {
     private final MetadataService metadataService;
     private final ViewService viewService;
     private final QueryService queryService;
+    private final SparqlQueryService sparqlQueryService;
     private final SearchService searchService;
     private final FileSearchService fileSearchService;
     private final BlobStore blobStore;
     private final DavFactory davFactory;
-    private final HttpServlet davServlet;
+    private final WebDAVServlet davServlet;
 
     private final BlobStore extraBlobStore;
     private final DavFactory extraDavFactory;
-    private final HttpServlet extraDavServlet;
+    private final WebDAVServlet extraDavServlet;
     private final DatasetGraph filteredDatasetGraph;
-    private final HealthService healthService;
     private final MaintenanceService maintenanceService;
 
     public Services(
-            @NonNull Config config,
             @NonNull ViewsConfig viewsConfig,
             @NonNull Dataset dataset,
-            ViewStoreClientFactory viewStoreClientFactory) {
-        this.config = config;
+            FeatureProperties featureProperties,
+            ViewStoreClientFactory viewStoreClientFactory,
+            UsersResource usersResource,
+            JenaProperties jenaProperties,
+            CacheProperties cacheProperties,
+            SearchProperties searchProperties,
+            WebDavProperties webDavProperties,
+            KeycloakClientProperties keycloakClientProperties,
+            String publicUrl) {
         this.transactions =
-                config.jena.bulkTransactions ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
+                jenaProperties.isBulkTransactions() ? new BulkTransactions(dataset) : new SimpleTransactions(dataset);
 
-        userService = new UserService(config.auth, transactions);
+        userService = new UserService(keycloakClientProperties, transactions, usersResource);
 
-        blobStore = new LocalBlobStore(new File(config.webDAV.blobStorePath));
+        blobStore = new LocalBlobStore(new File(webDavProperties.getBlobStorePath()));
         davFactory = new DavFactory(
-                dataset.getDefaultModel().createResource(config.publicUrl + "/api/webdav"),
+                dataset.getDefaultModel().createResource(publicUrl + "/api/webdav"),
                 blobStore,
                 userService,
-                dataset.getContext());
+                dataset.getContext(),
+                webDavProperties);
         davServlet = new WebDAVServlet(davFactory, transactions, blobStore);
 
-        if (CONFIG.features.contains(Feature.ExtraStorage)) {
-            extraBlobStore = new DeletableLocalBlobStore(new File(config.extraStorage.blobStorePath));
+        if (featureProperties.getFeatures().contains(Feature.ExtraStorage)) {
+            extraBlobStore = new DeletableLocalBlobStore(
+                    new File(webDavProperties.getExtraStorage().getBlobStorePath()));
             extraDavFactory = new DavFactory(
-                    dataset.getDefaultModel().createResource(config.publicUrl + "/api/extra-storage"),
+                    dataset.getDefaultModel().createResource(publicUrl + "/api/extra-storage"),
                     extraBlobStore,
                     userService,
-                    dataset.getContext());
+                    dataset.getContext(),
+                    webDavProperties);
             extraDavServlet = new WebDAVServlet(extraDavFactory, transactions, extraBlobStore);
-            initExtraStorageRootDirectories();
+            initExtraStorageRootDirectories(webDavProperties.getExtraStorage());
         } else {
             extraBlobStore = null;
             extraDavFactory = null;
@@ -116,10 +141,12 @@ public class Services {
         filteredDatasetGraph = new FilteredDatasetGraph(dataset.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
 
+        sparqlQueryService =
+                new SparqlQueryService(searchProperties, jenaProperties, viewsConfig, filteredDataset, transactions);
         queryService = viewStoreClientFactory == null
-                ? new SparqlQueryService(config.search, viewsConfig, filteredDataset)
+                ? new SparqlQueryService(searchProperties, jenaProperties, viewsConfig, filteredDataset, transactions)
                 : new JdbcQueryService(
-                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+                        searchProperties, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
 
         // File search should be done using JDBC for performance reasons. However, if the view store is not available,
         // or collections and files view is not configured, we fall back to using SPARQL queries on the RDF database
@@ -130,21 +157,25 @@ public class Services {
         fileSearchService = useSparqlFileSearchService
                 ? new SparqlFileSearchService(filteredDataset)
                 : new JdbcFileSearchService(
-                        config.search, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
+                        searchProperties, viewsConfig, viewStoreClientFactory, transactions, davFactory.root);
 
-        viewService =
-                new ViewService(config, viewsConfig, filteredDataset, viewStoreClientFactory, metadataPermissions);
+        viewService = new ViewService(
+                searchProperties,
+                cacheProperties,
+                viewsConfig,
+                filteredDataset,
+                viewStoreClientFactory,
+                metadataPermissions);
 
-        maintenanceService = new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService);
+        maintenanceService =
+                new MaintenanceService(userService, dataset, viewStoreClientFactory, viewService, publicUrl);
 
         searchService = new SearchService(filteredDataset);
-
-        healthService = new HealthService(viewStoreClientFactory == null ? null : viewStoreClientFactory.dataSource);
     }
 
-    private void initExtraStorageRootDirectories() {
+    private void initExtraStorageRootDirectories(WebDavProperties.ExtraStorage extraStorage) {
         this.transactions.calculateWrite(ds2 -> {
-            for (var rc : CONFIG.extraStorage.defaultRootCollections) {
+            for (var rc : extraStorage.getDefaultRootCollections()) {
                 try {
                     extraDavFactory.root.createCollection(rc);
                 } catch (Exception e) {

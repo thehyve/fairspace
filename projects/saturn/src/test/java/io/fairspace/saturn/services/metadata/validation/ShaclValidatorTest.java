@@ -21,7 +21,6 @@ import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.eclipse.jetty.util.ProcessorUtils.availableProcessors;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -32,14 +31,13 @@ public class ShaclValidatorTest {
     private static final Resource closedClassShape = createResource("http://example.com/ClosedClassShape");
 
     private ShaclValidator validator;
-    private Model vocabulary;
 
     @Mock
     private ViolationHandler violationHandler;
 
     @Before
     public void setUp() {
-        vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel()
+        Model vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel()
                 .add(closedClassShape, RDF.type, SHACLM.NodeShape)
                 .add(closedClassShape, SHACLM.targetClass, closedClass)
                 .add(closedClassShape, SHACLM.closed, createTypedLiteral(true)));
@@ -211,7 +209,7 @@ public class ShaclValidatorTest {
     @Test
     public void multipleResourcesAreValidatedAsExpected() {
         var model = createDefaultModel();
-        for (int i = 0; i < 2 * availableProcessors(); i++) {
+        for (int i = 0; i < 2 * Runtime.getRuntime().availableProcessors(); i++) {
             var resource = createResource();
             model.add(resource, RDF.type, FS.File).add(resource, FS.createdBy, createTypedLiteral(123));
         }

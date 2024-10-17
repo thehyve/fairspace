@@ -10,7 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.fairspace.saturn.config.Config;
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;
@@ -20,21 +21,21 @@ import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
 
 public class TransactionsTest {
-    private Config.Jena config = new Config.Jena();
+    private final JenaProperties config = new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
     private Dataset ds;
 
     @Before
     public void before() {
-        config.datasetPath = new File(getTempDirectory(), randomUUID().toString());
-        config.transactionLogPath = new File(getTempDirectory(), randomUUID().toString());
+        config.setDatasetPath(new File(getTempDirectory(), randomUUID().toString()));
+        config.setTransactionLogPath(new File(getTempDirectory(), randomUUID().toString()));
 
-        ds = SaturnDatasetFactory.connect(config, null);
+        ds = SaturnDatasetFactory.connect(config, null, null);
     }
 
     @After
     public void after() throws IOException {
         ds.close();
-        deleteDirectory(config.datasetPath);
+        deleteDirectory(config.getDatasetPath());
         ds = null;
     }
 

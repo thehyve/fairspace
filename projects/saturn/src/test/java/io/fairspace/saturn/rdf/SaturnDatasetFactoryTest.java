@@ -10,10 +10,10 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.config.properties.JenaProperties;
+import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
-
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +31,7 @@ public class SaturnDatasetFactoryTest {
     }
 
     @Test
-    public void testIsRestoreNeededForNonExistingDirectory() throws IOException {
+    public void testIsRestoreNeededForNonExistingDirectory() {
         File nonExistentDirectory = new File(testFolder.getRoot(), "non-existent-directory");
         assertTrue(SaturnDatasetFactory.isRestoreNeeded(nonExistentDirectory));
     }
@@ -54,7 +54,10 @@ public class SaturnDatasetFactoryTest {
     public void testUnwrappingDatasetGraphIsOfRightType() {
         // give
         var viewStoreClientFactory = mock(ViewStoreClientFactory.class);
-        var ds = SaturnDatasetFactory.connect(CONFIG.jena, viewStoreClientFactory);
+        var jenaProperties = new JenaProperties("", new StoreParamsProperties());
+        jenaProperties.setDatasetPath(new File("data/db"));
+        jenaProperties.setTransactionLogPath(new File("data/log"));
+        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory, "");
 
         var dataSetGraph = MaintenanceService.unwrap(ds.asDatasetGraph());
 

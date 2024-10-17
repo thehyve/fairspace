@@ -19,13 +19,13 @@ import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.util.Context;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
-import org.eclipse.jetty.server.Authentication;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
@@ -44,15 +44,21 @@ import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.resources.DirectoryResource;
 import io.fairspace.saturn.webdav.resources.FileResource;
 
-import static io.fairspace.saturn.TestUtils.*;
+import static io.fairspace.saturn.TestUtils.createTestUser;
+import static io.fairspace.saturn.TestUtils.mockAuthentication;
+import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
 
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DirectoryResourceTest {
@@ -85,11 +91,8 @@ public class DirectoryResourceTest {
     private DavFactory davFactory;
     DirectoryResource dir;
     User admin;
-    Authentication.User adminAuthentication;
-    private org.eclipse.jetty.server.Request request;
 
     private void selectAdmin() {
-        lenient().when(request.getAuthentication()).thenReturn(adminAuthentication);
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
 
@@ -107,14 +110,14 @@ public class DirectoryResourceTest {
         metadataService =
                 new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
         context.set(METADATA_SERVICE, metadataService);
-        davFactory = new DavFactory(model.createResource(baseUri), store, userService, context);
+        davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
 
-        adminAuthentication = mockAuthentication("admin");
+        mockAuthentication("admin");
         admin = createTestUser("admin", true);
         new DAO(model).write(admin);
 
         setupRequestContext();
-        request = getCurrentRequest();
+        var request = getCurrentRequest();
 
         selectAdmin();
 
@@ -194,7 +197,12 @@ public class DirectoryResourceTest {
     @Test
     public void testTypedLiteralMetadataUploadSuccess()
             throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv = "Path,Description\n" + ".,\"Blah\"\n" + "./coffee.jpg,\"Blah blah\"\n";
+        String csv =
+                """
+                Path,Description
+                .,"Blah"
+                ./coffee.jpg,"Blah blah"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         DirectoryResource dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
@@ -208,7 +216,10 @@ public class DirectoryResourceTest {
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadUnknownProperty()
             throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv = "Path,Unknown\n" + "./coll1,\"Blah blah\"\n";
+        String csv = """
+                Path,Unknown
+                ./coll1,"Blah blah"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
 
@@ -217,7 +228,10 @@ public class DirectoryResourceTest {
 
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadEmptyHeader() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv = ",\n" + "./coll1,\"Blah blah\"\n";
+        String csv = """
+                ,
+                ./coll1,"Blah blah"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
 
@@ -226,7 +240,10 @@ public class DirectoryResourceTest {
 
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadUnknownFile() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv = "Path,Description\n" + "./subdir,\"Blah blah\"\n";
+        String csv = """
+                Path,Description
+                ./subdir,"Blah blah"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
 
@@ -235,7 +252,10 @@ public class DirectoryResourceTest {
 
     @Test(expected = BadRequestException.class)
     public void testMetadataUploadDeletedFile() throws NotAuthorizedException, ConflictException, BadRequestException {
-        String csv = "Path,Description\n" + "./subdir,\"Blah blah\"\n";
+        String csv = """
+                Path,Description
+                ./subdir,"Blah blah"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         var subdir = (DirectoryResource) dir.createCollection("subdir");
@@ -251,7 +271,11 @@ public class DirectoryResourceTest {
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         assert !dir.subject.hasProperty(sampleProp);
 
-        String csv = "Path,Is about biological sample\n" + ".,\"http://example.com/samples#s2-b\"\n";
+        String csv =
+                """
+                Path,Is about biological sample
+                .,"http://example.com/samples#s2-b"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
 
@@ -265,7 +289,11 @@ public class DirectoryResourceTest {
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         assert !dir.subject.hasProperty(sampleProp);
 
-        String csv = "Path,Is about biological sample\n" + ".,\"Sample A for subject 1\"\n";
+        String csv =
+                """
+                Path,Is about biological sample
+                .,"Sample A for subject 1"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
 
@@ -279,7 +307,11 @@ public class DirectoryResourceTest {
         dir = (DirectoryResource) davFactory.getResource(null, BASE_PATH + "/coll1");
         assert !dir.subject.hasProperty(sampleProp);
 
-        String csv = "Path,Is about biological sample\n" + ".,\"http://example.com/samples#unknown-sample\"\n";
+        String csv =
+                """
+                Path,Is about biological sample
+                .,"http://example.com/samples#unknown-sample"
+                """;
         when(file.getInputStream()).thenReturn(new ByteArrayInputStream(csv.getBytes()));
         dir.processForm(Map.of("action", "upload_metadata"), Map.of("file", file));
     }

@@ -7,12 +7,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.pivovarit.function.ThrowingFunction;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.sparql.JenaTransactionException;
 import org.apache.jena.system.Txn;
-import org.eclipse.jetty.server.Request;
 
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentUserStringUri;
@@ -105,13 +105,13 @@ public class BulkTransactions extends BaseTransactions {
 
     private static class Task<R, E extends Exception> {
         private final CountDownLatch canBeRead = new CountDownLatch(1);
-        private final Request request;
+        private final HttpServletRequest request;
         private final String userUri;
         private final ThrowingFunction<? super Model, R, E> job;
         private R result;
         private Throwable error;
 
-        Task(Request request, String userUri, ThrowingFunction<? super Model, R, E> job) {
+        Task(HttpServletRequest request, String userUri, ThrowingFunction<? super Model, R, E> job) {
             this.request = request;
             this.userUri = userUri;
             this.job = job;

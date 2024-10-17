@@ -32,7 +32,6 @@ import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.vocabulary.FS;
 
-import static io.fairspace.saturn.config.ConfigLoader.CONFIG;
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
@@ -43,11 +42,13 @@ public class ViewUpdater implements AutoCloseable {
     private final ViewStoreClient viewStoreClient;
     private final DatasetGraph dsg;
     private final Graph graph;
+    private final String publicUrl;
 
-    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg) {
+    public ViewUpdater(ViewStoreClient viewStoreClient, DatasetGraph dsg, String publicUrl) {
         this.viewStoreClient = viewStoreClient;
         this.dsg = dsg;
         this.graph = dsg.getDefaultGraph();
+        this.publicUrl = publicUrl;
     }
 
     @Override
@@ -86,7 +87,7 @@ public class ViewUpdater implements AutoCloseable {
         if (labelNode == null) {
             return null;
         }
-        return labelNode.toString(false);
+        return labelNode.getLiteral().toString(false);
     }
 
     public Object getValue(ViewsConfig.View.Column column, Node node) throws SQLException {
@@ -127,7 +128,7 @@ public class ViewUpdater implements AutoCloseable {
     private void addCollectionToProtectedResourceRow(String type, Node subject, Map<String, Object> row) {
         if (protectedResources.contains(type)) {
             // set collection name
-            var rootLocation = CONFIG.publicUrl + "/api/webdav" + "/";
+            var rootLocation = publicUrl + "/api/webdav" + "/";
             if (subject.getURI().startsWith(rootLocation)) {
                 var location = subject.getURI().substring(rootLocation.length());
                 var collection = URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);

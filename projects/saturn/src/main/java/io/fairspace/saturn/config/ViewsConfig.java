@@ -119,6 +119,7 @@ public class ViewsConfig {
             public Integer displayIndex = Integer.MAX_VALUE;
 
             public String rdfType;
+
             public int priority;
         }
 
