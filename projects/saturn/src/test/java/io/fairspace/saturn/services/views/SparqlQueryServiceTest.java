@@ -27,6 +27,8 @@ import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.StoreParamsProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
+import io.fairspace.saturn.controller.dto.request.CountRequest;
+import io.fairspace.saturn.controller.dto.request.ViewRequest;
 import io.fairspace.saturn.rdf.dao.DAO;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
@@ -192,24 +194,19 @@ public class SparqlQueryServiceTest {
         assertEquals(2, page.getRows().size());
         // The implementation does not sort results. Probably deterministic,
         // but no certain order is guaranteed.
-        var row = page.getRows()
-                        .get(0)
-                        .get("Sample")
-                        .iterator()
-                        .next()
-                        .getValue()
-                        .equals("http://example.com/samples#s1-a")
-                ? page.getRows().get(0)
-                : page.getRows().get(1);
+        var row =
+                page.getRows().get(0).get("Sample").iterator().next().value().equals("http://example.com/samples#s1-a")
+                        ? page.getRows().get(0)
+                        : page.getRows().get(1);
         assertEquals(
-                "Sample A for subject 1", row.get("Sample").iterator().next().getLabel());
+                "Sample A for subject 1", row.get("Sample").iterator().next().label());
         assertEquals(
-                SAMPLE_NATURE_BLOOD, row.get("Sample_nature").iterator().next().getValue());
-        assertEquals("Blood", row.get("Sample_nature").iterator().next().getLabel());
-        assertEquals("Liver", row.get("Sample_topography").iterator().next().getLabel());
+                SAMPLE_NATURE_BLOOD, row.get("Sample_nature").iterator().next().value());
+        assertEquals("Blood", row.get("Sample_nature").iterator().next().label());
+        assertEquals("Liver", row.get("Sample_topography").iterator().next().label());
         assertEquals(
                 45.2f,
-                ((Number) row.get("Sample_tumorCellularity").iterator().next().getValue()).floatValue(),
+                ((Number) row.get("Sample_tumorCellularity").iterator().next().value()).floatValue(),
                 0.01);
     }
 
@@ -219,7 +216,7 @@ public class SparqlQueryServiceTest {
         var requestParams = new CountRequest();
         requestParams.setView("Sample");
         var result = queryService.count(requestParams);
-        assertEquals(2, result.getCount());
+        assertEquals(2, result.count());
     }
 
     @Test
@@ -227,7 +224,7 @@ public class SparqlQueryServiceTest {
         var request = new CountRequest();
         request.setView("Subject");
         var result = queryService.count(request);
-        Assert.assertEquals(1, result.getCount());
+        Assert.assertEquals(1, result.count());
     }
 
     @Test
@@ -237,7 +234,7 @@ public class SparqlQueryServiceTest {
         request.setView("Resource");
 
         var result = queryService.count(request);
-        Assert.assertEquals(3, result.getCount());
+        Assert.assertEquals(3, result.count());
     }
 
     @Test
@@ -246,7 +243,7 @@ public class SparqlQueryServiceTest {
         var countRequest = new CountRequest();
         countRequest.setView("Sample");
         var result = queryService.count(countRequest);
-        assertEquals(0, result.getCount());
+        assertEquals(0, result.count());
     }
 
     @Test

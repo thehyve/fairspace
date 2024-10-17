@@ -15,6 +15,11 @@ import lombok.extern.log4j.Log4j2;
 
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.controller.dto.CountDto;
+import io.fairspace.saturn.controller.dto.ValueDto;
+import io.fairspace.saturn.controller.dto.ViewPageDto;
+import io.fairspace.saturn.controller.dto.request.CountRequest;
+import io.fairspace.saturn.controller.dto.request.ViewRequest;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
 
@@ -83,7 +88,7 @@ public class JdbcQueryService implements QueryService {
     }
 
     @SneakyThrows
-    public ViewPageDTO retrieveViewPage(ViewRequest request) {
+    public ViewPageDto retrieveViewPage(ViewRequest request) {
         int page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         int size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
         var filters = new ArrayList<ViewFilter>();
@@ -92,9 +97,9 @@ public class JdbcQueryService implements QueryService {
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
         try (var viewStoreReader = getViewStoreReader()) {
-            List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
+            List<Map<String, Set<ValueDto>>> rows = viewStoreReader.retrieveRows(
                     request.getView(), filters, (page - 1) * size, size + 1, request.includeJoinedViews());
-            var pageBuilder = ViewPageDTO.builder()
+            var pageBuilder = ViewPageDto.builder()
                     .rows(rows.subList(0, min(size, rows.size())))
                     .hasNext(rows.size() > size);
             if (request.includeCounts()) {
@@ -103,7 +108,7 @@ public class JdbcQueryService implements QueryService {
             }
             return pageBuilder.build();
         } catch (SQLTimeoutException e) {
-            return ViewPageDTO.builder()
+            return ViewPageDto.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)
                     .build();
@@ -111,16 +116,16 @@ public class JdbcQueryService implements QueryService {
     }
 
     @SneakyThrows
-    public CountDTO count(CountRequest request) {
+    public CountDto count(CountRequest request) {
         var filters = request.getFilters();
         if (filters == null) {
             filters = new ArrayList<>();
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
         try (var viewStoreReader = getViewStoreReader()) {
-            return new CountDTO(viewStoreReader.countRows(request.getView(), filters), false);
+            return new CountDto(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
-            return new CountDTO(0, true);
+            return new CountDto(0, true);
         }
     }
 }

@@ -98,12 +98,12 @@ public class ViewServiceTest extends PostgresAwareTest {
         when(permissions.canReadFacets()).thenReturn(true);
         var facets = viewService.getFacets();
         var dateFacets = facets.stream()
-                .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Date)
+                .filter(facet -> facet.type() == ViewsConfig.ColumnType.Date)
                 .toList();
         Assert.assertEquals(2, dateFacets.size());
 
         var boolFacets = facets.stream()
-                .filter(facet -> facet.getType() == ViewsConfig.ColumnType.Boolean)
+                .filter(facet -> facet.type() == ViewsConfig.ColumnType.Boolean)
                 .toList();
         Assert.assertEquals(1, boolFacets.size());
     }
@@ -121,23 +121,23 @@ public class ViewServiceTest extends PostgresAwareTest {
     @Test
     public void testDisplayIndex_IsSet() {
         var views = viewService.getViews();
-        var columns = views.get(1).getColumns().stream().toList();
+        var columns = views.get(1).columns().stream().toList();
         var selectedColumn = columns.stream()
-                .filter(c -> c.getTitle().equals("Morphology"))
+                .filter(c -> c.title().equals("Morphology"))
                 .toList()
                 .getFirst();
-        Assert.assertEquals(Integer.valueOf(1), selectedColumn.getDisplayIndex());
+        Assert.assertEquals(Integer.valueOf(1), selectedColumn.displayIndex());
     }
 
     @Test
     public void testDisplayIndex_IsNotSet() {
         var views = viewService.getViews();
-        var columns = views.get(1).getColumns().stream().toList();
+        var columns = views.get(1).columns().stream().toList();
         var selectedColumn = columns.stream()
-                .filter(c -> c.getTitle().equals("Laterality"))
+                .filter(c -> c.title().equals("Laterality"))
                 .toList()
                 .getFirst();
-        Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), selectedColumn.getDisplayIndex());
+        Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), selectedColumn.displayIndex());
     }
 
     @Test

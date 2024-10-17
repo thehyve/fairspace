@@ -24,6 +24,10 @@ import org.apache.jena.rdf.model.Literal;
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.controller.dto.ColumnDto;
+import io.fairspace.saturn.controller.dto.FacetDto;
+import io.fairspace.saturn.controller.dto.ValueDto;
+import io.fairspace.saturn.controller.dto.ViewDto;
 import io.fairspace.saturn.rdf.search.FilteredDatasetGraph;
 import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
@@ -102,8 +106,8 @@ public class ViewService {
     private final Dataset ds;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final MetadataPermissions metadataPermissions;
-    private final LoadingCache<Boolean, List<FacetDTO>> facetsCache;
-    private final LoadingCache<Boolean, List<ViewDTO>> viewsCache;
+    private final LoadingCache<Boolean, List<FacetDto>> facetsCache;
+    private final LoadingCache<Boolean, List<ViewDto>> viewsCache;
 
     public ViewService(
             SearchProperties searchProperties,
@@ -134,7 +138,7 @@ public class ViewService {
         log.info("Caches refreshing/warming up successfully finished");
     }
 
-    public List<FacetDTO> getFacets() {
+    public List<FacetDto> getFacets() {
         if (!metadataPermissions.canReadFacets()) {
             // this check is needed for cached data only as, otherwise,
             // the check will be performed during retrieving data from Jena
@@ -147,7 +151,7 @@ public class ViewService {
         }
     }
 
-    public List<ViewDTO> getViews() {
+    public List<ViewDto> getViews() {
         try {
             return viewsCache.get(Boolean.TRUE);
         } catch (ExecutionException e) {
@@ -155,22 +159,22 @@ public class ViewService {
         }
     }
 
-    protected List<ViewDTO> fetchViews() {
+    protected List<ViewDto> fetchViews() {
         return viewsConfig.views.stream()
                 .map(v -> {
-                    var columns = new ArrayList<ColumnDTO>();
+                    var columns = new ArrayList<ColumnDto>();
 
                     // The entity label is the first column displayed,
                     // if you want a column before this label, assign a negative displayIndex value in views.yaml
                     final int ENTITY_LABEL_INDEX = 0;
 
-                    columns.add(new ColumnDTO(
+                    columns.add(new ColumnDto(
                             v.name,
                             v.itemName == null ? v.name : v.itemName,
                             ColumnType.Identifier,
                             ENTITY_LABEL_INDEX));
                     for (var c : v.columns) {
-                        columns.add(new ColumnDTO(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
+                        columns.add(new ColumnDto(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
                     for (var j : v.join) {
                         var joinView = viewsConfig.getViewConfig(j.view).orElse(null);
@@ -178,34 +182,34 @@ public class ViewService {
                             continue;
                         }
                         if (j.include.contains("id")) {
-                            columns.add(new ColumnDTO(
+                            columns.add(new ColumnDto(
                                     joinView.name, joinView.title, ColumnType.Identifier, j.displayIndex));
                         }
                         for (var c : joinView.columns) {
                             if (!j.include.contains(c.name)) {
                                 continue;
                             }
-                            columns.add(new ColumnDTO(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
+                            columns.add(new ColumnDto(joinView.name + "_" + c.name, c.title, c.type, j.displayIndex));
                         }
                     }
-                    return new ViewDTO(v.name, v.title, columns, v.maxDisplayCount);
+                    return new ViewDto(v.name, v.title, columns, v.maxDisplayCount);
                 })
                 .collect(toList());
     }
 
-    protected List<FacetDTO> fetchFacets() {
+    protected List<FacetDto> fetchFacets() {
         return calculateRead(ds, () -> viewsConfig.views.stream()
                 .flatMap(view -> view.columns.stream()
                         .map(column -> getFacetInfo(view, column))
-                        .filter(f -> (f.getMin() != null
-                                || f.getMax() != null
-                                || (f.getValues() != null && f.getValues().size() > 1)
-                                || f.getBooleanValue() != null)))
+                        .filter(f -> (f.min() != null
+                                || f.max() != null
+                                || (f.values() != null && f.values().size() > 1)
+                                || f.booleanValue() != null)))
                 .collect(toList()));
     }
 
-    private FacetDTO getFacetInfo(View view, View.Column column) {
-        List<ValueDTO> values = null;
+    private FacetDto getFacetInfo(View view, View.Column column) {
+        List<ValueDto> values = null;
         Object min = null;
         Object max = null;
         Boolean booleanValue = null;
@@ -225,7 +229,7 @@ public class ViewService {
                     for (var row : (Iterable<QuerySolution>) execution::execSelect) {
                         var resource = row.getResource("value");
                         var label = row.getLiteral("label").getString();
-                        values.add(new ValueDTO(label, resource.getURI()));
+                        values.add(new ValueDto(label, resource.getURI()));
                     }
                 }
             }
@@ -269,7 +273,7 @@ public class ViewService {
             }
         }
 
-        return new FacetDTO(view.name + "_" + column.name, column.title, column.type, values, booleanValue, min, max);
+        return new FacetDto(view.name + "_" + column.name, column.title, column.type, values, booleanValue, min, max);
     }
 
     private Object convertLiteralValue(Object value) {

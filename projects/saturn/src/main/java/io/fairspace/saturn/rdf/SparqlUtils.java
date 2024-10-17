@@ -25,7 +25,7 @@ import org.apache.jena.update.UpdateExecutionFactory;
 import org.apache.jena.update.UpdateFactory;
 
 import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.services.search.SearchResultDTO;
+import io.fairspace.saturn.controller.dto.SearchResultDto;
 
 import static java.util.Optional.ofNullable;
 import static java.util.UUID.randomUUID;
@@ -84,10 +84,10 @@ public class SparqlUtils {
                 .replace("/\\/g", "\\\\");
     }
 
-    public static List<SearchResultDTO> getByQuery(Query query, QuerySolutionMap binding, Dataset dataset) {
+    public static List<SearchResultDto> getByQuery(Query query, QuerySolutionMap binding, Dataset dataset) {
         log.debug("Executing query:\n{}", query);
         try (var selectExecution = QueryExecutionFactory.create(query, dataset, binding)) {
-            var results = new ArrayList<SearchResultDTO>();
+            var results = new ArrayList<SearchResultDto>();
 
             return calculateRead(dataset, () -> {
                 try (selectExecution) {
@@ -101,7 +101,7 @@ public class SparqlUtils {
                                 .map(Literal::getString)
                                 .orElse(null);
 
-                        var dto = SearchResultDTO.builder()
+                        var dto = SearchResultDto.builder()
                                 .id(id)
                                 .label(label)
                                 .type(type)

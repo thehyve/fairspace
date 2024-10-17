@@ -9,6 +9,8 @@ import lombok.extern.log4j.Log4j2;
 
 import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.controller.dto.SearchResultDto;
+import io.fairspace.saturn.controller.dto.request.FileSearchRequest;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.views.ViewStoreReader;
@@ -37,7 +39,7 @@ public class JdbcFileSearchService implements FileSearchService {
     }
 
     @SneakyThrows
-    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
+    public List<SearchResultDto> searchFiles(FileSearchRequest request) {
         var collectionsForUser = transactions.calculateRead(m -> rootSubject.getChildren().stream()
                 .map(collection -> getCollectionNameByUri(rootSubject.getUniqueId(), collection.getUniqueId()))
                 .collect(Collectors.toList()));

@@ -2,6 +2,8 @@ package io.fairspace.saturn.config;
 
 import java.sql.SQLException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
@@ -20,11 +22,15 @@ import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
+import io.fairspace.saturn.services.IRIModule;
 import io.fairspace.saturn.services.users.UserService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 
 import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
+
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 /**
  * Configuration for the Spark filter to enable the Saturn API.
@@ -92,5 +98,14 @@ public class ServiceConfig {
                 .username(keycloakClientProperties.getClientId())
                 .password(keycloakClientProperties.getClientSecret())
                 .build();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .registerModule(new IRIModule())
+                .registerModule(new JavaTimeModule())
+                .configure(WRITE_DATES_AS_TIMESTAMPS, false)
+                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 }
