@@ -5,7 +5,9 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import io.fairspace.saturn.vocabulary.FS;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UniqueLabelValidator implements MetadataRequestValidator {
     @Override
     public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {

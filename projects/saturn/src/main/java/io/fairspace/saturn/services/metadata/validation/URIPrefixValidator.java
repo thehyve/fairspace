@@ -1,13 +1,17 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import io.fairspace.saturn.webdav.DavFactory;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component
 public class URIPrefixValidator implements MetadataRequestValidator {
     private final String restrictedPrefix;
 
-    public URIPrefixValidator(String restrictedPrefix) {
-        this.restrictedPrefix = restrictedPrefix;
+    public URIPrefixValidator(@Qualifier("davFactory") DavFactory davFactory) {
+        this.restrictedPrefix = ((io.milton.resource.Resource) davFactory.root).getUniqueId();
     }
 
     @Override

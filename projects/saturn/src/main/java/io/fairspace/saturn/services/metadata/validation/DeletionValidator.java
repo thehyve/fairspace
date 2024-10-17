@@ -4,7 +4,9 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 
 import io.fairspace.saturn.vocabulary.FS;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DeletionValidator implements MetadataRequestValidator {
     @Override
     public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {

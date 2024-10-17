@@ -5,11 +5,14 @@ import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
 
 import io.fairspace.saturn.vocabulary.FS;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getBooleanProperty;
 
+@Component
 public class MachineOnlyClassesValidator extends VocabularyAwareValidator {
-    public MachineOnlyClassesValidator(Model vocabulary) {
+    public MachineOnlyClassesValidator(@Qualifier("vocabulary") Model vocabulary) {
         super(vocabulary);
     }
 
