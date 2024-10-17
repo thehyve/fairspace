@@ -2,8 +2,13 @@ package io.fairspace.saturn.services.search;
 
 import java.util.List;
 
-import lombok.extern.log4j.*;
-import org.apache.jena.query.*;
+import lombok.extern.log4j.Log4j2;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolutionMap;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import io.fairspace.saturn.controller.dto.SearchResultDto;
 import io.fairspace.saturn.controller.dto.SearchResultsDto;
@@ -15,6 +20,7 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
 
 @Log4j2
+@Service
 public class SearchService {
     private static final Query RESOURCE_BY_TEXT_QUERY = QueryFactory.create(String.format(
             """
@@ -47,10 +53,10 @@ public class SearchService {
             """,
             FS.NS));
 
-    private final Dataset ds;
+    private final Dataset filteredDataset;
 
-    public SearchService(Dataset ds) {
-        this.ds = ds;
+    public SearchService(@Qualifier("filteredDataset") Dataset filteredDataset) {
+        this.filteredDataset = filteredDataset;
     }
 
     public SearchResultsDto getLookupSearchResults(LookupSearchRequest request) {
@@ -65,12 +71,12 @@ public class SearchService {
         binding.add("query", createStringLiteral(request.getQuery()));
         binding.add("type", createResource(request.getResourceType()));
 
-        var results = SparqlUtils.getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding, ds);
+        var results = SparqlUtils.getByQuery(RESOURCE_BY_TEXT_EXACT_MATCH_QUERY, binding, filteredDataset);
         if (!results.isEmpty()) {
             return results;
         }
 
         binding.add("regexQuery", createStringLiteral(SparqlUtils.getQueryRegex(request.getQuery())));
-        return SparqlUtils.getByQuery(RESOURCE_BY_TEXT_QUERY, binding, ds);
+        return SparqlUtils.getByQuery(RESOURCE_BY_TEXT_QUERY, binding, filteredDataset);
     }
 }

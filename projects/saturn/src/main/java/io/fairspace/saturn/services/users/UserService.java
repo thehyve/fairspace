@@ -19,6 +19,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.sparql.util.Symbol;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.springframework.stereotype.Service;
 
 import io.fairspace.saturn.config.properties.KeycloakClientProperties;
 import io.fairspace.saturn.rdf.SparqlUtils;
@@ -32,6 +33,7 @@ import static io.fairspace.saturn.auth.RequestContext.getCurrentUserStringUri;
 import static java.util.stream.Collectors.toMap;
 
 @Log4j2
+@Service
 public class UserService {
     private final LoadingCache<Boolean, Map<String, User>> usersCache;
     private final Transactions transactions;

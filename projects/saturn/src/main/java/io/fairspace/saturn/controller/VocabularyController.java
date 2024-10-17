@@ -1,5 +1,7 @@
 package io.fairspace.saturn.controller;
 
+import org.apache.jena.rdf.model.Model;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,11 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static io.fairspace.saturn.services.metadata.Serialization.getFormat;
 import static io.fairspace.saturn.services.metadata.Serialization.serialize;
-import static io.fairspace.saturn.vocabulary.Vocabularies.VOCABULARY;
 
 @RestController
 @RequestMapping("/vocabulary")
 public class VocabularyController {
+
+    private final Model vocabulary;
+
+    public VocabularyController(@Qualifier("vocabulary") Model vocabulary) {
+        this.vocabulary = vocabulary;
+    }
 
     @GetMapping("/")
     public ResponseEntity<String> getVocabulary(
@@ -24,7 +31,7 @@ public class VocabularyController {
         var contentType = format.getLang().getHeaderString();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(contentType));
-        var vocabulary = serialize(VOCABULARY, format);
-        return new ResponseEntity<>(vocabulary, headers, HttpStatus.OK);
+        var serializedVocabulary = serialize(vocabulary, format);
+        return new ResponseEntity<>(serializedVocabulary, headers, HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package io.fairspace.saturn.services.search;
 
 import java.io.IOException;
+import java.util.List;
 
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -100,12 +101,21 @@ public class SparqlFileSearchServiceTest {
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
+        var systemVocabulary = model.read("system-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
 
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory =
-                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+
+        var davFactory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
@@ -113,7 +123,12 @@ public class SparqlFileSearchServiceTest {
         fileSearchService = new SparqlFileSearchService(filteredDataset);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(
+                tx,
+                vocabulary,
+                systemVocabulary,
+                new ComposedValidator(List.of(new UniqueLabelValidator())),
+                permissions);
 
         setupUsers(model);
 

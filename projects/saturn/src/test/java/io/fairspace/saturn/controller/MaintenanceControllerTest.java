@@ -1,6 +1,5 @@
 package io.fairspace.saturn.controller;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,11 +25,6 @@ class MaintenanceControllerTest extends BaseControllerTest {
 
     @MockBean
     private MaintenanceService maintenanceService;
-
-    @BeforeEach
-    public void setUp() {
-        when(getService().getMaintenanceService()).thenReturn(maintenanceService);
-    }
 
     @Test
     void testStartReindex() throws Exception {

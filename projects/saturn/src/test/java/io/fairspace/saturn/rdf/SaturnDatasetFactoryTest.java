@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.services.maintenance.MaintenanceService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 
@@ -57,7 +58,8 @@ public class SaturnDatasetFactoryTest {
         var jenaProperties = new JenaProperties("", new StoreParamsProperties());
         jenaProperties.setDatasetPath(new File("data/db"));
         jenaProperties.setTransactionLogPath(new File("data/log"));
-        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory, "");
+        var viewProperties = new ViewsProperties();
+        var ds = SaturnDatasetFactory.connect(viewProperties, jenaProperties, viewStoreClientFactory, "");
 
         var dataSetGraph = MaintenanceService.unwrap(ds.asDatasetGraph());
 

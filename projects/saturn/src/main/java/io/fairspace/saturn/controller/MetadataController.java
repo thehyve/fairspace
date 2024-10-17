@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.controller.validation.ValidIri;
+import io.fairspace.saturn.services.metadata.MetadataService;
 
 import static io.fairspace.saturn.controller.enums.CustomMediaType.APPLICATION_LD_JSON;
 import static io.fairspace.saturn.controller.enums.CustomMediaType.APPLICATION_N_TRIPLES;
@@ -41,7 +41,7 @@ public class MetadataController {
 
     public static final String DO_VIEWS_UPDATE_DEFAULT_VALUE = "true";
 
-    private final Services services;
+    private final MetadataService metadataService;
 
     @GetMapping(
             value = "/",
@@ -50,7 +50,7 @@ public class MetadataController {
             @RequestParam(required = false) String subject,
             @RequestParam(name = "withValueProperties", defaultValue = "false") boolean withValueProperties,
             @RequestHeader(value = HttpHeaders.ACCEPT, required = false) String acceptHeader) {
-        var model = services.getMetadataService().get(subject, withValueProperties);
+        var model = metadataService.get(subject, withValueProperties);
         var format = getFormat(acceptHeader);
         var metadata = serialize(model, format);
         return ResponseEntity.ok(metadata);
@@ -66,7 +66,7 @@ public class MetadataController {
             @RequestParam(name = DO_VIEWS_UPDATE, defaultValue = DO_VIEWS_UPDATE_DEFAULT_VALUE)
                     boolean doMaterializedViewsRefresh) {
         Model model = deserialize(body, contentType);
-        services.getMetadataService().put(model, doMaterializedViewsRefresh);
+        metadataService.put(model, doMaterializedViewsRefresh);
     }
 
     @PatchMapping(
@@ -78,7 +78,7 @@ public class MetadataController {
             @RequestHeader(value = HttpHeaders.CONTENT_TYPE, required = false) String contentType,
             @RequestParam(name = DO_VIEWS_UPDATE, defaultValue = DO_VIEWS_UPDATE_DEFAULT_VALUE) boolean doViewsUpdate) {
         Model model = deserialize(body, contentType);
-        services.getMetadataService().patch(model, doViewsUpdate);
+        metadataService.patch(model, doViewsUpdate);
     }
 
     @DeleteMapping("/")
@@ -90,12 +90,12 @@ public class MetadataController {
             @RequestParam(name = DO_VIEWS_UPDATE, defaultValue = DO_VIEWS_UPDATE_DEFAULT_VALUE)
                     boolean doMaterializedViewsRefresh) {
         if (subject != null) {
-            if (!services.getMetadataService().softDelete(ResourceFactory.createResource(subject))) {
+            if (!metadataService.softDelete(ResourceFactory.createResource(subject))) {
                 throw new IllegalArgumentException("Subject could not be deleted");
             }
         } else {
             Model model = deserialize(body, contentType);
-            services.getMetadataService().delete(model, doMaterializedViewsRefresh);
+            metadataService.delete(model, doMaterializedViewsRefresh);
         }
     }
 }

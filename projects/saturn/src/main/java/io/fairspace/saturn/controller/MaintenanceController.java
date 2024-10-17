@@ -7,30 +7,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.config.Services;
+import io.fairspace.saturn.services.maintenance.MaintenanceService;
 
 @RestController
 @RequestMapping("/maintenance")
 @RequiredArgsConstructor
 public class MaintenanceController {
 
-    private final Services services;
+    private final MaintenanceService maintenanceService;
 
     @PostMapping("/reindex")
     public ResponseEntity<Void> startReindex() {
-        services.getMaintenanceService().startRecreateIndexTask();
+        maintenanceService.startRecreateIndexTask();
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/compact")
     public ResponseEntity<Void> compactRdfStorage() {
-        services.getMaintenanceService().compactRdfStorageTask();
+        maintenanceService.compactRdfStorageTask();
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/status")
     public ResponseEntity<String> getStatus() {
-        var status = services.getMaintenanceService().active() ? "active" : "inactive";
+        var status = maintenanceService.active() ? "active" : "inactive";
         return ResponseEntity.ok(status);
     }
 }

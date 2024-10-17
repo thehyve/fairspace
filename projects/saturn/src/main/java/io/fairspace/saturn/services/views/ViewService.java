@@ -20,10 +20,13 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.Literal;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
 
-import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.controller.dto.ColumnDto;
 import io.fairspace.saturn.controller.dto.FacetDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
@@ -33,8 +36,8 @@ import io.fairspace.saturn.services.AccessDeniedException;
 import io.fairspace.saturn.services.metadata.MetadataPermissions;
 import io.fairspace.saturn.vocabulary.FS;
 
-import static io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import static io.fairspace.saturn.config.ViewsConfig.View;
+import static io.fairspace.saturn.config.properties.ViewsProperties.ColumnType;
+import static io.fairspace.saturn.config.properties.ViewsProperties.View;
 
 import static java.time.Instant.ofEpochMilli;
 import static java.util.Optional.ofNullable;
@@ -43,67 +46,69 @@ import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.system.Txn.calculateRead;
 
 @Log4j2
+@Service
 public class ViewService {
 
     private static final Query VALUES_QUERY = QueryFactory.create(String.format(
             """
-            PREFIX fs: <%s>
-            PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+                    PREFIX fs: <%s>
+                    PREFIX rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
 
-            SELECT ?value ?label
-            WHERE {
-               ?value a ?type ; rdfs:label ?label .
-               FILTER EXISTS {
-                  ?subject ?predicate ?value
-                  FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
-               }
-               FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
-            } ORDER BY ?label
-            """,
+                    SELECT ?value ?label
+                    WHERE {
+                       ?value a ?type ; rdfs:label ?label .
+                       FILTER EXISTS {
+                          ?subject ?predicate ?value
+                          FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
+                       }
+                       FILTER NOT EXISTS { ?value fs:dateDeleted ?anyDateDeleted }
+                    } ORDER BY ?label
+                    """,
             FS.NS));
 
     private static final Query RESOURCE_TYPE_VALUES_QUERY = QueryFactory.create(String.format(
             """
-            PREFIX fs: <%s>
-            SELECT ?value ?label
-            WHERE {
-               VALUES (?value ?label) {
-                  (fs:Collection "Collection")
-                  (fs:Directory "Directory")
-                  (fs:File "File")
-               }
-            }
-            """,
+                    PREFIX fs: <%s>
+                    SELECT ?value ?label
+                    WHERE {
+                       VALUES (?value ?label) {
+                          (fs:Collection "Collection")
+                          (fs:Directory "Directory")
+                          (fs:File "File")
+                       }
+                    }
+                    """,
             FS.NS));
 
     private static final Query BOUNDS_QUERY = QueryFactory.create(String.format(
             """
-            PREFIX fs: <%s>
+                    PREFIX fs: <%s>
 
-            SELECT (MIN(?value) AS ?min) (MAX(?value) AS ?max)
-            WHERE {
-               ?subject ?predicate ?value
-               FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
-            }
-            """,
+                    SELECT (MIN(?value) AS ?min) (MAX(?value) AS ?max)
+                    WHERE {
+                       ?subject ?predicate ?value
+                       FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
+                    }
+                    """,
             FS.NS));
 
     private static final Query BOOLEAN_VALUE_QUERY = QueryFactory.create(String.format(
             """
-            PREFIX fs: <%s>
-            SELECT ?booleanValue
-            WHERE {
-               ?subject ?predicate ?booleanValue
-               FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
-            }
-            """,
+                    PREFIX fs: <%s>
+                    SELECT ?booleanValue
+                    WHERE {
+                       ?subject ?predicate ?booleanValue
+                       FILTER NOT EXISTS { ?subject fs:dateDeleted ?anyDateDeleted }
+                    }
+                    """,
             FS.NS));
     public static final String USER_DOES_NOT_HAVE_PERMISSIONS_TO_READ_FACETS =
             "User does not have permissions to read facets";
 
     private final SearchProperties searchProperties;
-    private final ViewsConfig viewsConfig;
+    private final ViewsProperties viewsProperties;
     private final Dataset ds;
+    private final ViewStoreReader viewStoreReader;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final MetadataPermissions metadataPermissions;
     private final LoadingCache<Boolean, List<FacetDto>> facetsCache;
@@ -112,13 +117,15 @@ public class ViewService {
     public ViewService(
             SearchProperties searchProperties,
             CacheProperties cacheProperties,
-            ViewsConfig viewsConfig,
-            Dataset ds,
-            ViewStoreClientFactory viewStoreClientFactory,
+            ViewsProperties viewsProperties,
+            @Qualifier("filteredDataset") Dataset ds,
+            ViewStoreReader viewStoreReader,
+            @Nullable ViewStoreClientFactory viewStoreClientFactory,
             MetadataPermissions metadataPermissions) {
         this.searchProperties = searchProperties;
-        this.viewsConfig = viewsConfig;
+        this.viewsProperties = viewsProperties;
         this.ds = ds;
+        this.viewStoreReader = viewStoreReader;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.metadataPermissions = metadataPermissions;
         this.facetsCache = buildCache(this::fetchFacets, cacheProperties.getFacets());
@@ -160,7 +167,7 @@ public class ViewService {
     }
 
     protected List<ViewDto> fetchViews() {
-        return viewsConfig.views.stream()
+        return viewsProperties.views.stream()
                 .map(v -> {
                     var columns = new ArrayList<ColumnDto>();
 
@@ -177,7 +184,7 @@ public class ViewService {
                         columns.add(new ColumnDto(v.name + "_" + c.name, c.title, c.type, c.displayIndex));
                     }
                     for (var j : v.join) {
-                        var joinView = viewsConfig.getViewConfig(j.view).orElse(null);
+                        var joinView = viewsProperties.getViewConfig(j.view).orElse(null);
                         if (joinView == null) {
                             continue;
                         }
@@ -198,7 +205,7 @@ public class ViewService {
     }
 
     protected List<FacetDto> fetchFacets() {
-        return calculateRead(ds, () -> viewsConfig.views.stream()
+        return calculateRead(ds, () -> viewsProperties.views.stream()
                 .flatMap(view -> view.columns.stream()
                         .map(column -> getFacetInfo(view, column))
                         .filter(f -> (f.min() != null
@@ -288,9 +295,7 @@ public class ViewService {
         if (!EnumSet.of(ColumnType.Date, ColumnType.Number).contains(column.type)) {
             return null;
         }
-        try (var reader = new ViewStoreReader(searchProperties, viewsConfig, viewStoreClientFactory)) {
-            return reader.aggregate(view.name, column.name);
-        }
+        return viewStoreReader.aggregate(view.name, column.name);
     }
 
     private <T> LoadingCache<Boolean, List<T>> buildCache(

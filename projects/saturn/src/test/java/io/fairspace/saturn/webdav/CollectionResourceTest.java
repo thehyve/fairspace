@@ -20,7 +20,7 @@ import io.fairspace.saturn.webdav.blobstore.BlobStore;
 import io.fairspace.saturn.webdav.resources.CollectionResource;
 
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
-import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
+import static io.fairspace.saturn.config.MetadataConfig.METADATA_SERVICE;
 
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.junit.Assert.assertFalse;
@@ -63,10 +63,18 @@ public class CollectionResourceTest {
                 .add(COLLECTION_1, RDF.type, FS.Collection)
                 .add(COLLECTION_1, FS.ownedBy, WORKSPACE_1)
                 .add(COLLECTION_1, FS.belongsTo, WORKSPACE_1);
-
+        var vocabulary = model.read("test-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
         context.set(METADATA_SERVICE, metadataService);
-        var factory = new DavFactory(model.createResource(baseUri), store, userService, context, webDavProperties);
-        resource = new CollectionResource(factory, COLLECTION_1, Access.Manage);
+        var factory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                webDavProperties,
+                userVocabulary,
+                vocabulary);
+        resource = new CollectionResource(factory, COLLECTION_1, Access.Manage, userVocabulary, vocabulary);
 
         setupRequestContext();
     }

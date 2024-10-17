@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 import io.fairspace.saturn.auth.JwtAuthConverterProperties;
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.services.IRIModule;
 
 @ImportAutoConfiguration(exclude = {SecurityAutoConfiguration.class, OAuth2ResourceServerAutoConfiguration.class})
@@ -20,9 +19,6 @@ public class BaseControllerTest {
     @MockBean
     private JwtAuthConverterProperties jwtAuthConverterProperties;
 
-    @MockBean
-    private Services services;
-
     @TestConfiguration
     static class CustomObjectMapperConfig {
         @Bean
@@ -31,9 +27,5 @@ public class BaseControllerTest {
                     .registerModule(new IRIModule())
                     .findAndRegisterModules(); // Automatically registers JavaTimeModule, etc.
         }
-    }
-
-    protected Services getService() {
-        return services;
     }
 }

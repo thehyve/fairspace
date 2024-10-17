@@ -16,12 +16,21 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.vocabulary.FS;
 
-import static io.fairspace.saturn.rdf.ModelUtils.*;
-import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
+import static io.fairspace.saturn.rdf.ModelUtils.EMPTY_MODEL;
+import static io.fairspace.saturn.rdf.ModelUtils.asNode;
+import static io.fairspace.saturn.rdf.ModelUtils.modelOf;
 
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
-import static org.mockito.Mockito.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.riot.RDFDataMgr.loadModel;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ShaclValidatorTest {
@@ -37,10 +46,11 @@ public class ShaclValidatorTest {
 
     @Before
     public void setUp() {
-        Model vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel()
-                .add(closedClassShape, RDF.type, SHACLM.NodeShape)
-                .add(closedClassShape, SHACLM.targetClass, closedClass)
-                .add(closedClassShape, SHACLM.closed, createTypedLiteral(true)));
+        Model vocabulary = loadModel("system-vocabulary.ttl")
+                .union(createDefaultModel()
+                        .add(closedClassShape, RDF.type, SHACLM.NodeShape)
+                        .add(closedClassShape, SHACLM.targetClass, closedClass)
+                        .add(closedClassShape, SHACLM.closed, createTypedLiteral(true)));
 
         validator = new ShaclValidator(vocabulary);
     }

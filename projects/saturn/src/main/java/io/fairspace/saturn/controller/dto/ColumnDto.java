@@ -1,5 +1,5 @@
 package io.fairspace.saturn.controller.dto;
 
-import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 
-public record ColumnDto(String name, String title, ViewsConfig.ColumnType type, Integer displayIndex) {}
+public record ColumnDto(String name, String title, ViewsProperties.ColumnType type, Integer displayIndex) {}

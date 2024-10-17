@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.jena.rdf.model.Model;
 import org.jetbrains.annotations.NotNull;
@@ -15,9 +17,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 import io.fairspace.saturn.auth.RequestContext;
-import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.services.users.User;
 
@@ -120,15 +122,21 @@ public class TestUtils {
         setupRequestContext(USER);
     }
 
-    public static ViewsConfig loadViewsConfig(String path) {
+    public static ObjectMapper getYamlObjectMapper() {
+        return new ObjectMapper(new YAMLFactory());
+    }
+
+    public static ViewsProperties loadViewsConfig(String path) {
         var settingsFile = new File(path);
         if (settingsFile.exists()) {
             try {
-                return ViewsConfig.MAPPER.readValue(settingsFile, ViewsConfig.class);
+                ViewsProperties viewsProperties = getYamlObjectMapper().readValue(settingsFile, ViewsProperties.class);
+                viewsProperties.init();
+                return viewsProperties;
             } catch (IOException e) {
                 throw new RuntimeException("Error loading search configuration", e);
             }
         }
-        return new ViewsConfig();
+        return new ViewsProperties();
     }
 }

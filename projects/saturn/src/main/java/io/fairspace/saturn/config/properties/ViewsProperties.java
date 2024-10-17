@@ -1,9 +1,12 @@
-package io.fairspace.saturn.config;
+package io.fairspace.saturn.config.properties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -11,16 +14,21 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.stereotype.Component;
 
-@Component
-@PropertySource("classpath:views.yaml")
-public class ViewsConfigProperties {
+public class ViewsProperties {
 
-    //    private Map<String, View> nameToViewConfigMap;
-
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     public List<View> views = new ArrayList<>();
+
+    private Map<String, View> nameToViewConfigMap;
+
+    public Optional<View> getViewConfig(String viewName) {
+        return Optional.ofNullable(nameToViewConfigMap.get(viewName));
+    }
+
+    public void init() {
+        nameToViewConfigMap = views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
+    }
 
     public enum ColumnType {
         Text,

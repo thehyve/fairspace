@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;
@@ -21,21 +22,24 @@ import static org.apache.commons.io.FileUtils.getTempDirectory;
 import static org.apache.jena.query.ReadWrite.WRITE;
 
 public class TransactionsTest {
-    private final JenaProperties config = new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
+
+    private final JenaProperties jenaProperties =
+            new JenaProperties("http://localhost/iri/", new StoreParamsProperties());
     private Dataset ds;
 
     @Before
     public void before() {
-        config.setDatasetPath(new File(getTempDirectory(), randomUUID().toString()));
-        config.setTransactionLogPath(new File(getTempDirectory(), randomUUID().toString()));
-
-        ds = SaturnDatasetFactory.connect(config, null, null);
+        jenaProperties.setDatasetPath(new File(getTempDirectory(), randomUUID().toString()));
+        jenaProperties.setTransactionLogPath(
+                new File(getTempDirectory(), randomUUID().toString()));
+        var viewProperties = new ViewsProperties();
+        ds = SaturnDatasetFactory.connect(viewProperties, jenaProperties, null, null);
     }
 
     @After
     public void after() throws IOException {
         ds.close();
-        deleteDirectory(config.getDatasetPath());
+        deleteDirectory(jenaProperties.getDatasetPath());
         ds = null;
     }
 

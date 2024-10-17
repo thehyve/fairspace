@@ -7,21 +7,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.controller.dto.SearchResultsDto;
 import io.fairspace.saturn.controller.dto.request.FileSearchRequest;
 import io.fairspace.saturn.controller.dto.request.LookupSearchRequest;
+import io.fairspace.saturn.services.search.FileSearchService;
+import io.fairspace.saturn.services.search.SearchService;
 
 @RestController
 @RequestMapping("/search")
 @RequiredArgsConstructor
 public class SearchController {
 
-    private final Services services;
+    private final SearchService searchService;
+
+    private final FileSearchService fileSearchService;
 
     @PostMapping(value = "/files")
     public ResponseEntity<SearchResultsDto> searchFiles(@RequestBody FileSearchRequest request) {
-        var searchResult = services.getFileSearchService().searchFiles(request);
+        var searchResult = fileSearchService.searchFiles(request);
         var resultDto = SearchResultsDto.builder()
                 .results(searchResult)
                 .query(request.getQuery())
@@ -31,7 +34,7 @@ public class SearchController {
 
     @PostMapping(value = "/lookup")
     public ResponseEntity<SearchResultsDto> lookupSearch(@RequestBody LookupSearchRequest request) {
-        var results = services.getSearchService().getLookupSearchResults(request);
+        var results = searchService.getLookupSearchResults(request);
         return ResponseEntity.ok(results);
     }
 }

@@ -1,111 +1,56 @@
 package io.fairspace.saturn.config;
 
-import java.sql.SQLException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.RequiredArgsConstructor;
-import org.keycloak.OAuth2Constants;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.apache.jena.query.Dataset;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
 
-import io.fairspace.saturn.config.properties.CacheProperties;
-import io.fairspace.saturn.config.properties.FeatureProperties;
-import io.fairspace.saturn.config.properties.JenaProperties;
-import io.fairspace.saturn.config.properties.KeycloakClientProperties;
-import io.fairspace.saturn.config.properties.SearchProperties;
-import io.fairspace.saturn.config.properties.ViewDatabaseProperties;
-import io.fairspace.saturn.config.properties.WebDavProperties;
-import io.fairspace.saturn.rdf.SaturnDatasetFactory;
-import io.fairspace.saturn.services.IRIModule;
-import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.config.properties.ViewsProperties;
+import io.fairspace.saturn.rdf.transactions.Transactions;
+import io.fairspace.saturn.services.search.FileSearchService;
+import io.fairspace.saturn.services.search.JdbcFileSearchService;
+import io.fairspace.saturn.services.search.SparqlFileSearchService;
+import io.fairspace.saturn.services.views.JdbcQueryService;
+import io.fairspace.saturn.services.views.QueryService;
 import io.fairspace.saturn.services.views.SparqlQueryService;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
+import io.fairspace.saturn.services.views.ViewStoreReader;
+import io.fairspace.saturn.webdav.DavFactory;
 
-import static io.fairspace.saturn.config.ConfigLoader.VIEWS_CONFIG;
+import static io.fairspace.saturn.services.views.ViewStoreClientFactory.protectedResources;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-
-/**
- * Configuration for the Spark filter to enable the Saturn API.
- */
 @Configuration
-@RequiredArgsConstructor
 public class ServiceConfig {
 
-    // todo: make the init done by Spring
     @Bean
-    public Services getService(
-            Keycloak keycloak,
+    public QueryService queryService(
+            SparqlQueryService sparqlQueryService,
             @Nullable ViewStoreClientFactory viewStoreClientFactory,
-            FeatureProperties featureProperties,
-            JenaProperties jenaProperties,
-            CacheProperties cacheProperties,
-            SearchProperties searchProperties,
-            WebDavProperties webDavProperties,
-            KeycloakClientProperties keycloakClientProperties,
-            @Value("${application.publicUrl}") String publicUrl) {
-        var ds = SaturnDatasetFactory.connect(jenaProperties, viewStoreClientFactory, publicUrl);
-        return new Services(
-                VIEWS_CONFIG,
-                ds,
-                featureProperties,
-                viewStoreClientFactory,
-                keycloak.realm(keycloakClientProperties.getRealm()).users(),
-                jenaProperties,
-                cacheProperties,
-                searchProperties,
-                webDavProperties,
-                keycloakClientProperties,
-                publicUrl);
+            Transactions transactions,
+            @Qualifier("davFactory") DavFactory davFactory,
+            ViewStoreReader viewStoreReader) {
+        return viewStoreClientFactory == null
+                ? sparqlQueryService
+                : new JdbcQueryService(transactions, davFactory.root, viewStoreReader);
     }
 
     @Bean
-    @ConditionalOnProperty(value = "application.view-database.enabled", havingValue = "true")
-    public ViewStoreClientFactory getViewStoreClientFactory(
-            ViewDatabaseProperties viewDatabaseProperties, SearchProperties searchProperties) {
-        try {
-            return new ViewStoreClientFactory(VIEWS_CONFIG, viewDatabaseProperties, searchProperties);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error connecting to the view database", e);
-        }
-    }
+    public FileSearchService fileSearchService(
+            @Qualifier("filteredDataset") Dataset filteredDataset,
+            @Nullable ViewStoreClientFactory viewStoreClientFactory,
+            ViewsProperties viewsProperties,
+            Transactions transactions,
+            @Qualifier("davFactory") DavFactory davFactory,
+            ViewStoreReader viewStoreReader) {
+        // File search should be done using JDBC for performance reasons. However, if the view store is not available,
+        // or collections and files view is not configured, we fall back to using SPARQL queries on the RDF database
+        // directly.
+        boolean useSparqlFileSearchService = viewStoreClientFactory == null
+                || viewsProperties.views.stream().noneMatch(view -> protectedResources.containsAll(view.types));
 
-    @Bean
-    public SparqlQueryService getSparqlQueryService(Services services) {
-        return services.getSparqlQueryService();
-    }
-
-    @Bean
-    public UserService getUserService(Services services) {
-        return services.getUserService();
-    }
-
-    @Bean
-    public Keycloak getKeycloak(KeycloakClientProperties keycloakClientProperties) {
-        return KeycloakBuilder.builder()
-                .serverUrl(keycloakClientProperties.getAuthServerUrl())
-                .realm(keycloakClientProperties.getRealm())
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .clientId(keycloakClientProperties.getClientId())
-                .clientSecret(keycloakClientProperties.getClientSecret())
-                .username(keycloakClientProperties.getClientId())
-                .password(keycloakClientProperties.getClientSecret())
-                .build();
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .registerModule(new IRIModule())
-                .registerModule(new JavaTimeModule())
-                .configure(WRITE_DATES_AS_TIMESTAMPS, false)
-                .configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return useSparqlFileSearchService
+                ? new SparqlFileSearchService(filteredDataset)
+                : new JdbcFileSearchService(transactions, davFactory.root, viewStoreReader);
     }
 }

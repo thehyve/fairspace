@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.views;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -23,9 +24,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.PostgresAwareTest;
 import io.fairspace.saturn.auth.RequestContext;
-import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
-import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.rdf.SparqlUtils;
 import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
@@ -72,6 +72,9 @@ public class ViewServiceTest extends PostgresAwareTest {
     @Mock
     private MetadataPermissions permissions;
 
+    @Mock
+    private MaterializedViewService materializedViewService;
+
     MetadataService api;
     ViewService viewService;
 
@@ -79,18 +82,29 @@ public class ViewServiceTest extends PostgresAwareTest {
     public void before()
             throws SQLException, BadRequestException, ConflictException, NotAuthorizedException, IOException {
         var viewDatabase = buildViewDatabaseConfig();
-        ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, new SearchProperties());
-
+        var viewsProperties = loadViewsConfig("src/test/resources/test-views.yaml");
+        var configuration = new ViewStoreClient.ViewStoreConfiguration(viewsProperties);
+        var dataSource = getDataSource(viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(
+                viewsProperties, viewDatabase, materializedViewService, dataSource, configuration);
         var dsg = new TxnIndexDatasetGraph(
-                DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
+                viewsProperties, DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
 
         Dataset ds = wrap(dsg);
 
         loadTestData(ds);
 
+        var searchProperties = buildSearchProperties();
+        var viewStoreReader =
+                new ViewStoreReader(searchProperties, viewsProperties, viewStoreClientFactory, configuration);
         viewService = new ViewService(
-                new SearchProperties(), new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
+                searchProperties,
+                new CacheProperties(),
+                viewsProperties,
+                ds,
+                viewStoreReader,
+                viewStoreClientFactory,
+                permissions);
     }
 
     @Test
@@ -98,12 +112,12 @@ public class ViewServiceTest extends PostgresAwareTest {
         when(permissions.canReadFacets()).thenReturn(true);
         var facets = viewService.getFacets();
         var dateFacets = facets.stream()
-                .filter(facet -> facet.type() == ViewsConfig.ColumnType.Date)
+                .filter(facet -> facet.type() == ViewsProperties.ColumnType.Date)
                 .toList();
         Assert.assertEquals(2, dateFacets.size());
 
         var boolFacets = facets.stream()
-                .filter(facet -> facet.type() == ViewsConfig.ColumnType.Boolean)
+                .filter(facet -> facet.type() == ViewsProperties.ColumnType.Boolean)
                 .toList();
         Assert.assertEquals(1, boolFacets.size());
     }
@@ -173,16 +187,29 @@ public class ViewServiceTest extends PostgresAwareTest {
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
+        var systemVocabulary = model.read("system-vocabulary.ttl");
 
         var workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
 
-        var davFactory =
-                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var davFactory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(
+                tx,
+                vocabulary,
+                systemVocabulary,
+                new ComposedValidator(List.of(new UniqueLabelValidator())),
+                permissions);
 
         setupRequestContext();
 

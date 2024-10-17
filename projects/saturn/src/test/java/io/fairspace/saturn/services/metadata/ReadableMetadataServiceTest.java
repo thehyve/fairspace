@@ -17,11 +17,10 @@ import io.fairspace.saturn.rdf.transactions.SimpleTransactions;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.vocabulary.FS;
 
-import static io.fairspace.saturn.vocabulary.Vocabularies.SYSTEM_VOCABULARY;
-
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
 import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.riot.RDFDataMgr.loadModel;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -41,7 +40,13 @@ public class ReadableMetadataServiceTest {
 
     private Transactions txn = new SimpleTransactions(createTxnMem());
     private MetadataService api;
-    private Model vocabulary = SYSTEM_VOCABULARY.union(createDefaultModel());
+    private final Model vocabulary;
+    private final Model systemVocabulary;
+
+    {
+        systemVocabulary = loadModel("system-vocabulary.ttl");
+        vocabulary = systemVocabulary.union(createDefaultModel());
+    }
 
     @Mock
     MetadataPermissions permissions;
@@ -49,7 +54,7 @@ public class ReadableMetadataServiceTest {
     @Before
     public void setUp() {
         when(permissions.canReadMetadata(any())).thenReturn(true);
-        api = new MetadataService(txn, vocabulary, null, permissions);
+        api = new MetadataService(txn, vocabulary, systemVocabulary, null, permissions);
     }
 
     @Test

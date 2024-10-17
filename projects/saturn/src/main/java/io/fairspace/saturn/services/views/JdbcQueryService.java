@@ -1,6 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,8 +12,6 @@ import io.milton.resource.CollectionResource;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.properties.SearchProperties;
 import io.fairspace.saturn.controller.dto.CountDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
 import io.fairspace.saturn.controller.dto.ViewPageDto;
@@ -36,27 +33,16 @@ import static java.lang.Integer.min;
  */
 @Log4j2
 public class JdbcQueryService implements QueryService {
+
     private final Transactions transactions;
     private final CollectionResource rootSubject;
-    private final SearchProperties searchProperties;
-    private final ViewsConfig viewsConfig;
-    private final ViewStoreClientFactory viewStoreClientFactory;
+    private final ViewStoreReader viewStoreReader;
 
     public JdbcQueryService(
-            SearchProperties searchProperties,
-            ViewsConfig viewsConfig,
-            ViewStoreClientFactory viewStoreClientFactory,
-            Transactions transactions,
-            CollectionResource rootSubject) {
-        this.searchProperties = searchProperties;
-        this.viewStoreClientFactory = viewStoreClientFactory;
+            Transactions transactions, CollectionResource rootSubject, ViewStoreReader viewStoreReader) {
         this.transactions = transactions;
         this.rootSubject = rootSubject;
-        this.viewsConfig = viewsConfig;
-    }
-
-    ViewStoreReader getViewStoreReader() throws SQLException {
-        return new ViewStoreReader(searchProperties, viewsConfig, viewStoreClientFactory);
+        this.viewStoreReader = viewStoreReader;
     }
 
     @SneakyThrows
@@ -96,7 +82,7 @@ public class JdbcQueryService implements QueryService {
             filters.addAll(request.getFilters());
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try (var viewStoreReader = getViewStoreReader()) {
+        try {
             List<Map<String, Set<ValueDto>>> rows = viewStoreReader.retrieveRows(
                     request.getView(), filters, (page - 1) * size, size + 1, request.includeJoinedViews());
             var pageBuilder = ViewPageDto.builder()
@@ -122,7 +108,7 @@ public class JdbcQueryService implements QueryService {
             filters = new ArrayList<>();
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try (var viewStoreReader = getViewStoreReader()) {
+        try {
             return new CountDto(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
             return new CountDto(0, true);

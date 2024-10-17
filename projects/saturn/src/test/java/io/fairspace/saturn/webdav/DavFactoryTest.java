@@ -114,7 +114,16 @@ public class DavFactoryTest {
     public void before() {
         JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
         workspaceService = new WorkspaceService(tx, userService);
-        factory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var vocabulary = model.read("test-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
+        factory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
 
         user = createTestUser("user", false);
         dao.write(user);

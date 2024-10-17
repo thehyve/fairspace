@@ -36,7 +36,6 @@ class SearchControllerTest extends BaseControllerTest {
 
     @Test
     void testSearchFiles() throws Exception {
-        when(getService().getFileSearchService()).thenReturn(fileSearchService);
         var mockResults = List.of(
                 SearchResultDto.builder()
                         .id("file1.txt")
@@ -79,7 +78,6 @@ class SearchControllerTest extends BaseControllerTest {
 
     @Test
     void testLookupSearch() throws Exception {
-        when(getService().getSearchService()).thenReturn(searchService);
         var mockResults = List.of(
                 SearchResultDto.builder()
                         .id("file1.txt")
