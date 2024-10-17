@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.StoreParamsProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.rdf.SaturnDatasetFactory;
 
 import static java.util.UUID.randomUUID;
@@ -85,6 +86,7 @@ public class RestoreTest {
     }
 
     private Transactions newDataset() {
-        return new BulkTransactions(SaturnDatasetFactory.connect(config, null, null));
+        var viewProperties = new ViewsProperties();
+        return new BulkTransactions(SaturnDatasetFactory.connect(viewProperties, config, null, null));
     }
 }

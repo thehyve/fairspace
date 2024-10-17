@@ -2,6 +2,7 @@ package io.fairspace.saturn.services.search;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -36,8 +37,11 @@ import io.fairspace.saturn.services.metadata.validation.ComposedValidator;
 import io.fairspace.saturn.services.metadata.validation.UniqueLabelValidator;
 import io.fairspace.saturn.services.users.User;
 import io.fairspace.saturn.services.users.UserService;
+import io.fairspace.saturn.services.views.MaterializedViewService;
 import io.fairspace.saturn.services.views.ViewService;
+import io.fairspace.saturn.services.views.ViewStoreClient;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
+import io.fairspace.saturn.services.views.ViewStoreReader;
 import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceRole;
 import io.fairspace.saturn.services.workspaces.WorkspaceService;
@@ -71,6 +75,9 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
 
     @Mock
     private MetadataPermissions permissions;
+
+    @Mock
+    private MaterializedViewService materializedViewService;
 
     WorkspaceService workspaceService;
     MetadataService api;
@@ -110,34 +117,55 @@ public class JdbcFileSearchServiceTest extends PostgresAwareTest {
     public void before()
             throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
         JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
-        var config = loadViewsConfig("src/test/resources/test-views.yaml");
+        var viewsProperties = loadViewsConfig("src/test/resources/test-views.yaml");
         var searchProperties = buildSearchProperties();
         var viewDatabase = buildViewDatabaseConfig();
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, searchProperties);
-
+        var configuration = new ViewStoreClient.ViewStoreConfiguration(viewsProperties);
+        var dataSource = getDataSource(viewDatabase);
+        var viewStoreClientFactory = new ViewStoreClientFactory(
+                viewsProperties, viewDatabase, materializedViewService, dataSource, configuration);
         var dsg = new TxnIndexDatasetGraph(
-                DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
+                viewsProperties, DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, "http://localhost:8080");
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
-
+        var userVocabulary = model.read("vocabulary.ttl");
+        var systemVocabulary = model.read("system-vocabulary.ttl");
+        var viewStoreReader =
+                new ViewStoreReader(searchProperties, viewsProperties, viewStoreClientFactory, configuration);
         var viewService = new ViewService(
-                searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
+                searchProperties,
+                new CacheProperties(),
+                viewsProperties,
+                ds,
+                viewStoreReader,
+                viewStoreClientFactory,
+                permissions);
 
-        maintenanceService =
-                new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, "http://localhost:8080");
+        maintenanceService = new MaintenanceService(
+                viewsProperties, userService, ds, viewStoreClientFactory, viewService, "http://localhost:8080");
 
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory =
-                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
-        fileSearchService =
-                new JdbcFileSearchService(searchProperties, config, viewStoreClientFactory, tx, davFactory.root);
+        var davFactory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
+        fileSearchService = new JdbcFileSearchService(tx, davFactory.root, viewStoreReader);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(
+                tx,
+                vocabulary,
+                systemVocabulary,
+                new ComposedValidator(List.of(new UniqueLabelValidator())),
+                permissions);
 
         dao = new DAO(model);
 

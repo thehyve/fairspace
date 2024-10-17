@@ -19,9 +19,6 @@ public class BaseControllerTest {
     @MockBean
     private JwtAuthConverterProperties jwtAuthConverterProperties;
 
-    @MockBean
-    private Services services;
-
     @TestConfiguration
     static class CustomObjectMapperConfig {
         @Bean
@@ -30,9 +27,5 @@ public class BaseControllerTest {
                     .registerModule(new IRIModule())
                     .findAndRegisterModules(); // Automatically registers JavaTimeModule, etc.
         }
-    }
-
-    protected Services getService() {
-        return services;
     }
 }
