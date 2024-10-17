@@ -3,10 +3,10 @@ package io.fairspace.saturn.services.metadata.validation;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.shacl.vocabulary.SHACLM;
 import org.apache.jena.vocabulary.RDF;
-
-import io.fairspace.saturn.vocabulary.FS;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import io.fairspace.saturn.vocabulary.FS;
 
 import static io.fairspace.saturn.rdf.ModelUtils.getBooleanProperty;
 

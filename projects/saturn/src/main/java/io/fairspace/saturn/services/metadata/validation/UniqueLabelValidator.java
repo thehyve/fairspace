@@ -3,9 +3,9 @@ package io.fairspace.saturn.services.metadata.validation;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.springframework.stereotype.Component;
 
 import io.fairspace.saturn.vocabulary.FS;
-import org.springframework.stereotype.Component;
 
 @Component
 public class UniqueLabelValidator implements MetadataRequestValidator {

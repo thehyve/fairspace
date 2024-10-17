@@ -374,6 +374,14 @@ public class DirectoryResource extends BaseResource implements FolderResource, D
             throw new BadRequestException("Error parsing file " + file.getName(), e);
         }
 
+        // TODO: I would refactor all resources to be anemic rather than rich.
+        //  Due to the "rich" nature of the resources,
+        //  the resources (directory, collections, etc.) are responsible for handling the request and performing the
+        //  actions.
+        //  I would go more "spring way" and use services to handle the request and perform the actions over resources
+        //  via the services
+        //  It would suggest not to mix the responsibilities and make the code more maintainable.
+        //  It would let us avoid such an inelegant workaround as the one below.
         MetadataService metadataService = factory.context.get(METADATA_SERVICE);
         try {
             metadataService.patch(model, Boolean.TRUE);

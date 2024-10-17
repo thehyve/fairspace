@@ -1,10 +1,10 @@
 package io.fairspace.saturn.services.metadata.validation;
 
+import java.util.List;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * Combines a few validators into one. Stops on a first failing validator.
