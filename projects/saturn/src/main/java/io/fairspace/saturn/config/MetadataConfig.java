@@ -30,7 +30,8 @@ public class MetadataConfig {
         // This is a workaround (old, not a new one) to resolve circular dependency:
         // MetadataService --> ComposedValidator --> URIPrefixValidator --> DavFactory --> DirectoryResource -->
         // MetadataService
-        // See comment with a suggestion to refactor resources to be anemic (not rich)
+        // TODO: refactor to avoid circular dependency and !!!USE!!! injection using Spring (at least in DavFactory)
+        //  this to-do supposes getting rid of the following line and using dataset context for storing metadataService
         dataset.getContext().set(METADATA_SERVICE, metadataService);
         return metadataService;
     }
