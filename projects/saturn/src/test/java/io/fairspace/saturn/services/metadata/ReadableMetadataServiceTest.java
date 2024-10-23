@@ -19,9 +19,15 @@ import io.fairspace.saturn.vocabulary.FS;
 
 import static org.apache.jena.query.DatasetFactory.createTxnMem;
 import static org.apache.jena.rdf.model.ModelFactory.createDefaultModel;
-import static org.apache.jena.rdf.model.ResourceFactory.*;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createStringLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 import static org.apache.jena.riot.RDFDataMgr.loadModel;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -38,15 +44,10 @@ public class ReadableMetadataServiceTest {
     private static final Statement LBL_STMT1 = createStatement(S1, RDFS.label, createStringLiteral("subject1"));
     private static final Statement LBL_STMT2 = createStatement(S2, RDFS.label, createStringLiteral("subject2"));
 
-    private Transactions txn = new SimpleTransactions(createTxnMem());
+    private final Transactions txn = new SimpleTransactions(createTxnMem());
     private MetadataService api;
-    private final Model vocabulary;
-    private final Model systemVocabulary;
-
-    {
-        systemVocabulary = loadModel("system-vocabulary.ttl");
-        vocabulary = systemVocabulary.union(createDefaultModel());
-    }
+    private final Model systemVocabulary = loadModel("system-vocabulary.ttl");
+    private final Model vocabulary = systemVocabulary.union(createDefaultModel());
 
     @Mock
     MetadataPermissions permissions;
