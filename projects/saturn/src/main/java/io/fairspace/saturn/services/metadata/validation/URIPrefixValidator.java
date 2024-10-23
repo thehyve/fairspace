@@ -1,27 +1,19 @@
 package io.fairspace.saturn.services.metadata.validation;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.fairspace.saturn.webdav.DavFactory;
+import static io.fairspace.saturn.config.WebDAVConfig.WEB_DAV_URL_PATH;
 
 @Component
 public class URIPrefixValidator implements MetadataRequestValidator {
 
     private final String restrictedPrefix;
 
-    @Autowired
-    public URIPrefixValidator(@Qualifier("davFactory") DavFactory davFactory) {
-        this.restrictedPrefix = ((io.milton.resource.Resource) davFactory.root).getUniqueId();
-    }
-
-    @VisibleForTesting
-    public URIPrefixValidator(String restrictedPrefix) {
-        this.restrictedPrefix = restrictedPrefix;
+    public URIPrefixValidator(@Value("${application.publicUrl}") String publicUrl) {
+        this.restrictedPrefix = publicUrl + WEB_DAV_URL_PATH; // should be the same as dav root unique id
     }
 
     @Override
