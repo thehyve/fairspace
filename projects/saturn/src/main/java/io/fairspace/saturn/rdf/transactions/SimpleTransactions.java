@@ -9,11 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(
-        name = "application.jena.bulkTransactions",
-        havingValue = "false",
-        matchIfMissing = true // initialize the Simple implementation absent
-        )
+@ConditionalOnProperty(name = "application.jena.bulkTransactions", havingValue = "false")
 public class SimpleTransactions extends BaseTransactions {
 
     public SimpleTransactions(@Qualifier("dataset") Dataset ds) {

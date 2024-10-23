@@ -25,7 +25,11 @@ import static io.fairspace.saturn.auth.RequestContext.setCurrentUserStringUri;
 import static java.lang.Thread.currentThread;
 
 @Component
-@ConditionalOnProperty(name = "application.jena.bulkTransactions", havingValue = "true")
+@ConditionalOnProperty(
+        name = "application.jena.bulkTransactions",
+        havingValue = "true",
+        matchIfMissing = true // BulkTransactions is used by default
+        )
 public class BulkTransactions extends BaseTransactions {
     private final LinkedBlockingQueue<Task<?, ?>> queue = new LinkedBlockingQueue<>();
     private static final AtomicInteger threadCounter = new AtomicInteger();
