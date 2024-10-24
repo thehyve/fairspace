@@ -126,12 +126,20 @@ public class SparqlQueryServiceTest {
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
+        var systemVocabulary = model.read("system-vocabulary.ttl");
 
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
-        var davFactory =
-                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var davFactory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
         var metadataPermissions = new MetadataPermissions(workspaceService, davFactory, userService);
         var filteredDatasetGraph = new FilteredDatasetGraph(ds.asDatasetGraph(), metadataPermissions);
         var filteredDataset = DatasetImpl.wrap(filteredDatasetGraph);
@@ -148,7 +156,12 @@ public class SparqlQueryServiceTest {
                 tx);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
-        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(
+                tx,
+                vocabulary,
+                systemVocabulary,
+                new ComposedValidator(List.of(new UniqueLabelValidator())),
+                permissions);
 
         dao = new DAO(model);
 

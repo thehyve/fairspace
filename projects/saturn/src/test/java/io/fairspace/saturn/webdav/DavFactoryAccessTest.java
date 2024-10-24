@@ -115,7 +115,16 @@ public class DavFactoryAccessTest {
     @Before
     public void before() {
         workspaceService = new WorkspaceService(tx, userService);
-        factory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var vocabulary = model.read("test-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
+        factory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
 
         setupRequestContext();
         var request = getCurrentRequest();

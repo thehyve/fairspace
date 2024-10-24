@@ -1,5 +1,9 @@
 package io.fairspace.saturn;
 
+import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -36,5 +40,21 @@ public class PostgresAwareTest {
         searchProperties.setPageRequestTimeout(10000);
         searchProperties.setMaxJoinItems(50);
         return searchProperties;
+    }
+
+    public DataSource getDataSource(ViewDatabaseProperties viewDatabaseProperties) {
+        var databaseConfig = getHikariConfig(viewDatabaseProperties);
+        return new HikariDataSource(databaseConfig);
+    }
+
+    private HikariConfig getHikariConfig(ViewDatabaseProperties viewDatabaseProperties) {
+        var databaseConfig = new HikariConfig();
+        databaseConfig.setJdbcUrl(viewDatabaseProperties.getUrl());
+        databaseConfig.setUsername(viewDatabaseProperties.getUsername());
+        databaseConfig.setPassword(viewDatabaseProperties.getPassword());
+        databaseConfig.setAutoCommit(viewDatabaseProperties.isAutoCommitEnabled());
+        databaseConfig.setConnectionTimeout(viewDatabaseProperties.getConnectionTimeout());
+        databaseConfig.setMaximumPoolSize(viewDatabaseProperties.getMaxPoolSize());
+        return databaseConfig;
     }
 }

@@ -6,7 +6,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import io.fairspace.saturn.config.Feature;
+import io.fairspace.saturn.config.enums.Feature;
 
 @Data
 @Component

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,10 +12,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.controller.dto.CountDto;
 import io.fairspace.saturn.controller.dto.FacetDto;
-import io.fairspace.saturn.controller.dto.FacetsDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
 import io.fairspace.saturn.controller.dto.ViewDto;
 import io.fairspace.saturn.controller.dto.ViewPageDto;
@@ -42,17 +40,11 @@ public class ViewControllerTest extends BaseControllerTest {
     @MockBean
     private ViewService viewService;
 
-    @MockBean
+    @MockBean(name = "queryService")
     private QueryService queryService;
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @BeforeEach
-    public void setUp() {
-        when(getService().getViewService()).thenReturn(viewService);
-        when(getService().getQueryService()).thenReturn(queryService);
-    }
 
     @Test
     public void testGetViewsSuccess() throws Exception {
@@ -104,8 +96,7 @@ public class ViewControllerTest extends BaseControllerTest {
     @Test
     public void testGetFacetsSuccess() throws Exception {
         // Mock data for getFacets
-        var facetDto = new FacetDto("facet1", "Facet 1", ViewsConfig.ColumnType.Set, List.of(), null, null, null);
-        var mockFacetsDto = new FacetsDto(List.of(facetDto));
+        var facetDto = new FacetDto("facet1", "Facet 1", ViewsProperties.ColumnType.Set, List.of(), null, null, null);
 
         when(viewService.getFacets()).thenReturn(List.of(facetDto));
 
@@ -114,8 +105,8 @@ public class ViewControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.facets", hasSize(1)))
                 .andExpect(jsonPath("$.facets[0].name", is("facet1")))
                 .andExpect(jsonPath("$.facets[0].title", is("Facet 1")))
-                .andExpect(
-                        jsonPath("$.facets[0].type", is(ViewsConfig.ColumnType.Set.getName()))); // Empty options list
+                .andExpect(jsonPath(
+                        "$.facets[0].type", is(ViewsProperties.ColumnType.Set.getName()))); // Empty options list
     }
 
     @Test

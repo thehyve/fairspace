@@ -3,6 +3,7 @@ package io.fairspace.saturn.webdav;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import io.milton.http.FileItem;
@@ -48,7 +49,7 @@ import static io.fairspace.saturn.TestUtils.createTestUser;
 import static io.fairspace.saturn.TestUtils.mockAuthentication;
 import static io.fairspace.saturn.TestUtils.setupRequestContext;
 import static io.fairspace.saturn.auth.RequestContext.getCurrentRequest;
-import static io.fairspace.saturn.config.Services.METADATA_SERVICE;
+import static io.fairspace.saturn.config.MetadataConfig.METADATA_SERVICE;
 
 import static org.apache.jena.query.DatasetFactory.wrap;
 import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
@@ -92,6 +93,10 @@ public class DirectoryResourceTest {
     DirectoryResource dir;
     User admin;
 
+    Model vocabulary;
+    Model systemVocabulary;
+    Model userVocabulary;
+
     private void selectAdmin() {
         lenient().when(userService.currentUser()).thenReturn(admin);
     }
@@ -102,15 +107,27 @@ public class DirectoryResourceTest {
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         model = ds.getDefaultModel();
+        vocabulary = model.read("test-vocabulary.ttl");
+        systemVocabulary = model.read("system-vocabulary.ttl");
+        userVocabulary = model.read("vocabulary.ttl");
         var workspaceService = new WorkspaceService(tx, userService);
-        var vocabulary = model.read("test-vocabulary.ttl");
-
         when(permissions.canWriteMetadata(any())).thenReturn(true);
         Context context = new Context();
-        metadataService =
-                new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        metadataService = new MetadataService(
+                tx,
+                vocabulary,
+                systemVocabulary,
+                new ComposedValidator(List.of(new UniqueLabelValidator())),
+                permissions);
         context.set(METADATA_SERVICE, metadataService);
-        davFactory = new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        davFactory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
 
         mockAuthentication("admin");
         admin = createTestUser("admin", true);
@@ -143,7 +160,8 @@ public class DirectoryResourceTest {
 
     @Test
     public void testFileUploadSuccess() throws NotAuthorizedException, ConflictException, BadRequestException {
-        dir = new DirectoryResource(davFactory, model.getResource(baseUri + "/dir"), Access.Manage);
+        dir = new DirectoryResource(
+                davFactory, model.getResource(baseUri + "/dir"), Access.Manage, userVocabulary, vocabulary);
         dir.subject.addProperty(RDF.type, FS.Directory);
 
         dir.processForm(Map.of("action", "upload_files"), Map.of("/subdir/file.ext", blobFileItem));
@@ -162,7 +180,8 @@ public class DirectoryResourceTest {
     @Test
     public void testDeleteAllInDirectory()
             throws NotAuthorizedException, ConflictException, BadRequestException, IOException {
-        dir = new DirectoryResource(davFactory, model.getResource(baseUri + "/dir"), Access.Manage);
+        dir = new DirectoryResource(
+                davFactory, model.getResource(baseUri + "/dir"), Access.Manage, userVocabulary, vocabulary);
         dir.subject.addProperty(RDF.type, FS.Directory);
 
         dir.createNew("file1", input, 3L, "text/abc");

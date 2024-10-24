@@ -107,7 +107,16 @@ public class DavFactoryExtraStorageTest {
         extraStorage.setBlobStorePath("db/extra");
         extraStorage.setDefaultRootCollections(List.of(defaultExtraStorageRootName));
         webDavProperties.setExtraStorage(extraStorage);
-        factory = new DavFactory(model.createResource(extraStorageUri), store, userService, context, webDavProperties);
+        var vocabulary = model.read("test-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
+        factory = new DavFactory(
+                model.createResource(extraStorageUri),
+                store,
+                userService,
+                context,
+                webDavProperties,
+                userVocabulary,
+                vocabulary);
 
         user = createTestUser("user", false);
         new DAO(model).write(user);

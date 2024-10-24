@@ -2,7 +2,6 @@ package io.fairspace.saturn.controller;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import static io.fairspace.saturn.controller.enums.CustomMediaType.TEXT_TURTLE;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -34,11 +32,6 @@ public class MetadataControllerTest extends BaseControllerTest {
 
     @MockBean
     private MetadataService metadataService;
-
-    @BeforeEach
-    void setUp() {
-        when(getService().getMetadataService()).thenReturn(metadataService);
-    }
 
     @Test
     public void testGetMetadata() throws Exception {

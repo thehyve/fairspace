@@ -37,12 +37,14 @@ import org.apache.jena.sparql.expr.ExprVar;
 import org.apache.jena.sparql.expr.NodeValue;
 import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.vocabulary.RDFS;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
-import io.fairspace.saturn.config.ViewsConfig;
-import io.fairspace.saturn.config.ViewsConfig.ColumnType;
-import io.fairspace.saturn.config.ViewsConfig.View;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties.ColumnType;
+import io.fairspace.saturn.config.properties.ViewsProperties.View;
 import io.fairspace.saturn.controller.dto.CountDto;
 import io.fairspace.saturn.controller.dto.ValueDto;
 import io.fairspace.saturn.controller.dto.ViewPageDto;
@@ -70,23 +72,27 @@ import static org.apache.jena.sparql.expr.NodeValue.makeString;
 import static org.apache.jena.system.Txn.calculateRead;
 
 @Log4j2
+@Service
+@Qualifier("sparqlQueryService")
 public class SparqlQueryService implements QueryService {
+
     private static final String RESOURCES_VIEW = "Resource";
+
     private final SearchProperties searchProperties;
     private final JenaProperties jenaProperties;
-    private final ViewsConfig viewsConfig;
+    private final ViewsProperties viewsProperties;
     private final Dataset ds;
     private final Transactions transactions;
 
     public SparqlQueryService(
             SearchProperties searchProperties,
             JenaProperties jenaProperties,
-            ViewsConfig viewsConfig,
-            Dataset ds,
+            ViewsProperties viewsProperties,
+            @Qualifier("filteredDataset") Dataset ds,
             Transactions transactions) {
         this.searchProperties = searchProperties;
         this.jenaProperties = jenaProperties;
-        this.viewsConfig = viewsConfig;
+        this.viewsProperties = viewsProperties;
         this.ds = ds;
         this.transactions = transactions;
     }
@@ -207,7 +213,7 @@ public class SparqlQueryService implements QueryService {
     }
 
     private View getView(String viewName) {
-        return viewsConfig
+        return viewsProperties
                 .getViewConfig(viewName)
                 .orElseThrow(() -> new IllegalArgumentException("Unknown view: " + viewName));
     }

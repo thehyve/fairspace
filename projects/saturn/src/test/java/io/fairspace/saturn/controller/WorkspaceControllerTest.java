@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -39,11 +38,6 @@ class WorkspaceControllerTest extends BaseControllerTest {
 
     @MockBean
     private WorkspaceService workspaceService;
-
-    @BeforeEach
-    void setUp() {
-        when(getService().getWorkspaceService()).thenReturn(workspaceService);
-    }
 
     @Test
     void createWorkspace_shouldReturnCreatedWorkspace() throws Exception {

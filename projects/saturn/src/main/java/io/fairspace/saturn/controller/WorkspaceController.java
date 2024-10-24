@@ -3,6 +3,7 @@ package io.fairspace.saturn.controller;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.springframework.http.HttpStatus;
@@ -18,51 +19,48 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fairspace.saturn.config.Services;
 import io.fairspace.saturn.services.workspaces.UserRoleDto;
 import io.fairspace.saturn.services.workspaces.Workspace;
 import io.fairspace.saturn.services.workspaces.WorkspaceRole;
+import io.fairspace.saturn.services.workspaces.WorkspaceService;
 
 @RestController
 @RequestMapping("/workspaces")
 @Validated
+@RequiredArgsConstructor
 public class WorkspaceController {
 
-    private final Services services;
-
-    public WorkspaceController(Services services) {
-        this.services = services;
-    }
+    private final WorkspaceService workspaceService;
 
     @PutMapping("/")
     public ResponseEntity<Workspace> createWorkspace(@RequestBody Workspace workspace) {
-        var createdWorkspace = services.getWorkspaceService().createWorkspace(workspace);
-        return ResponseEntity.ok(createdWorkspace);
+        var createdWorkspace = workspaceService.createWorkspace(workspace);
+        return ResponseEntity.ok(
+                createdWorkspace); // it should return HTTP 201 CREATED - tobe analyzed across the codebase
     }
 
     @GetMapping("/")
     public ResponseEntity<List<Workspace>> listWorkspaces() {
-        var workspaces = services.getWorkspaceService().listWorkspaces();
+        var workspaces = workspaceService.listWorkspaces();
         return ResponseEntity.ok(workspaces);
     }
 
     @DeleteMapping("/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWorkspace(@RequestParam("workspace") String workspaceUri) {
-        services.getWorkspaceService().deleteWorkspace(NodeFactory.createURI(workspaceUri));
+        workspaceService.deleteWorkspace(NodeFactory.createURI(workspaceUri));
     }
 
     @GetMapping(value = "/users/")
     public ResponseEntity<Map<Node, WorkspaceRole>> getUsers(@RequestParam("workspace") String workspaceUri) {
         var uri = NodeFactory.createURI(workspaceUri);
-        var users = services.getWorkspaceService().getUsers(uri);
+        var users = workspaceService.getUsers(uri);
         return ResponseEntity.ok(users);
     }
 
     @PatchMapping(value = "/users/")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void setUserRole(@RequestBody UserRoleDto userRoleDto) {
-        services.getWorkspaceService()
-                .setUserRole(userRoleDto.getWorkspace(), userRoleDto.getUser(), userRoleDto.getRole());
+        workspaceService.setUserRole(userRoleDto.getWorkspace(), userRoleDto.getUser(), userRoleDto.getRole());
     }
 }

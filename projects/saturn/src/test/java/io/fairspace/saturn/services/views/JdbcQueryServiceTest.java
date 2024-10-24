@@ -3,8 +3,10 @@ package io.fairspace.saturn.services.views;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.sql.DataSource;
 
 import io.milton.http.ResourceFactory;
 import io.milton.http.exceptions.BadRequestException;
@@ -24,10 +26,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import io.fairspace.saturn.PostgresAwareTest;
-import io.fairspace.saturn.config.ViewsConfig;
 import io.fairspace.saturn.config.properties.CacheProperties;
 import io.fairspace.saturn.config.properties.JenaProperties;
 import io.fairspace.saturn.config.properties.SearchProperties;
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.config.properties.WebDavProperties;
 import io.fairspace.saturn.controller.dto.ValueDto;
 import io.fairspace.saturn.controller.dto.request.CountRequest;
@@ -108,42 +110,66 @@ public class JdbcQueryServiceTest extends PostgresAwareTest {
             throws SQLException, NotAuthorizedException, BadRequestException, ConflictException, IOException {
         JenaProperties.setMetadataBaseIRI("http://localhost/iri/");
         var viewDatabase = buildViewDatabaseConfig();
-        ViewsConfig config = loadViewsConfig("src/test/resources/test-views.yaml");
+        ViewsProperties viewsProperties = loadViewsConfig("src/test/resources/test-views.yaml");
         SearchProperties searchProperties = new SearchProperties();
         searchProperties.setCountRequestTimeout(60000);
         searchProperties.setPageRequestTimeout(10000);
         searchProperties.setMaxJoinItems(50);
-        var viewStoreClientFactory = new ViewStoreClientFactory(config, viewDatabase, searchProperties);
+        var configuration = new ViewStoreClient.ViewStoreConfiguration(viewsProperties);
+        DataSource dataSource = getDataSource(viewDatabase);
+        MaterializedViewService materializedViewService = new MaterializedViewService(
+                dataSource, configuration, viewsProperties, searchProperties.getMaxJoinItems());
+        var viewStoreClientFactory = new ViewStoreClientFactory(
+                viewsProperties, viewDatabase, materializedViewService, dataSource, configuration);
 
-        var dsg = new TxnIndexDatasetGraph(DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, PUBLIC_URL);
+        var dsg = new TxnIndexDatasetGraph(
+                viewsProperties, DatasetGraphFactory.createTxnMem(), viewStoreClientFactory, PUBLIC_URL);
         Dataset ds = wrap(dsg);
         Transactions tx = new SimpleTransactions(ds);
         Model model = ds.getDefaultModel();
         var vocabulary = model.read("test-vocabulary.ttl", "TTL");
+        var systemVocabulary = model.read("system-vocabulary.ttl");
+        var userVocabulary = model.read("vocabulary.ttl");
+
         dao = new DAO(model);
 
+        var viewStoreReader =
+                new ViewStoreReader(searchProperties, viewsProperties, viewStoreClientFactory, configuration);
         var viewService = new ViewService(
-                searchProperties, new CacheProperties(), config, ds, viewStoreClientFactory, permissions);
+                searchProperties,
+                new CacheProperties(),
+                viewsProperties,
+                ds,
+                viewStoreReader,
+                viewStoreClientFactory,
+                permissions);
 
-        maintenanceService = new MaintenanceService(userService, ds, viewStoreClientFactory, viewService, PUBLIC_URL);
+        maintenanceService = new MaintenanceService(
+                viewsProperties, userService, ds, viewStoreClientFactory, viewService, PUBLIC_URL);
 
         workspaceService = new WorkspaceService(tx, userService);
 
         var context = new Context();
 
-        var davFactory =
-                new DavFactory(model.createResource(baseUri), store, userService, context, new WebDavProperties());
+        var davFactory = new DavFactory(
+                model.createResource(baseUri),
+                store,
+                userService,
+                context,
+                new WebDavProperties(),
+                userVocabulary,
+                vocabulary);
 
-        sut = new JdbcQueryService(
-                searchProperties,
-                loadViewsConfig("src/test/resources/test-views.yaml"),
-                viewStoreClientFactory,
-                tx,
-                davFactory.root);
+        sut = new JdbcQueryService(tx, davFactory.root, viewStoreReader);
 
         when(permissions.canWriteMetadata(any())).thenReturn(true);
 
-        api = new MetadataService(tx, vocabulary, new ComposedValidator(new UniqueLabelValidator()), permissions);
+        api = new MetadataService(
+                tx,
+                vocabulary,
+                systemVocabulary,
+                new ComposedValidator(List.of(new UniqueLabelValidator())),
+                permissions);
 
         setupUsers();
 

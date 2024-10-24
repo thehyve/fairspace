@@ -12,6 +12,7 @@ import org.apache.jena.query.TxnType;
 import org.apache.jena.query.text.changes.TextQuadAction;
 import org.apache.jena.sparql.core.DatasetGraph;
 
+import io.fairspace.saturn.config.properties.ViewsProperties;
 import io.fairspace.saturn.rdf.AbstractChangesAwareDatasetGraph;
 import io.fairspace.saturn.services.views.ViewStoreClientFactory;
 import io.fairspace.saturn.services.views.ViewUpdater;
@@ -20,6 +21,8 @@ import static io.fairspace.saturn.services.users.UserService.currentUserAsSymbol
 
 @Slf4j
 public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
+
+    private final ViewsProperties viewsProperties;
     private final DatasetGraph dsg;
     private final ViewStoreClientFactory viewStoreClientFactory;
     private final String publicUrl;
@@ -28,8 +31,13 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
     // tied to the active thread.
     private final Set<Node> updatedSubjects = new HashSet<>();
 
-    public TxnIndexDatasetGraph(DatasetGraph dsg, ViewStoreClientFactory viewStoreClientFactory, String publicUrl) {
+    public TxnIndexDatasetGraph(
+            ViewsProperties viewsProperties,
+            DatasetGraph dsg,
+            ViewStoreClientFactory viewStoreClientFactory,
+            String publicUrl) {
         super(dsg);
+        this.viewsProperties = viewsProperties;
         this.dsg = dsg;
         this.viewStoreClientFactory = viewStoreClientFactory;
         this.publicUrl = publicUrl;
@@ -75,7 +83,7 @@ public class TxnIndexDatasetGraph extends AbstractChangesAwareDatasetGraph {
                     log.info("Commit {} updated subjects", updatedSubjects.size());
                     var start = new Date().getTime();
                     try (var viewStoreClient = viewStoreClientFactory.build();
-                            var viewUpdater = new ViewUpdater(viewStoreClient, dsg, publicUrl)) {
+                            var viewUpdater = new ViewUpdater(viewsProperties, viewStoreClient, dsg, publicUrl)) {
                         updatedSubjects.forEach(viewUpdater::updateSubject);
                         viewUpdater.commit();
                         log.debug(
