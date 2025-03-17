@@ -10,12 +10,12 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.0'
+    id 'org.springframework.boot' version '3.4.3'
     id 'io.spring.dependency-management' version '1.1.5'
-    id "io.freefair.lombok" version "8.6"
+    id "io.freefair.lombok" version "8.12.2.1"
     id 'application'
     id 'jacoco'
-    id "org.owasp.dependencycheck" version "8.2.1"
+    id "org.owasp.dependencycheck" version "12.1.0"
     id "com.diffplug.spotless" version "6.25.0"
     id 'com.github.jk1.dependency-license-report' version '2.9'
 }
@@ -53,7 +53,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     implementation "org.apache.jena:jena-text:${jena_version}"
-    implementation "io.milton:milton-server-ce:${milton_version}"
+    implementation("io.milton:milton-server-ce:${milton_version}") {
+        // TODO remove this when new Milton is released (>4.0.5.2400), so it does not depend on mina-core:2.2.3
+        exclude group: 'org.apache.mina', module: 'mina-core'
+    }
+    implementation 'org.apache.mina:mina-core:2.2.4' // TODO remove this line when exclude group above is removed
 
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"

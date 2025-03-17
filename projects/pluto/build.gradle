@@ -6,12 +6,12 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.6'
-    id "io.freefair.lombok" version '8.6'
+    id 'org.springframework.boot' version '3.4.3'
+    id "io.freefair.lombok" version '8.12.2.1'
     id 'application'
     id 'jacoco'
-    id "org.owasp.dependencycheck" version '8.2.1'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id "org.owasp.dependencycheck" version '12.1.0'
+    id 'io.spring.dependency-management' version '1.1.7'
     id "com.diffplug.spotless" version "6.25.0"
     id 'com.github.jk1.dependency-license-report' version '2.9'
 }
@@ -37,7 +37,7 @@ repositories {
 }
 
 ext {
-    springCloudVersion = '2023.0.3'
+    springCloudVersion = '2024.0.0'
     jacksonVersion = '2.18.1'
 }
 
