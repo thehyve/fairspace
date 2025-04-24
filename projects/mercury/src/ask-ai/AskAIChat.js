@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Card, Grid, IconButton, Modal, Paper, TextField, Tooltip, Typography} from '@mui/material';
+import {Button, Card, Grid, IconButton, Modal, Paper, TextField, Tooltip} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,36 +7,15 @@ import withStyles from '@mui/styles/withStyles';
 import InputAdornment from '@mui/material/InputAdornment';
 import styles from './AskAIChat.styles';
 import LinkedDataEntityPage from '../metadata/common/LinkedDataEntityPage';
-import {LocalSearchAPI} from '../search/SearchAPI';
 import LoadingOverlayWrapper from '../common/components/LoadingOverlayWrapper';
 
-// TODO make this configurable instead of hardcoded value
-const getMetadataEntityType = () => {
-    return 'https://www.fns-cloud.eu/study';
-};
-
 const AskAIChat = props => {
-    const {query, responseDocuments, messages, loading, responseInfo, clearChat, setQuery, classes} = props;
+    const {query, loading, clearChat, setQuery, classes, inputQuery, setInputQuery, questionQueryAnswer} = props;
     const [documentIri, setDocumentIri] = useState('');
     const [openMetadataDialog, setOpenMetadataDialog] = useState(false);
-    const [inputQuery, setInputQuery] = useState(query);
 
     const handleOpenMetadataDialog = () => setOpenMetadataDialog(true);
     const handleCloseMetadataDialog = () => setOpenMetadataDialog(false);
-
-    const extractDocumentIri = webResult => {
-        if (webResult && webResult.length > 0) {
-            setDocumentIri(webResult[0].id);
-        } else {
-            setDocumentIri('');
-        }
-    };
-
-    const showDocument = documentId => {
-        if (documentId !== null && documentId.length > 0) {
-            LocalSearchAPI.lookupSearch(documentId, getMetadataEntityType()).then(extractDocumentIri);
-        }
-    };
 
     const onMetadataDialogClose = () => setDocumentIri('');
 
@@ -52,7 +31,7 @@ const AskAIChat = props => {
         if (query === '') {
             setInputQuery('');
         }
-    }, [query]);
+    }, [query, setInputQuery]);
 
     // TODO this requires further refactoring, since it is a duplication of LinkedDataLink.js
     const renderMetadataDialog = () => (
@@ -72,58 +51,6 @@ const AskAIChat = props => {
             </div>
         </Modal>
     );
-
-    const renderMessages = () => {
-        return (
-            <div>
-                {messages &&
-                    messages.map(message => {
-                        if (message.userInput?.input) {
-                            return (
-                                <div className={classes.chatInput}>
-                                    <Typography variant="body3" color="primary.dark">
-                                        {'> ' + message.userInput.input}
-                                    </Typography>
-                                </div>
-                            );
-                        }
-                        if (message.reply?.summary?.summaryText) {
-                            return (
-                                <div className={classes.chatReply}>
-                                    <Typography variant="body1">{message.reply.summary.summaryText}</Typography>
-                                </div>
-                            );
-                        }
-                        return null;
-                    })}
-            </div>
-        );
-    };
-
-    const renderDocumentReferences = () => {
-        return (
-            <div>
-                {responseDocuments && responseDocuments.length > 0 && (
-                    <Typography variant="h6" color="primary">
-                        Source metadata:
-                    </Typography>
-                )}
-                <div className={classes.documentContainer}>
-                    {responseDocuments &&
-                        responseDocuments.map(
-                            document =>
-                                document?.content &&
-                                document.content.length > 0 && (
-                                    <div className={classes.chatDocument} onClick={() => showDocument(document.title)}>
-                                        <Typography variant="button">Id: {document.title}</Typography>
-                                        <Typography variant="body1">{document.content}</Typography>
-                                    </div>
-                                )
-                        )}
-                </div>
-            </div>
-        );
-    };
 
     const renderSearchBar = () => {
         return (
@@ -197,39 +124,13 @@ const AskAIChat = props => {
                         justifyContent="flex-start"
                         alignItems="stretch"
                     >
-                        {!responseInfo && !(messages && messages.length > 0) ? (
-                            <Grid
-                                item
-                                container
-                                alignItems="stretch"
-                                justifyContent="center"
-                                direction="column"
-                                className={classes.chatSectionBeforeResponse}
-                            >
-                                <Grid item>
-                                    <Typography variant="h3" align="center">
-                                        Ask AI
-                                    </Typography>
-                                </Grid>
-                                <Grid item>
-                                    <Typography variant="subtitle1" align="center">
-                                        What would you like to know more about?
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-                        ) : (
-                            <Grid item container alignItems="stretch" justifyContent="center" direction="column">
-                                <Grid item className={classes.responseMessage}>
-                                    <Typography variant="body1">{responseInfo}</Typography>
-                                </Grid>
-                                <Grid item>{renderMessages()}</Grid>
-                                <Grid item>
-                                    {responseDocuments && responseDocuments.length > 0 && renderDocumentReferences()}
-                                </Grid>
-                            </Grid>
-                        )}
+                        {questionQueryAnswer[query]?.answer || ''}
                     </Grid>
                 </LoadingOverlayWrapper>
+                <Paper style={{margin: 20, padding: 10}}>
+                    <h4>Query used:</h4>
+                    {questionQueryAnswer[query]?.query || ''}
+                </Paper>
             </Grid>
             <div>{renderMetadataDialog()}</div>
         </Paper>

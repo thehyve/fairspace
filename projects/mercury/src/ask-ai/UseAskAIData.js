@@ -184,6 +184,7 @@ export const useAskAIData = initQuery => {
         conversationHistory,
         restoreChat,
         clearChat,
-        deleteChat
+        deleteChat,
+        setResponseInfo
     };
 };
