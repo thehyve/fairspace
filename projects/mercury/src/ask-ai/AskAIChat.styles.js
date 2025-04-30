@@ -1,86 +1,108 @@
-import {alpha} from '@mui/material/styles';
-
 const styles = theme => ({
     searchGrid: {
         height: '100%',
-        width: '100%'
+        width: '100%',
+        backgroundColor: theme.palette.background.default,
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: theme.shadows[2]
     },
     searchInputGrid: {
-        height: 100
+        height: 80,
+        borderBottom: `1px solid ${theme.palette.divider}`
     },
     clearChatButtonSection: {
         display: 'flex',
         alignItems: 'center'
     },
     clearChatButton: {
-        margin: '20px 0 20px 20px'
+        margin: '20px 0 20px 10px'
     },
     searchSection: {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        padding: 20
+        padding: '10px 20px'
     },
     searchIcon: {
-        padding: 0
+        padding: 0,
+        color: theme.palette.primary.main
     },
     searchInput: {
-        borderRadius: theme.shape.borderRadius,
-        borderColor: theme.palette.primary.main,
-        backgroundColor: alpha(theme.palette.primary.main, 0.15),
-        color: theme.palette.primary.contrastText,
+        borderRadius: 20,
+        borderColor: theme.palette.divider,
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
         '&:hover': {
-            backgroundColor: alpha(theme.palette.primary.main, 0.25),
+            backgroundColor: theme.palette.background.paper,
             borderColor: theme.palette.primary.main
         },
         width: '100%',
-        marginTop: 20,
-        marginRight: 10
+        marginTop: 10,
+        marginRight: 10,
+        boxShadow: theme.shadows[1]
     },
     chatResponseSection: {
-        padding: '20px 60px 20px 60px',
-        width: '100%'
+        padding: '30px 60px',
+        width: '100%',
+        fontSize: '16px',
+        lineHeight: '1.5',
+        color: theme.palette.text.primary
     },
     chatSectionBeforeResponse: {
         paddingTop: 30,
         paddingBottom: 40
     },
     documentContainer: {
-        overflow: 'auto'
+        overflow: 'auto',
+        maxHeight: '300px'
     },
     chatDocument: {
-        // backgroundColor: theme.palette.mellow.light,
+        backgroundColor: '#f5f8fa',
         border: '1px solid ' + theme.palette.primary.light,
-        borderRadius: theme.shape.borderRadius,
+        borderRadius: 12,
         margin: 0,
-        marginBottom: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
-        cursor: 'pointer'
+        marginBottom: 15,
+        padding: '10px 15px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+            backgroundColor: '#e1e8ed',
+            transform: 'translateY(-2px)'
+        }
     },
     chatResponse: {
         backgroundColor: 'white',
         width: '100%',
-        height: '100%'
+        height: '100%',
+        padding: '15px',
+        borderRadius: 12,
+        boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)'
     },
     chatInput: {
         borderBottom: '2px solid ' + theme.palette.primary.main,
-        marginBottom: 10
+        marginBottom: 15,
+        padding: '10px 0'
     },
     chatReply: {
         marginLeft: 30,
-        marginBottom: 10
+        marginBottom: 15,
+        backgroundColor: theme.palette.primary.light,
+        padding: '15px',
+        borderRadius: '12px 12px 12px 0',
+        color: 'white'
     },
     responseMessage: {
         color: theme.palette.primary.main,
         fontWeight: 'bold',
-        marginBottom: 10
+        marginBottom: 15,
+        fontSize: '18px'
     },
     responseDocumentsContainer: {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%'
+        height: '100%',
+        padding: '20px 0'
     },
     modalWrapper: {
         position: 'relative',
@@ -115,13 +137,70 @@ const styles = theme => ({
     },
     adornedEnd: {
         paddingRight: theme.spacing(1)
+    },
+    queryBox: {
+        margin: '25px 20px',
+        padding: '15px',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+        backgroundColor: 'white'
+    },
+    queryBoxHeader: {
+        marginBottom: '15px'
+    },
+    queryBoxTitle: {
+        margin: 0,
+        color: '#14171a',
+        fontSize: '18px'
+    },
+    queryBoxButton: {
+        borderRadius: '20px',
+        padding: '6px 16px'
+    },
+    queryBoxContent: {
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word',
+        backgroundColor: '#f8f9fa',
+        padding: '15px',
+        borderRadius: '8px',
+        border: '1px solid #e1e8ed',
+        fontSize: '14px',
+        lineHeight: '1.5'
+    },
+    queryBoxLoading: {
+        padding: '10px',
+        textAlign: 'center',
+        color: '#657786'
+    },
+    queryBoxResults: {
+        marginTop: '20px'
+    },
+    queryBoxResultsContent: {
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word',
+        backgroundColor: theme.palette.background.paper,
+        padding: '15px',
+        borderRadius: '8px',
+        border: `1px solid ${theme.palette.divider}`,
+        fontSize: '14px',
+        lineHeight: '1.5',
+        maxHeight: '300px',
+        overflow: 'auto'
+    },
+    welcomeMessage: {
+        padding: '20px',
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+        fontSize: '16px',
+        lineHeight: '1.5'
+    },
+    unsupportedQueryMessage: {
+        padding: '15px',
+        marginTop: '15px',
+        borderRadius: '8px',
+        fontSize: '14px',
+        lineHeight: '1.5'
     }
-    // clickableDiv: {
-    //     cursor: 'pointer',
-    //     '&:hover': {
-    //         textDecoration: 'underline'
-    //     }
-    // }
 });
 
 export default styles;

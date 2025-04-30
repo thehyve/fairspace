@@ -9,8 +9,55 @@ import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 import {useAskAIData} from './UseAskAIData';
 
 const questionQueryAnswer = {
-    'Which studies are on the gut microbiome?': {
+    'Are there some studies related to injuries of liver, stomach, intestines etc?': {
         query: `
+    {
+      "view": "Study",
+      "filters": [
+        {
+          "field": "Study_indicationPreferredTerm",
+          "values": ["https://example.com/ontology#indication_preferred_term_0226"]
+        }
+      ],
+      "page": 1,
+      "size": 1
+    }
+    `,
+        sparqlQuery: `
+    PREFIX example: <https://example.com/ontology#>
+    PREFIX fs: <https://fairspace.nl/ontology#>
+
+    SELECT ?study ?title
+    WHERE {
+      ?study a <https://example.com/ontology#Study> ;
+             <http://purl.org/dc/terms/title> ?title ;
+             <https://example.com/ontology#hasIndicationPreferredTerm> ?indicationPreferredTerm .
+      FILTER (?indicationPreferredTerm = "https://example.com/ontology#indication_preferred_term_0226")
+    }
+        `,
+        answer: 'The studies with more than 10 samples are: 1. Study A, 2. Study B, 3. Study C'
+    },
+    'What is the average planned number of subjects across all studies?': {
+        query: null,
+        sparqlQuery: `
+    PREFIX example: <https://example.com/ontology#>
+    PREFIX fs: <https://fairspace.nl/ontology#>
+
+    SELECT DISTINCT ?study ?label
+    WHERE {
+        ?study a example:Study .
+        ?study fs:label ?label .
+        ?study example:description ?description .
+        FILTER(CONTAINS(LCASE(?description), "gut microbiome"))
+        FILTER NOT EXISTS { ?study fs:dateDeleted ?anyDateDeleted }
+    }
+    LIMIT 10
+    `,
+        answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
+    },
+    'I would like to see a location of data files for studies that were completed after August last year with at least 100 subjects.':
+        {
+            query: `
     {
       "view": "Study",
       "filters": [
@@ -23,24 +70,29 @@ const questionQueryAnswer = {
       "size": 1
     }
     `,
-        answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
-    },
-    'Which studies have more than 10 samples?': {
-        query: `
-    {
-      "view": "Study",
-      "filters": [
-        {
-          "field": "Study_samples",
-          "gt": 10
-        }
-      ],
-      "page": 1,
-      "size": 1
+            sparqlQuery: `
+    PREFIX demo: <https://demo.nl/test#>
+    PREFIX dct: <http://purl.org/dc/terms/>
+
+            SELECT ?fileName
+    WHERE {
+      ?study a demo:Study ;
+             dct:title ?title ;
+             demo:hasStudyStartDate ?studyStartDate ;
+             demo:hasDuration ?studyDuration ;
+             demo:hasPlannedNumberOfSubjects ?plannedNumberOfSubjects .
+      ?dataFile demo:dataFileRelatedToStudy ?study ;
+                demo:hasFileName ?fileName .
+
+      FILTER (?plannedNumberOfSubjects >= 100)
+      FILTER (
+        (YEAR(?studyStartDate) * 12 + MONTH(?studyStartDate) + ?studyDuration) > (2024 * 12 + 8)
+      )
     }
+    LIMIT 10
     `,
-        answer: 'The studies with more than 10 samples are: 1. Study A, 2. Study B, 3. Study C'
-    }
+            answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
+        }
 };
 
 const AskAIPage = props => {
@@ -56,12 +108,7 @@ const AskAIPage = props => {
     const [inputQuery, setInputQuery] = useState(query);
 
     return (
-        <Grid
-            container
-            justifyContent="center"
-            spacing="10"
-            style={{paddingTop: 60, paddingBottom: 60, height: '100%'}}
-        >
+        <Grid container justifyContent="center" spacing={3} style={{paddingTop: 60, paddingBottom: 60, height: '100%'}}>
             <Grid item xs={8}>
                 {canViewMetadata && (
                     <AskAIChat
