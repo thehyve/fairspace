@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.3'
+    id 'org.springframework.boot' version '3.3.6'
     id "io.freefair.lombok" version '8.12.2.1'
     id 'application'
     id 'jacoco'
@@ -37,7 +37,7 @@ repositories {
 }
 
 ext {
-    springCloudVersion = '2024.0.0'
+    springCloudVersion = '2023.0.3'
     jacksonVersion = '2.18.1'
 }
 
