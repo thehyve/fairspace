@@ -1,0 +1,14 @@
+# .snyk
+ignore:
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-9486467:
+    - '*':
+        reason: "Temporarily ignoring until the upgrade to the fixed version is possible. Upgrading Spring Boot plugin > 3.4.* causes issues with /authorize endpoint."
+        expires: 2025-06-30T23:59:59Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-8523186:
+    - '*':
+        reason: "Temporarily ignoring until the upgrade to the fixed version is possible."
+        expires: 2025-06-30T23:59:59Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-8547999:
+    - '*':
+        reason: "Temporarily ignoring until the upgrade to the fixed version is possible."
+        expires: 2025-06-30T23:59:59Z

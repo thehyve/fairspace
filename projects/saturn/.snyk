@@ -1,0 +1,6 @@
+# .snyk
+ignore:
+  SNYK-JAVA-ORGSPRINGFRAMEWORKSECURITY-9486467:
+    - '*':
+        reason: "Temporarily ignoring until the upgrade to the fixed version is possible."
+        expires: 2025-06-30T23:59:59Z
