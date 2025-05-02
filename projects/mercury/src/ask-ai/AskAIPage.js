@@ -9,7 +9,8 @@ import usePageTitleUpdater from '../common/hooks/UsePageTitleUpdater';
 import {useAskAIData} from './UseAskAIData';
 
 const questionQueryAnswer = {
-    'Are there some studies related to injuries of liver, stomach, intestines etc?': {
+    'How many studies are there in the database?': {
+        title: 'studies in database',
         query: `
     {
       "view": "Study",
@@ -24,75 +25,45 @@ const questionQueryAnswer = {
     }
     `,
         sparqlQuery: `
-    PREFIX example: <https://example.com/ontology#>
-    PREFIX fs: <https://fairspace.nl/ontology#>
-
-    SELECT ?study ?title
-    WHERE {
-      ?study a <https://example.com/ontology#Study> ;
-             <http://purl.org/dc/terms/title> ?title ;
-             <https://example.com/ontology#hasIndicationPreferredTerm> ?indicationPreferredTerm .
-      FILTER (?indicationPreferredTerm = "https://example.com/ontology#indication_preferred_term_0226")
-    }
+        PREFIX : <https://fairspace.nl/pfizer#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT (COUNT(?subject) as ?count) WHERE {
+        ?subject a :Study .
+        }
         `,
-        answer: 'The studies with more than 10 samples are: 1. Study A, 2. Study B, 3. Study C'
+        answer: 'The results from the knowledge graph show that there are 15 instances of studies.'
     },
-    'What is the average planned number of subjects across all studies?': {
+    'how many studies in the therapeutic area with label ONCOLOGY or HEMATOLOGY are there?': {
+        title: 'studies in therapeutic area',
         query: null,
         sparqlQuery: `
-    PREFIX example: <https://example.com/ontology#>
-    PREFIX fs: <https://fairspace.nl/ontology#>
-
-    SELECT DISTINCT ?study ?label
-    WHERE {
-        ?study a example:Study .
-        ?study fs:label ?label .
-        ?study example:description ?description .
-        FILTER(CONTAINS(LCASE(?description), "gut microbiome"))
-        FILTER NOT EXISTS { ?study fs:dateDeleted ?anyDateDeleted }
-    }
-    LIMIT 10
+        PREFIX : <https://fairspace.nl/pfizer#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT (COUNT(?study) as ?count) WHERE {
+        ?study a :Study ;
+                :TherapeuticArea ?therapeuticArea .
+        ?therapeuticArea rdfs:label ?label .
+        FILTER(?label = "ONCOLOGY" || ?label = "HEMATOLOGY")
+        }
     `,
-        answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
+        answer: 'The query is counting the number of studies in the knowledge graph related to Oncology or Hematology. The result is 0 studies found.'
     },
-    'I would like to see a location of data files for studies that were completed after August last year with at least 100 subjects.':
-        {
-            query: `
-    {
-      "view": "Study",
-      "filters": [
-        {
-          "field": "Study_description",
-          "prefix": "gut microbiome"
+    'Whats the most common imaging modality that is found in the uploaded studies?': {
+        title: 'most common imaging modality',
+        query: null,
+        sparqlQuery: `
+        PREFIX fs: <https://fairspace.nl/pfizer#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        SELECT ?modality (COUNT(?modality) AS ?count)
+        WHERE {
+        ?study fs:hasImagingModality ?modality .
         }
-      ],
-      "page": 1,
-      "size": 1
-    }
+        GROUP BY ?modality
+        ORDER BY DESC(?count)
+        LIMIT 1
     `,
-            sparqlQuery: `
-    PREFIX demo: <https://demo.nl/test#>
-    PREFIX dct: <http://purl.org/dc/terms/>
-
-            SELECT ?fileName
-    WHERE {
-      ?study a demo:Study ;
-             dct:title ?title ;
-             demo:hasStudyStartDate ?studyStartDate ;
-             demo:hasDuration ?studyDuration ;
-             demo:hasPlannedNumberOfSubjects ?plannedNumberOfSubjects .
-      ?dataFile demo:dataFileRelatedToStudy ?study ;
-                demo:hasFileName ?fileName .
-
-      FILTER (?plannedNumberOfSubjects >= 100)
-      FILTER (
-        (YEAR(?studyStartDate) * 12 + MONTH(?studyStartDate) + ?studyDuration) > (2024 * 12 + 8)
-      )
+        answer: 'The results show that the imaging modality with the most occurrences is "https://fairspace.nl/pfizer#imaging_modality_0019" with a count of 79.'
     }
-    LIMIT 10
-    `,
-            answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
-        }
 };
 
 const AskAIPage = props => {
@@ -136,9 +107,9 @@ const AskAIPage = props => {
                             setResponseInfo('');
                             setInputQuery(question);
                         }}
-                        style={{marginBottom: 10}}
+                        style={{marginRight: 10, marginBottom: 10}}
                     >
-                        {question}
+                        {questionQueryAnswer[question].title}
                     </Button>
                 ))}
             </Grid>
