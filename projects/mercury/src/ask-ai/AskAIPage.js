@@ -16,7 +16,7 @@ const questionQueryAnswer = {
       "filters": [
         {
           "field": "Study_indicationPreferredTerm",
-          "values": ["https://example.com/ontology#indication_preferred_term_0226"]
+          "values": ["https://example.com/ontology#indication_preferred_term_0354"]
         }
       ],
       "page": 1,
@@ -24,46 +24,50 @@ const questionQueryAnswer = {
     }
     `,
         sparqlQuery: `
-    PREFIX example: <https://example.com/ontology#>
-    PREFIX fs: <https://fairspace.nl/ontology#>
-
+    PREFIX demo: <https://fairspace.nl/demo#>
+    PREFIX dct: <http://purl.org/dc/terms/>
+    
     SELECT ?study ?title
     WHERE {
-      ?study a <https://example.com/ontology#Study> ;
-             <http://purl.org/dc/terms/title> ?title ;
-             <https://example.com/ontology#hasIndicationPreferredTerm> ?indicationPreferredTerm .
-      FILTER (?indicationPreferredTerm = "https://example.com/ontology#indication_preferred_term_0226")
+      ?study a demo:Study ;
+        dct:title ?title ;
+        demo:hasIndicationPreferredTerm <https://fairspace.nl/demo#indication_preferred_term_0354> .
     }
-        `,
-        answer: 'The studies with more than 10 samples are: 1. Study A, 2. Study B, 3. Study C'
+    `,
+        answer: 'Yes, there are 3 studies related to indications of an abdominal injury: \n  1. Study X1000001, \n  2. Study X1000002, \n  3. Study X123'
     },
-    'What is the average planned number of subjects across all studies?': {
+    'What is the most common imaging modality that is found in the uploaded studies?': {
         query: null,
         sparqlQuery: `
-    PREFIX example: <https://example.com/ontology#>
-    PREFIX fs: <https://fairspace.nl/ontology#>
-
-    SELECT DISTINCT ?study ?label
+    PREFIX demo: <https://fairspace.nl/demo#>
+    
+    SELECT ?modality (COUNT(?modality) AS ?count)
     WHERE {
-        ?study a example:Study .
-        ?study fs:label ?label .
-        ?study example:description ?description .
-        FILTER(CONTAINS(LCASE(?description), "gut microbiome"))
-        FILTER NOT EXISTS { ?study fs:dateDeleted ?anyDateDeleted }
+      ?study demo:hasImagingModality ?modality .
     }
-    LIMIT 10
+    GROUP BY ?modality
+    ORDER BY DESC(?count)
+    LIMIT 1
     `,
-        answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
+        answer: 'The results show that the imaging modality with the most occurrences \nis "https://fairspace.nl/demo#imaging_modality_0019" with a count of 79.'
     },
-    'I would like to see a location of data files for studies that were completed after August last year with at least 100 subjects.':
+    'I would like to see a location of data files for studies that were started after August last year with at least 100 subjects.':
         {
             query: `
     {
-      "view": "Study",
+      "view": "DataFile",
       "filters": [
         {
-          "field": "Study_description",
-          "prefix": "gut microbiome"
+            field: "Study_studyStartDate", 
+            min: "2021-01-31T23:00:00.000Z", 
+            max: null, 
+            numericValue: false
+        },
+        {
+            field: "Study_actualTotalNumberOfSubjects", 
+            min: 500, 
+            max: null, 
+            numericValue: true
         }
       ],
       "page": 1,
@@ -71,10 +75,10 @@ const questionQueryAnswer = {
     }
     `,
             sparqlQuery: `
-    PREFIX demo: <https://demo.nl/test#>
+    PREFIX demo: <https://fairspace.nl/demo#>
     PREFIX dct: <http://purl.org/dc/terms/>
 
-            SELECT ?fileName
+    SELECT ?fileName
     WHERE {
       ?study a demo:Study ;
              dct:title ?title ;
@@ -91,8 +95,11 @@ const questionQueryAnswer = {
     }
     LIMIT 10
     `,
-            answer: 'The studies on the gut microbiome are: 1. Study 1, 2. Study 2, 3. Study 3'
-        }
+            answer: 'There are 5 studies that were started after August last year with at least 100 subjects, \nwhich link to at least 1.2 mln files. Here are the locations of first 10 files: \n 1. /data00/Oyster_Exports/A9001140/A9001140/1002/10021013/24 month/3D/7/IMA9.dcm, \n 2. /some/file/path/X/IMA20.dcm, \n 3. /some/file/path/X/IMA23.dcm, \n 4. /some/file/path/X/IMA24.dcm, \n 5. /some/file/another/path/Y/IMA20.dcm'
+        },
+    'Can you find me all the studies where the images are according to the DICOM standard?': {
+        answer: 'Unfortunately I could not find any information related to the DICOM standard \nin the available data.'
+    }
 };
 
 const AskAIPage = props => {
@@ -131,12 +138,11 @@ const AskAIPage = props => {
                     <Button
                         key={question}
                         variant="contained"
-                        size="small"
                         onClick={() => {
                             setResponseInfo('');
                             setInputQuery(question);
                         }}
-                        style={{marginBottom: 10}}
+                        style={{marginBottom: 10, textAlign: 'left'}}
                     >
                         {question}
                     </Button>
