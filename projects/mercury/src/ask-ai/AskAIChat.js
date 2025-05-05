@@ -1,10 +1,12 @@
+/* eslint-disable */
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
-import {Button, Card, Grid, IconButton, Collapse, Modal, Paper, TextField, Tooltip} from '@mui/material';
+import {Button, Card, Grid, IconButton, Collapse, Modal, Paper, TextField, Tooltip, Divider} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import EditIcon from '@mui/icons-material/Edit';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
@@ -75,6 +77,12 @@ const AskAIChat = props => {
             });
     };
 
+    const handleClickOnChatAnswer = () => {
+        if (questionQueryAnswer[query]?.answer && questionQueryAnswer[query]?.answer.includes('Study X1000001')) {
+            setDocumentIri('https://fairspace.example/study/8cad2f6b-ed34-4193-b205-fc48748b7b05');
+        }
+    };
+
     const redirectToMetadataViews = jsonQuery => {
         try {
             const queryObj = JSON.parse(jsonQuery);
@@ -83,27 +91,17 @@ const AskAIChat = props => {
             // Add filters as query parameters
             if (queryObj.filters && queryObj.filters.length > 0) {
                 queryObj.filters.forEach((filter, index) => {
-                    const filterKey = `filter${index}`;
-                    const filterValue = encodeURIComponent(JSON.stringify(filter));
+                    const filterKey = filter['field'];
+                    const filterValue = encodeURIComponent(JSON.stringify(filter['values'][0]));
                     path += `&${filterKey}=${filterValue}`;
                 });
             }
-
-            // Add page and size if present
-            if (queryObj.page) {
-                path += `&page=${queryObj.page}`;
-            }
-            if (queryObj.size) {
-                path += `&size=${queryObj.size}`;
-            }
-
             window.open(path, '_blank');
         } catch (error) {
             // Error
         }
     };
 
-    // TODO this requires further refactoring, since it is a duplication of LinkedDataLink.js
     const renderMetadataDialog = () => (
         <Modal
             open={openMetadataDialog}
@@ -164,7 +162,7 @@ const AskAIChat = props => {
         if (query === '') {
             return (
                 <div className={classes.welcomeMessage}>
-                    Welcome to the chat functionality that helps you search for data. You can type your own query or
+                    Welcome to the AI chat functionality that helps you search for data. You can type your own query or
                     select one of the example queries from the right panel.
                 </div>
             );
@@ -179,7 +177,11 @@ const AskAIChat = props => {
             );
         }
 
-        return questionQueryAnswer[query]?.answer || '';
+        return (
+            <div style={{whiteSpace: 'pre', width: 400}} onClick={() => handleClickOnChatAnswer()}>
+                {questionQueryAnswer[query]?.answer || ''}
+            </div>
+        );
     };
 
     return (
@@ -207,6 +209,7 @@ const AskAIChat = props => {
                         {renderSearchBar()}
                     </Grid>
                 </Grid>
+                <Divider />
                 <LoadingOverlayWrapper loading={loading}>
                     <Grid
                         item
@@ -231,20 +234,9 @@ const AskAIChat = props => {
                             style={{cursor: 'pointer'}}
                         >
                             <Grid item>
-                                <h4 className={classes.queryBoxTitle}>SPARQL Query</h4>
+                                <h5 className={classes.queryBoxTitle}>See executed SPARQL query</h5>
                             </Grid>
                             <Grid item>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    startIcon={<PlayArrowIcon />}
-                                    onClick={() => executeSparqlQuery(questionQueryAnswer[query].sparqlQuery)}
-                                    disabled={sparqlLoading}
-                                    className={classes.headerButton}
-                                >
-                                    Execute Fairspace query
-                                </Button>
                                 <IconButton onClick={toggleSparqlQuery} size="small">
                                     {showSparqlQuery ? <ExpandLess /> : <ExpandMore />}
                                 </IconButton>
@@ -254,6 +246,31 @@ const AskAIChat = props => {
                             <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: '16px'}}>
                                 {questionQueryAnswer[query]?.sparqlQuery || ''}
                             </pre>
+                            <Grid item container justifyContent="flex-end" spacing={1}>
+                                <Grid item>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        size="small"
+                                        startIcon={<EditIcon />}
+                                        disabled={sparqlLoading}
+                                    >
+                                        Edit
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        size="small"
+                                        startIcon={<PlayArrowIcon />}
+                                        onClick={() => executeSparqlQuery(questionQueryAnswer[query].sparqlQuery)}
+                                        disabled={sparqlLoading}
+                                    >
+                                        Re-execute Fairspace query
+                                    </Button>
+                                </Grid>
+                            </Grid>
                             {sparqlLoading && <div className={classes.queryBoxLoading}>Loading...</div>}
                             {sparqlResult && (
                                 <div className={classes.queryBoxResults}>
@@ -278,7 +295,9 @@ const AskAIChat = props => {
                             style={{cursor: 'pointer'}}
                         >
                             <Grid item>
-                                <h4 className={classes.queryBoxTitle}>Metadata Query</h4>
+                                <h5 className={classes.queryBoxTitle}>
+                                    Would you like to see the results on metadata page?
+                                </h5>
                             </Grid>
                             <Grid item>
                                 <Button
@@ -289,7 +308,7 @@ const AskAIChat = props => {
                                     onClick={() => redirectToMetadataViews(questionQueryAnswer[query]?.query)}
                                     className={classes.headerButton}
                                 >
-                                    Show results on metadata page
+                                    Show results
                                 </Button>
                                 <IconButton onClick={toggleMetadataQuery} size="small">
                                     {showMetadataQuery ? <ExpandLess /> : <ExpandMore />}

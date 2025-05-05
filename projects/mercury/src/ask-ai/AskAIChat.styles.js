@@ -7,21 +7,22 @@ const styles = theme => ({
         boxShadow: theme.shadows[2]
     },
     searchInputGrid: {
-        height: 80,
-        borderBottom: `1px solid ${theme.palette.divider}`
+        height: 80
     },
     clearChatButtonSection: {
         display: 'flex',
         alignItems: 'center'
     },
     clearChatButton: {
-        margin: '20px 0 20px 10px'
+        margin: '20px 0 20px 10px',
+        minWidth: 30,
+        paddingLeft: 5
     },
     searchSection: {
         display: 'flex',
         alignItems: 'center',
         width: '100%',
-        padding: '10px 20px'
+        padding: '10px 10px'
     },
     searchIcon: {
         padding: 0,
@@ -38,7 +39,7 @@ const styles = theme => ({
         },
         width: '100%',
         marginTop: 10,
-        marginRight: 10,
+        marginRight: 0,
         boxShadow: theme.shadows[1]
     },
     chatResponseSection: {
@@ -139,19 +140,19 @@ const styles = theme => ({
         paddingRight: theme.spacing(1)
     },
     queryBox: {
-        margin: '25px 20px',
-        padding: '15px',
+        margin: '15px 20px',
+        padding: 5,
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-        backgroundColor: 'white'
+        backgroundColor: theme.palette.mellow.light
     },
     queryBoxHeader: {
-        marginBottom: '15px'
+        marginBottom: 0
     },
     queryBoxTitle: {
         margin: 0,
         color: '#14171a',
-        fontSize: '18px'
+        fontStyle: 'italic'
     },
     queryBoxButton: {
         borderRadius: '20px',
@@ -195,10 +196,10 @@ const styles = theme => ({
         lineHeight: '1.5'
     },
     unsupportedQueryMessage: {
-        padding: '15px',
-        marginTop: '15px',
-        borderRadius: '8px',
-        fontSize: '14px',
+        padding: '20px',
+        textAlign: 'center',
+        color: theme.palette.text.disabled,
+        fontSize: '16px',
         lineHeight: '1.5'
     }
 });
