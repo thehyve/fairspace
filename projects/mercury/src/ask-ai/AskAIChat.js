@@ -26,11 +26,13 @@ const AskAIChat = props => {
     const [unsupportedQuery, setUnsupportedQuery] = useState(false);
     const [showSparqlQuery, setShowSparqlQuery] = useState(false);
     const [showMetadataQuery, setShowMetadataQuery] = useState(false);
+    const [showCTQuery, setShowCTQuery] = useState(false);
 
     const handleOpenMetadataDialog = () => setOpenMetadataDialog(true);
     const handleCloseMetadataDialog = () => setOpenMetadataDialog(false);
     const toggleSparqlQuery = () => setShowSparqlQuery(!showSparqlQuery);
     const toggleMetadataQuery = () => setShowMetadataQuery(!showMetadataQuery);
+    const toggleCTQuery = () => setShowCTQuery(!showCTQuery);
 
     const onMetadataDialogClose = () => setDocumentIri('');
 
@@ -78,8 +80,11 @@ const AskAIChat = props => {
     };
 
     const handleClickOnChatAnswer = () => {
-        if (questionQueryAnswer[query]?.answer && questionQueryAnswer[query]?.answer.includes('Study X1000001')) {
-            setDocumentIri('https://fairspace.example/study/8cad2f6b-ed34-4193-b205-fc48748b7b05');
+        if (
+            questionQueryAnswer[query]?.answer &&
+            questionQueryAnswer[query]?.answer.includes('84f8d787-3974-418c-b12a-55c6367c1e34')
+        ) {
+            setDocumentIri('https://fairspace.example/study/a4ab140d-4e0e-4fd5-bc4f-4355aa4ee701');
         }
     };
 
@@ -92,13 +97,18 @@ const AskAIChat = props => {
             if (queryObj.filters && queryObj.filters.length > 0) {
                 queryObj.filters.forEach((filter, index) => {
                     const filterKey = filter['field'];
-                    const filterValue = encodeURIComponent(JSON.stringify(filter['values'][0]));
+                    let filterValue = '';
+                    if (filter['values']) {
+                        filterValue = encodeURIComponent(JSON.stringify(filter['values'][0]));
+                    } else {
+                        filterValue = encodeURIComponent(filter['min']);
+                    }
                     path += `&${filterKey}=${filterValue}`;
                 });
             }
             window.open(path, '_blank');
         } catch (error) {
-            // Error
+            console.error('Error parsing JSON query:', error);
         }
     };
 
@@ -280,6 +290,37 @@ const AskAIChat = props => {
                                     </pre>
                                 </div>
                             )}
+                        </Collapse>
+                    </Paper>
+                )}
+                {questionQueryAnswer[query]?.ctQuery && (
+                    <Paper className={classes.queryBox}>
+                        <Grid
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center"
+                            className={classes.queryBoxHeader}
+                            onClick={toggleCTQuery}
+                            style={{cursor: 'pointer'}}
+                        >
+                            <Grid item>
+                                <h5 className={classes.queryBoxTitle}>ClinicalTrials.gov API Query</h5>
+                            </Grid>
+                            <Grid item>
+                                <IconButton onClick={toggleCTQuery} size="small">
+                                    {showCTQuery ? <ExpandLess /> : <ExpandMore />}
+                                </IconButton>
+                            </Grid>
+                        </Grid>
+                        <Collapse in={showCTQuery} timeout="auto" unmountOnExit>
+                            <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: '16px'}}>
+                                {questionQueryAnswer[query]?.ctQuery || ''}
+                            </pre>
+                            <h4 className={classes.queryBoxTitle}>Results:</h4>
+                            <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginBottom: '16px'}}>
+                                {questionQueryAnswer[query]?.ctAnswer || ''}
+                            </pre>
                         </Collapse>
                     </Paper>
                 )}
