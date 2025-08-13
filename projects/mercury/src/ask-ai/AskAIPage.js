@@ -101,44 +101,38 @@ const questionQueryAnswer = {
         ctQuery:
             'curl -X GET "https://clinicaltrials.gov/api/v2/studies?format=json&query.cond=%28intestine+OR+stomach+OR+liver%29&filter.overallStatus=COMPLETED&postFilter.overallStatus=COMPLETED&countTotal=true" \n -H "accept: application/json" \n'
     },
-    'Show me all female, Asian patients from any Phase II study related to Asthma who had a treatment score at least 75 and for whom DICOM imaging files are available.':
+    'Show me all female, Asian patients from any Phase II study related to Asthma for whom DICOM imaging files are available.':
         {
             query: `
     {
       "view": "Patient",
       "filters": [
         {
-          "field": "Patient_isOfGender",
+          "field": "patient_gender",
           "values": [
             "https://fairspace.nl/demo#gender_female"
           ]
         },
         {
-          "field": "Patient_isOfRace",
+          "field": "patient_race",
           "values": [
             "https://fairspace.nl/demo#race_Asian_American"
           ]
         },
         {
-          "field": "Study_hasClinicalStudyPhase",
+          "field": "study_clinicalstudyphase",
           "values": [
             "https://fairspace.nl/demo#clinical_study_phase_0002"
           ]
         },
         {
-          "field": "Study_hasIndicationVerbatimTerm",
+          "field": "study_indicationverbatimterm",
           "values": [
             "https://fairspace.nl/demo#indication_verbatim_term_1765"
           ]
         },
         {
-          "field": "Treatment_score", 
-          "min": 75, 
-          "max": null, 
-          "numericValue": true
-        },
-        {
-          "field": "DataFile_hasFileType",
+          "field": "datafile_filetype",
           "values": [
             "https://fairspace.nl/demo#file_type_0001"
           ]
@@ -164,22 +158,30 @@ const questionQueryAnswer = {
       ?study demo:hasClinicalStudyPhase demo:clinical_study_phase_0002 ;
              demo:hasIndicationVerbatimTerm demo:indication_verbatim_term_1765 .
     
-      ?treatment demo:treatmentLinkedToPatient ?patient ;
-                 demo:score ?score .
-      FILTER(?score >= 75)
-    
       ?dataFile demo:dataFileLinkedToPatient ?patient ;
                 demo:hasFileType demo:file_type_0001 .
     }
     `,
             answer:
-                'The query found that there are 2 female, Asian patients related to Phase II Asthma studies \n' +
-                ' with a treatment score of at least 75 and available DICOM imaging files in the knowledge graph. \n' +
+                'The query found that there are 8 female, Asian patients related to Phase II Asthma studies \n' +
+                'with available DICOM imaging files in the knowledge graph. \n' +
                 'It retrieved the following patients and labels: \n' +
-                ' - Patient: https://fairspace.nl/demo#P020,\n' +
-                '   Label: P020 \n' +
-                ' - Patient: https://fairspace.nl/demo#P089,\n' +
-                '   Label: P089'
+                ' - Patient: https://fairspace.nl/demo#P003,\n' +
+                '   Label: P003 \n' +
+                ' - Patient: https://fairspace.nl/demo#P033,\n' +
+                '   Label: P033 \n' +
+                ' - Patient: https://fairspace.nl/demo#P018,\n' +
+                '   Label: P018 \n' +
+                ' - Patient: https://fairspace.nl/demo#P048,\n' +
+                '   Label: P048 \n' +
+                ' - Patient: https://fairspace.nl/demo#P054,\n' +
+                '   Label: P054 \n' +
+                ' - Patient: https://fairspace.nl/demo#P053,\n' +
+                '   Label: P053 \n' +
+                ' - Patient: https://fairspace.nl/demo#P052,\n' +
+                '   Label: P052 \n' +
+                ' - Patient: https://fairspace.nl/demo#P051,\n' +
+                '   Label: P051 \n'
         },
     'What is the most common imaging modality that is found in the uploaded studies?': {
         query: null,

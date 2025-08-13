@@ -6,7 +6,6 @@ import {Button, Icon, Stack} from '@mui/material';
 import {Search, SavedSearch, Folder, FolderSpecial, OpenInNew, VerifiedUser, Widgets} from '@mui/icons-material';
 import ChatIcon from '@mui/icons-material/Chat';
 import HomeIcon from '@mui/icons-material/Home';
-import FeaturesContext from '../common/contexts/FeaturesContext';
 import ServicesContext from '../common/contexts/ServicesContext';
 import UserContext from '../users/UserContext';
 import {isAdmin} from '../users/userUtils';
@@ -65,8 +64,9 @@ const MainMenu = ({open, classes}) => {
     const {externalMetadataSources} = useContext(ExternalMetadataSourceContext);
     const {internalMetadataIcon, internalMetadataLabel} = useContext(InternalMetadataSourceContext);
     const {views} = useContext(MetadataViewContext);
-    const {isFeatureEnabled} = useContext(FeaturesContext);
-    const useLlmSearch = isFeatureEnabled('LlmSearch');
+    // const {isFeatureEnabled} = useContext(FeaturesContext);
+    // const useLlmSearch = isFeatureEnabled('LlmSearch');
+    const useLlmSearch = true;
 
     // eslint-disable-next-line no-template-curly-in-string
     const interpolate = s => s.replace('${username}', currentUser.username);

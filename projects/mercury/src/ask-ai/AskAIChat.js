@@ -99,7 +99,7 @@ const AskAIChat = props => {
                     const filterKey = filter['field'];
                     let filterValue = '';
                     if (filter['values']) {
-                        filterValue = encodeURIComponent(JSON.stringify(filter['values'][0]));
+                        filterValue = encodeURIComponent(filter['values'][0]);
                     } else {
                         filterValue = encodeURIComponent(filter['min']);
                     }
