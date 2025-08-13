@@ -3,9 +3,13 @@ package io.fairspace.saturn.services.metadata.validation;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.springframework.stereotype.Component;
 
 import io.fairspace.saturn.vocabulary.FS;
 
+import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
+
+@Component
 public class UniqueLabelValidator implements MetadataRequestValidator {
     @Override
     public void validate(Model before, Model after, Model removed, Model added, ViolationHandler violationHandler) {
@@ -19,7 +23,7 @@ public class UniqueLabelValidator implements MetadataRequestValidator {
                     .filterDrop(res -> res.hasProperty(FS.dateDeleted))
                     .hasNext();
             if (conflictingResourceExists) {
-                violationHandler.onViolation("Duplicate label", resource, RDFS.label, null);
+                violationHandler.onViolation("Duplicate label", resource, RDFS.label, createPlainLiteral(label));
             }
         });
     }

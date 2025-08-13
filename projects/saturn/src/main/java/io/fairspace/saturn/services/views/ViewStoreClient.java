@@ -1,19 +1,30 @@
 package io.fairspace.saturn.services.views;
 
-import java.sql.*;
-import java.time.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.*;
-import org.apache.commons.lang3.tuple.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.util.LinkedCaseInsensitiveMap;
 
-import io.fairspace.saturn.config.*;
-import io.fairspace.saturn.config.ViewsConfig.*;
-import io.fairspace.saturn.services.views.Table.*;
+import io.fairspace.saturn.config.properties.ViewsProperties;
+import io.fairspace.saturn.services.views.Table.ColumnDefinition;
 
 import static io.fairspace.saturn.services.views.Table.idColumn;
 import static io.fairspace.saturn.services.views.Table.valueColumn;
@@ -22,13 +33,16 @@ import static io.fairspace.saturn.services.views.Table.valueColumn;
 public class ViewStoreClient implements AutoCloseable {
 
     public static class ViewStoreConfiguration {
-        final Map<String, View> viewConfig;
-        final Map<String, Table> viewTables = new HashMap<>();
-        final Map<String, Map<String, Table>> propertyTables = new HashMap<>();
-        final Map<String, Map<String, Table>> joinTables = new HashMap<>();
+        final LinkedCaseInsensitiveMap<ViewsProperties.View> viewConfig;
+        final LinkedCaseInsensitiveMap<Table> viewTables = new LinkedCaseInsensitiveMap<>();
+        final LinkedCaseInsensitiveMap<LinkedCaseInsensitiveMap<Table>> propertyTables =
+                new LinkedCaseInsensitiveMap<>();
+        final LinkedCaseInsensitiveMap<LinkedCaseInsensitiveMap<Table>> joinTables = new LinkedCaseInsensitiveMap<>();
 
-        ViewStoreConfiguration(ViewsConfig viewsConfig) {
-            viewConfig = viewsConfig.views.stream().collect(Collectors.toMap(view -> view.name, Function.identity()));
+        public ViewStoreConfiguration(ViewsProperties viewsProperties) {
+            viewConfig = new LinkedCaseInsensitiveMap<>();
+            viewConfig.putAll(
+                    viewsProperties.views.stream().collect(Collectors.toMap(view -> view.name, Function.identity())));
         }
     }
 
@@ -134,7 +148,7 @@ public class ViewStoreClient implements AutoCloseable {
 
     public void updateValues(String view, String id, String property, Set<String> values) throws SQLException {
         var propertyTable = configuration.propertyTables.get(view).get(property);
-        var valueColumn = valueColumn(property, ColumnType.Text);
+        var valueColumn = valueColumn(property, ViewsProperties.ColumnType.Text);
         var existing = retrieveValues(propertyTable.name, view, id, valueColumn);
 
         var deleteCount = deleteValues(
@@ -259,7 +273,7 @@ public class ViewStoreClient implements AutoCloseable {
         tables.add(configuration.viewTables.get(view));
         tables.addAll(configuration
                 .propertyTables
-                .getOrDefault(view, Collections.emptyMap())
+                .getOrDefault(view, new LinkedCaseInsensitiveMap<>())
                 .values());
         var joins = configuration.viewConfig.get(view).join;
         if (joins != null) {

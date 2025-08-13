@@ -6,13 +6,14 @@ buildscript {
 
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.4'
-    id "io.freefair.lombok" version '8.6'
+    id 'org.springframework.boot' version '3.3.6'
+    id "io.freefair.lombok" version '8.12.2.1'
     id 'application'
     id 'jacoco'
-    id "org.owasp.dependencycheck" version '8.2.1'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id "org.owasp.dependencycheck" version '12.1.0'
+    id 'io.spring.dependency-management' version '1.1.7'
     id "com.diffplug.spotless" version "6.25.0"
+    id 'com.github.jk1.dependency-license-report' version '2.9'
 }
 
 group 'nl.fairspace'
@@ -36,8 +37,8 @@ repositories {
 }
 
 ext {
-    springCloudVersion = '2023.0.0'
-    jacksonVersion = '2.16.1'
+    springCloudVersion = '2023.0.3'
+    jacksonVersion = '2.18.1'
 }
 
 jacoco.toolVersion = "0.8.11"
@@ -50,10 +51,10 @@ dependencies {
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation("org.springframework.cloud:spring-cloud-starter-gateway")
     implementation('org.springframework.boot:spring-boot-actuator')
-    implementation('commons-io:commons-io:2.16.0')
+    implementation('commons-io:commons-io:2.18.0')
 
-    implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
-    implementation 'com.nimbusds:oauth2-oidc-sdk:11.10.1'
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.47'
+    implementation 'com.nimbusds:oauth2-oidc-sdk:11.20.1'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
@@ -97,4 +98,10 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
+}
+
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+licenseReport {
+    filters = [new LicenseBundleNormalizer(bundlePath: "$projectDir/license-normalizer-bundle.json")]
+    allowedLicensesFile = new File("$projectDir/allowed-licenses.json")
 }

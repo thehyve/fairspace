@@ -11,6 +11,10 @@ const styles = theme => ({
         padding: '10px 20px 10px 20px',
         height: '100%'
     },
+    domains: {
+        overflowX: 'auto',
+        minWidth: 190
+    },
     link: {
         color: theme.palette.primary.light,
         textDecoration: 'underline'

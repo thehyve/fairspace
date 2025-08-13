@@ -7,7 +7,7 @@ import styles from './DomainInfo.styles';
 const DomainInfo = props => {
     const {domainName, domainLink, domainIcon, classes} = props;
     return (
-        <div className={classes.outerMargin}>
+        <div className={classes.outerDiv}>
             <Link href={domainLink} className={classes.link}>
                 <Paper className={classes.paper}>
                     <Typography variant="h5" className={classes.domainText}>

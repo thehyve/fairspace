@@ -1,16 +1,17 @@
 const styles = theme => ({
+    outerDiv: {
+        padding: 10
+    },
     paper: {
-        width: '180px',
-        height: '100px',
+        marginRight: 1,
+        height: 100,
+        minWidth: 90,
         border: 'none',
         background: theme.palette.primary.main,
         '&:hover': {
             backgroundColor: theme.palette.primary.light
         },
         textAlign: 'center'
-    },
-    outerMargin: {
-        margin: 10
     },
     icon: {
         marginLeft: 10,

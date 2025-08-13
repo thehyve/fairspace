@@ -28,6 +28,15 @@ module.exports = {
     },
     eslint: {
         mode: 'file'
+    },
+    jest: {
+        configure: {
+            setupFiles: ['<rootDir>/src/textEncoderPolyfill.js'],
+            moduleNameMapper: {
+                'cheerio/lib/utils': '<rootDir>/src/metadata/common/__mocks__/cheerio-lib-utils.mock.js',
+                ...require('./package.json').jest.moduleNameMapper
+            }
+        }
     }
 };
 

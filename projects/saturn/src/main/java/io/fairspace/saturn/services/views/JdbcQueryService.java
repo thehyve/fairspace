@@ -1,8 +1,5 @@
 package io.fairspace.saturn.services.views;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,12 +12,15 @@ import io.milton.resource.CollectionResource;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import io.fairspace.saturn.config.Config;
-import io.fairspace.saturn.config.ViewsConfig;
+import io.fairspace.saturn.controller.dto.CountDto;
+import io.fairspace.saturn.controller.dto.ValueDto;
+import io.fairspace.saturn.controller.dto.ViewPageDto;
+import io.fairspace.saturn.controller.dto.request.CountRequest;
+import io.fairspace.saturn.controller.dto.request.ViewRequest;
 import io.fairspace.saturn.rdf.transactions.Transactions;
 import io.fairspace.saturn.rdf.transactions.TxnIndexDatasetGraph;
-import io.fairspace.saturn.services.search.FileSearchRequest;
-import io.fairspace.saturn.services.search.SearchResultDTO;
+
+import static io.fairspace.saturn.webdav.PathUtils.getCollectionNameByUri;
 
 import static java.lang.Integer.min;
 
@@ -33,33 +33,16 @@ import static java.lang.Integer.min;
  */
 @Log4j2
 public class JdbcQueryService implements QueryService {
+
     private final Transactions transactions;
     private final CollectionResource rootSubject;
-    private final Config.Search searchConfig;
-    private final ViewsConfig viewsConfig;
-    private final ViewStoreClientFactory viewStoreClientFactory;
+    private final ViewStoreReader viewStoreReader;
 
     public JdbcQueryService(
-            Config.Search searchConfig,
-            ViewsConfig viewsConfig,
-            ViewStoreClientFactory viewStoreClientFactory,
-            Transactions transactions,
-            CollectionResource rootSubject) {
-        this.searchConfig = searchConfig;
-        this.viewStoreClientFactory = viewStoreClientFactory;
+            Transactions transactions, CollectionResource rootSubject, ViewStoreReader viewStoreReader) {
         this.transactions = transactions;
         this.rootSubject = rootSubject;
-        this.viewsConfig = viewsConfig;
-    }
-
-    public String getCollectionName(String uri) {
-        var rootLocation = rootSubject.getUniqueId() + "/";
-        var location = uri.substring(rootLocation.length());
-        return URLDecoder.decode(location.split("/")[0], StandardCharsets.UTF_8);
-    }
-
-    ViewStoreReader getViewStoreReader() throws SQLException {
-        return new ViewStoreReader(searchConfig, viewsConfig, viewStoreClientFactory);
+        this.viewStoreReader = viewStoreReader;
     }
 
     @SneakyThrows
@@ -71,14 +54,14 @@ public class JdbcQueryService implements QueryService {
             return;
         }
         var collections = transactions.calculateRead(m -> rootSubject.getChildren().stream()
-                .map(collection -> (Object) getCollectionName(collection.getUniqueId()))
+                .map(collection -> (Object) getCollectionNameByUri(rootSubject.getUniqueId(), collection.getUniqueId()))
                 .collect(Collectors.toList()));
         if (filters.stream().anyMatch(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))) {
             // Update existing filters in place
             filters.stream()
                     .filter(filter -> filter.getField().equalsIgnoreCase("Resource_collection"))
                     .forEach(filter -> filter.setValues(filter.values.stream()
-                            .map(value -> getCollectionName(value.toString()))
+                            .map(value -> getCollectionNameByUri(rootSubject.getUniqueId(), value.toString()))
                             .filter(collections::contains)
                             .collect(Collectors.toList())));
             return;
@@ -91,7 +74,7 @@ public class JdbcQueryService implements QueryService {
     }
 
     @SneakyThrows
-    public ViewPageDTO retrieveViewPage(ViewRequest request) {
+    public ViewPageDto retrieveViewPage(ViewRequest request) {
         int page = (request.getPage() != null && request.getPage() >= 1) ? request.getPage() : 1;
         int size = (request.getSize() != null && request.getSize() >= 1) ? request.getSize() : 20;
         var filters = new ArrayList<ViewFilter>();
@@ -99,10 +82,10 @@ public class JdbcQueryService implements QueryService {
             filters.addAll(request.getFilters());
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try (var viewStoreReader = getViewStoreReader()) {
-            List<Map<String, Set<ValueDTO>>> rows = viewStoreReader.retrieveRows(
+        try {
+            List<Map<String, Set<ValueDto>>> rows = viewStoreReader.retrieveRows(
                     request.getView(), filters, (page - 1) * size, size + 1, request.includeJoinedViews());
-            var pageBuilder = ViewPageDTO.builder()
+            var pageBuilder = ViewPageDto.builder()
                     .rows(rows.subList(0, min(size, rows.size())))
                     .hasNext(rows.size() > size);
             if (request.includeCounts()) {
@@ -111,7 +94,7 @@ public class JdbcQueryService implements QueryService {
             }
             return pageBuilder.build();
         } catch (SQLTimeoutException e) {
-            return ViewPageDTO.builder()
+            return ViewPageDto.builder()
                     .rows(Collections.emptyList())
                     .timeout(true)
                     .build();
@@ -119,27 +102,16 @@ public class JdbcQueryService implements QueryService {
     }
 
     @SneakyThrows
-    public CountDTO count(CountRequest request) {
+    public CountDto count(CountRequest request) {
         var filters = request.getFilters();
         if (filters == null) {
             filters = new ArrayList<>();
         }
         applyCollectionsFilterIfRequired(request.getView(), filters);
-        try (var viewStoreReader = getViewStoreReader()) {
-            return new CountDTO(viewStoreReader.countRows(request.getView(), filters), false);
+        try {
+            return new CountDto(viewStoreReader.countRows(request.getView(), filters), false);
         } catch (SQLTimeoutException e) {
-            return new CountDTO(0, true);
-        }
-    }
-
-    @SneakyThrows
-    public List<SearchResultDTO> searchFiles(FileSearchRequest request) {
-        var collectionsForUser = transactions.calculateRead(m -> rootSubject.getChildren().stream()
-                .map(collection -> getCollectionName(collection.getUniqueId()))
-                .collect(Collectors.toList()));
-
-        try (var viewStoreReader = getViewStoreReader()) {
-            return viewStoreReader.searchFiles(request, collectionsForUser);
+            return new CountDto(0, true);
         }
     }
 }

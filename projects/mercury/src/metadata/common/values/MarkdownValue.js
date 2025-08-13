@@ -14,7 +14,11 @@ const MarkdownValue = props => {
                 <BaseInputValue
                     {...props}
                     autoFocus={showEdit && !!props.entry.value}
-                    onBlur={() => setShowEdit(false)}
+                    onBlur={() => {
+                        if (props.entry.value.trim() !== '') {
+                            setShowEdit(false);
+                        }
+                    }}
                     type="text"
                 />
             ) : (
