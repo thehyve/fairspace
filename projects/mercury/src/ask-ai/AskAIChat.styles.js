@@ -43,7 +43,7 @@ const styles = theme => ({
         boxShadow: theme.shadows[1]
     },
     chatResponseSection: {
-        padding: '30px 60px',
+        padding: '30px 40px',
         width: '100%',
         fontSize: '16px',
         lineHeight: '1.5',

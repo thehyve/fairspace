@@ -16,7 +16,7 @@ const questionQueryAnswer = {
       "filters": [
         {
           "field": "Study_indicationPreferredTerm",
-          "values": ["https://example.com/ontology#indication_preferred_term_0354"]
+          "values": ["https://fairspace.nl/demo#indication_preferred_term_0354"]
         }
       ],
       "page": 1,
@@ -37,10 +37,10 @@ const questionQueryAnswer = {
         answer:
             'The query found that there are 2 studies related to indications of an abdominal injury \n' +
             'in the knowledge graph. It retrieved the following studies and labels: \n' +
-            ' - Study: https://fairspace.example/study/a4ab140d-4e0e-4fd5-bc4f-4355aa4ee701,\n' +
-            '   Label: 84f8d787-3974-418c-b12a-55c6367c1e34 \n' +
-            ' - Study: https://fairspace.example/study/431178ec-1b75-4a29-861d-e248bcc9c47c,\n' +
-            '   Label: 40659394-a12f-4407-97a3-fd68da19a1c3' +
+            ' - Study: https://fairspace.nl/demo#S001,\n' +
+            '   Label: S001 \n' +
+            ' - Study: https://fairspace.nl/demo#S002,\n' +
+            '   Label: S002' +
             '\n\nThe query to ClinicalTrials.gov API found that there are 19706 studies \n' +
             'in ClinicalTrials.gov database that fit the criteria.',
         ctAnswer: `{
@@ -101,6 +101,86 @@ const questionQueryAnswer = {
         ctQuery:
             'curl -X GET "https://clinicaltrials.gov/api/v2/studies?format=json&query.cond=%28intestine+OR+stomach+OR+liver%29&filter.overallStatus=COMPLETED&postFilter.overallStatus=COMPLETED&countTotal=true" \n -H "accept: application/json" \n'
     },
+    'Show me all female, Asian patients from any Phase II study related to Asthma who had a treatment score at least 75 and for whom DICOM imaging files are available.':
+        {
+            query: `
+    {
+      "view": "Patient",
+      "filters": [
+        {
+          "field": "Patient_isOfGender",
+          "values": [
+            "https://fairspace.nl/demo#gender_female"
+          ]
+        },
+        {
+          "field": "Patient_isOfRace",
+          "values": [
+            "https://fairspace.nl/demo#race_Asian_American"
+          ]
+        },
+        {
+          "field": "Study_hasClinicalStudyPhase",
+          "values": [
+            "https://fairspace.nl/demo#clinical_study_phase_0002"
+          ]
+        },
+        {
+          "field": "Study_hasIndicationVerbatimTerm",
+          "values": [
+            "https://fairspace.nl/demo#indication_verbatim_term_1765"
+          ]
+        },
+        {
+          "field": "Treatment_score", 
+          "min": 75, 
+          "max": null, 
+          "numericValue": true
+        },
+        {
+          "field": "DataFile_hasFileType",
+          "values": [
+            "https://fairspace.nl/demo#file_type_0001"
+          ]
+        }
+      ],
+      "page": 1,
+      "size": 1
+    }
+    `,
+            sparqlQuery: `
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX demo: <https://fairspace.nl/demo#>
+    
+    SELECT DISTINCT ?patient ?patientLabel
+    WHERE {
+      ?patient a demo:Patient ;
+               rdfs:label ?patientLabel ;
+               demo:isOfGender demo:gender_female ;
+               demo:isOfRace demo:race_Asian_American .
+    
+      ?patient demo:patientLinkedToStudy ?study .
+      ?study demo:hasClinicalStudyPhase demo:clinical_study_phase_0002 ;
+             demo:hasIndicationVerbatimTerm demo:indication_verbatim_term_1765 .
+    
+      ?treatment demo:treatmentLinkedToPatient ?patient ;
+                 demo:score ?score .
+      FILTER(?score >= 75)
+    
+      ?dataFile demo:dataFileLinkedToPatient ?patient ;
+                demo:hasFileType demo:file_type_0001 .
+    }
+    `,
+            answer:
+                'The query found that there are 2 female, Asian patients related to Phase II Asthma studies \n' +
+                ' with a treatment score of at least 75 and available DICOM imaging files in the knowledge graph. \n' +
+                'It retrieved the following patients and labels: \n' +
+                ' - Patient: https://fairspace.nl/demo#P020,\n' +
+                '   Label: P020 \n' +
+                ' - Patient: https://fairspace.nl/demo#P089,\n' +
+                '   Label: P089'
+        },
     'What is the most common imaging modality that is found in the uploaded studies?': {
         query: null,
         sparqlQuery: `
